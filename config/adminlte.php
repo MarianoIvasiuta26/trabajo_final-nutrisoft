@@ -253,7 +253,7 @@ return [
     */
 
     'use_route_url' => false,
-    'dashboard_url' => 'home',
+    'dashboard_url' => 'dashboard',
     'logout_url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
@@ -318,6 +318,18 @@ return [
             'label'       => 4,
             'label_color' => 'success',
         ],*/
+        ['header' => 'GESTIÓN DE USUARIOS'],
+        [
+            'text' => 'Lista de usuarios',
+            'route'  => 'gestion-usuarios.index',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+        [
+            'text' => 'Nuevo usuario',
+            'route'  => 'gestion-usuarios.create',
+            'icon' => 'fas fa-fw fa-user',
+        ],
+
         ['header' => 'account_settings'],
         [
             'text' => 'profile',
