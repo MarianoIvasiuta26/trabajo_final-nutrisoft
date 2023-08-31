@@ -26,7 +26,7 @@ class GestionUsuariosController extends Controller
      */
     public function create()
     {
-        return "Nuevo usuario";
+        return view('admin.gestion-usuarios.create');
     }
 
     /**
@@ -37,7 +37,16 @@ class GestionUsuariosController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $usuarios = new User();
+        $usuarios->name = $request->get('name');
+        $usuarios->email = $request->get('email');
+        $usuarios->apellido = $request->get('apellido');
+        $usuarios->dni = $request->get('dni');
+        $usuarios->telefono = $request->get('telefono');
+
+        $usuarios->save();
+
+        return redirect('/gestion-usuarios')->with('success', 'Usuario guardado correctamente');
     }
 
     /**

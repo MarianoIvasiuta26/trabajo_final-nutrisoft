@@ -8,7 +8,7 @@
 
 @section('content')
 
-    <a class="btn btn-primary" href="#">Agregar nuevo usuario</a>
+    <a class="btn btn-primary" href="gestion-usuarios/create">Agregar nuevo usuario</a>
 
     <table class="table table-dark table-striped mt-4">
         <thead>
