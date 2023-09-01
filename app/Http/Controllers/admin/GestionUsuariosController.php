@@ -68,7 +68,8 @@ class GestionUsuariosController extends Controller
      */
     public function edit($id)
     {
-        //
+        $usuario = User::find($id);
+        return view('admin.gestionar.edit')->with('usuario', $usuario);
     }
 
     /**

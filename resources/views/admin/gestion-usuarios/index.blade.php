@@ -34,7 +34,7 @@
                     <td>{{$usuario->email}}</td>
                     <td>{{$usuario->telefono}}</td>
                     <td>
-                        <a class="btn btn-info" href="#">Editar</a>
+                        <a class="btn btn-info" href="gestion-usuario/{{$usuario->id}}/edit">Editar</a>
                         <button class="btn btn-danger">Borrar</button>
                     </td>
                 </tr>
