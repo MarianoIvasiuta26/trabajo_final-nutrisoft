@@ -8,15 +8,21 @@
 
         <form method="POST" action="{{ route('register') }}" class="w-full max-w-lg mx-auto">
             @csrf
-
-            <div class="mt-2 flex items-center space-x-4">
-                <div class="w-1/2">
-                    <x-label for="dni" value="{{ __('DNI') }}" />
-                    <x-input id="dni" class="block mt-1 w-full" type="text" name="dni" :value="old('dni')" required />
-                </div>
-                <div class="w-1/2">
-                    <x-label for="telefono" value="{{ __('Teléfono') }}" />
-                    <x-input id="telefono" class="block mt-1 w-full" type="text" name="telefono" :value="old('telefono')" required autocomplete="telefono" />
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <x-label for="tipo_usuario" value="{{ __('Tipo de usuario:') }}" />
+                    <div class="flex items-center space-x-2">
+                        <x-input id="tipo_usuario_admin" type="radio" class="form-radio" name="tipo_usuario" value="Administrador" required/>
+                        <x-label for="tipo_usuario_admin" value="{{ __('Administrador') }}" />
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <x-input id="tipo_usuario_nutri" type="radio" class="form-radio" name="tipo_usuario" value="Nutricionista" required/>
+                        <x-label for="tipo_usuario_nutri" value="{{ __('Nutricionista') }}" />
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <x-input id="tipo_usuario_paciente" type="radio" class="form-radio" name="tipo_usuario" value="Paciente" required checked />
+                        <x-label for="tipo_usuario_paciente" value="{{ __('Paciente') }}" />
+                    </div>
                 </div>
             </div>
 

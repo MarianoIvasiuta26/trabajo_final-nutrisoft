@@ -10,7 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     use HasApiTokens;
     use HasFactory;
@@ -27,9 +27,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'dni',
         'apellido',
-        'telefono',
+        'tipo_usuario',
     ];
 
     /**
@@ -61,4 +60,17 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function administrador(){
+        return $this->hasOne('App\Models\Administrador');
+    }
+
+    public function nutricionista(){
+        return $this->hasOne('App\Models\Nutricionista');
+    }
+
+    public function paciente(){
+        return $this->hasOne('App\Models\Paciente');
+    }
+
 }
