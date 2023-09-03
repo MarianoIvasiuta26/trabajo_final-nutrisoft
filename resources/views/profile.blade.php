@@ -55,8 +55,13 @@
 
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
+     <!-- Fonts -->
+     <link rel="preconnect" href="https://fonts.bunny.net">
+     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
 @stop
 
 @section('js')
     <script> console.log('Hi!'); </script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 @stop

@@ -318,6 +318,12 @@ return [
             'label'       => 4,
             'label_color' => 'success',
         ],*/
+        [
+            'text' => 'Página principal',
+            'url'  => 'dashboard',
+            'icon' => 'fas fa-home fa-fw',
+        ],
+
         ['header' => 'GESTIÓN DE USUARIOS'],
         [
             'text' => 'Usuarios',
@@ -327,7 +333,13 @@ return [
         [
             'text' => 'Nuevo usuario',
             'route'  => 'gestion-usuarios.create',
-            'icon' => 'fas fa-fw fa-user',
+            'icon' => 'fas fa-fw fa-user-plus',
+        ],
+
+        [
+            'text' => 'Roles y permisos',
+            'route'  => 'gestion-usuarios.create',
+            'icon' => 'fas fa-lock fa-fw',
         ],
 
         ['header' => 'account_settings'],
@@ -335,7 +347,7 @@ return [
             'text' => 'profile',
             'url'  => 'profile',
             'icon' => 'fas fa-fw fa-user',
-        ],
+        ],/*
         [
             'text' => 'change_password',
             'url'  => 'admin/settings',
@@ -394,7 +406,7 @@ return [
             'text'       => 'information',
             'icon_color' => 'cyan',
             'url'        => '#',
-        ],
+        ],*/
     ],
 
     /*

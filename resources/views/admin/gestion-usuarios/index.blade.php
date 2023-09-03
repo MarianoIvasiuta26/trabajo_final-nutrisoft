@@ -31,7 +31,7 @@
                     <td>{{$usuario->email}}</td>
                     <td>
                         <a class="btn btn-info" href="{{ route('gestion-usuarios.edit', $usuario->id) }}">Editar</a>
-                        <button class="btn btn-danger">Borrar</button>
+                        <a class="btn btn-danger" href="{{route('gestion-usuarios.destroy', $usuario->id)}}">Borrar</a>
                     </td>
                 </tr>
             @endforeach

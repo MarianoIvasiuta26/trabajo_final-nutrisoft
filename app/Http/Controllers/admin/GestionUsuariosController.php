@@ -103,7 +103,30 @@ class GestionUsuariosController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:20'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $id], // Asegura que el email sea único, excluyendo el usuario actual.
+            'apellido' => ['required', 'string', 'max:20'],
+            'tipo_usuario' => ['required', 'string', 'max:15'],
+        ])->validate();
+
+        // Encuentra el usuario que deseas actualizar
+        $user = User::find($id);
+
+        if ($user) {
+            // Actualiza los campos del usuario
+            $user->name = $request->input('name');
+            $user->email = $request->input('email');
+            $user->apellido = $request->input('apellido');
+            $user->tipo_usuario = $request->input('tipo_usuario');
+
+            // Guarda los cambios en la base de datos
+            $user->save();
+
+            return redirect()->route('gestion-usuarios.index')->with('success', 'Usuario actualizado correctamente');
+        } else {
+            return redirect()->route('gestion-usuarios.index')->with('error', 'Usuario no encontrado');
+        }
     }
 
     /**
@@ -114,6 +137,16 @@ class GestionUsuariosController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $usuario = User::find($id);
+
+        if (!$usuario) {
+            return redirect()->route('gestion-usuarios.index')->with('error', 'Usuario no encontrado');
+        }
+
+        // Realiza la eliminación del usuario
+        $usuario->delete();
+
+        // Redirecciona de nuevo a la lista de usuarios con un mensaje de éxito
+        return redirect()->route('gestion-usuarios.index')->with('success', 'Usuario eliminado correctamente');
     }
 }

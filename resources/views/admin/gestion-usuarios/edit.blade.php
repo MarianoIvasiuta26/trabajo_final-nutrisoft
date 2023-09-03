@@ -7,7 +7,7 @@
 @stop
 
 @section('content')
-    <form action="gestion-usuarios/{{$usuario->id}}" method="POST">
+    <form action="{{route('gestion-usuarios.update', $usuario->id)}}" method="POST">
         @csrf
         @method('PUT')
         <div class="mb-3">
@@ -21,9 +21,9 @@
         <div class="mb-3">
             <label for="tipo_usuario" class="form-label">Rol</label>
             <select name="tipo_usuario" id="tipo_usuario" class="form-control" tabindex="6">
-                <option value="administrador" @if ($usuario->tipo_usuario === 'Administrador') selected @endif>Administrador</option>
-                <option value="nutricionista" @if ($usuario->tipo_usuario === 'Nutricionista') selected @endif>Nutricionista</option>
-                <option value="paciente" @if ($usuario->tipo_usuario === 'Paciente') selected @endif>Paciente</option>
+                <option value="Administrador" @if ($usuario->tipo_usuario === 'Administrador') selected @endif>Administrador</option>
+                <option value="Nutricionista" @if ($usuario->tipo_usuario === 'Nutricionista') selected @endif>Nutricionista</option>
+                <option value="Paciente" @if ($usuario->tipo_usuario === 'Paciente') selected @endif>Paciente</option>
             </select>
         </div>
 
