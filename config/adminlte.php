@@ -320,9 +320,9 @@ return [
         ],*/
         ['header' => 'GESTIÓN DE USUARIOS'],
         [
-            'text' => 'Lista de usuarios',
+            'text' => 'Usuarios',
             'route'  => 'gestion-usuarios.index',
-            'icon' => 'fas fa-fw fa-user',
+            'icon' => 'fas fa-users fa-fw',
         ],
         [
             'text' => 'Nuevo usuario',

@@ -8,6 +8,7 @@
 
         <form method="POST" action="{{ route('register') }}" class="w-full max-w-lg mx-auto">
             @csrf
+            {{--
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-2">
                     <x-label for="tipo_usuario" value="{{ __('Tipo de usuario:') }}" />
@@ -24,7 +25,7 @@
                         <x-label for="tipo_usuario_paciente" value="{{ __('Paciente') }}" />
                     </div>
                 </div>
-            </div>
+            </div>--}}
 
             <div class="mt-4">
                 <x-label for="name" value="{{ __('Name') }}" />

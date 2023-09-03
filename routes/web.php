@@ -27,7 +27,7 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
+    
     Route::get('profile',[UserController::class,'show'])->name('profile');
     Route::resource('gestion-usuarios', GestionUsuariosController::class)->names('gestion-usuarios');
 });

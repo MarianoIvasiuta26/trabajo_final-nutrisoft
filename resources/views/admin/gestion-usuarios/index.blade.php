@@ -14,12 +14,10 @@
         <thead>
             <tr>
                 <th scope="col">ID</th>
-                <th scope="col">DNI</th>
                 <th scope="col">Nombre</th>
                 <th scope="col">Apellido</th>
                 <th scope="col">Rol</th>
                 <th scope="col">Email</th>
-                <th scope="col">Teléfono</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
@@ -27,14 +25,12 @@
             @foreach ($usuarios as $usuario)
                 <tr>
                     <td>{{$usuario->id}}</td>
-                    <td>{{$usuario->dni}}</td>
                     <td>{{$usuario->name}}</td>
                     <td>{{$usuario->apellido}}</td>
                     <td>{{$usuario->tipo_usuario}}</td>
                     <td>{{$usuario->email}}</td>
-                    <td>{{$usuario->telefono}}</td>
                     <td>
-                        <a class="btn btn-info" href="gestion-usuario/{{$usuario->id}}/edit">Editar</a>
+                        <a class="btn btn-info" href="{{ route('gestion-usuarios.edit', $usuario->id) }}">Editar</a>
                         <button class="btn btn-danger">Borrar</button>
                     </td>
                 </tr>

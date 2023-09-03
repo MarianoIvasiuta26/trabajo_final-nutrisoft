@@ -7,12 +7,9 @@
 @stop
 
 @section('content')
-    <form action="gestion-usuarios" method="POST">
+        <form action="{{ route('gestion-usuarios.store') }}" method="POST">
         @csrf
-        <div class="mb-3">
-            <label for="dni" class="form-label">DNI</label>
-            <input type="text" name="dni" id="dni" class="form-control" tabindex="1">
-        </div>
+
         <div class="mb-3">
             <label for="name" class="form-label">Nombre</label>
             <input type="text" name="name" id="name" class="form-control" tabindex="2">
@@ -24,21 +21,17 @@
         <div class="mb-3">
             <label for="tipo_usuario" class="form-label">Rol</label>
             <select name="tipo_usuario" id="tipo_usuario" class="form-control" tabindex="4">
-                <option value="administrador">Administrador</option>
-                <option value="nutricionista">Nutricionista</option>
-                <option value="paciente">Paciente</option>
+                <option value="Administrador">Administrador</option>
+                <option value="Nutricionista">Nutricionista</option>
+                <option value="Paciente">Paciente</option>
             </select>
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" name="email" id="email" class="form-control" tabindex="5">
         </div>
-        <div class="mb-3">
-            <label for="telefono">Teléfono</label>
-            <input type="text" name="telefono" id="telefono" class="form-control" tabindex="6">
-        </div>
 
-        <a href="gestion-usuarios" class="btn btn-secondary" tabindex="7">Cancelar</a>
+        <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-secondary" tabindex="7">Cancelar</a>
         <button type="submit" class="btn btn-primary">Guardar</button>
     </form>
 @stop

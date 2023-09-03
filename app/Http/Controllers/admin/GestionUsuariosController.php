@@ -3,8 +3,14 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Administrador;
+use App\Models\Nutricionista;
+use App\Models\Paciente;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Laravel\Jetstream\Jetstream;
 
 class GestionUsuariosController extends Controller
 {
@@ -37,16 +43,32 @@ class GestionUsuariosController extends Controller
      */
     public function store(Request $request)
     {
-        $usuarios = new User();
-        $usuarios->name = $request->get('name');
-        $usuarios->email = $request->get('email');
-        $usuarios->apellido = $request->get('apellido');
-        $usuarios->dni = $request->get('dni');
-        $usuarios->telefono = $request->get('telefono');
 
-        $usuarios->save();
+        Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:20'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'apellido' => ['required', 'string', 'max:20'],
+            'tipo_usuario' => ['required', 'string', 'max:15'],
+            'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
+        ])->validate();
 
-        return redirect('/gestion-usuarios')->with('success', 'Usuario guardado correctamente');
+        $user = User::create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'apellido' => $request['apellido'],
+            'password' => Hash::make('12345678'),
+            'tipo_usuario' => $request['tipo_usuario'],
+        ]);
+
+        if ($request['tipo_usuario'] === 'Paciente') {
+            Paciente::create(['user_id' => $user->id]);
+        } elseif ($request['tipo_usuario'] === 'Administrador') {
+            Administrador::create(['user_id' => $user->id]);
+        } elseif ($request['tipo_usuario'] === 'Nutricionista') {
+            Nutricionista::create(['user_id' => $user->id]);
+        }
+
+        return redirect()->route('gestion-usuarios.index')->with('success', 'Usuario guardado correctamente');
     }
 
     /**
@@ -69,7 +91,7 @@ class GestionUsuariosController extends Controller
     public function edit($id)
     {
         $usuario = User::find($id);
-        return view('admin.gestionar.edit')->with('usuario', $usuario);
+        return view('admin.gestion-usuarios.edit')->with('usuario', $usuario);
     }
 
     /**
