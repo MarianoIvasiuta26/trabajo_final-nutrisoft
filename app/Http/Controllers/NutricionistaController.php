@@ -59,7 +59,7 @@ class NutricionistaController extends Controller
             $nutricionista->diasAtencion()->createMany($dias);
         }
 
-        return redirect()->route('gestion-atencion.consulta')->with('success', 'Horarios de consulta y días de atención actualizados correctamente');
+        return redirect()->route('gestion-atencion.index')->with('success', 'Horarios de consulta y días de atención actualizados correctamente');
     }
 
 
