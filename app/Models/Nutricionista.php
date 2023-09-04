@@ -11,7 +11,6 @@ class Nutricionista extends Model
 
     protected $fillable = [
         'user_id',
-        'dias_atencion',
         'hora_inicio_maniana',
         'hora_fin_maniana',
         'hora_inicio_tarde',
@@ -21,5 +20,9 @@ class Nutricionista extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User');
+    }
+
+    public function diasAtencion(){
+        return $this->hasMany('App\Models\DiasAtencion');
     }
 }

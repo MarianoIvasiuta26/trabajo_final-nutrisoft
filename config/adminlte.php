@@ -324,6 +324,12 @@ return [
             'icon' => 'fas fa-home fa-fw',
         ],
 
+        [
+            'text' => 'Turnos',
+            'route'  => 'gestion-atencion.index',
+            'icon' => 'fas fa-lock fa-fw',
+        ],
+
         ['header' => 'GESTIÓN DE USUARIOS'],
         [
             'text' => 'Usuarios',
