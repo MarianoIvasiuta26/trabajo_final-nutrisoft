@@ -3,6 +3,7 @@
 use App\Http\Controllers\admin\GestionUsuariosController;
 use App\Http\Controllers\nutricionista\HorasDiasAtencionController;
 use App\Http\Controllers\NutricionistaController;
+use App\Http\Controllers\paciente\HistoriaClinicaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,7 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
+    //Admin
     Route::get('profile',[UserController::class,'show'])->name('profile');
     Route::resource('gestion-usuarios', GestionUsuariosController::class)->names('gestion-usuarios');
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
@@ -39,5 +41,9 @@ Route::middleware([
     Route::get('gestion-atencion/consulta', [NutricionistaController::class, 'consultaForm'])->name('gestion-atencion.consultaForm');
     Route::post('gestion-atencion/guardar', [NutricionistaController::class, 'guardarHorarios'])->name('gestion-atencion.guardarHorarios');
     Route::delete('gestion-atencion/{id}', [NutricionistaController::class, 'destroy'])->name('gestion-atencion.destroy');
+
+    //Paciente
+    Route::resource('historia-clinica', HistoriaClinicaController::class)->names('historia-clinica');
+    Route::get('/complete-history', [HistoriaClinicaController::class, 'index'])->name('complete-history');
 
 });

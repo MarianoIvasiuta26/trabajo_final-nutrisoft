@@ -5,6 +5,7 @@ namespace App\Actions\Fortify;
 use App\Models\Administrador;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
+use App\Models\Paciente\HistoriaClinica;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -27,24 +28,26 @@ class CreateNewUser implements CreatesNewUsers
             'name' => ['required', 'string', 'max:20'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'apellido' => ['required', 'string', 'max:20'],
-            'tipo_usuario' => ['required', 'string', 'max:15'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
+
+        $tipoUsuario = $input['tipo_usuario'] ?? 'Paciente';
 
         $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'apellido' => $input['apellido'],
             'password' => Hash::make($input['password']),
-            'tipo_usuario' => $input['tipo_usuario'],
+            'tipo_usuario' => $tipoUsuario,
         ]);
 
-        if ($input['tipo_usuario'] === 'Paciente') {
+        if ($tipoUsuario === 'Paciente') {
             Paciente::create(['user_id' => $user->id]);
-        } elseif ($input['tipo_usuario'] === 'Administrador') {
+            //HistoriaClinica::create(['paciente_id' => $paciente->id]);
+        } elseif ($tipoUsuario === 'Administrador') {
             Administrador::create(['user_id' => $user->id]);
-        } elseif ($input['tipo_usuario'] === 'Nutricionista') {
+        } elseif ($tipoUsuario === 'Nutricionista') {
             Nutricionista::create(['user_id' => $user->id]);
         }
 

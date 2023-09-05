@@ -19,4 +19,9 @@ class Paciente extends Model
     {
         return $this->belongsTo('App\Models\User');
     }
+
+    public function historiaClinica()
+    {
+        return $this->hasOne('App\Models\Paciente\HistoriaClinica');
+    }
 }
