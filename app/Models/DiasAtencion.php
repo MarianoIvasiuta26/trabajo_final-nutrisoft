@@ -10,11 +10,10 @@ class DiasAtencion extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nutricionista_id',
         'dia',
     ];
 
-    public function nutricionista(){
-        return $this->belongsTo('App\Models\Nutricionista');
+    public function horariosAtencion(){
+        return $this->hasMany('App\Models\HorariosAtencion');
     }
 }

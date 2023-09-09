@@ -5,18 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Nutricionista extends Model
+class HorasAtencion extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
+        'hora_inicio',
+        'hora_fin',
+        'etiqueta',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo('App\Models\User');
-    }
 
     public function horariosAtencion(){
         return $this->hasMany('App\Models\HorariosAtencion');

@@ -7,23 +7,24 @@
 @stop
 
 @section('content')
-        <form action="{{ route('gestion-atencion.guardarHorarios') }}" method="POST">
-            @csrf
+    <form action="{{ route('gestion-atencion.store') }}" method="POST">
+        @csrf
 
-            <!-- Días y horarios generales -->
-            <div class="container mt-4">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card card-dark">
-                            <div class="card-header">
-                                <h5>Días y horarios de Atención</h5>
-                            </div>
+        <!-- Días y horarios generales -->
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-dark">
+                        <div class="card-header">
+                            <h5>Días y horarios de Atención</h5>
+                        </div>
 
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">Seleccione los días que realiza consultas:</label>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Seleccione los días que realiza consultas:</label>
+
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Lunes" id="lunes">
                                                 <label class="form-check-label" for="lunes">Lunes</label>
@@ -33,7 +34,7 @@
                                                 <label class="form-check-label" for="martes">Martes</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Miércoles" id="miercoles">
+                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Miercoles" id="miercoles">
                                                 <label class="form-check-label" for="miercoles">Miércoles</label>
                                             </div>
                                             <div class="form-check">
@@ -49,65 +50,65 @@
                                                 <label class="form-check-label" for="sabado">Sábado</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Viernes" id="viernes">
+                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Domingo" id="domingo">
                                                 <label class="form-check-label" for="domingo">Domingo</label>
                                             </div>
 
-                                        </div>
                                     </div>
+                                </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label">Seleccione las horas que realiza consultas:</label>
-                                        <div class="row mb-3">
-                                            <div class="col">
-                                                <label for="hora_inicio" class="form-label">Hora de Apertura</label>
-                                                <input type="time" name="hora_inicio" id="hora_inicio" class="form-control">
-                                            </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Seleccione las horas que realiza consultas:</label>
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            <label for="hora_inicio" class="form-label">Hora de Apertura</label>
+                                            <input type="time" name="hora_inicio" id="hora_inicio" class="form-control">
+                                        </div>
 
-                                            <div class="col">
-                                                <div class="mb-3">
-                                                    <label for="hora_fin" class="form-label">Hora de Cierre</label>
-                                                    <input type="time" name="hora_fin" id="hora_fin" class="form-control">
-                                                </div>
-                                            </div>
-
+                                        <div class="col">
                                             <div class="mb-3">
-                                                <label for="etiqueta_hora">Seleccione la etiqueta del horario</label><br>
-                                                <select class="selectpicker" data-style="btn-primary" title="Etiqueta del Horario...">
-                                                    <option value="Maniana">Consultas de Mañana</option>
-                                                    <option value="Tarde">Consultas de Tarde</option>
-                                                </select>
+                                                <label for="hora_fin" class="form-label">Hora de Cierre</label>
+                                                <input type="time" name="hora_fin" id="hora_fin" class="form-control">
                                             </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="etiqueta">Seleccione la etiqueta del horario</label><br>
+                                            <select name="etiqueta" class="selectpicker" data-style="btn-primary" title="Etiqueta del Horario...">
+                                                <option value="Maniana">Consultas de Mañana</option>
+                                                <option value="Tarde">Consultas de Tarde</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <div class="float-right">
-                                        <a href="{{ route('gestion-atencion.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
-                                        <button type="submit" class="btn btn-success">Guardar</button>
-                                    </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="float-right">
+                                    <a href="{{ route('gestion-atencion.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                                    <button type="submit" class="btn btn-success">Guardar</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Días y horarios de fechas específicas -->
-            <div class="container mt-4">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card card-dark">
-                            <div class="card-header">
-                                <h5>Días y horarios de Atención - Fechas Específicas</h5>
-                            </div>
-
-                            <div class="card-body">
-                                <input type="text" name="datetimes" />
-                            </div>
+        <!-- Días y horarios de fechas específicas -->
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-dark">
+                        <div class="card-header">
+                            <h5>Días y horarios de Atención - Fechas Específicas</h5>
                         </div>
-                </div>
+
+                        <div class="card-body">
+                            <input type="text" name="datetimes" />
+                        </div>
+                    </div>
             </div>
+        </div>
 
     </form>
 @stop

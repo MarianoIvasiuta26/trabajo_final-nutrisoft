@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\admin\GestionUsuariosController;
+use App\Http\Controllers\DiaController;
+use App\Http\Controllers\HoraController;
+use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\nutricionista\HorasDiasAtencionController;
 use App\Http\Controllers\NutricionistaController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
@@ -37,10 +40,21 @@ Route::middleware([
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 
     //Nutricionista
-    Route::get('gestion-atencion', [NutricionistaController::class, 'index'])->name('gestion-atencion.index');
+
+/*
+    Route::resources([
+        'nutricionista' => NutricionistaController::class,
+        'dia' => DiaController::class,
+        'hora' => HoraController::class,
+        'horario' => HorarioController::class,
+    ]);
+*/
+
+    Route::get('gestion-atencion', [HorasDiasAtencionController::class, 'index'])->name('gestion-atencion.index');
     Route::get('gestion-atencion/consulta', [NutricionistaController::class, 'consultaForm'])->name('gestion-atencion.consultaForm');
-    Route::post('gestion-atencion/guardar', [NutricionistaController::class, 'guardarHorarios'])->name('gestion-atencion.guardarHorarios');
-    Route::delete('gestion-atencion/{id}', [NutricionistaController::class, 'destroy'])->name('gestion-atencion.destroy');
+    //Route::post('gestion-atencion/guardar', [NutricionistaController::class, 'guardarHorarios'])->name('gestion-atencion.guardarHorarios');
+    Route::delete('gestion-atencion/{id}', [HorasDiasAtencionController::class, 'destroy'])->name('gestion-atencion.destroy');
+    Route::post('gestion-atencion/guardar', [HorasDiasAtencionController::class, 'store'])->name('gestion-atencion.store');
 
     //Paciente
     Route::resource('historia-clinica', HistoriaClinicaController::class)->names('historia-clinica');
