@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\paciente;
 
 use App\Http\Controllers\Controller;
+use App\Models\DiasAtencion;
+use App\Models\HorariosAtencion;
 use Illuminate\Http\Request;
 
 class HistoriaClinicaController extends Controller
@@ -24,7 +26,10 @@ class HistoriaClinicaController extends Controller
      */
     public function create()
     {
-        return view('paciente.historia-clinica.create');
+
+        $dias = DiasAtencion::all();
+        $horarios = HorariosAtencion::all();
+        return view('paciente.historia-clinica.create', compact('dias', 'horarios'));
     }
 
     /**

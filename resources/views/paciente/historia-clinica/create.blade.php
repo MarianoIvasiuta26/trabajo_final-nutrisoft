@@ -34,9 +34,9 @@
                             <div class="col-md-4">
                                 <label for="sexo" class="form-label">Sexo</label>
                                 <select id="sexo" class="form-select">
-                                <option selected>Elija una opción...</option>
-                                <option value="Masculino">Masculino</option>
-                                <option value="Femenino">Femenino</option>
+                                    <option selected>Elija una opción...</option>
+                                    <option value="Masculino">Masculino</option>
+                                    <option value="Femenino">Femenino</option>
                                 </select>
                             </div>
 
@@ -78,29 +78,19 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <h5>Seleccione los días que tiene disponibles:</h5>
-                                    <div class="col-md-2">
-                                        <div class="icheck-primary">
-                                            <input value="Lunes" type="checkbox" id="diasFijos-lunes" />
-                                            <label for="diasFijos-lunes">Lunes</label>
-                                        </div>
-                                        <div class="icheck-primary">
-                                            <input value="Martes" type="checkbox" id="diasFijos-martes" />
-                                            <label for="diasFijos-martes">Martes</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <div class="icheck-primary">
-                                            <input value="Miercoles" type="checkbox" id="diasFijos-miercoles" />
-                                            <label for="diasFijos-miercoles">Miércoles</label>
-                                        </div>
-                                        <div class="icheck-primary">
-                                            <input value="Jueves" type="checkbox" id="diasFijos-jueves" />
-                                            <label for="diasFijos-jueves">Jueves</label>
-                                        </div>
-                                    </div>
+                                    @foreach ($horarios as $horario)
+                                        @foreach ($dias as $dia)
+                                            @if ($dia->id == $horario->dia_atencion_id)
+                                                <div class="col-md-2">
+                                                    <div class="icheck-primary">
+                                                        <input value="{{$dia->dia}}" type="checkbox" id="diasFijos-{{$dia->dia}}" />
+                                                        <label for="diasFijos-{{$dia->dia}}">{{$dia->dia}}</label>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    @endforeach
                                 </div>
-
                                 <!-- Horas -->
                                 <div class="col-md-6">
                                     <h5>Seleccione las horas disponibles:</h5>
@@ -143,32 +133,108 @@
                                             <option>19:30</option>
                                         </select>
                                     </div>
-
-
                                 </div>
                             </div>
 
-                            <div class="col-12">
-                                <div class="float-right">
-                                    <button type="submit" class="btn btn-success">Guardar</button>
-                                    <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="float-right">
+                                        <button type="submit" class="btn btn-success">Guardar</button>
+                                        <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <button class="btn btn-link float-right" onclick="toggleCard('datosMedicos')">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                        <h5>Datos médicos</h5>
+                    </div>
+                    <div id="datosMedicos" class="card-body" style="display: none;">
+                        <form action="{{route('historia-clinica.store')}}" method="POST">
+                            @csrf
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="peso" class="form-label">Peso</label>
+                                    <input type="number" class="form-control" id="peso">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="altura" class="form-label">Altura</label>
+                                    <input type="number" class="form-control" id="altura">
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-3">
+                                    <label for="circ_munieca" class="form-label">Circunferencia de Muñeca</label>
+                                    <input type="number" class="form-control" id="circ_munieca">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="circ_cintura" class="form-label">Circunferencia de Cintura</label>
+                                    <input type="number" class="form-control" id="circ_cintura">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="circ_cadera" class="form-label">Circunferencia de Cadera</label>
+                                    <input type="number" class="form-control" id="circ_cadera">
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="circ_pecho" class="form-label">Circunferencia de Pecho</label>
+                                    <input type="number" class="form-control" id="circ_pecho">
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label for="estilo_vida" class="form-label">Estilo de vida actual</label>
+                                    <select id="estilo_vida" class="form-select">
+                                        <option selected>Elija una opción...</option>
+                                        <option value="Sedentario">Sedentario</option>
+                                        <option value="Actividad Física regular">Actividad Física regular</option>
+                                        <option value="Actividad Física intensa">Actividad Física intensa</option>
+                                        <option value="Poca actividad física"> Poca actividad física</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="objetivo_salud" class="form-label">Objetivo de salud</label>
+                                    <select id="objetivo_salud" class="form-select">
+                                        <option selected>Elija una opción...</option>
+                                        <option value="Adelgazar">Adelgazar</option>
+                                        <option value="Ganar masa muscular">Ganar masa muscular</option>
+                                        <option value="Nutrición deportiva">Nutrición deportiva</option>
+                                        <option value="Nutrición por enfermedad"> Nutrición por enfermedad</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="float-right">
+                                        <button type="submit" class="btn btn-success">Guardar</button>
+                                        <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                                    </div>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="card card-dark">
-        <div class="card-header">
-            <h5>Datos médicos</h5>
-        </div>
-        <div class="card-body">
 
         </div>
     </div>
+
 
 
 @stop
