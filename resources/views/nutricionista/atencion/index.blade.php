@@ -122,7 +122,7 @@
                             </td>
 
                             <td>
-                                <form action="{{ route('gestion-atencion.destroy', $nutricionista->id) }}" method="POST">
+                                <form action="{{ route('gestion-atencion.destroy', $horario->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <input type="submit" value="Eliminar" class="btn btn-danger">

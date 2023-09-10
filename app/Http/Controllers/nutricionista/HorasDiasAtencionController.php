@@ -47,28 +47,60 @@ class HorasDiasAtencionController extends Controller
         $horaFin = $request->input('hora_fin');
         $etiqueta = $request->input('etiqueta');
 
-        //Creamos el registro en la tabla horas_atencions
-        $horas = HorasAtencion::create([
-            'hora_inicio' => $horaInicio,
-            'hora_fin' => $horaFin,
-            'etiqueta' => $etiqueta,
-        ]);
+        //Verificamos si ya existe un registro con los mismos datos
+        $horas = HorasAtencion::where(
+            [
+                ['hora_inicio', $horaInicio],
+                ['hora_fin', $horaFin],
+                ['etiqueta', $etiqueta],
+            ]
+        )->first();
+
+        if(!$horas){
+            //Si no existe ningún registro dehora con los mismos datos
+            //Creamos el registro en la tabla horas_atencions
+            $horas = HorasAtencion::create([
+                'hora_inicio' => $horaInicio,
+                'hora_fin' => $horaFin,
+                'etiqueta' => $etiqueta,
+            ]);
+        }
 
         //días
         $dias = $request->input('dias_atencion');
+        $horarioExistente =false;
 
         foreach ($dias as $dia) {
 
             //Verificamos que existe el día en la tabla DiasAtencion
             $diaExistente = DiasAtencion::where('dia', $dia)->first();
 
-            HorariosAtencion::create([
-                'nutricionista_id' => $nutricionista->id,
-                'dia_atencion_id' => $diaExistente->id,
-                'hora_atencion_id' =>$horas->id,
-            ]);
+            $horarioExistente = HorariosAtencion::where(
+                [
+                    ['nutricionista_id', $nutricionista->id],
+                    ['dia_atencion_id', $diaExistente->id],
+                    ['hora_atencion_id', $horas->id],
+                ]
+            )->first();
+
+            if(!$horarioExistente){
+                //Si no existe el horario se crea
+                HorariosAtencion::create([
+                    'nutricionista_id' => $nutricionista->id,
+                    'dia_atencion_id' => $diaExistente->id,
+                    'hora_atencion_id' =>$horas->id,
+                ]);
+            }else{
+                //Si ya existe un registro con los mismos datos
+                break;
+            }
 
 
+
+        }
+
+        if($horarioExistente){
+            return redirect()->route('gestion-atencion.index')->with('error', 'Horario ya registrado');
         }
 
         return redirect()->route('gestion-atencion.index')->with('success', 'Dias y horarios registrados!');
@@ -108,7 +140,14 @@ class HorasDiasAtencionController extends Controller
 
     public function destroy($id){
 
+        $horario = HorariosAtencion::find($id);
 
+        if (!$horario) {
+            return redirect()->route('gestion-atencion.index')->with('error', 'Horario no encontrado');
+        } else{
+            $horario->delete();
+            return redirect()->route('gestion-atencion.index')->with('success', 'Horario eliminado');
+        }
 
     }
 
