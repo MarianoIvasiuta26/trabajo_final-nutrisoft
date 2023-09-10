@@ -60,15 +60,15 @@ class HorasDiasAtencionController extends Controller
         foreach ($dias as $dia) {
 
             //Verificamos que existe el día en la tabla DiasAtencion
-            $diaExistente = DiasAtencion::where('dia', $dia)->value('id');
+            $diaExistente = DiasAtencion::where('dia', $dia)->first();
 
-            $horariosAtencion = HorariosAtencion::create([
+            HorariosAtencion::create([
                 'nutricionista_id' => $nutricionista->id,
-                'dia_atencion_id' => $diaExistente,
+                'dia_atencion_id' => $diaExistente->id,
                 'hora_atencion_id' =>$horas->id,
             ]);
 
-            $horariosAtencion->save();
+
         }
 
         return redirect()->route('gestion-atencion.index')->with('success', 'Dias y horarios registrados!');
@@ -108,7 +108,7 @@ class HorasDiasAtencionController extends Controller
 
     public function destroy($id){
 
-        
+
 
     }
 

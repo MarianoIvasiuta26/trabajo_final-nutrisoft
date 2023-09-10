@@ -88,16 +88,17 @@
                     </tr>
                 @endif
             @else
-                <td colspan="4">No se encontraron registros de días y horarios de atención.</td>
+
             @endif --}}
 
             @if (isset($nutricionista))
+
                     @forelse ($horarios as $horario)
                         <tr>
                             <td>
                                 @forelse ($dias as $dia)
                                     @if ($dia->id == $horario->dia_atencion_id)
-                                        {{ $horario->diasAtencion->dia }}
+                                        {{ $dia->dia }}
                                     @endif
                                 @empty
                                    <h5> No hay días de atención</h5>
@@ -106,7 +107,7 @@
 
                             <td>
                                 @foreach ($horas as $hora)
-                                    @if ($hora->etiqueta == 'Maniana')
+                                    @if ($hora->etiqueta == 'Maniana' && $horario->hora_atencion_id == $hora->id)
                                         {{ $hora->hora_inicio }} - {{ $hora->hora_fin }}
                                     @endif
                                 @endforeach
@@ -114,7 +115,7 @@
 
                             <td>
                                 @foreach ($horas as $hora)
-                                    @if ($hora->etiqueta == 'Tarde')
+                                    @if ($hora->etiqueta == 'Tarde' && $horario->hora_atencion_id == $hora->id)
                                         {{ $hora->hora_inicio }} - {{ $hora->hora_fin }}
                                     @endif
                                 @endforeach
@@ -129,7 +130,7 @@
                             </td>
                         </tr>
                     @empty
-                        <h5>No se encontraron horairos registrados.</h5>
+                        <td colspan="4">No se encontraron registros de días y horarios de atención.</td>
                     @endforelse
             @endif
         </tbody>

@@ -11,7 +11,7 @@ class HorariosAtencion extends Model
 
     protected $fillable = [
         'nutricionista_id',
-        'dias_atencion_id',
+        'dia_atencion_id',
         'hora_atencion_id',
     ];
 
