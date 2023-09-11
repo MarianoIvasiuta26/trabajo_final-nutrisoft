@@ -20,36 +20,56 @@
                         <h5>Datos Personales</h5>
                     </div>
                     <div id="datosPersonales" class="card-body">
-                        <form class="row g-3" action="{{route('historia-clinica.store')}}" method="POST">
+                        <form class="row g-3" action="{{route('datos-personales.store')}}" method="POST">
                            @csrf
                             <div class="col-md-6">
                                 <label for="dni" class="form-label">DNI</label>
-                                <input type="text" class="form-control" id="dni">
+                                <input type="text" class="form-control @error('dni') is-invalid @enderror" id="dni" name="dni" value="{{old('dni')}}">
+
+                                @error('dni')
+                                    <div class="invalid-feedback">{{ $message}}</div>
+                                @enderror
                             </div>
+
                             <div class="col-md-6">
                                 <label for="telefono" class="form-label">Teléfono</label>
-                                <input type="text" class="form-control" id="telefono">
+                                <input type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{old('telefono')}}">
+
+                                @error('telefono')
+                                    <div class="invalid-feedback">{{ $message}}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md-4">
                                 <label for="sexo" class="form-label">Sexo</label>
-                                <select id="sexo" class="form-select">
-                                    <option selected>Elija una opción...</option>
+                                <select id="sexo" class="form-select @error('sexo') is-invalid @enderror" name="sexo">
+                                    <option value="" disabled selected>Elija una opción...</option>
                                     <option value="Masculino">Masculino</option>
                                     <option value="Femenino">Femenino</option>
                                 </select>
+
+                                @error('sexo')
+                                    <div class="invalid-feedback">{{ $message}}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md-4">
                                 <label for="edad" class="form-label">Edad</label>
-                                <input type="number" class="form-control" id="edad">
+                                <input type="number" class="form-control @error('edad') is-invalid @enderror" id="edad" name="edad" value="{{old('edad')}}">
+
+                                @error('edad')
+                                    <div class="invalid-feedback">{{ $message}}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md-4">
                                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                <input type="date" class="form-control" id="fecha_nacimiento">
-                            </div>
+                                <input type="date" value="{{old('fecha_nacimiento')}}" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento">
 
+                                @error('fecha_nacimiento')
+                                    <div class="invalid-feedback">{{ $message}}</div>
+                                @enderror
+                            </div>
 
                             <div class="col-12">
                                 <div class="float-right">
@@ -73,7 +93,7 @@
                         <h5>Días y Horas Fijos disponibles</h5>
                     </div>
                     <div id="diasYHoras" class="card-body" style="display: none;">
-                        <form action="{{route('historia-clinica.store')}}" method="POST">
+                        <form action="{{route('adelantamiento-turno.store')}}" method="POST">
                             @csrf
 
                             <div class="row">
@@ -247,7 +267,6 @@
                         <form action="{{route('historia-clinica.store')}}" method="POST">
                             @csrf
 
-
                             <div class="row">
                                 <h5>Anamnesis Alimentaria</h5>
                                 <div class="col-md-6">
@@ -266,7 +285,7 @@
 
                             <div class="row mt-3">
                                 <h5>Alergias</h5>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <label for="alergias" class="form-label">Seleccione las alergias que posee</label>
                                     <select name="alergias[]" class="form-select" id="alergias" data-placeholder="Alergias..." multiple>
                                         <option value="">Ninguna</option>
@@ -373,18 +392,33 @@
 
                             <div class="row mt-3">
                                 <h5>Patologías</h5>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
+                                    <label for="patologias" class="form-label">Seleccione las patologías que posee</label>
+                                    <select name="patologias[]" class="form-select" id="patologias" data-placeholder="Patologías..." multiple>
+                                        <option value="">Ninguna</option>
 
+                                    </select>
                                 </div>
                             </div>
 
                             <div class="row mt-3">
                                 <h5>Intolerancias</h5>
-                                <div class="col-md-6">
+                                <div class="col-md-12">
+                                    <label for="intolerancias" class="form-label">Seleccione las intolerancias que posee</label>
+                                    <select name="intolerancias[]" class="form-select" id="intolerancias" data-placeholder="Intolerancias..." multiple>
+                                        <option value="">Ninguna</option>
 
+                                    </select>
                                 </div>
                             </div>
-
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="float-right">
+                                        <button type="submit" class="btn btn-success">Guardar</button>
+                                        <a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -478,6 +512,20 @@
         } );
 
         $( '#cirugias' ).select2( {
+            theme: "bootstrap-5",
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+            closeOnSelect: false,
+        } );
+
+        $( '#patologias' ).select2( {
+            theme: "bootstrap-5",
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+            closeOnSelect: false,
+        } );
+
+        $( '#intolerancias' ).select2( {
             theme: "bootstrap-5",
             width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
             placeholder: $( this ).data( 'placeholder' ),

@@ -6,7 +6,10 @@ use App\Http\Controllers\HoraController;
 use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\nutricionista\HorasDiasAtencionController;
 use App\Http\Controllers\NutricionistaController;
+use App\Http\Controllers\paciente\AdelantamientoTurnoController;
+use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
+use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -59,5 +62,7 @@ Route::middleware([
     //Paciente
     Route::resource('historia-clinica', HistoriaClinicaController::class)->names('historia-clinica');
     Route::get('/complete-history', [HistoriaClinicaController::class, 'index'])->name('complete-history');
-
+    Route::post('datos-personales/store', [PacienteController::class, 'store'])->name('datos-personales.store');
+    Route::resource('adelantamiento-turno', AdelantamientoTurnoController::class)->names('adelantamiento-turno');
+    Route::resource('datos-medicos', DatosMedicosController::class)->names('datos-medicos');
 });

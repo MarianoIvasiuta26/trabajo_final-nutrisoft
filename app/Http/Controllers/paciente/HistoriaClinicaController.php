@@ -5,7 +5,11 @@ namespace App\Http\Controllers\paciente;
 use App\Http\Controllers\Controller;
 use App\Models\DiasAtencion;
 use App\Models\HorariosAtencion;
+use App\Models\Paciente;
+use App\Models\Paciente\AdelantamientoTurno;
+use App\Models\Paciente\HistoriaClinica;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class HistoriaClinicaController extends Controller
 {
@@ -26,7 +30,6 @@ class HistoriaClinicaController extends Controller
      */
     public function create()
     {
-
         $dias = DiasAtencion::all();
         $horarios = HorariosAtencion::all();
         return view('paciente.historia-clinica.create', compact('dias', 'horarios'));
@@ -40,7 +43,63 @@ class HistoriaClinicaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        //Datos físicos
+        $request->validate([
+            'peso' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'altura' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circunferencia_munieca' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circunferencia_cadera' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circunferencia_cintura' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circunferencia_pecho' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'estilo_vida' => ['string', 'max:25'],
+            'objetivo_salud' => ['string', 'max:25'],
+        ]);
+
+        $peso = $request->input('peso');
+        $altura = $request->input('altura');
+        $circunferencia_munieca = $request->input('circunferencia_munieca');
+        $circunferencia_cadera = $request->input('circunferencia_cadera');
+        $circunferencia_cintura = $request->input('circunferencia_cintura');
+        $circunferencia_pecho = $request->input('circunferencia_pecho');
+        $estilo_vida = $request->input('estilo_vida');
+        $objetivo_salud = $request->input('objetivo_salud');
+
+        // Obtenemos el paciente autenticado
+        $paciente = Paciente::where('user_id', auth()->id())->first();
+
+        //Validamos si existen estos ya registrados
+        $datosFisicos = HistoriaClinica::where([
+            ['paciente_id', $paciente->id],
+            ['peso', $peso],
+            ['altura', $altura],
+            ['circunferencia_munieca', $circunferencia_munieca],
+            ['circunferencia_cadera', $circunferencia_cadera],
+            ['circunferencia_cintura', $circunferencia_cintura],
+            ['circunferencia_pecho', $circunferencia_pecho],
+            ['estilo_vida', $estilo_vida],
+            ['objetivo_salud', $objetivo_salud],
+        ])->first();
+
+        if(!$datosFisicos){
+            HistoriaClinica::create([
+                'paciente_id' => $paciente->id,
+                'peso' => $peso,
+                'altura' => $altura,
+                'circunferencia_munieca' => $circunferencia_munieca,
+                'circunferencia_cadera' => $circunferencia_cadera,
+                'circunferencia_cintura' => $circunferencia_cintura,
+                'circunferencia_pecho' => $circunferencia_pecho,
+                'estilo_vida' => $estilo_vida,
+                'objetivo_salud' => $objetivo_salud,
+            ]);
+
+            return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
+        } else {
+            return redirect()->route('historia-clinica.create')->with('error', 'Ya existe la historia clínica para este paciente');
+        }
+
+
     }
 
     /**

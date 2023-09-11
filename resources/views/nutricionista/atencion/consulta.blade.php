@@ -93,7 +93,7 @@
                 </div>
             </div>
         </div>
-
+{{--
         <!-- Días y horarios de fechas específicas -->
         <div class="container mt-4">
             <div class="row">
@@ -109,7 +109,7 @@
                     </div>
             </div>
         </div>
-
+    --}}
     </form>
 @stop
 
