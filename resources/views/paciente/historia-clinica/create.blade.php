@@ -264,7 +264,7 @@
                         <h5>Datos Médicos</h5>
                     </div>
                     <div id="datosMedicos" class="card-body" style="display: none;">
-                        <form action="{{route('historia-clinica.store')}}" method="POST">
+                        <form action="{{route('datos-medicos.store')}}" method="POST">
                             @csrf
 
                             <div class="row">
@@ -331,63 +331,64 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-3">
+                            <div class="row mt-3" id="cirugias-container">
                                 <h5>Cirugías</h5>
-                                <div class="col-md-6">
-                                    <label for="cirugias" class="form-label">Seleccione las cirugías que se realizó</label>
-                                    <select name="cirugias[]" class="form-select" id="cirugias" data-placeholder="Cirugías..." multiple>
-                                        <option value="">Ninguna</option>
-                                        <optgroup label="Cirugia reciente">
-                                            <option value="">Cirugía oral</option>
-                                            <option value="">Apendicetomía</option>
-                                        </optgroup>
+                                <div class="cirugia-entry">
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <select name="cirugias[]" class="form-select">
+                                                <option value="">Seleccione una cirugía</option>
+                                                <optgroup label="Cirugia reciente">
+                                                    <option value="">Cirugía oral</option>
+                                                    <option value="">Apendicetomía</option>
+                                                </optgroup>
+                                                <optgroup label="Cirugía Gastrointestinal">
+                                                    <option value="">Resección intestinal</option>
+                                                    <option value="">cirugía de pérdida de peso</option>
+                                                </optgroup>
 
-                                        <optgroup label="Cirugía Gastrointestinal">
-                                            <option value="">Resección intestinal</option>
-                                            <option value="">cirugía de pérdida de peso</option>
-                                        </optgroup>
+                                                <optgroup label="Cirugía Cardíaca o Vascular">
+                                                    <option value="">Bypass de arteria coronaria</option>
+                                                    <option value="">Cirugía de válvula cardíaca</option>
+                                                    <option value="">Cirugía de aneurisma aórtico</option>
+                                                    <option value="">Cirugía de arteria carótida</option>
+                                                </optgroup>
 
-                                        <optgroup label="Cirugía Cardíaca o Vascular">
-                                            <option value="">Bypass de arteria coronaria</option>
-                                            <option value="">Cirugía de válvula cardíaca</option>
-                                            <option value="">Cirugía de aneurisma aórtico</option>
-                                            <option value="">Cirugía de arteria carótida</option>
-                                        </optgroup>
+                                                <optgroup label="Cirugía Bariátrica">
+                                                    <option value="">Bypass gástrico</option>
+                                                    <option value="">Banda gástrica</option>
+                                                </optgroup>
 
-                                        <optgroup label="Cirugía Bariátrica">
-                                            <option value="">Bypass gástrico</option>
-                                            <option value="">Banda gástrica</option>
-                                        </optgroup>
-
-                                        <optgroup label="Cirugía de Órganos Vitales">
-                                            <option value="">Cirugía de Hígado</option>
-                                            <option value="">Cirugía de Páncreas</option>
-                                            <option value="">Cirugía de Riñón</option>
-                                            <option value="">Cirugía de Pulmón</option>
-                                            <option value="">Cirugía de Vejiga</option>
-                                            <option value="">Cirugía de Próstata</option>
-                                            <option value="">Cirugía de Vesícula Biliar</option>
-                                            <option value="">Cirugía de Bazo</option>
-                                            <option value="">Cirugía de Intestino Delgado</option>
-                                            <option value="">Cirugía de Intestino Grueso</option>
-                                            <option value="">Cirugía de Colon o Recto</option>
-                                        </optgroup>
-                                    </select>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="tiempoCirugia">¿Hace cuánto tiempo se realizó la cirugía?</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control form-control-sm" id="tiempoCirugia">
-                                        <select name="periodoCirugia" id="periodoCirugia" class="form-select form-select-sm">
-                                            <option value="Dias">Días</option>
-                                            <option value="Semanas">Semanas</option>
-                                            <option value="Meses">Meses</option>
-                                            <option value="Años">Años</option>
-                                        </select>
+                                                <optgroup label="Cirugía de Órganos Vitales">
+                                                    <option value="">Cirugía de Hígado</option>
+                                                    <option value="">Cirugía de Páncreas</option>
+                                                    <option value="">Cirugía de Riñón</option>
+                                                    <option value="">Cirugía de Pulmón</option>
+                                                    <option value="">Cirugía de Vejiga</option>
+                                                    <option value="">Cirugía de Próstata</option>
+                                                    <option value="">Cirugía de Vesícula Biliar</option>
+                                                    <option value="">Cirugía de Bazo</option>
+                                                    <option value="">Cirugía de Intestino Delgado</option>
+                                                    <option value="">Cirugía de Intestino Grueso</option>
+                                                    <option value="">Cirugía de Colon o Recto</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <input type="number" name="tiempo[]" class="form-control tiempo-input" placeholder="Tiempo">
+                                                <select name="unidad[]" class="form-select unidad-select">
+                                                    <option value="dias">Días</option>
+                                                    <option value="semanas">Semanas</option>
+                                                    <option value="meses">Meses</option>
+                                                    <option value="anos">Años</option>
+                                                </select>
+                                                <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
+                                                <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
                             </div>
 
                             <div class="row mt-3">
@@ -411,6 +412,8 @@
                                     </select>
                                 </div>
                             </div>
+
+
                             <div class="row mt-3">
                                 <div class="col-12">
                                     <div class="float-right">
@@ -460,6 +463,7 @@
 
     <!-- Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -531,6 +535,22 @@
             placeholder: $( this ).data( 'placeholder' ),
             closeOnSelect: false,
         } );
+
+        //Función para agregar y eliminar cirugías
+        $(document).ready(function() {
+            // Manejar clic en el botón "Agregar Cirugía"
+            $('#agregar-cirugia').click(function() {
+                var nuevaCirugia = $('.cirugia-entry:first').clone();
+                nuevaCirugia.find('select').val('');
+                nuevaCirugia.find('input').val('');
+                nuevaCirugia.appendTo('#cirugias-container');
+            });
+
+            // Manejar clic en el botón "x" para eliminar una entrada de cirugía
+            $('#cirugias-container').on('click', '.remove-cirugia', function() {
+                $(this).closest('.cirugia-entry').remove();
+            });
+        });
 
     </script>
 
