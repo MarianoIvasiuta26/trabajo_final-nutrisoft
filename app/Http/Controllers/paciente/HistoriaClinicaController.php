@@ -3,11 +3,16 @@
 namespace App\Http\Controllers\paciente;
 
 use App\Http\Controllers\Controller;
+use App\Models\Alimento;
 use App\Models\DiasAtencion;
 use App\Models\HorariosAtencion;
 use App\Models\Paciente;
 use App\Models\Paciente\AdelantamientoTurno;
+use App\Models\Paciente\Alergia;
+use App\Models\Paciente\Cirugia;
 use App\Models\Paciente\HistoriaClinica;
+use App\Models\Paciente\Intolerancia;
+use App\Models\Paciente\Patologia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -32,7 +37,12 @@ class HistoriaClinicaController extends Controller
     {
         $dias = DiasAtencion::all();
         $horarios = HorariosAtencion::all();
-        return view('paciente.historia-clinica.create', compact('dias', 'horarios'));
+        $patologias = Patologia::all();
+        $alergias = Alergia::all();
+        $cirugias = Cirugia::all();
+        $intolerancias = Intolerancia::all();
+        $alimentos = Alimento::all();
+        return view('paciente.historia-clinica.create', compact('dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos'));
     }
 
     /**
@@ -67,6 +77,15 @@ class HistoriaClinicaController extends Controller
 
         // Obtenemos el paciente autenticado
         $paciente = Paciente::where('user_id', auth()->id())->first();
+
+        //Verificamos si el paciente ya tiene la historia clínica completa
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        if(!$historiaClinica){
+            HistoriaClinica::create([
+                'paciente_id' => $paciente->id,
+            ]);
+        }
 
         //Validamos si existen estos ya registrados
         $datosFisicos = HistoriaClinica::where([

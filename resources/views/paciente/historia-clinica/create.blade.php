@@ -117,41 +117,27 @@
                                     <h5>Seleccione las horas disponibles:</h5>
                                     <div class="row">
                                         <select name="horasFijas[]" class="selectpicker" multiple title="Seleccione las horas de la mañana disponibles..." data-style="btn-success" data-width="fit" data-live-search="true" data-size="5">
-                                            <option>8:00</option>
-                                            <option>8:15</option>
-                                            <option>8:30</option>
-                                            <option>8:45</option>
-                                            <option>9:00</option>
-                                            <option>9:15</option>
-                                            <option>9:30</option>
-                                            <option>9:45</option>
-                                            <option>10:00</option>
-                                            <option>10:15</option>
-                                            <option>10:30</option>
-                                            <option>10:45</option>
-                                            <option>11:00</option>
-                                            <option>11:15</option>
-                                            <option>11:30</option>
-                                            <option>11:45</option>
+                                            <option value="8:00">8:00</option>
+                                            <option value="8:30">8:30</option>
+                                            <option value="9:00">9:00</option>
+                                            <option value="9:30">9:30</option>
+                                            <option value="10:00">10:00</option>
+                                            <option value="10:30">10:30</option>
+                                            <option value="11:00">11:00</option>
+                                            <option value="11:30">11:30</option>
                                             <option value="12:00">12:00</option>
                                         </select>
                                     </div>
 
                                     <div class="row">
                                         <select class="selectpicker mt-4" data-style="btn-success" multiple title="Seleccione las horas de la tarde disponibles..." data-width="fit" data-size="5" data-live-search="true">
-                                            <option>16:30</option>
-                                            <option>16:45</option>
-                                            <option>17:00</option>
-                                            <option>17:15</option>
-                                            <option>17:30</option>
-                                            <option>17:45</option>
-                                            <option>18:00</option>
-                                            <option>18:15</option>
-                                            <option>18:30</option>
-                                            <option>18:45</option>
-                                            <option>19:00</option>
-                                            <option>19:15</option>
-                                            <option>19:30</option>
+                                            <option value="16:30">16:30</option>
+                                            <option value="17:00">17:00</option>
+                                            <option value="17:30">17:30</option>
+                                            <option value="18:00">18:00</option>
+                                            <option value="18:30">18:30</option>
+                                            <option value="19:00">19:00</option>
+                                            <option value="19:30">19:30</option>
                                         </select>
                                     </div>
                                 </div>
@@ -272,13 +258,27 @@
                                 <div class="col-md-6">
                                     <label for="gustos" class="form-label">Seleccione sus alimentos preferidos</label>
                                     <select name="alimentos_gustos[]" class="form-select" id="gustos" data-placeholder="Alimentos preferidos..." multiple>
-
+                                        <option value="">Ninguna</option>
+                                        @foreach ($alimentos->groupBy('grupo') as $grupo => $alimentos_del_grupo)
+                                            <optgroup label="{{$grupo_alimento}}">
+                                                @foreach ($alimentos_del_grupo as $alimento)
+                                                    <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="no_gustos" class="form-label">Seleccione los alimentos que no le guste</label>
                                     <select name="alimentos_no_gustos[]" class="form-select" id="no_gustos" data-placeholder="Alimentos que no guste..." multiple>
-
+                                        <option value="">Ninguna</option>
+                                        @foreach ($alimentos->groupBy('grupo') as $grupo => $alimentos_del_grupo)
+                                            <optgroup label="{{$grupo_alimento}}">
+                                                @foreach ($alimentos_del_grupo as $alimento)
+                                                    <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -289,44 +289,13 @@
                                     <label for="alergias" class="form-label">Seleccione las alergias que posee</label>
                                     <select name="alergias[]" class="form-select" id="alergias" data-placeholder="Alergias..." multiple>
                                         <option value="">Ninguna</option>
-                                        <optgroup label="Alergia a Frutos secos">
-                                            <option value="">Nueces</option>
-                                            <option value="">Almendras</option>
-                                            <option value="">Avellanas</option>
-                                            <option value="">Pistachos</option>
-                                            <option value="">Anacardos</option>
-
-                                        </optgroup>
-
-                                        <optgroup label="Alergia al Pescado">
-                                            <option value="">Salmón</option>
-                                            <option value="">Atún</option>
-                                            <option value="">Trucha</option>
-                                            <option value="">Sardinas</option>
-                                            <option value="">Bacalao</option>
-                                            <option value="">Merluza</option>
-                                        </optgroup>
-
-                                        <optgroup label="Alergia a Mariscos">
-                                            <option value="">Camarón</option>
-                                            <option value="">Langosta</option>
-                                            <option value="">Cangrejo</option>
-                                            <option value="">Ostras</option>
-                                            <option value="">Mejillones</option>
-                                        </optgroup>
-
-                                        <optgroup label="Otras alergias">
-                                            <option value="">Maní</option>
-                                            <option value="">Huevo y derivados</option>
-                                            <option value="">Leche y derivados</option>
-                                            <option value="">Soja y derivados</option>
-                                            <option value="">Trigo y gluten</option>
-                                            <option value="">Apio</option>
-                                            <option value="">Sésamo</option>
-                                            <option value="">Sulfitos</option>
-                                            <option value="">Lupino</option>
-                                            <option value="">Moluscos</option>
-                                        </optgroup>
+                                        @foreach ($alergias->groupBy('grupo_alergia') as $grupo_alergia => $alergias_del_grupo)
+                                            <optgroup label="{{$grupo_alergia}}">
+                                                @foreach ($alergias_del_grupo as $alergia)
+                                                    <option value="{{$alergia->id}}">{{$alergia->alergia}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -338,40 +307,13 @@
                                         <div class="col-md-6">
                                             <select name="cirugias[]" class="form-select">
                                                 <option value="">Seleccione una cirugía</option>
-                                                <optgroup label="Cirugia reciente">
-                                                    <option value="">Cirugía oral</option>
-                                                    <option value="">Apendicetomía</option>
-                                                </optgroup>
-                                                <optgroup label="Cirugía Gastrointestinal">
-                                                    <option value="">Resección intestinal</option>
-                                                    <option value="">cirugía de pérdida de peso</option>
-                                                </optgroup>
-
-                                                <optgroup label="Cirugía Cardíaca o Vascular">
-                                                    <option value="">Bypass de arteria coronaria</option>
-                                                    <option value="">Cirugía de válvula cardíaca</option>
-                                                    <option value="">Cirugía de aneurisma aórtico</option>
-                                                    <option value="">Cirugía de arteria carótida</option>
-                                                </optgroup>
-
-                                                <optgroup label="Cirugía Bariátrica">
-                                                    <option value="">Bypass gástrico</option>
-                                                    <option value="">Banda gástrica</option>
-                                                </optgroup>
-
-                                                <optgroup label="Cirugía de Órganos Vitales">
-                                                    <option value="">Cirugía de Hígado</option>
-                                                    <option value="">Cirugía de Páncreas</option>
-                                                    <option value="">Cirugía de Riñón</option>
-                                                    <option value="">Cirugía de Pulmón</option>
-                                                    <option value="">Cirugía de Vejiga</option>
-                                                    <option value="">Cirugía de Próstata</option>
-                                                    <option value="">Cirugía de Vesícula Biliar</option>
-                                                    <option value="">Cirugía de Bazo</option>
-                                                    <option value="">Cirugía de Intestino Delgado</option>
-                                                    <option value="">Cirugía de Intestino Grueso</option>
-                                                    <option value="">Cirugía de Colon o Recto</option>
-                                                </optgroup>
+                                                @foreach ($cirugias->groupBy('grupo_cirugia') as $grupo_cirugia => $cirugias_del_grupo)
+                                                    <optgroup label="{{$grupo_cirugia}}">
+                                                        @foreach ($cirugias_del_grupo as $cirugia)
+                                                            <option value="{{$cirugia->id}}">{{$cirugia->cirugia}}</option>
+                                                        @endforeach
+                                                    </optgroup>
+                                                @endforeach
                                             </select>
                                         </div>
                                         <div class="col-md-6">
@@ -397,7 +339,13 @@
                                     <label for="patologias" class="form-label">Seleccione las patologías que posee</label>
                                     <select name="patologias[]" class="form-select" id="patologias" data-placeholder="Patologías..." multiple>
                                         <option value="">Ninguna</option>
-
+                                        @foreach ($patologias->groupBy('grupo_patologia') as $grupo_patologia => $patologias_del_grupo)
+                                            <optgroup label="{{$grupo_patologia}}">
+                                                @foreach ($patologias_del_grupo as $patologia)
+                                                    <option value="{{$patologia->id}}">{{$patologia->patologia}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -408,7 +356,9 @@
                                     <label for="intolerancias" class="form-label">Seleccione las intolerancias que posee</label>
                                     <select name="intolerancias[]" class="form-select" id="intolerancias" data-placeholder="Intolerancias..." multiple>
                                         <option value="">Ninguna</option>
-
+                                        @foreach ($intolerancias as $intolerancia)
+                                            <option value="{{$intolerancia->id}}">{{$intolerancia->intolerancia}}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>

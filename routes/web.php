@@ -7,6 +7,11 @@ use App\Http\Controllers\HorarioController;
 use App\Http\Controllers\nutricionista\HorasDiasAtencionController;
 use App\Http\Controllers\NutricionistaController;
 use App\Http\Controllers\paciente\AdelantamientoTurnoController;
+use App\Http\Controllers\admin\AlergiaController;
+use App\Http\Controllers\admin\AnalisisClinicoController;
+use App\Http\Controllers\admin\CirugiaController;
+use App\Http\Controllers\admin\IntoleranciaController;
+use App\Http\Controllers\admin\PatologiaController;
 use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
 use App\Http\Controllers\PacienteController;
@@ -40,6 +45,12 @@ Route::middleware([
     //Admin
     Route::get('profile',[UserController::class,'show'])->name('profile');
     Route::resource('gestion-usuarios', GestionUsuariosController::class)->names('gestion-usuarios');
+    Route::resource('gestion-alergias', AlergiaController::class)->names('gestion-alergias');
+    Route::resource('gestion-intolerancias', IntoleranciaController::class)->names('gestion-intolerancias');
+    Route::resource('gestion-cirugias', CirugiaController::class)->names('gestion-cirugias');
+    Route::resource('gestion-analisis', AnalisisClinicoController::class)->names('gestion-analisis');
+    Route::resource('gestion-patologias', PatologiaController::class)->names('gestion-patologias');
+
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 
     //Nutricionista

@@ -23,4 +23,13 @@ class HistoriaClinica extends Model
     public function paciente(){
         return $this->belongsTo('App/Models/Paciente');
     }
+
+    public function datosMedicos(){
+        return $this->hasMany('App/Models/Paciente/DatosMedicos');
+    }
+
+    public function anamnesisAlimentaria(){
+        return $this->hasOne('App/Models/Paciente/AnamnesisAlimentaria');
+    }
+
 }

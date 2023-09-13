@@ -325,9 +325,120 @@ return [
         ],
 
         [
+            'text' => 'Historia Clínica',
+            'route'  => 'historia-clinica.index',
+            'icon' => 'fas fa-lock fa-fw',
+        ],
+
+        [
             'text' => 'Turnos',
             'route'  => 'gestion-atencion.index',
             'icon' => 'fas fa-lock fa-fw',
+        ],
+
+        [
+            'text' => 'Gestión Médica',
+            'icon' => 'fas fa-laptop-medical',
+            'submenu' => [
+                [
+                    'text'    => 'Patologías',
+                    'icon'    => 'fas fa-fw fa-stethoscope',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Patologías',
+                            'icon' =>'fas fa-fw fa-briefcase-medical',
+                            'route'  => 'gestion-patologias.index',
+                        ],
+                        [
+                            'text' => 'Nueva Patología',
+                            'icon' =>'fas fa-fw fa-file-medical',
+                            'route'  => 'gestion-patologias.create',
+                        ],
+                    ],
+                ],
+                [
+                    'text'    => 'Alergias',
+                    'icon'    => 'fas fa-fw fa-head-side-mask',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Alergias',
+                            'icon' =>'fas fa-fw fa-briefcase-medical',
+                            'route'  => 'gestion-alergias.index',
+                        ],
+                        [
+                            'text' => 'Nueva Alergia',
+                            'icon' =>'fas fa-fw fa-file-medical',
+                            'route'  => 'gestion-alergias.create',
+                        ],
+                    ],
+                ],
+                [
+                    'text'    => 'Cirugías',
+                    'icon'    => 'fas fa-fw fa-star-of-life',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Cirugías',
+                            'icon' =>'fas fa-fw fa-briefcase-medical',
+                            'route'  => 'gestion-cirugias.index',
+                        ],
+                        [
+                            'text' => 'Nueva Cirugía',
+                            'icon' =>'fas fa-fw fa-file-medical',
+                            'route'  => 'gestion-cirugias.create',
+                        ],
+                    ],
+                ],
+                [
+                    'text'    => 'Intolerancias',
+                    'icon'    => 'fas fa-fw fa-capsules',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Intolerancias',
+                            'icon' =>'fas fa-fw fa-briefcase-medical',
+                            'route'  => 'gestion-intolerancias.index',
+                        ],
+                        [
+                            'text' => 'Nueva Intolerancia',
+                            'icon' =>'fas fa-fw fa-file-medical',
+                            'route'  => 'gestion-intolerancias.create',
+                        ],
+                    ],
+                ],
+                [
+                    'text'    => 'Análisis clínico',
+                    'icon'    => 'fas fa-fw fa-syringe',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Análisis clínico',
+                            'icon' =>'fas fa-fw fa-briefcase-medical',
+                            'url'  => '#',
+                        ],
+                        [
+                            'text' => 'Nuevo Análisis clínico',
+                            'icon' =>'fas fa-fw fa-file-medical',
+                            'url'  => '#',
+                        ],
+                    ],
+                ],
+            ],
+
+        ],
+
+        [
+            'text' => 'Gestión Alimentos',
+            'icon' => 'fas fa-utensils',
+            'submenu' => [
+                [
+                    'text' => 'Lista de Alimentos',
+                    'icon' =>'fas fa-fw fa-list',
+                    'url'  => '#',
+                ],
+                [
+                    'text' => 'Nuevo Alimento',
+                    'icon' =>'fas fa-fw fa-plus',
+                    'url'  => '#',
+                ],
+            ],
         ],
 
         ['header' => 'GESTIÓN DE USUARIOS'],
@@ -345,8 +456,9 @@ return [
         [
             'text' => 'Roles y permisos',
             'route'  => 'gestion-usuarios.create',
-            'icon' => 'fas fa-lock fa-fw',
+            'icon' => 'fas fa-lock',
         ],
+
 
         ['header' => 'account_settings'],
         [
@@ -359,44 +471,7 @@ return [
             'url'  => 'admin/settings',
             'icon' => 'fas fa-fw fa-lock',
         ],
-        [
-            'text'    => 'multilevel',
-            'icon'    => 'fas fa-fw fa-share',
-            'submenu' => [
-                [
-                    'text' => 'level_one',
-                    'url'  => '#',
-                ],
-                [
-                    'text'    => 'level_one',
-                    'url'     => '#',
-                    'submenu' => [
-                        [
-                            'text' => 'level_two',
-                            'url'  => '#',
-                        ],
-                        [
-                            'text'    => 'level_two',
-                            'url'     => '#',
-                            'submenu' => [
-                                [
-                                    'text' => 'level_three',
-                                    'url'  => '#',
-                                ],
-                                [
-                                    'text' => 'level_three',
-                                    'url'  => '#',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'level_one',
-                    'url'  => '#',
-                ],
-            ],
-        ],
+
         ['header' => 'labels'],
         [
             'text'       => 'important',
@@ -414,6 +489,31 @@ return [
             'url'        => '#',
         ],*/
     ],
+    /*
+    [
+        'text'    => 'level_one',
+        'url'     => '#',
+        'submenu' => [
+            [
+                'text' => 'level_two',
+                'url'  => '#',
+            ],
+            [
+                'text'    => 'level_two',
+                'url'     => '#',
+                'submenu' => [
+                    [
+                        'text' => 'level_three',
+                        'url'  => '#',
+                    ],
+                    [
+                        'text' => 'level_three',
+                        'url'  => '#',
+                    ],
+                ],
+            ],
+        ],
+    ],*/
 
     /*
     |--------------------------------------------------------------------------

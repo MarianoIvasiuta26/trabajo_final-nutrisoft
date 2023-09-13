@@ -40,39 +40,30 @@ class AdelantamientoTurnoController extends Controller
         // Obtenemos el nutricionista autenticado
         $paciente = Paciente::where('user_id', auth()->id())->first();
 
-        //Días y horarios fijos
+        // Días y horarios fijos
         $diasFijos = $request->input('diasFijos');
         $horasFijas = $request->input('horasFijas');
-        $existe = false;
 
-        foreach($diasFijos as $diaFijo){
-            foreach($horasFijas as $horaFija){
-                //Verificamos si ya existe un registro de esos días y horarios fijos
-                $existe = AdelantamientoTurno::where(
-                    [
-                        ['paciente_id', $paciente->id],
-                        ['horas_fijas', $horaFija],
-                        ['dias_fijos', $diaFijo],
-                    ]
-                )->first();
+        foreach ($diasFijos as $diaFijo) {
+            foreach ($horasFijas as $horaFija) {
+                // Verificamos si ya existe un registro de esos días y horarios fijos
+                $existe = AdelantamientoTurno::where([
+                    ['paciente_id', $paciente->id],
+                    ['horas_fijas', $horaFija],
+                    ['dias_fijos', $diaFijo],
+                ])->first();
 
-                if(!$existe){
+                if (!$existe) {
                     AdelantamientoTurno::create([
                         'paciente_id' => $paciente->id,
                         'horas_fijas' => $horaFija,
                         'dias_fijos' => $diaFijo,
                     ]);
-
-                    return redirect()->route('historia-clinica.create')->with('success', 'Días y horas disponibles registrados');
-                }else{
-                    break;
                 }
             }
         }
 
-        if($existe){
-            return redirect()->route('historia-clinica.create')->with('error', 'Ya existe un paciente con estos datos');
-        }
+        return redirect()->route('historia-clinica.create')->with('success', 'Días y horas disponibles registrados');
     }
 
     /**

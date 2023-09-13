@@ -7,6 +7,7 @@ use App\Models\Paciente;
 use App\Models\Paciente\Alergia;
 use App\Models\Paciente\AnamnesisAlimentaria;
 use App\Models\Paciente\Cirugia;
+use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
@@ -40,9 +41,8 @@ class DatosMedicosController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
 
+    public function store(Request $request){
         //Anamnesis alimentaria
         $alimentosGustos = $request->input('alimentos_gustos');
         $alimentosNoGustos = $request->input('alimentos_no_gustos');
@@ -80,41 +80,30 @@ class DatosMedicosController extends Controller
             ]);
         }
 
+        //Obtenemos los datos médicos de la historia clínica
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
+
+        if(!$datosMedicos){
+            //Si no existe se crea
+            $datosMedicos = DatosMedicos::create([
+                'historia_clinica_id' => $historiaClinica->id,
+                'alergia_id' => 0,
+                'patologia_id' => 0,
+                'cirugia_id' => 0,
+                'intolerancia_id' => 0,
+                'valor_analisis_clinico_id' => 0,
+            ]);
+        }
+
         //Si no se ingresaron datos en el form, crea las tablas correspondientes con valores vacíos (ya sea si son numéricos o string)
         if(!$alimentosGustos){
-            $alimentosGustos = [''];
-        }
-        if(!$alimentosNoGustos){
-            $alimentosNoGustos = [''];
-        }
-        if(!$alergias){
-            $alergias = [''];
-        }
-        if(!$cirugias){
-            $cirugias = [''];
-        }
-        if(!$tiempo){
-            $tiempo = [0];
-        }
-        if(!$unidad){
-            $unidad = [''];
-        }
-        if(!$patologias){
-            $patologias = [''];
-        }
-        if(!$intolerancias){
-            $intolerancias = [''];
-        }
-
-
-        //Verificación de anamnesis
-        foreach ($alimentosGustos as $alimentoGusto) {
-            foreach($alimentosNoGustos as $alimentoNoGusto){
+            $alimentosGustos = [0];
+        }else{
+            //Verificación de anamnesis
+            foreach ($alimentosGustos as $alimentoGusto){
                 $anamnesisExistente = AnamnesisAlimentaria::where(
                     [
                         ['historia_clinica_id', $historiaClinica->id],
-                        ['alimentos_que_gustan', $alimentoGusto],
-                        ['alimentos_que_no_gustan', $alimentoNoGusto],
                     ]
                 )->first();
 
@@ -122,123 +111,137 @@ class DatosMedicosController extends Controller
                     //Si no existe se crea
                     AnamnesisAlimentaria::create([
                         'historia_clinica_id' => $historiaClinica->id,
-                        'alimentos_que_gustan' => $alimentoGusto,
-                        'alimentos_que_no_gustan' => $alimentoNoGusto,
+                        'alimento_id' => $alimentoGusto,
+                        'gusta' => true,
                     ]);
+
                 }else{
                     break;
                 }
             }
         }
-        if($anamnesisExistente){
-            return redirect()->route('gestion-atencion.index')->with('error', 'Anamnesis ya registrada');
-        }
 
-        //Verificación de alergias
-        foreach ($alergias as $alergia) {
-            $alergiasExistente = Alergia::where(
-                [
-                    ['historia_clinica_id', $historiaClinica->id],
-                    ['alergia', $alergia],
-                ]
-            )->first();
 
-            if(!$alergiasExistente){
-                //Si no existe se crea
-                Alergia::create([
-                    'historia_clinica_id' => $historiaClinica->id,
-                    'alergia' => $alergia,
-                ]);
-            }else{
-                break;
+        if(!$alimentosNoGustos){
+            $alimentosNoGustos = [0];
+        }else{
+            foreach($alimentosNoGustos as $alimentoNoGusto){
+                $anamnesisExistente = AnamnesisAlimentaria::where(
+                    [
+                        ['historia_clinica_id', $historiaClinica->id],
+                    ]
+                )->first();
+
+                if(!$anamnesisExistente){
+                    //Si no existe se crea
+                    AnamnesisAlimentaria::create([
+                        'historia_clinica_id' => $historiaClinica->id,
+                        'alimento_id' => $alimentoNoGusto,
+                        'gusta' => false,
+                    ]);
+
+                }else{
+                    break;
+                }
             }
         }
-        if($alergiasExistente){
-            return redirect()->route('gestion-atencion.index')->with('error', 'Alergias ya registradas');
+
+        if(!$alergias){
+            $alergias = [''];
+        }else{
+            //Verificación de alergias
+            foreach ($alergias as $alergia) {
+                $alergiasExistente = DatosMedicos::where(
+                    [
+                        ['historia_clinica_id', $historiaClinica->id],
+                        ['alergia_id', $alergia],
+                    ]
+                )->first();
+
+                if(!$alergiasExistente){
+                    //Si no existe se crea
+                    $datosMedicos->alergia_id = $alergia;
+                }else{
+                    break;
+                }
+            }
         }
 
-        //Verificación de cirugias
-        foreach ($cirugias as $cirugia) {
-            foreach($tiempo as $tiempoCirugia){
-                foreach($unidad as $unidadCirugia){
-                    $cirugiasExistente = Cirugia::where(
+        if(!$cirugias){
+            $cirugias = [0];
+            $tiempo = [0];
+            $unidad = [''];
+        }else{
+            //Verificación de cirugias
+            foreach ($cirugias as $key => $cirugia) {
+                // Verificar si esta entrada de cirugía está vacía
+                if ($cirugia !== '') {
+                    $tiempoCirugia = $tiempo[$key];
+                    $unidadCirugia = $unidad[$key];
+
+                    $cirugiasExistente = DatosMedicos::where(
                         [
                             ['historia_clinica_id', $historiaClinica->id],
-                            ['cirugia', $cirugia],
-                            ['tiempo', $tiempoCirugia],
-                            ['unidad', $unidadCirugia],
+                            ['cirugia_id', $cirugia],
                         ]
                     )->first();
 
                     if(!$cirugiasExistente){
                         //Si no existe se crea
-                        Cirugia::create([
-                            'historia_clinica_id' => $historiaClinica->id,
-                            'cirugia' => $cirugia,
-                            'tiempo' => $tiempoCirugia,
-                            'unidad' => $unidadCirugia,
-                        ]);
+                        $datosMedicos->cirugia_id = $cirugia;
                     }else{
                         break;
                     }
+
                 }
             }
         }
 
-        if($cirugiasExistente){
-            return redirect()->route('gestion-atencion.index')->with('error', 'Cirugías ya registradas');
-        }
+        if(!$patologias){
+            $patologias = [''];
+        }else{
+            //Verificación de patologias
+            foreach ($patologias as $patologia) {
+                $patologiasExistente = DatosMedicos::where(
+                    [
+                        ['historia_clinica_id', $historiaClinica->id],
+                        ['patologia_id', $patologia],
+                    ]
+                )->first();
 
-        //Verificación de patologias
-        foreach ($patologias as $patologia) {
-            $patologiasExistente = Patologia::where(
-                [
-                    ['historia_clinica_id', $historiaClinica->id],
-                    ['patologia', $patologia],
-                ]
-            )->first();
-
-            if(!$patologiasExistente){
-                //Si no existe se crea
-                Patologia::create([
-                    'historia_clinica_id' => $historiaClinica->id,
-                    'patologia' => $patologia,
-                ]);
-            }else{
-                break;
+                if(!$patologiasExistente){
+                    //Si no existe se crea
+                    $datosMedicos->patologia_id = $patologia;
+                }else{
+                    break;
+                }
             }
         }
 
-        if($patologiasExistente){
-            return redirect()->route('gestion-atencion.index')->with('error', 'Patologías ya registradas');
-        }
+        if(!$intolerancias){
+            $intolerancias = [''];
+        } else {
+            //Verificación de intolerancias
+            foreach ($intolerancias as $intolerancia) {
+                $intoleranciasExistente = DatosMedicos::where(
+                    [
+                        ['historia_clinica_id', $historiaClinica->id],
+                        ['intolerancia_id', $intolerancia],
+                    ]
+                )->first();
 
-        //Verificación de intolerancias
-
-        foreach ($intolerancias as $intolerancia) {
-            $intoleranciasExistente = Intolerancia::where(
-                [
-                    ['historia_clinica_id', $historiaClinica->id],
-                    ['intolerancia', $intolerancia],
-                ]
-            )->first();
-
-            if(!$intoleranciasExistente){
-                //Si no existe se crea
-                Intolerancia::create([
-                    'historia_clinica_id' => $historiaClinica->id,
-                    'intolerancia' => $intolerancia,
-                ]);
-            }else{
-                break;
+                if(!$intoleranciasExistente){
+                    //Si no existe se crea
+                    $datosMedicos->intolerancia_id = $intolerancia;
+                }else{
+                    break;
+                }
             }
         }
 
-        if($intoleranciasExistente){
-            return redirect()->route('gestion-atencion.index')->with('error', 'Intolerancias ya registradas');
-        }
 
         return redirect()->route('gestion-atencion.index')->with('success', 'Datos médicos registrados correctamente');
+
     }
 
     /**

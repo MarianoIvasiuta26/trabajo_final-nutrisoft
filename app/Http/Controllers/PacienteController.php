@@ -50,12 +50,13 @@ class PacienteController extends Controller
 
         //Validamos si existen estos ya registrados
         $datosPersonales = Paciente::where([
-            ['fecha_nacimiento' => $fechaNacimiento],
-            ['dni' => $dni],
-            ['sexo' => $sexo],
-            ['edades' => $edad],
-            ['telefono' => $telefono],
+            ['fecha_nacimiento', $fechaNacimiento],
+            ['dni', $dni],
+            ['sexo', $sexo],
+            ['edad', $edad],
+            ['telefono', $telefono],
         ])->first();
+
 
         if(!$datosPersonales){
             // Obtenemos el paciente autenticado
@@ -69,6 +70,17 @@ class PacienteController extends Controller
             $paciente->telefono = $telefono;
 
             $paciente->save();
+
+            //Verificacimos que no existe ya la historia clínica para el paciente
+            $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+            if(!$historiaClinica){
+                //Si no existe se crea
+                $historiaClinica = HistoriaClinica::create([
+                    'paciente_id' => $paciente->id,
+                ]);
+            }
+
             return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
         }else{
             return redirect()->route('historia-clinica.create')->with('error', 'Ya existe un paciente con estos datos');

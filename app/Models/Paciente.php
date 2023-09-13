@@ -27,4 +27,9 @@ class Paciente extends Model
     {
         return $this->hasOne('App\Models\Paciente\HistoriaClinica');
     }
+
+    public function adelantamientoTurno()
+    {
+        return $this->hasMany('App\Models\Paciente\AdelantamientoTurno');
+    }
 }

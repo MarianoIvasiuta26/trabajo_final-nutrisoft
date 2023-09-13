@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\paciente;
+namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Paciente\ValorAnalisisClinico;
 use Illuminate\Http\Request;
 
 class AnalisisClinicoController extends Controller
@@ -14,7 +15,8 @@ class AnalisisClinicoController extends Controller
      */
     public function index()
     {
-        //
+        $analisis = ValorAnalisisClinico::all();
+        return view('admin.gestion-medica.analisis-clinico.index', compact('analisis'));
     }
 
     /**
