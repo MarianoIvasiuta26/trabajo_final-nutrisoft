@@ -206,24 +206,32 @@
                             <div class="row mt-3">
                                 <div class="col-md-6">
                                     <label for="estilo_vida" class="form-label">Estilo de vida actual</label>
-                                    <select id="estilo_vida" class="form-select">
-                                        <option selected>Elija una opción...</option>
-                                        <option value="Sedentario">Sedentario</option>
-                                        <option value="Actividad Física regular">Actividad Física regular</option>
-                                        <option value="Actividad Física intensa">Actividad Física intensa</option>
-                                        <option value="Poca actividad física"> Poca actividad física</option>
+                                    <select id="estilo_vida" class="form-select @error('estilo_vida') is-invalid @enderror" name="estilo_vida">
+                                        <option value="">Elija una opción...</option>
+                                        <option value="Sedentario" {{ old('estilo_vida') == 'Sedentario' ? 'selected' : '' }}>Sedentario</option>
+                                        <option value="Actividad Fisica regular" {{ old('estilo_vida') == 'Actividad Fisica regular' ? 'selected' : '' }}>Actividad Física regular</option>
+                                        <option value="Actividad Fisica intensa" {{ old('estilo_vida') == 'Actividad Fisica intensa' ? 'selected' : '' }}>Actividad Física intensa</option>
+                                        <option value="Poca actividad física" {{ old('estilo_vida') == 'Poca actividad física' ? 'selected' : '' }}>Poca actividad física</option>
                                     </select>
+
+                                    @error('estilo_vida')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="col-md-6">
                                     <label for="objetivo_salud" class="form-label">Objetivo de salud</label>
-                                    <select id="objetivo_salud" class="form-select">
-                                        <option selected>Elija una opción...</option>
-                                        <option value="Adelgazar">Adelgazar</option>
-                                        <option value="Ganar masa muscular">Ganar masa muscular</option>
-                                        <option value="Nutrición deportiva">Nutrición deportiva</option>
-                                        <option value="Nutrición por enfermedad"> Nutrición por enfermedad</option>
+                                    <select name="objetivo_salud" id="objetivo_salud" class="form-select @error('objetivo_salud') is-invalid @enderror">
+                                        <option value="">Elija una opción...</option>
+                                        <option value="Adelgazar" {{ old('objetivo_salud') == 'Adelgazar' ? 'selected' : '' }}>Adelgazar</option>
+                                        <option value="Ganar masa muscular" {{ old('objetivo_salud') == 'Ganar masa muscular' ? 'selected' : '' }}>Ganar masa muscular</option>
+                                        <option value="Nutrición deportiva" {{ old('objetivo_salud') == 'Nutrición deportiva' ? 'selected' : '' }}>Nutrición deportiva</option>
+                                        <option value="Nutrición por enfermedad" {{ old('objetivo_salud') == 'Nutrición por enfermedad' ? 'selected' : '' }}>Nutrición por enfermedad</option>
                                     </select>
+
+                                    @error('objetivo_salud')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -259,7 +267,7 @@
                                     <label for="gustos" class="form-label">Seleccione sus alimentos preferidos</label>
                                     <select name="alimentos_gustos[]" class="form-select" id="gustos" data-placeholder="Alimentos preferidos..." multiple>
                                         <option value="">Ninguna</option>
-                                        @foreach ($alimentos->groupBy('grupo') as $grupo => $alimentos_del_grupo)
+                                        @foreach ($alimentos->groupBy('grupo_alimento') as $grupo_alimento => $alimentos_del_grupo)
                                             <optgroup label="{{$grupo_alimento}}">
                                                 @foreach ($alimentos_del_grupo as $alimento)
                                                     <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
@@ -272,7 +280,7 @@
                                     <label for="no_gustos" class="form-label">Seleccione los alimentos que no le guste</label>
                                     <select name="alimentos_no_gustos[]" class="form-select" id="no_gustos" data-placeholder="Alimentos que no guste..." multiple>
                                         <option value="">Ninguna</option>
-                                        @foreach ($alimentos->groupBy('grupo') as $grupo => $alimentos_del_grupo)
+                                        @foreach ($alimentos->groupBy('grupo') as $grupo_alimento => $alimentos_del_grupo)
                                             <optgroup label="{{$grupo_alimento}}">
                                                 @foreach ($alimentos_del_grupo as $alimento)
                                                     <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>

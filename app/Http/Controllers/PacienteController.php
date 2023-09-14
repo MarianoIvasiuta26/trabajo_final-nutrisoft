@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Paciente;
+use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use Illuminate\Http\Request;
 
@@ -21,17 +22,6 @@ class PacienteController extends Controller
     }
 
     function store(Request $request){
-
-        //Datos personales
-    /*
-        Validator::make($request->all(), [
-            'dni' => ['required', 'string', 'max:8'],
-            'sexo' => ['required', 'string', 'max:10'],
-            'fecha_nacimiento' => ['required', 'date'],
-            'edad' => ['required', 'integer'],
-            'telefono' => ['required', 'string', 'max:10'],
-        ]);
-    */
 
         $request->validate([
             'dni' => ['required', 'string', 'max:8'],
@@ -78,9 +68,31 @@ class PacienteController extends Controller
                 //Si no existe se crea
                 $historiaClinica = HistoriaClinica::create([
                     'paciente_id' => $paciente->id,
+                    'peso' => 0,
+                    'altura' => 0,
+                    'circunferencia_munieca' => 0,
+                    'circunferencia_cadera' => 0,
+                    'circunferencia_cintura' => 0,
+                    'circunferencia_pecho' => 0,
+                    'estilo_vida' => '',
+                    'objetivo_salud' => '',
                 ]);
             }
+/*
+            //Obtenemos los datos médicos de la historia clínica
+            $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
 
+            if(!$datosMedicos){
+                //Si no existe se crea
+                $datosMedicos = DatosMedicos::create([
+                    'historia_clinica_id' => $historiaClinica->id,
+                    'alergia_id' => 0,
+                    'patologia_id' => 0,
+                    'intolerancia_id' => 0,
+                    'valor_analisis_clinico_id' => 0,
+                ]);
+            }
+*/
             return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
         }else{
             return redirect()->route('historia-clinica.create')->with('error', 'Ya existe un paciente con estos datos');

@@ -47,7 +47,7 @@ class PatologiaController extends Controller
 
         //Validamos que no exista esa alergia
         //$alergia_existente = Alergia::where(['alergia', $alergia], ['grupo_alergia', $grupo_alergia])->first();
-        $patologia_existente = Patologia::whereIn('alergia', [$patologia])->where('grupo_patologia', $grupo_patologia)->first();
+        $patologia_existente = Patologia::whereIn('patologia', [$patologia])->where('grupo_patologia', $grupo_patologia)->first();
 
         if ($patologia_existente) {
             /*$alimentos_prohibidos = $request->input('alimentos_prohibidos');
@@ -65,7 +65,7 @@ class PatologiaController extends Controller
         } else {
             $patologia_creada = Patologia::create([
                 'patologia' => $patologia,
-                'grupo_cirugia' => $grupo_patologia,
+                'grupo_patologia' => $grupo_patologia,
             ]);
 
             /*$alimentos_prohibidos = $request->input('alimentos_prohibidos');

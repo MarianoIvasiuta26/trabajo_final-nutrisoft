@@ -32,4 +32,8 @@ class HistoriaClinica extends Model
         return $this->hasOne('App/Models/Paciente/AnamnesisAlimentaria');
     }
 
+    public function cirugiasPaciente(){
+        return $this->hasMany('App/Models/Paciente/CirugiasPaciente');
+    }
+
 }

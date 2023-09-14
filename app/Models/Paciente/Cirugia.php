@@ -16,4 +16,8 @@ class Cirugia extends Model
     public function datosMedicos(){
         return $this->hasMany('App/Models/Paciente/DatosMedicos');
     }
+
+    public function cirugiasPaciente(){
+        return $this->hasMany('App/Models/Paciente/CirugiasPaciente');
+    }
 }

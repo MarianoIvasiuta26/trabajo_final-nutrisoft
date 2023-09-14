@@ -9,7 +9,9 @@ use App\Models\HorariosAtencion;
 use App\Models\Paciente;
 use App\Models\Paciente\AdelantamientoTurno;
 use App\Models\Paciente\Alergia;
+use App\Models\Paciente\AnamnesisAlimentaria;
 use App\Models\Paciente\Cirugia;
+use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
@@ -25,7 +27,16 @@ class HistoriaClinicaController extends Controller
      */
     public function index()
     {
-        return view('paciente.historia-clinica.index');
+        $paciente = Paciente::where('user_id', auth()->id())->first();
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
+        $alergias = Alergia::where('id', $datosMedicos->alergia_id)->get();
+        $cirugias = Cirugia::where('id', $datosMedicos->cirugia_id)->get();
+        $intolerancias = Intolerancia::where('id', $datosMedicos->intolerancia_id)->get();
+        $patologias = Patologia::where('id', $datosMedicos->patologia_id)->get();
+        $adelantamientos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();
+        $anamnesisAlimentaria = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->get();
+        return view('paciente.historia-clinica.index', compact('paciente', 'historiaClinica', 'datosMedicos', 'adelantamientos', 'anamnesisAlimentaria', 'alergias', 'cirugias', 'intolerancias', 'patologias'));
     }
 
     /**
@@ -54,7 +65,7 @@ class HistoriaClinicaController extends Controller
     public function store(Request $request)
     {
 
-        //Datos físicos
+        // Datos físicos
         $request->validate([
             'peso' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'altura' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
@@ -62,64 +73,59 @@ class HistoriaClinicaController extends Controller
             'circunferencia_cadera' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'circunferencia_cintura' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'circunferencia_pecho' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'estilo_vida' => ['string', 'max:25'],
-            'objetivo_salud' => ['string', 'max:25'],
+            'estilo_vida' => ['required', 'string', 'max:25'],
+            'objetivo_salud' => ['required', 'string', 'max:25'],
         ]);
 
-        $peso = $request->input('peso');
-        $altura = $request->input('altura');
-        $circunferencia_munieca = $request->input('circunferencia_munieca');
-        $circunferencia_cadera = $request->input('circunferencia_cadera');
-        $circunferencia_cintura = $request->input('circunferencia_cintura');
-        $circunferencia_pecho = $request->input('circunferencia_pecho');
-        $estilo_vida = $request->input('estilo_vida');
-        $objetivo_salud = $request->input('objetivo_salud');
-
-        // Obtenemos el paciente autenticado
         $paciente = Paciente::where('user_id', auth()->id())->first();
 
-        //Verificamos si el paciente ya tiene la historia clínica completa
+        // Verificamos si el paciente ya tiene la historia clínica completa
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
 
-        if(!$historiaClinica){
-            HistoriaClinica::create([
+        if (!$historiaClinica) {
+            // Si no existe un registro, crear uno nuevo con los datos proporcionados o valores predeterminados
+            $historiaClinica = HistoriaClinica::create([
                 'paciente_id' => $paciente->id,
+                'peso' => $request->input('peso', 0),
+                'altura' => $request->input('altura', 0),
+                'circunferencia_munieca' => $request->input('circunferencia_munieca', 0),
+                'circunferencia_cadera' => $request->input('circunferencia_cadera', 0),
+                'circunferencia_cintura' => $request->input('circunferencia_cintura', 0),
+                'circunferencia_pecho' => $request->input('circunferencia_pecho', 0),
+                'estilo_vida' => $request->input('estilo_vida', ''),
+                'objetivo_salud' => $request->input('objetivo_salud', ''),
             ]);
         }
+/*
+        //Obtenemos los datos médicos de la historia clínica
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
 
-        //Validamos si existen estos ya registrados
-        $datosFisicos = HistoriaClinica::where([
-            ['paciente_id', $paciente->id],
-            ['peso', $peso],
-            ['altura', $altura],
-            ['circunferencia_munieca', $circunferencia_munieca],
-            ['circunferencia_cadera', $circunferencia_cadera],
-            ['circunferencia_cintura', $circunferencia_cintura],
-            ['circunferencia_pecho', $circunferencia_pecho],
-            ['estilo_vida', $estilo_vida],
-            ['objetivo_salud', $objetivo_salud],
-        ])->first();
-
-        if(!$datosFisicos){
-            HistoriaClinica::create([
-                'paciente_id' => $paciente->id,
-                'peso' => $peso,
-                'altura' => $altura,
-                'circunferencia_munieca' => $circunferencia_munieca,
-                'circunferencia_cadera' => $circunferencia_cadera,
-                'circunferencia_cintura' => $circunferencia_cintura,
-                'circunferencia_pecho' => $circunferencia_pecho,
-                'estilo_vida' => $estilo_vida,
-                'objetivo_salud' => $objetivo_salud,
+        if(!$datosMedicos){
+            //Si no existe se crea
+            $datosMedicos = DatosMedicos::create([
+                'historia_clinica_id' => $historiaClinica->id,
+                'alergia_id' => 0,
+                'patologia_id' => 0,
+                'intolerancia_id' => 0,
+                'valor_analisis_clinico_id' => 0,
             ]);
-
-            return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
-        } else {
-            return redirect()->route('historia-clinica.create')->with('error', 'Ya existe la historia clínica para este paciente');
         }
+*/
+        // Actualizamos o creamos los datos físicos con los valores proporcionados o valores predeterminados
+        $historiaClinica->update([
+            'peso' => $request->input('peso', 0),
+            'altura' => $request->input('altura', 0),
+            'circunferencia_munieca' => $request->input('circunferencia_munieca', 0),
+            'circunferencia_cadera' => $request->input('circunferencia_cadera', 0),
+            'circunferencia_cintura' => $request->input('circunferencia_cintura', 0),
+            'circunferencia_pecho' => $request->input('circunferencia_pecho', 0),
+            'estilo_vida' => $request->input('estilo_vida', ''),
+            'objetivo_salud' => $request->input('objetivo_salud', ''),
+        ]);
 
-
+        return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
     }
+
 
     /**
      * Display the specified resource.
