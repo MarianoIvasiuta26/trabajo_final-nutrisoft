@@ -150,7 +150,8 @@ class HistoriaClinicaController extends Controller
      */
     public function edit($id)
     {
-        //
+        $historiaClinica = HistoriaClinica::find($id);
+        return view('paciente.historia-clinica.edit')->with('historiaClinica', $historiaClinica);
     }
 
     /**
@@ -162,7 +163,35 @@ class HistoriaClinicaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'peso' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'altura' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circunferencia_munieca' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circunferencia_cadera' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circunferencia_cintura' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circunferencia_pecho' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'estilo_vida' => ['required', 'string', 'max:25'],
+            'objetivo_salud' => ['required', 'string', 'max:25'],
+        ]);
+
+        $historiaClinica = HistoriaClinica::find($id);
+
+        if($historiaClinica){
+            $historiaClinica->peso = $request->input('peso');
+            $historiaClinica->altura = $request->input('altura');
+            $historiaClinica->circunferencia_munieca = $request->input('circunferencia_munieca');
+            $historiaClinica->circunferencia_cadera = $request->input('circunferencia_cadera');
+            $historiaClinica->circunferencia_cintura = $request->input('circunferencia_cintura');
+            $historiaClinica->circunferencia_pecho = $request->input('circunferencia_pecho');
+            $historiaClinica->estilo_vida = $request->input('estilo_vida');
+            $historiaClinica->objetivo_salud = $request->input('objetivo_salud');
+
+            $historiaClinica->save();
+
+            return redirect()->route('historia-clinica.index')->with('success', 'Datos personales actualizados');
+        }else{
+            return redirect()->route('historia-clinica.index')->with('error', 'No se ha encontrado la historia clínica');
+        }
     }
 
     /**
@@ -173,6 +202,6 @@ class HistoriaClinicaController extends Controller
      */
     public function destroy($id)
     {
-        //
+
     }
 }

@@ -9,9 +9,6 @@
 @section('content')
     <div class="card card-dark">
         <div class="card-header">
-            <button class="btn btn-link float-right" onclick="toggleCard('datosPersonales')">
-                <i class="fa fa-minus"></i>
-            </button>
             <h5>Datos Personales</h5>
         </div>
         <div id="datosPersonales" class="card-body">
