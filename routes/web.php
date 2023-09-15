@@ -74,6 +74,10 @@ Route::middleware([
     Route::resource('historia-clinica', HistoriaClinicaController::class)->names('historia-clinica');
     Route::get('/complete-history', [HistoriaClinicaController::class, 'index'])->name('complete-history');
     Route::post('datos-personales/store', [PacienteController::class, 'store'])->name('datos-personales.store');
+
+    Route::get('datos-personales/edit/{id}', [PacienteController::class, 'edit'])->name('datos-personales.edit');
+    Route::post('datos-personales/update/{id}', [PacienteController::class, 'update'])->name('datos-personales.update');
+
     Route::resource('adelantamiento-turno', AdelantamientoTurnoController::class)->names('adelantamiento-turno');
     Route::resource('datos-medicos', DatosMedicosController::class)->names('datos-medicos');
 });

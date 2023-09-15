@@ -30,6 +30,9 @@ class HistoriaClinicaController extends Controller
     {
         $paciente = Paciente::where('user_id', auth()->id())->first();
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+        if(!$historiaClinica){
+            return view('paciente.historia-clinica.index')->with('info', 'No se ha registrado la historia clínica');
+        }
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
         $alergias = Alergia::where('id', $datosMedicos->alergia_id)->get();
         $cirugias = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();

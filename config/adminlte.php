@@ -327,7 +327,7 @@ return [
         [
             'text' => 'Historia Clínica',
             'route'  => 'historia-clinica.index',
-            'icon' => 'fas fa-lock fa-fw',
+            'icon' => 'fas fa-file-medical fa-fw',
         ],
 
         [

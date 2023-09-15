@@ -98,4 +98,48 @@ class PacienteController extends Controller
             return redirect()->route('historia-clinica.create')->with('error', 'Ya existe un paciente con estos datos');
         }
     }
+
+    public function edit($id)
+    {
+        $paciente = Paciente::find($id);
+        return view('paciente.historia-clinica.datos-personales.edit')->with('paciente', $paciente);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'dni' => ['required', 'string', 'max:8'],
+            'sexo' => ['required', 'string', 'max:10'],
+            'fecha_nacimiento' => ['required', 'date'],
+            'edad' => ['required', 'integer'],
+            'telefono' => ['required', 'string', 'max:10'],
+        ]);
+
+        $paciente = Paciente::find($id);
+
+        if($paciente){
+            // Actualiza los campos del paciente
+            $paciente->dni = $request->input('dni');
+            $paciente->sexo = $request->input('sexo');
+            $paciente->fecha_nacimiento = $request->input('fecha_nacimiento');
+            $paciente->edad = $request->input('edad');
+            $paciente->telefono = $request->input('telefono');
+
+            // Guarda los cambios en la base de datos
+            $paciente->save();
+
+            return redirect()->route('historia-clinica.index')->with('success', 'Datos personales actualizados');
+        }else{
+            return redirect()->route('historia-clinica.index')->with('error', 'Paciente no encontrado');
+        }
+    }
+
 }
+

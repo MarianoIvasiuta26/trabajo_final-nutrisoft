@@ -18,7 +18,7 @@ class HistoriaClinica extends Model
         'circunferencia_cadera',
         'circunferencia_pecho',
         'estilo_vida',
-        'objetivo_Salud',
+        'objetivo_salud',
     ];
     public function paciente(){
         return $this->belongsTo('App/Models/Paciente');
