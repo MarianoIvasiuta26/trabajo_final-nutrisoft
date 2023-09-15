@@ -11,6 +11,7 @@ use App\Models\Paciente\AdelantamientoTurno;
 use App\Models\Paciente\Alergia;
 use App\Models\Paciente\AnamnesisAlimentaria;
 use App\Models\Paciente\Cirugia;
+use App\Models\Paciente\CirugiasPaciente;
 use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\Paciente\Intolerancia;
@@ -31,7 +32,7 @@ class HistoriaClinicaController extends Controller
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
         $alergias = Alergia::where('id', $datosMedicos->alergia_id)->get();
-        $cirugias = Cirugia::where('id', $datosMedicos->cirugia_id)->get();
+        $cirugias = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
         $intolerancias = Intolerancia::where('id', $datosMedicos->intolerancia_id)->get();
         $patologias = Patologia::where('id', $datosMedicos->patologia_id)->get();
         $adelantamientos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();
