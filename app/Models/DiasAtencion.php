@@ -11,6 +11,7 @@ class DiasAtencion extends Model
 
     protected $fillable = [
         'dia',
+        'seleccionado',
     ];
 
     public function horariosAtencion(){

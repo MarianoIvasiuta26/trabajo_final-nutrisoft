@@ -90,12 +90,12 @@ class HorasDiasAtencionController extends Controller
                     'dia_atencion_id' => $diaExistente->id,
                     'hora_atencion_id' =>$horas->id,
                 ]);
+                $diaExistente->seleccionado = true;
+                $diaExistente->save();
             }else{
                 //Si ya existe un registro con los mismos datos
                 break;
             }
-
-
 
         }
 

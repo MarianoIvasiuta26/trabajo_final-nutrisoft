@@ -93,45 +93,46 @@
 
             @if (isset($nutricionista))
 
-                    @forelse ($horarios as $horario)
-                        <tr>
-                            <td>
-                                @forelse ($dias as $dia)
-                                    @if ($dia->id == $horario->dia_atencion_id)
-                                        {{ $dia->dia }}
-                                    @endif
-                                @empty
-                                   <h5> No hay días de atención</h5>
-                                @endforelse
-                            </td>
+                @forelse ($dias as $dia)
+                    @if ($dia->seleccionado == true)
+                    <tr>
+                        <td>
+                            {{ $dia->dia }}
+                        </td>
 
-                            <td>
+                        @php $morning = ''; $afternoon = ''; @endphp
+                        @foreach ($horarios as $horario)
+                            @if ($horario->dia_atencion_id == $dia->id)
                                 @foreach ($horas as $hora)
-                                    @if ($hora->etiqueta == 'Maniana' && $horario->hora_atencion_id == $hora->id)
-                                        {{ $hora->hora_inicio }} - {{ $hora->hora_fin }}
+                                    @if ($hora->id == $horario->hora_atencion_id)
+                                        @if ($hora->etiqueta == 'Maniana')
+                                            @php $morning = $hora->hora_inicio . ' - ' . $hora->hora_fin; @endphp
+                                        @elseif ($hora->etiqueta == 'Tarde')
+                                            @php $afternoon = $hora->hora_inicio . ' - ' . $hora->hora_fin; @endphp
+                                        @endif
                                     @endif
                                 @endforeach
-                            </td>
+                            @endif
+                        @endforeach
 
-                            <td>
-                                @foreach ($horas as $hora)
-                                    @if ($hora->etiqueta == 'Tarde' && $horario->hora_atencion_id == $hora->id)
-                                        {{ $hora->hora_inicio }} - {{ $hora->hora_fin }}
-                                    @endif
-                                @endforeach
-                            </td>
+                        <td>{{ $morning }}</td>
+                        <td>{{ $afternoon }}</td>
 
-                            <td>
-                                <form action="{{ route('gestion-atencion.destroy', $horario->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <input type="submit" value="Eliminar" class="btn btn-danger">
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
+                        <td>
+                            <form action="{{ route('gestion-atencion.destroy', $horario->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <input type="submit" value="Eliminar" class="btn btn-danger">
+                            </form>
+                        </td>
+                    </tr>
+                    @endif
+
+                @empty
+                    <tr>
                         <td colspan="4">No se encontraron registros de días y horarios de atención.</td>
-                    @endforelse
+                    </tr>
+                @endforelse
             @endif
         </tbody>
     </table>

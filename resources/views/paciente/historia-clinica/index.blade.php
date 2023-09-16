@@ -176,11 +176,7 @@
                                         @empty
                                             <tr>
                                                 <td colspan="2">No se encontraron registros de días y horarios de atención.</td>
-                                                <td colspan="1">
-                                                    <a href="{{route('adelantamiento-turno.edit', $paciente->id)}}" class="btn btn-warning">
-                                                        Agregar
-                                                    </a>
-                                                </td>
+                                                
                                             </tr>
                                         @endforelse
                                         <tr>
