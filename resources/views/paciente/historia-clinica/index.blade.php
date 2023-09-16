@@ -130,7 +130,7 @@
 
                             <div id="dias-horas" class="tab-pane">
 
-                                <table class="table table-success table-striped mt-4">
+                                <table class="table table-striped mt-4">
                                     <thead>
                                         <tr>
                                             <th scope="col">Días libres</th>
@@ -143,32 +143,53 @@
                                         @forelse ($adelantamientos as $adelantamiento)
                                             <tr>
                                                 <td>
-                                                    @foreach ($adelantamiento->dias_fijos as $dia)
-                                                        {{ $dia }}
-                                                    @endforeach
+                                                    @if(is_array($adelantamiento->dias_fijos))
+                                                        @foreach ($adelantamiento->dias_fijos as $dia)
+                                                            {{ $dia }}
+                                                        @endforeach
+                                                    @else
+                                                        {{ $adelantamiento->dias_fijos }}
+                                                    @endif
                                                 </td>
 
                                                 <td>
-                                                    @foreach ($adelantamiento->horas_fijas as $hora)
-                                                        {{ $hora }}
-                                                    @endforeach
+                                                    @if(is_array($adelantamiento->horas_fijas))
+                                                        @foreach ($adelantamiento->horas_fijas as $hora)
+                                                            {{ $hora }}
+                                                        @endforeach
+                                                    @else
+                                                        {{ $adelantamiento->horas_fijas }}
+                                                    @endif
                                                 </td>
 
                                                 <td>
-                                                    <a class="btn btn-info" href="{{ route('historia-clinica.edit', $adelantamiento->id) }}">Editar</a>
-                                                    <a class="btn btn-danger" href="{{route('historia-clinica.destroy', $adelantamiento->id)}}">Borrar</a>
+                                                    <div class="btn-group">
+                                                        <a class="btn btn-info" href="{{ route('adelantamiento-turno.edit', $paciente->id) }}">Editar</a>
+                                                        <form action="{{ route('adelantamiento-turno.destroy', $adelantamiento->id) }}" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
                                                 <td colspan="2">No se encontraron registros de días y horarios de atención.</td>
                                                 <td colspan="1">
-                                                    <a href="" class="btn btn-warning">
+                                                    <a href="{{route('adelantamiento-turno.edit', $paciente->id)}}" class="btn btn-warning">
                                                         Agregar
                                                     </a>
                                                 </td>
                                             </tr>
                                         @endforelse
+                                        <tr>
+                                            <td colspan="3">
+                                                <a href="{{route('adelantamiento-turno.create', $paciente->id)}}" class="btn btn-warning">
+                                                    Agregar
+                                                </a>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>

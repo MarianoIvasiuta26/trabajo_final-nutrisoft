@@ -130,7 +130,7 @@
                                     </div>
 
                                     <div class="row">
-                                        <select class="selectpicker mt-4" data-style="btn-success" multiple title="Seleccione las horas de la tarde disponibles..." data-width="fit" data-size="5" data-live-search="true">
+                                        <select name="horasFijas[]" class="selectpicker mt-4" data-style="btn-success" multiple title="Seleccione las horas de la tarde disponibles..." data-width="fit" data-size="5" data-live-search="true">
                                             <option value="16:30">16:30</option>
                                             <option value="17:00">17:00</option>
                                             <option value="17:30">17:30</option>

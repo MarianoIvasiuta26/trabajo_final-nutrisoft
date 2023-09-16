@@ -100,7 +100,7 @@
                                             <option value="meses" @if ($cirugiasPaciente->unidad_tiempo == 'meses')
                                                 selected
                                             @endif>Meses</option>
-                                            <option value="anos" @if ($cirugiasPaciente->unidad_tiempo == 'anos')
+                                            <option value="anios" @if ($cirugiasPaciente->unidad_tiempo == 'anios')
                                                 selected
                                             @endif>Años</option>
                                         </select>
@@ -151,7 +151,7 @@
                         <div class="col-12">
                             <div class="float-right">
                                 <button type="submit" class="btn btn-success">Guardar</button>
-                                <a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                                <a href="{{ route('historia-clinica.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
                             </div>
                         </div>
                     </div>

@@ -80,4 +80,5 @@ Route::middleware([
 
     Route::resource('adelantamiento-turno', AdelantamientoTurnoController::class)->names('adelantamiento-turno');
     Route::resource('datos-medicos', DatosMedicosController::class)->names('datos-medicos');
+    Route::post('adelantamiento-turno/guardar', [AdelantamientoTurnoController::class, 'guardar'])->name('adelantamiento-turno.guardar');
 });

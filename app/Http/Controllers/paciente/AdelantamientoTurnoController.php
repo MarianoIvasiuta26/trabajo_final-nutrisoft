@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\paciente;
 
 use App\Http\Controllers\Controller;
+use App\Models\DiasAtencion;
+use App\Models\HorariosAtencion;
 use App\Models\Paciente;
 use App\Models\Paciente\AdelantamientoTurno;
 use App\Models\Paciente\DatosMedicos;
@@ -28,7 +30,70 @@ class AdelantamientoTurnoController extends Controller
      */
     public function create()
     {
-        //
+        $paciente = Paciente::where('user_id', auth()->id())->first();
+        $dias = DiasAtencion::all();
+        $horarios = HorariosAtencion::all();
+        return view('paciente.historia-clinica.adelantamiento-turnos.create', compact('dias', 'horarios', 'paciente'));
+    }
+
+    public function guardar(Request $request){
+        // Obtenemos el nutricionista autenticado
+        $paciente = Paciente::where('user_id', auth()->id())->first();
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        //Si no existe la historia clinica del paciente, la creamos
+        if (!$historiaClinica) {
+            $historiaClinica = HistoriaClinica::create([
+                'paciente_id' => $paciente->id,
+                'peso' => 0,
+                'altura' => 0,
+                'circunferencia_munieca' => 0,
+                'circunferencia_cadera' => 0,
+                'circunferencia_cintura' => 0,
+                'circunferencia_pecho' => 0,
+                'estilo_vida' => '',
+                'objetivo_salud' => '',
+            ]);
+        }
+/*
+        //Obtenemos los datos médicos de la historia clínica
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
+
+        if(!$datosMedicos){
+            //Si no existe se crea
+            $datosMedicos = DatosMedicos::create([
+                'historia_clinica_id' => $historiaClinica->id,
+                'alergia_id' => 0,
+                'patologia_id' => 0,
+                'intolerancia_id' => 0,
+                'valor_analisis_clinico_id' => 0,
+            ]);
+        }
+*/
+        // Días y horarios fijos
+        $diasFijos = $request->input('diasFijos');
+        $horasFijas = $request->input('horasFijas');
+
+        foreach ($diasFijos as $diaFijo) {
+            foreach ($horasFijas as $horaFija) {
+                // Verificamos si ya existe un registro de esos días y horarios fijos
+                $existe = AdelantamientoTurno::where([
+                    ['paciente_id', $paciente->id],
+                    ['horas_fijas', $horaFija],
+                    ['dias_fijos', $diaFijo],
+                ])->first();
+
+                if (!$existe) {
+                    AdelantamientoTurno::create([
+                        'paciente_id' => $paciente->id,
+                        'horas_fijas' => $horaFija,
+                        'dias_fijos' => $diaFijo,
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('historia-clinica.index')->with('success', 'Días y horas disponibles registrados');
     }
 
     /**
@@ -118,8 +183,12 @@ class AdelantamientoTurnoController extends Controller
     public function edit($id)
     {
         $paciente = Paciente::find($id);
-        return view('paciente.historia-clinica.datos-personales.edit')->with('paciente', $paciente);
+        $dias = DiasAtencion::all();
+        $horarios = HorariosAtencion::all();
+        $adelantamientos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();
+        return view('paciente.historia-clinica.adelantamiento-turnos.edit', compact('dias', 'horarios', 'adelantamientos', 'paciente'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -130,31 +199,41 @@ class AdelantamientoTurnoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'dni' => ['required', 'string', 'max:8'],
-            'sexo' => ['required', 'string', 'max:10'],
-            'fecha_nacimiento' => ['required', 'date'],
-            'edad' => ['required', 'integer'],
-            'telefono' => ['required', 'string', 'max:10'],
-        ]);
-
         $paciente = Paciente::find($id);
 
+        // Días y horarios fijos
+        $diasFijos = $request->input('diasFijos');
+        $horasFijas = $request->input('horasFijas');
+
         if($paciente){
-            // Actualiza los campos del paciente
-            $paciente->dni = $request->input('dni');
-            $paciente->sexo = $request->input('sexo');
-            $paciente->fecha_nacimiento = $request->input('fecha_nacimiento');
-            $paciente->edad = $request->input('edad');
-            $paciente->telefono = $request->input('telefono');
+            foreach ($diasFijos as $diaFijo) {
+                foreach ($horasFijas as $horaFija) {
+                    // Verificamos si ya existe un registro de esos días y horarios fijos
+                    $adelantamiento = AdelantamientoTurno::where([
+                        ['paciente_id', $paciente->id],
+                        ['horas_fijas', $horaFija],
+                        ['dias_fijos', $diaFijo],
+                    ])->first();
 
-            // Guarda los cambios en la base de datos
-            $paciente->save();
+                    if (!$adelantamiento) {
+                        AdelantamientoTurno::create([
+                            'paciente_id' => $paciente->id,
+                            'horas_fijas' => $horaFija,
+                            'dias_fijos' => $diaFijo,
+                        ]);
+                    }else{
+                        $adelantamiento->horas_fijas->$request->input('horasFijas');
+                        $adelantamiento->dias_fijos->$request->input('diasFijos');
 
-            return redirect()->route('historia-clinica.index')->with('success', 'Datos personales actualizados');
-        }else{
-            return redirect()->route('historia-clinica.index')->with('error', 'Paciente no encontrado');
+                        $adelantamiento->save();
+                    }
+                }
+            }
+            return redirect()->route('historia-clinica.index', $paciente->id)->with('success', 'Días y horas disponibles actualizados');
+        } else {
+            return redirect()->route('adelantamiento-turnos.edit', $paciente->id)->with('error', 'No se pudo actualizar los días y horas disponibles');
         }
+
     }
 
     /**
@@ -165,6 +244,13 @@ class AdelantamientoTurnoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $adelantamiento = AdelantamientoTurno::find($id);
+
+        if($adelantamiento){
+            $adelantamiento->delete();
+            return redirect()->route('historia-clinica.index')->with('success', 'Día y hora disponible eliminado');
+        } else {
+            return redirect()->route('historia-clinica.index')->with('error', 'No se pudo eliminar el día y hora disponible');
+        }
     }
 }
