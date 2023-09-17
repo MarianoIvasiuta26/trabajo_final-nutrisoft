@@ -176,7 +176,7 @@
                                         @empty
                                             <tr>
                                                 <td colspan="2">No se encontraron registros de días y horarios de atención.</td>
-                                                
+
                                             </tr>
                                         @endforelse
                                         <tr>
@@ -254,9 +254,26 @@
                                 <p>Anamnesis Alimentaria:</p>
                                 <!-- Iterar y mostrar alimentos preferidos y no gustados -->
                                 <ul>
-                                    @foreach ($anamnesisAlimentaria as $anamnesis)
-                                        <li>{{ $anamnesis->alimento }}</li>
+                                    @foreach ($alimentos as $alimento)
+                                        @forelse ($anamnesisAlimentaria as $anamnesis)
+                                            @if ($anamnesis->alimento_id == $alimento->id)
+                                                @if ($alimento->alimento == 'Ninguno')
+                                                    <li>No se registró ningún alimento para la anamnesis.</li>
+                                                @else
+                                                    @if ($alimento->gusta == 0)
+                                                        <li>{{ $alimento->alimento }} - No gusta</li>
+
+                                                    @else
+                                                        <li>{{ $alimento->alimento }} - Gusta</li>
+                                                    @endif
+                                                @endif
+
+                                            @endif
+                                        @empty
+                                            <h5>No se encontraron anamnesis alimentarias registradas.</h5>
+                                        @endforelse
                                     @endforeach
+
                                 </ul>
                                 <p>Alergias:</p>
                                 <!-- Iterar y mostrar alergias -->
@@ -269,7 +286,13 @@
                                 <!-- Iterar y mostrar cirugías -->
                                 <ul>
                                     @foreach ($cirugias as $cirugia)
-                                        <li>{{ $cirugia->cirugia }} - {{ $cirugia->tiempo }} {{ $cirugia->unidad }}</li>
+                                        @forelse ($cirugiasPaciente as $cirugiaPaciente)
+                                            @if ($cirugiaPaciente->cirugia_id == $cirugia->id)
+                                                <li>{{ $cirugia->cirugia }} - {{ $cirugiaPaciente->tiempo }} {{ $cirugiaPaciente->unidad_tiempo }}</li>
+                                            @endif
+                                        @empty
+                                            <h5>No se encontraron cirugías registradas.</h5>
+                                        @endforelse
                                     @endforeach
                                 </ul>
                                 <p>Patologías:</p>

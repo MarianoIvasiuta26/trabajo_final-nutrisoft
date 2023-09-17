@@ -71,45 +71,45 @@
 
                     <div class="row mt-3" id="cirugias-container">
                         <h5>Cirugías</h5>
-                        <div class="cirugia-entry">
-                            <div class="row mt-3">
-                                <div class="col-md-6">
-                                    <select name="cirugias[]" class="form-select">
-                                        <option value="">Seleccione una cirugía</option>
-                                        @foreach ($cirugias->groupBy('grupo_cirugia') as $grupo_cirugia => $cirugias_del_grupo)
-                                            <optgroup label="{{$grupo_cirugia}}">
-                                                @foreach ($cirugias_del_grupo as $cirugia)
-                                                    <option value="{{$cirugia->id}}" @if ($cirugiasPaciente->cirugia_id == $cirugia->id)
-                                                        selected
-                                                    @endif>{{$cirugia->cirugia}}</option>
-                                                @endforeach
-                                            </optgroup>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="input-group">
-                                        <input type="number" name="tiempo[]" class="form-control tiempo-input" placeholder="Tiempo" value="{{$cirugiasPaciente->tiempo}}">
-                                        <select name="unidad[]" class="form-select unidad-select">
-                                            <option value="dias" @if ($cirugiasPaciente->unidad_tiempo == 'dias')
-                                                selected
-                                            @endif>Días</option>
-                                            <option value="semanas" @if ($cirugiasPaciente->unidad_tiempo == 'semanas')
-                                                selected
-                                            @endif>Semanas</option>
-                                            <option value="meses" @if ($cirugiasPaciente->unidad_tiempo == 'meses')
-                                                selected
-                                            @endif>Meses</option>
-                                            <option value="anios" @if ($cirugiasPaciente->unidad_tiempo == 'anios')
-                                                selected
-                                            @endif>Años</option>
+                            <div class="cirugia-entry">
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <select name="cirugias[]" class="form-select">
+                                            <option value="">Seleccione una cirugía</option>
+                                            @foreach ($cirugias->groupBy('grupo_cirugia') as $grupo_cirugia => $cirugias_del_grupo)
+                                                <optgroup label="{{$grupo_cirugia}}">
+                                                    @foreach ($cirugias_del_grupo as $cirugia)
+                                                        <option value="{{$cirugia->id}}" @if ($cirugiasPaciente->cirugia_id == $cirugia->id)
+                                                            selected
+                                                        @endif>{{$cirugia->cirugia}}</option>
+                                                    @endforeach
+                                                </optgroup>
+                                            @endforeach
                                         </select>
-                                        <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
-                                        <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <input type="number" name="tiempo[]" class="form-control tiempo-input" placeholder="Tiempo" value="{{$cirugiasPaciente->tiempo}}">
+                                            <select name="unidad[]" class="form-select unidad-select">
+                                                <option value="dias" @if ($cirugiasPaciente->unidad_tiempo == 'dias')
+                                                    selected
+                                                @endif>Días</option>
+                                                <option value="semanas" @if ($cirugiasPaciente->unidad_tiempo == 'semanas')
+                                                    selected
+                                                @endif>Semanas</option>
+                                                <option value="meses" @if ($cirugiasPaciente->unidad_tiempo == 'meses')
+                                                    selected
+                                                @endif>Meses</option>
+                                                <option value="anios" @if ($cirugiasPaciente->unidad_tiempo == 'anios')
+                                                    selected
+                                                @endif>Años</option>
+                                            </select>
+                                            <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
+                                            <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                     </div>
 
                     <div class="row mt-3">

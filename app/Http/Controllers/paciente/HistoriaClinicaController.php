@@ -35,12 +35,14 @@ class HistoriaClinicaController extends Controller
         }
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
         $alergias = Alergia::where('id', $datosMedicos->alergia_id)->get();
-        $cirugias = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
+        $cirugias = Cirugia::all();
         $intolerancias = Intolerancia::where('id', $datosMedicos->intolerancia_id)->get();
         $patologias = Patologia::where('id', $datosMedicos->patologia_id)->get();
         $adelantamientos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();
         $anamnesisAlimentaria = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->get();
-        return view('paciente.historia-clinica.index', compact('paciente', 'historiaClinica', 'datosMedicos', 'adelantamientos', 'anamnesisAlimentaria', 'alergias', 'cirugias', 'intolerancias', 'patologias'));
+        $alimentos = Alimento::all();
+        return view('paciente.historia-clinica.index', compact('paciente', 'historiaClinica', 'datosMedicos', 'adelantamientos', 'anamnesisAlimentaria', 'alimentos', 'alergias', 'cirugiasPaciente', 'cirugias', 'intolerancias', 'patologias'));
     }
 
     /**
