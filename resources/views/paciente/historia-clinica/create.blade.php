@@ -101,7 +101,7 @@
                                     <h5>Seleccione los días que tiene disponibles:</h5>
                                     @foreach ($horarios as $horario)
                                         @foreach ($dias as $dia)
-                                            @if ($dia->id == $horario->dia_atencion_id)
+                                            @if ($dia->id == $horario->dia_atencion_id && $dia->seleccionado == true)
                                                 <div class="col-md-2">
                                                     <div class="icheck-primary">
                                                         <input value="{{$dia->dia}}" type="checkbox" id="diasFijos-{{$dia->dia}}" name="diasFijos[]"/>
@@ -326,12 +326,12 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="input-group">
-                                                <input type="number" name="tiempo[]" class="form-control tiempo-input" placeholder="Tiempo">
-                                                <select name="unidad[]" class="form-select unidad-select">
+                                                <input type="number" name="tiempos[]" class="form-control tiempo-input" placeholder="Tiempo">
+                                                <select name="unidades_tiempo[]" class="form-select unidad-select">
                                                     <option value="dias">Días</option>
                                                     <option value="semanas">Semanas</option>
                                                     <option value="meses">Meses</option>
-                                                    <option value="anos">Años</option>
+                                                    <option value="anios">Años</option>
                                                 </select>
                                                 <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
                                                 <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
