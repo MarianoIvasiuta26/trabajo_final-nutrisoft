@@ -11,11 +11,10 @@ class ValorNutricional extends Model
 
     protected $fillable = [
         'alimento_id',
-        'nombre',
         'fuente_alimento_id',
+        'nutriente_id',
         'unidad',
         'valor',
-        'tipo',
     ];
 
     public function alimento()
@@ -26,5 +25,10 @@ class ValorNutricional extends Model
     public function fuenteAlimento()
     {
         return $this->belongsTo(FuenteAlimento::class, 'id_fuente_alimento');
+    }
+
+    public function nutriente()
+    {
+        return $this->belongsTo(Nutriente::class, 'id_nutriente');
     }
 }

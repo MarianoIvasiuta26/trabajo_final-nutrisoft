@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('macronutrientes', function (Blueprint $table) {
+        Schema::create('tipo_nutrientes', function (Blueprint $table) {
             $table->id();
+            $table->string('tipo_nutriente', 20);
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('macronutrientes');
+        Schema::dropIfExists('tipo_nutrientes');
     }
 };

@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('micronutrientes', function (Blueprint $table) {
+        Schema::create('nutrientes', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tipo_nutriente_id');
+            $table->foreign('tipo_nutriente_id')->references('id')->on('tipo_nutrientes');
+            $table->string('nombre_nutriente', 50);
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('micronutrientes');
+        Schema::dropIfExists('nutrientes');
     }
 };
