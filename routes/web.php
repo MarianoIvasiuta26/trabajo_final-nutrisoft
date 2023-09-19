@@ -8,8 +8,11 @@ use App\Http\Controllers\nutricionista\HorasDiasAtencionController;
 use App\Http\Controllers\NutricionistaController;
 use App\Http\Controllers\paciente\AdelantamientoTurnoController;
 use App\Http\Controllers\admin\AlergiaController;
+use App\Http\Controllers\admin\AlimentoController;
 use App\Http\Controllers\admin\AnalisisClinicoController;
 use App\Http\Controllers\admin\CirugiaController;
+use App\Http\Controllers\admin\FuenteAlimentoController;
+use App\Http\Controllers\admin\GrupoAlimentoController;
 use App\Http\Controllers\admin\IntoleranciaController;
 use App\Http\Controllers\admin\PatologiaController;
 use App\Http\Controllers\paciente\DatosMedicosController;
@@ -50,7 +53,9 @@ Route::middleware([
     Route::resource('gestion-cirugias', CirugiaController::class)->names('gestion-cirugias');
     Route::resource('gestion-analisis', AnalisisClinicoController::class)->names('gestion-analisis');
     Route::resource('gestion-patologias', PatologiaController::class)->names('gestion-patologias');
-
+    Route::resource('gestion-alimentos', AlimentoController::class)->names('gestion-alimentos');
+    Route::resource('gestion-grupos-alimento', GrupoAlimentoController::class)->names('gestion-grupos-alimento');
+    Route::resource('gestion-fuentes', FuenteAlimentoController::class)->names('gestion-fuentes');
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 
     //Nutricionista

@@ -45,9 +45,9 @@ class GestionUsuariosController extends Controller
     {
 
         Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:20'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'apellido' => ['required', 'string', 'max:20'],
+            'name' => ['required', 'string', 'max:50'],
+            'email' => ['required', 'string', 'email', 'max:50', 'unique:users'],
+            'apellido' => ['required', 'string', 'max:50'],
             'tipo_usuario' => ['required', 'string', 'max:15'],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();

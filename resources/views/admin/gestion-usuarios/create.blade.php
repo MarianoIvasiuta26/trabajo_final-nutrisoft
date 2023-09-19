@@ -12,12 +12,22 @@
 
         <div class="mb-3">
             <label for="name" class="form-label">Nombre</label>
-            <input type="text" name="name" id="name" class="form-control" tabindex="2">
+            <input type="text" name="name" id="name" class="form-control" tabindex="2" maxlength="50">
         </div>
+
+        @error('name')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+
         <div class="mb-3">
             <label for="apellido">Apellido</label>
-            <input type="text" name="apellido" id="apellido" class="form-control" tabindex="3">
+            <input type="text" name="apellido" id="apellido" class="form-control" tabindex="3" maxlength="50">
         </div>
+
+        @error('apellido')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+
         <div class="mb-3">
             <label for="tipo_usuario" class="form-label">Rol</label>
             <select name="tipo_usuario" id="tipo_usuario" class="form-control" tabindex="4">
@@ -26,10 +36,19 @@
                 <option value="Paciente">Paciente</option>
             </select>
         </div>
+
+        @error('tipo_usuario')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" name="email" id="email" class="form-control" tabindex="5">
+            <input type="email" name="email" id="email" class="form-control" tabindex="5" maxlength="50">
         </div>
+
+        @error('email')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
 
         <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-secondary" tabindex="7">Cancelar</a>
         <button type="submit" class="btn btn-primary">Guardar</button>

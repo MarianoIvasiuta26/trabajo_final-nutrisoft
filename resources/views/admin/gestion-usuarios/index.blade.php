@@ -30,8 +30,18 @@
                     <td>{{$usuario->tipo_usuario}}</td>
                     <td>{{$usuario->email}}</td>
                     <td>
-                        <a class="btn btn-info" href="{{ route('gestion-usuarios.edit', $usuario->id) }}">Editar</a>
-                        <a class="btn btn-danger" href="{{route('gestion-usuarios.destroy', $usuario->id)}}">Borrar</a>
+                        <div class="row">
+                            <div class="col">
+                                <a class="btn btn-info" href="{{ route('gestion-usuarios.edit', $usuario->id) }}">Editar</a>
+                            </div>
+                            <div class="col">
+                                <form action="{{ route('gestion-usuarios.destroy', $usuario->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Borrar</button>
+                                </form>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             @endforeach

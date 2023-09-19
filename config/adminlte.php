@@ -431,12 +431,12 @@ return [
                 [
                     'text' => 'Lista de Alimentos',
                     'icon' =>'fas fa-fw fa-list',
-                    'url'  => '#',
+                    'route'  => 'gestion-alimentos.index',
                 ],
                 [
                     'text' => 'Nuevo Alimento',
                     'icon' =>'fas fa-fw fa-plus',
-                    'url'  => '#',
+                    'route'  => 'gestion-alimentos.create',
                 ],
             ],
         ],

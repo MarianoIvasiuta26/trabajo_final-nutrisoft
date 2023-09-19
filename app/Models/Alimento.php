@@ -11,14 +11,21 @@ class Alimento extends Model
 
     protected $fillable = [
         'alimento',
-        'grupo_alimento',
-        'fuente',
+        'grupo_alimento_id',
         'estacional',
         'estacion',
     ];
 
     public function anamnesisAlimentaria(){
         return $this->hasMany('App\Models\Paciente\AnamnesisAlimentaria');
+    }
+
+    public function valorNutricional(){
+        return $this->hasMany('App\Models\ValorNutricional');
+    }
+
+    public function grupoAlimento(){
+        return $this->belongsTo('App\Models\GrupoAlimento');
     }
 
 }
