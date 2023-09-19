@@ -1,30 +1,41 @@
 @extends('adminlte::page')
 
-@section('title', 'Editar Fuente de información nutricional')
+@section('title', 'Agregar nuevo Nutriente')
 
 @section('content_header')
-    <h1>Editar Fuente de información nutricional</h1>
+    <h1>Agregar nuevo Nutriente</h1>
 @stop
 
 @section('content')
     <div class="card card-dark">
         <div class="card-header">
-            <h5>Fuente de información nutricional - {{$fuente->fuente}} </h5>
+            <h5>Nutrientes</h5>
         </div>
         <div class="card-body">
-                <form action="{{ route('gestion-fuentes.update', $fuente->id)}}" method="POST">
+                <form action="{{ route('gestion-nutrientes.store') }}" method="POST">
                     @csrf
 
                     <div class="col mb-3">
-                        <label for="fuente">Fuente</label>
-                        <input value="{{$fuente->fuente}}" type="text" class="form-control" name="fuente" id="fuente">
+                        <label for="nombre_nutriente">Nutriente</label>
+                        <input type="text" class="form-control" name="nombre_nutriente" id="nombre_nutriente">
 
-                        @error('fuente')
+                        @error('nutriente')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
 
-                    <a href="{{ route('gestion-fuentes.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                    <div class="col mb-3">
+                        <label for="tipo_nutriente">Tipo de Nutriente</label>
+                        <select class="form-select" name="tipo_nutriente" id="tipo_nutriente">
+                            <option value="">Seleccione una opción</option>
+                            @foreach ($tipo_nutrientes as $tipo_nutriente)
+                                <option value="{{ $tipo_nutriente->id }}">{{ $tipo_nutriente->tipo_nutriente }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+
+                    <a href="{{ route('gestion-nutrientes.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
                     <button type="submit" class="btn btn-success">Guardar</button>
 
                 </form>

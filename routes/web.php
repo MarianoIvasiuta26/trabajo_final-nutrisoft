@@ -14,6 +14,7 @@ use App\Http\Controllers\admin\CirugiaController;
 use App\Http\Controllers\admin\FuenteAlimentoController;
 use App\Http\Controllers\admin\GrupoAlimentoController;
 use App\Http\Controllers\admin\IntoleranciaController;
+use App\Http\Controllers\admin\NutrienteController;
 use App\Http\Controllers\admin\PatologiaController;
 use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
@@ -56,6 +57,8 @@ Route::middleware([
     Route::resource('gestion-alimentos', AlimentoController::class)->names('gestion-alimentos');
     Route::resource('gestion-grupos-alimento', GrupoAlimentoController::class)->names('gestion-grupos-alimento');
     Route::resource('gestion-fuentes', FuenteAlimentoController::class)->names('gestion-fuentes');
+    Route::resource('gestion-nutrientes', NutrienteController::class)->names('gestion-nutrientes');
+
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 
     //Nutricionista

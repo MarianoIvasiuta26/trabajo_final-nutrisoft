@@ -76,7 +76,9 @@ class FuenteAlimentoController extends Controller
      */
     public function edit($id)
     {
-        //
+        $fuente = FuenteAlimento::find($id);
+
+        return view('admin.gestion-alimentos.fuente.edit', compact('fuente'));
     }
 
     /**
@@ -88,7 +90,20 @@ class FuenteAlimentoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $fuente = FuenteAlimento::find($id);
+
+        $request->validate([
+            'fuente' => ['required', 'string', 'max:80'],
+        ]);
+
+        if($fuente){
+            $fuente->fuente = $request->input('fuente');
+            $fuente->save();
+            return redirect()->route('gestion-fuentes.index')->with('success', 'Fuente de alimento actualizada correctamente');
+        }else{
+            return redirect()->route('gestion-fuentes.index')->with('error', 'No se pudo actualizar la fuente de alimento');
+        }
+
     }
 
     /**
@@ -99,6 +114,13 @@ class FuenteAlimentoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $fuente = FuenteAlimento::find($id);
+
+        if($fuente){
+            $fuente->delete();
+            return redirect()->route('gestion-fuentes.index')->with('success', 'Fuente de alimento eliminada correctamente');
+        }else{
+            return redirect()->route('gestion-fuentes.index')->with('error', 'No se pudo eliminar la fuente de alimento');
+        }
     }
 }

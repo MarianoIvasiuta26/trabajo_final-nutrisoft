@@ -15,7 +15,8 @@ class GrupoAlimentoController extends Controller
      */
     public function index()
     {
-        return view('admin.gestion-alimentos.grupo.index');
+        $grupos = GrupoAlimento::all();
+        return view('admin.gestion-alimentos.grupo.index', compact('grupos'));
     }
 
     /**
@@ -75,7 +76,8 @@ class GrupoAlimentoController extends Controller
      */
     public function edit($id)
     {
-        //
+        $grupo = GrupoAlimento::find($id);
+        return view('admin.gestion-alimentos.grupo.edit', compact('grupo'));
     }
 
     /**
@@ -87,7 +89,21 @@ class GrupoAlimentoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $grupo = GrupoAlimento::find($id);
+        $request->validate([
+            'grupo' => ['required', 'string', 'max:80'],
+        ]);
+
+        if($grupo){
+            $grupo->grupo = $request->input('grupo');
+
+            $grupo->save();
+
+            return redirect()->route('gestion-grupos-alimento.index')->with('success', 'Grupo de alimento actualizado correctamente');
+        }else{
+            return redirect()->route('gestion-grupos-alimento.index')->with('error', 'No se pudo actualizar el grupo de alimento');
+        }
+
     }
 
     /**
@@ -98,6 +114,13 @@ class GrupoAlimentoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $grupo = GrupoAlimento::find($id);
+
+        if($grupo){
+            $grupo->delete();
+            return redirect()->route('gestion-grupos-alimento.index')->with('success', 'Grupo de alimento eliminado correctamente');
+        }else{
+            return redirect()->route('gestion-grupos-alimento.index')->with('error', 'No se pudo eliminar el grupo de alimento');
+        }
     }
 }
