@@ -16,9 +16,9 @@
                 <th scope="col">ID</th>
                 <th scope="col">Alimento</th>
                 <th scope="col">Grupo de alimento</th>
-                <th scope="col">Fuente</th>
                 <th scope="col">Estacional</th>
                 <th scope="col">Estacion</th>
+                <th scope="col">Valores nutricionales</th>
                 <th scope="col">Acciones</th>
             </tr>
         </thead>
@@ -27,10 +27,16 @@
                 <tr>
                     <td>{{$alimento->id}}</td>
                     <td>{{$alimento->alimento}}</td>
-                    <td>{{$alimento->grupo_alimento}}</td>
-                    <td>{{$alimento->fuente}}</td>
+                    <td>
+                        @foreach ($grupos as $grupo)
+                            @if ($grupo->id == $alimento->grupo_alimento_id)
+                                {{$grupo->grupo}}
+                            @endif
+                        @endforeach
+                    </td>
                     <td>{{$alimento->estacional}}</td>
                     <td>{{$alimento->estacion}}</td>
+                    <td><a href="#">Ver valores nutricionales</a></td>
                     <td>
                         <div class="row">
 

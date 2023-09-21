@@ -22,8 +22,9 @@ class AlimentoController extends Controller
     {
         $alimentos = Alimento::all();
         $grupos = GrupoAlimento::all();
-        $nutrientes = Nutriente::all();
-        return view ('admin.gestion-alimentos.index', compact('alimentos', 'grupos', 'nutrientes'));
+        $valores = ValorNutricional::all();
+        $fuentes = FuenteAlimento::all();
+        return view ('admin.gestion-alimentos.index', compact('alimentos', 'grupos', 'valores', 'fuentes'));
     }
 
     /**
@@ -115,7 +116,15 @@ class AlimentoController extends Controller
      */
     public function edit($id)
     {
-        //
+        $alimento = Alimento::find($id);
+        $valor = ValorNutricional::where('alimento_id', $id)->first();
+        $grupos = GrupoAlimento::all();
+        $fuentes = FuenteAlimento::all();
+        $nutrientes = Nutriente::all();
+        $tipo_nutrientes = TipoNutriente::all();
+        $valores = ValorNutricional::where('alimento_id', $id)->get();
+
+        return view ('admin.gestion-alimentos.edit', compact('alimento', 'valor', 'valores', 'tipo_nutrientes', 'nutrientes', 'grupos', 'fuentes'));
     }
 
     /**
@@ -127,7 +136,50 @@ class AlimentoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $alimento = Alimento::find($id);
+
+        //Validación y Creación del primer Form 'Datos de Alimento'
+        $request->validate([
+            'alimento' => ['required', 'string', 'max:30'],
+            'grupo_alimento' => ['required', 'integer'],
+            'estacional' => ['required', 'boolean'],
+            'estacion' => ['required', 'string', 'max:10'],
+        ]);
+
+        if($alimento){
+            $alimento->alimento = $request->input('alimento');
+            $alimento->grupo_alimento_id = $request->input('grupo_alimento');
+            $alimento->estacional = $request->input('estacional');
+            $alimento->estacion = $request->input('estacion');
+            $alimento->save();
+
+            //Validación y creación del segundo Form 'Valores nutricionales'.
+            $fuente = $request->input('fuente');
+
+            $request->validate([
+                'fuente' => ['required', 'integer'],
+            ]);
+
+            foreach ($request->input('nutrientes') as $nutrienteId => $nutrienteData) {
+                $valor = ValorNutricional::where('alimento_id', $id)->where('nutriente_id', $nutrienteId)->first();
+                if($valor){
+                    $valor->alimento_id = $alimento->id;
+                    $valor->nutriente_id = $nutrienteId;
+                    $valor->fuente_alimento_id = $fuente;
+                    $valor->unidad = $nutrienteData['unidad'];
+                    $valor->valor = $nutrienteData['valor'];
+                    $valor->save();
+                }else{
+                    return redirect()->route('gestion-alimentos.index')->with('error', 'No se pudo editar el valor nutricional');
+                }
+            }
+
+            return redirect()->route('gestion-alimentos.index')->with('success', 'Alimento y sus valores nutricionales editados correctamente');
+
+        }else{
+            return redirect()->route('gestion-alimentos.index')->with('error', 'No se pudo editar el alimento');
+        }
+
     }
 
     /**
