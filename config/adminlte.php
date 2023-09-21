@@ -332,6 +332,24 @@ return [
 
         [
             'text' => 'Turnos',
+            'route'  => 'historia-clinica.index',
+            'icon' => 'fas fa-file-medical fa-fw',
+            'submenu' => [
+                [
+                    'text' => 'Mis Turnos',
+                    'icon' =>'fas fa-fw fa-list',
+                    'route'  => 'turnos.index',
+                ],
+                [
+                    'text' => 'Solicitar un turno',
+                    'icon' =>'fas fa-fw fa-plus',
+                    'route'  => 'turnos.create',
+                ],
+            ],
+        ],
+
+        [
+            'text' => 'Horarios de Atención',
             'route'  => 'gestion-atencion.index',
             'icon' => 'fas fa-lock fa-fw',
         ],

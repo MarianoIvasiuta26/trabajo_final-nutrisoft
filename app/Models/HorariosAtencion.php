@@ -26,4 +26,8 @@ class HorariosAtencion extends Model
     public function horasAtencion(){
         return $this->belongsTo('App\Models\HorasAtencion');
     }
+
+    public function turno(){
+        return $this->hasMany('App\Models\Turno');
+    }
 }

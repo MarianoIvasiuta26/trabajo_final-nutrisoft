@@ -32,4 +32,9 @@ class Paciente extends Model
     {
         return $this->hasMany('App\Models\Paciente\AdelantamientoTurno');
     }
+
+    public function turno()
+    {
+        return $this->hasMany('App\Models\Turno');
+    }
 }
