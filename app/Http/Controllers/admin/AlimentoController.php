@@ -51,9 +51,9 @@ class AlimentoController extends Controller
         //Validación y Creación del primer Form 'Datos de Alimento'
         $request->validate([
             'alimento' => ['required', 'string', 'max:30'],
-            'grupo_alimento' => ['required', 'integer', 'default:1'],
-            'estacional' => ['required', 'boolean', 'default:false'],
-            'estacion' => ['required', 'string', 'max:10', 'default:Ninguna'],
+            'grupo_alimento' => ['required', 'integer'],
+            'estacional' => ['required', 'boolean'],
+            'estacion' => ['required', 'string', 'max:10'],
         ]);
 
         $alimento = $request->input('alimento');
@@ -75,31 +75,25 @@ class AlimentoController extends Controller
                 'estacion' => $estacion,
             ]);
 
-            return redirect()->route('gestion-alimentos.create')->with('success', 'Alimento creado correctamente');
-
             //Validación y creación del segundo Form 'Valores nutricionales'.
-            $request->validate([
-                'fuente' => ['required', 'integer', 'default:1'],
-                'nutriente' => ['required', 'integer'],
-                'unidad' => ['required', 'string', 'max:10'],
-                'valor' => ['required', 'numeric'],
-            ]);
-
             $fuente = $request->input('fuente');
-            $nutriente = $request->input('nutriente');
-            $unidad = $request->input('unidad');
-            $valor = $request->input('valor');
 
-            ValorNutricional::create([
-                'alimento_id' => $alimentoNuevo->id,
-                'fuente_alimento_id' => $fuente,
-                'nutriente_id' => $nutriente,
-                'unidad' => $unidad,
-                'valor' => $valor,
+            $request->validate([
+                'fuente' => ['required', 'integer'],
             ]);
+
+            foreach ($request->input('nutrientes') as $nutrienteId => $nutrienteData) {
+                ValorNutricional::create([
+                    'alimento_id' => $alimentoNuevo->id,
+                    'nutriente_id' => $nutrienteId,
+                    'fuente_alimento_id' => $fuente,
+                    'unidad' => $nutrienteData['unidad'],
+                    'valor' => $nutrienteData['valor'],
+                ]);
+            }
 
         }
-
+        return redirect()->route('gestion-alimentos.create')->with('success', 'Alimento y sus valores nutricionales creados correctamente');
     }
 
     /**
@@ -144,6 +138,10 @@ class AlimentoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $alimento = Alimento::find($id);
+        $alimento->delete();
+        $valorNutricional = ValorNutricional::where('alimento_id', $id);
+        $valorNutricional->delete();
+        return redirect()->route('gestion-alimentos.index')->with('success', 'Alimento eliminado correctamente');
     }
 }

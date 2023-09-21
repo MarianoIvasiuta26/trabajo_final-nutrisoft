@@ -33,16 +33,15 @@
                     <td>{{$alimento->estacion}}</td>
                     <td>
                         <div class="row">
-                            <div class="col">
-                                <a class="btn btn-info" href="{{ route('gestion-alimentos.edit', $usuario->id) }}">Editar</a>
-                            </div>
-                            <div class="col">
-                                <form action="{{ route('gestion-alimentos.destroy', $usuario->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">Borrar</button>
-                                </form>
-                            </div>
+
+                            <a class="btn btn-info" href="{{ route('gestion-alimentos.edit', $alimento->id) }}">Editar</a>
+
+                            <form action="{{ route('gestion-alimentos.destroy', $alimento->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Borrar</button>
+                            </form>
+
                         </div>
                     </td>
                 </tr>
