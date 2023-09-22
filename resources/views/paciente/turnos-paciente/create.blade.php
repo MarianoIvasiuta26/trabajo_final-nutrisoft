@@ -106,6 +106,9 @@
                         <div class="btn-group" data-toggle="buttons" id="horas-disponibles">
                             <!-- Las horas disponibles se agregarán aquí dinámicamente -->
                         </div>
+                        <div id="mensaje-error" class="alert alert-danger" style="display: none;">
+                            No hay horarios disponibles para la fecha seleccionada o este día no se realizan consultas.
+                        </div>
                     </div>
                 </div>
 
@@ -134,7 +137,7 @@
             // Obtén el token CSRF del formulario
             var csrfToken = $('meta[name="csrf-token"]').attr('content');
             var profesionalSeleccionado = $('#profesional').val();
-            
+
             $.ajax({
                 url: '{{ route('turnos.horas-disponibles') }}',
                 method: 'POST',
@@ -144,29 +147,41 @@
                     _token: csrfToken,
                 },
                 success: function (horasDisponibles) {
-                    // Limpiar cualquier contenido anterior
-                    $('#horas-disponibles').empty();
+                    if (horasDisponibles.horasDisponiblesManiana && horasDisponibles.horasDisponiblesManiana.length > 0
+                    || horasDisponibles.horasDisponiblesTarde && horasDisponibles.horasDisponiblesTarde.length > 0) {
+                        // Si hay horarios disponibles, oculta el mensaje de error.
+                        $('#mensaje-error').hide();
 
-                    // Iterar sobre las horas disponibles y crear botones de alternancia
-                    $.each(horasDisponibles.horasDisponiblesManiana, function (index, hora) {
-                        // Crea un botón de alternancia para cada hora
-                        var btn = $('<label class="btn btn-outline-secondary hora-disponible-maniana">' +
-                            '<input type="radio" name="hora" value="' + hora + '">' + hora +
-                            '</label>');
+                        // Limpiar cualquier contenido anterior
+                        $('#horas-disponibles').empty();
 
-                        // Agrega el botón al contenedor
-                        $('#horas-disponibles').append(btn);
-                    });
+                        // Iterar sobre las horas disponibles y crear botones de alternancia
+                        $.each(horasDisponibles.horasDisponiblesManiana, function (index, hora) {
+                            // Crea un botón de alternancia para cada hora
+                            var btn = $('<label class="btn btn-outline-secondary hora-disponible-maniana">' +
+                                '<input type="radio" name="hora" value="' + hora + '">' + hora +
+                                '</label>');
 
-                    $.each(horasDisponibles.horasDisponiblesTarde, function (index, hora) {
-                        // Crea un botón de alternancia para cada hora
-                        var btn = $('<label class="btn btn-outline-secondary hora-disponible-tarde">' +
-                            '<input type="radio" name="hora" value="' + hora + '">' + hora +
-                            '</label>');
+                            // Agrega el botón al contenedor
+                            $('#horas-disponibles').append(btn);
+                        });
 
-                        // Agrega el botón al contenedor
-                        $('#horas-disponibles').append(btn);
-                    });
+                        $.each(horasDisponibles.horasDisponiblesTarde, function (index, hora) {
+                            // Crea un botón de alternancia para cada hora
+                            var btn = $('<label class="btn btn-outline-secondary hora-disponible-tarde">' +
+                                '<input type="radio" name="hora" value="' + hora + '">' + hora +
+                                '</label>');
+
+                            // Agrega el botón al contenedor
+                            $('#horas-disponibles').append(btn);
+                        });
+                        $('#horas-disponibles').show();
+                    } else {
+                        // Si no hay horarios disponibles, muestra el mensaje de error.
+                        $('#mensaje-error').show();
+                        $('#horas-disponibles').hide();
+                    }
+
 
                 },
                 error: function (error) {

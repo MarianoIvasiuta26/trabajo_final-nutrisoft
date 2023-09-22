@@ -368,18 +368,16 @@ class TurnoController extends Controller
                     }
                 }
             }
-            return response()->json([
-                'horasDisponiblesManiana' => $horasDisponiblesManiana,
-                'horasDisponiblesTarde' => $horasDisponiblesTarde
-            ]);
+            if ($horasDisponiblesManiana || $horasDisponiblesTarde) {
+                return response()->json([
+                    'horasDisponiblesManiana' => $horasDisponiblesManiana,
+                    'horasDisponiblesTarde' => $horasDisponiblesTarde
+                ]);
+            } else {
+                return response()->json(['error' => 'No hay horarios disponibles para la fecha seleccionada o este día no se realizan consultas.']);
+            }
         } else {
             return response()->json(['error' => 'Profesional no válido']);
         }
     }
-
-
-
-
-
-
 }
