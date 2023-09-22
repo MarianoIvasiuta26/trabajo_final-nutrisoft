@@ -130,12 +130,14 @@
         //Agregamos un evento change al input date
         document.getElementById('fecha').addEventListener('change', function () {
             var fechaSeleccionada = this.value; // Obtenemos la fecha seleccionada
-
+            // Obtén el token CSRF del formulario
+            var csrfToken = $('meta[name="csrf-token"]').attr('content');
             $.ajax({
                 url: '{{ route('turnos.horas-disponibles') }}',
                 method: 'POST',
                 data: {
-                    fecha: fechaSeleccionada
+                    fecha: fechaSeleccionada,
+                    _token: csrfToken,
                 },
                 success: function (horasDisponibles) {
                     // Limpiar cualquier contenido anterior
@@ -152,7 +154,15 @@
                         $('#horas-disponibles').append(btn);
                     });
 
-                    // Puedes hacer lo mismo para las horas de la tarde si es necesario
+                    $.each(horasDisponibles.horasDisponiblesTarde, function (index, hora) {
+                        // Crea un botón de alternancia para cada hora
+                        var btn = $('<label class="btn btn-outline-secondary hora-disponible-tarde">' +
+                            '<input type="radio" name="hora" value="' + hora + '">' + hora +
+                            '</label>');
+
+                        // Agrega el botón al contenedor
+                        $('#horas-disponibles').append(btn);
+                    });
 
                 },
                 error: function (error) {
