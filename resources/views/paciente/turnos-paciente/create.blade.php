@@ -109,6 +109,7 @@
                     </div>
                 </div>
 
+                <button class="btn btn-success mt-3" type="submit">Solicitar turno</button>
 
             </form>
         </div>
@@ -132,10 +133,13 @@
             var fechaSeleccionada = this.value; // Obtenemos la fecha seleccionada
             // Obtén el token CSRF del formulario
             var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            var profesionalSeleccionado = $('#profesional').val();
+            
             $.ajax({
                 url: '{{ route('turnos.horas-disponibles') }}',
                 method: 'POST',
                 data: {
+                    profesional: profesionalSeleccionado,
                     fecha: fechaSeleccionada,
                     _token: csrfToken,
                 },
