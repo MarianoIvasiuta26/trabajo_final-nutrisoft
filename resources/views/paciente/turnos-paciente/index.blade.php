@@ -20,6 +20,19 @@
 
     @else
 
+        @foreach ($turnos as $turno)
+            @if ($turno->paciente_id == $paciente->id)
+                @if ($turno->estado == 'Pendiente')
+                    <div class="alert alert-warning" role="alert">
+                        <h5>Turno pendiente</h5>
+                        Usted tiene un turno pendiente para el día {{ $turno->fecha }} a las {{ $turno->hora }} hs.
+                        <br>Para cancelar el turno, haga click en el siguiente enlace:
+                        <br><a href="{{ route('turnos.edit', $turno->id) }}" class="alert-link">Cancelar turno</a>
+                    </div>
+                @endif
+            @endif
+        @endforeach
+
         <div class="card card-dark">
             <div class="card-header">
                 <h5>Historial de Turnos</h5>
@@ -30,8 +43,7 @@
                     <tr>
                         <th scope="col">Fecha</th>
                         <th scope="col">Hora</th>
-                        <th scope="col">Especialidad</th>
-                        <th scope="col">Profesional</th>
+                        <th scope="col">Tipo de consulta</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Acciones</th>
                     </tr>
@@ -43,8 +55,7 @@
                             <tr>
                                 <td>{{ $turno->fecha }}</td>
                                 <td>{{ $turno->hora }}</td>
-                                <td>{{ $turno->especialidad }}</td>
-                                <td>{{ $turno->profesional }}</td>
+                                <td>{{ $turno->tipo_consulta_id }}</td>
                                 <td>{{ $turno->estado }}</td>
                                 <td>
                                     <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary">Ver</a>
@@ -60,7 +71,7 @@
                         @endif
                     @empty
                         <tr>
-                            <td colspan="6">No hay turnos registrados</td>
+                            <td colspan="5">No hay turnos registrados</td>
                         </tr>
                     @endforelse
 
@@ -73,8 +84,11 @@
 
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
 @stop
 
 @section('js')
     <script> console.log('Hi!'); </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 @stop

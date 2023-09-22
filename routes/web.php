@@ -92,5 +92,5 @@ Route::middleware([
     Route::post('adelantamiento-turno/guardar', [AdelantamientoTurnoController::class, 'guardar'])->name('adelantamiento-turno.guardar');
 
     Route::resource('gestion-turnos', TurnoController::class)->names('turnos');
-
+    Route::post('turnos.horas-disponibles', [TurnoController::class, 'horasDisponibles'])->name('turnos.horas-disponibles');
 });
