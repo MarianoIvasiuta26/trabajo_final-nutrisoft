@@ -46,9 +46,9 @@ class TurnoController extends Controller
         $historias_clinicas = HistoriaClinica::all();
         $horas = HorasAtencion::all();
         $dias = DiasAtencion::all();
+        $paciente = Paciente::where('user_id', auth()->user()->id)->first();
 
-
-        return view ('paciente.turnos-paciente.create', compact('horarios', 'tipo_consultas', 'turnos', 'pacientes', 'profesionales', 'historias_clinicas', 'horas', 'dias'));
+        return view ('paciente.turnos-paciente.create', compact('horarios', 'tipo_consultas', 'turnos', 'pacientes', 'profesionales', 'historias_clinicas', 'horas', 'dias', 'paciente'));
     }
 
     /**
@@ -257,7 +257,16 @@ class TurnoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $turno = Turno::find($id);
+
+        if(!$turno){
+            return redirect()->back()->with('error', 'El turno no existe.');
+        }
+
+        $turno->estado = 'Cancelado';
+        $turno->save();
+
+        return redirect()->route('turnos.index')->with('success', 'Turno cancelado correctamente.');
     }
 
     public function horasDisponibles(Request $request){

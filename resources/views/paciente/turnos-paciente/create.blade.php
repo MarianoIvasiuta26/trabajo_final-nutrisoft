@@ -10,121 +10,147 @@
 
         @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
-        <div class="alert alert-warning" role="alert">
-            <h5>Historia Clínica icompleta</h5>
-            Parece que aún no has completado tu Historia Clínica. <br>
-            Para tener acceso a esta funcionalidad del sistema, necesita completar su historia clínica. <br>
-            Haga click en el siguiente enlace para completar su historia clínica:
-            <br><a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar mi Historia Clínica</a>
-        </div>
+            <div class="alert alert-warning" role="alert">
+                <h5>Historia Clínica icompleta</h5>
+                Parece que aún no has completado tu Historia Clínica. <br>
+                Para tener acceso a esta funcionalidad del sistema, necesita completar su historia clínica. <br>
+                Haga click en el siguiente enlace para completar su historia clínica:
+                <br><a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar mi Historia Clínica</a>
+            </div>
 
         @else
-            <div class="card card-dark">
-                <div class="card-header">
-                    <h5>Solicitud de turno</h5>
-                </div>
 
-                <div class="card-body">
-                    <form action="{{route('turnos.store')}}" method="POST">
-                        @csrf
+            @foreach ($turnos as $turno)
+                @if($turno->paciente_id == $paciente->id && $turno->estado == 'Pendiente')
+                    <div class="alert alert-warning" role="alert">
+                        <h5>Ya tienes un turno solicitado</h5>
+                        <p>Ya tienes un turno solicitado para el día {{$turno->fecha}} a las {{$turno->hora}} hs.</p>
+                        <p>Si desea cancelar su turno, haga click en el siguiente enlace:</p>
+                        <a href="{{ route('turnos.destroy', $turno->id) }}" class="alert-link">Cancelar mi turno</a>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label" for="profesional">Profesional</label>
-                                <select name="profesional" id="profesional" class="form-select">
-                                    <option value="">Seleccione un profesional</option>
-                                    @foreach($profesionales as $profesional)
-                                        <option value="{{$profesional->id}}">{{$profesional->user->name}} {{$profesional->user->apellido}}</option>
-                                    @endforeach
-                                </select>
+                @else
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h5>Solicitud de turno</h5>
+                    </div>
 
-                                @error('profesional')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
+                    <div class="card-body">
+                        <form action="{{route('turnos.store')}}" method="POST">
+                            @csrf
 
-                            <div class="col-md-6">
-                                <label class="form-label" for="paciente">Paciente</label>
-                                <input
-                                    @foreach ($pacientes as $paciente)
-                                        @if ($paciente->user_id == auth()->user()->id)
-                                        value="{{$paciente->user->name}} {{$paciente->user->apellido}}"
-                                        @endif
-                                    @endforeach
-                                class="form-control" name="paciente" id="paciente" type="text" disabled>
-
-                                @error('paciente')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <label class="form-label" for="tipo_consulta">Tipo de consulta</label>
-                                <select class="form-select" name="tipo_consulta" id="tipo_consulta">
-                                    <option value="">Seleccione un tipo de consulta</option>
-                                    @foreach($tipo_consultas as $tipo_consulta)
-                                        <option value="{{$tipo_consulta->id}}">{{$tipo_consulta->tipo_consulta}}</option>
-                                    @endforeach
-                                </select>
-                                @error('tipo_consulta')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label" for="objetivo_salud">Objetivo de salud</label>
-                                <select class="form-select" name="objetivo_salud" id="objetivo_salud" disabled>
-                                    @foreach ($pacientes as $paciente)
-                                        @foreach ($historias_clinicas as $historia_clinica)
-                                            @if ($paciente->user_id == auth()->user()->id)
-                                                @if ($historia_clinica->paciente_id == $paciente->id)
-                                                    <option value="{{$historia_clinica->objetivo_salud}}">{{$historia_clinica->objetivo_salud}}</option>
-                                                @endif
-                                            @endif
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="profesional">Profesional</label>
+                                    <select name="profesional" id="profesional" class="form-select">
+                                        <option value="">Seleccione un profesional</option>
+                                        @foreach($profesionales as $profesional)
+                                            <option value="{{$profesional->id}}">{{$profesional->user->name}} {{$profesional->user->apellido}}</option>
                                         @endforeach
-                                    @endforeach
-                                </select>
-                                @error('objetivo_salud')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-                        </div>
+                                    </select>
 
-                        <div class="row mt-3" id="horarios-disponibles">
-                            <div class="col-md-12" id="fecha-turno">
-                                <label class="form-label" for="fecha">Fecha</label>
-                                <input class="form-control" type="date" name="fecha" id="fecha">
-
-                                @error('fecha')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <label for="hora">Horas Disponibles</label>
-                                <br>
-                                <div class="btn-group" data-toggle="buttons" id="horas-disponibles">
-                                    <!-- Las horas disponibles se agregarán aquí dinámicamente -->
-                                    @error('hora')
+                                    @error('profesional')
                                         <small class="text-danger">{{$message}}</small>
                                     @enderror
                                 </div>
-                                <div id="mensaje-error" class="alert alert-danger" style="display: none;">
-                                    No hay horarios disponibles para la fecha seleccionada o este día no se realizan consultas.
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="paciente">Paciente</label>
+                                    <input
+                                        @foreach ($pacientes as $paciente)
+                                            @if ($paciente->user_id == auth()->user()->id)
+                                            value="{{$paciente->user->name}} {{$paciente->user->apellido}}"
+                                            @endif
+                                        @endforeach
+                                    class="form-control" name="paciente" id="paciente" type="text" disabled>
+
+                                    @error('paciente')
+                                        <small class="text-danger">{{$message}}</small>
+                                    @enderror
                                 </div>
                             </div>
-                        </div>
 
-                        <button class="btn btn-success mt-3" type="submit">Solicitar turno</button>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="tipo_consulta">Tipo de consulta</label>
+                                    <select class="form-select" name="tipo_consulta" id="tipo_consulta">
+                                        <option value="">Seleccione un tipo de consulta</option>
+                                        @foreach($tipo_consultas as $tipo_consulta)
+                                            @foreach ($turnos as $turno)
+                                                @if ($turno->paciente_id == $paciente->id && $turno->tipo_consulta_id == 1)
+                                                    @if ($tipo_consulta->id == 1)
+                                                        <option value="{{$tipo_consulta->id}}" disabled>{{$tipo_consulta->tipo_consulta}}</option>
+                                                    @else
+                                                        <option value="{{$tipo_consulta->id}}" selected>{{$tipo_consulta->tipo_consulta}}</option>
+                                                    @endif
+                                                    <option value="2" selected>Seguimiento</option>
+                                                @else
+                                                    <option value="{{$tipo_consulta->id}}">{{$tipo_consulta->tipo_consulta}}</option>
+                                                @endif
+                                            @endforeach
+                                        @endforeach
+                                    </select>
+                                    @error('tipo_consulta')
+                                        <small class="text-danger">{{$message}}</small>
+                                    @enderror
+                                </div>
 
-                    </form>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="objetivo_salud">Objetivo de salud</label>
+                                    <select class="form-select" name="objetivo_salud" id="objetivo_salud" disabled>
+                                        @foreach ($pacientes as $paciente)
+                                            @foreach ($historias_clinicas as $historia_clinica)
+                                                @if ($paciente->user_id == auth()->user()->id)
+                                                    @if ($historia_clinica->paciente_id == $paciente->id)
+                                                        <option value="{{$historia_clinica->objetivo_salud}}">{{$historia_clinica->objetivo_salud}}</option>
+                                                    @endif
+                                                @endif
+                                            @endforeach
+                                        @endforeach
+                                    </select>
+                                    @error('objetivo_salud')
+                                        <small class="text-danger">{{$message}}</small>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" id="horarios-disponibles">
+                                <div class="col-md-12" id="fecha-turno">
+                                    <label class="form-label" for="fecha">Fecha</label>
+                                    <input class="form-control" type="date" name="fecha" id="fecha">
+
+                                    @error('fecha')
+                                        <small class="text-danger">{{$message}}</small>
+                                    @enderror
+                                </div>
+
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <label for="hora">Horas Disponibles</label>
+                                    <br>
+                                    <div class="btn-group" data-toggle="buttons" id="horas-disponibles">
+                                        <!-- Las horas disponibles se agregarán aquí dinámicamente -->
+                                        @error('hora')
+                                            <small class="text-danger">{{$message}}</small>
+                                        @enderror
+                                    </div>
+                                    <div id="mensaje-error" class="alert alert-danger" style="display: none;">
+                                        No hay horarios disponibles para la fecha seleccionada o este día no se realizan consultas.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-success mt-3" type="submit">Solicitar turno</button>
+
+                        </form>
+                    </div>
                 </div>
-            </div>
+                @endif
+
+            @endforeach
+
         @endif
 
 @stop
