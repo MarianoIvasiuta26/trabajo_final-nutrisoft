@@ -55,7 +55,13 @@
                             <tr>
                                 <td>{{ $turno->fecha }}</td>
                                 <td>{{ $turno->hora }}</td>
-                                <td>{{ $turno->tipo_consulta_id }}</td>
+                                <td>
+                                    @foreach ($tipo_consultas as $tipoConsulta)
+                                        @if ($tipoConsulta->id == $turno->tipo_consulta_id)
+                                            {{ $tipoConsulta->tipo_consulta }}
+                                        @endif
+                                    @endforeach
+                                </td>
                                 <td>{{ $turno->estado }}</td>
                                 <td>
                                     <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary">Ver</a>
@@ -63,7 +69,7 @@
                                     <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        <button type="submit" class="btn btn-danger">Cancelar</button>
                                     </form>
 
                                 </td>

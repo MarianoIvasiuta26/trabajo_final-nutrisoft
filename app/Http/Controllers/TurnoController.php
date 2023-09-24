@@ -27,7 +27,8 @@ class TurnoController extends Controller
     {
         $turnos = Turno::all();
         $paciente = Paciente::where('user_id', auth()->user()->id)->first();
-        return view('paciente.turnos-paciente.index', compact('turnos', 'paciente'));
+        $tipo_consultas = TipoConsulta::all();
+        return view('paciente.turnos-paciente.index', compact('turnos', 'paciente', 'tipo_consultas'));
     }
 
     /**
@@ -45,34 +46,6 @@ class TurnoController extends Controller
         $historias_clinicas = HistoriaClinica::all();
         $horas = HorasAtencion::all();
         $dias = DiasAtencion::all();
-        /*
-        $horasManiana = HorasAtencion::where('etiqueta', 'Maniana')->get();
-        $horasTarde = HorasAtencion::where('etiqueta', 'Tarde')->get();
-
-        $intervalo = new DateInterval('PT30M'); //Intervalo de 30 minutos
-        $horasDisponiblesManiana = [];
-        $horasDisponiblesTarde = [];
-
-       // Recorremos las horas de la mañana para dividirlas en un rango de 30 minutos
-        foreach ($horasManiana as $horaManiana) {
-            $horaInicio = new DateTime($horaManiana->hora_inicio);
-            $horaFin = new DateTime($horaManiana->hora_fin);
-            while ($horaInicio < $horaFin) {
-                $horasDisponiblesManiana[] = $horaInicio->format('H:i');
-                $horaInicio->add($intervalo);
-            }
-        }
-
-        //Recorremos las horas de la tarde para dividirla en un rango de 30 minutos
-
-        foreach ($horasTarde as $horaTarde) {
-            $horaInicio = new DateTime($horaTarde->hora_inicio);
-            $horaFin = new DateTime($horaTarde->hora_fin);
-            while ($horaInicio < $horaFin) {
-                $horasDisponiblesTarde[] = $horaInicio->format('H:i');
-                $horaInicio->add($intervalo);
-            }
-        }*/
 
 
         return view ('paciente.turnos-paciente.create', compact('horarios', 'tipo_consultas', 'turnos', 'pacientes', 'profesionales', 'historias_clinicas', 'horas', 'dias'));
@@ -328,6 +301,7 @@ class TurnoController extends Controller
 
             $horasManiana = HorasAtencion::where('etiqueta', 'Maniana')->get();
             $horasTarde = HorasAtencion::where('etiqueta', 'Tarde')->get();
+
             $turnos = Turno::all();
 
             $intervalo = new DateInterval('PT30M'); //Intervalo de 30 minutos
@@ -348,7 +322,8 @@ class TurnoController extends Controller
 
                                 // Comprobamos si hay un turno pendiente en esta hora
                                 foreach ($turnos as $turno) {
-                                    if ($turno->fecha == $fechaSeleccionada && $turno->hora == $horaActual && $turno->estado == 'Pendiente') {
+                                    $horaTurno = Carbon::parse($turno->hora)->format('H:i');
+                                    if ($turno->fecha == $fechaSeleccionada && $horaTurno == $horaActual && $turno->estado == 'Pendiente') {
                                         $horaOcupada = true;
                                         break; // No necesitamos seguir buscando
                                     }
