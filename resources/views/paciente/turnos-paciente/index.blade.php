@@ -65,13 +65,16 @@
                                 <td>{{ $turno->estado }}</td>
                                 <td>
                                     <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary">Ver</a>
-                                    <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
-                                    <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Cancelar</button>
-                                    </form>
-
+                                    @if ($turno->estado != 'Cancelado')
+                                        <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
+                                    @endif
+                                    @if ($turno->estado != 'Cancelado')
+                                        <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger">Cancelar</button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @endif

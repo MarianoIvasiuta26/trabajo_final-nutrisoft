@@ -21,15 +21,15 @@
         @else
 
             @foreach ($turnos as $turno)
-                @if($turno->paciente_id == $paciente->id && $turno->estado == 'Pendiente')
+                @if($turno->paciente_id == $paciente->id && $turno->estado == 'Pendiente' || $turno->estado == 'Confirmar asistencia')
                     <div class="alert alert-warning" role="alert">
                         <h5>Ya tienes un turno solicitado</h5>
                         <p>Ya tienes un turno solicitado para el día {{$turno->fecha}} a las {{$turno->hora}} hs.</p>
                         <p>Si desea cancelar su turno, haga click en el siguiente enlace:</p>
                         <a href="{{ route('turnos.destroy', $turno->id) }}" class="alert-link">Cancelar mi turno</a>
                     </div>
-
-                @else
+                @endif
+            @endforeach
                 <div class="card card-dark">
                     <div class="card-header">
                         <h5>Solicitud de turno</h5>
@@ -76,18 +76,7 @@
                                     <select class="form-select" name="tipo_consulta" id="tipo_consulta">
                                         <option value="">Seleccione un tipo de consulta</option>
                                         @foreach($tipo_consultas as $tipo_consulta)
-                                            @foreach ($turnos as $turno)
-                                                @if ($turno->paciente_id == $paciente->id && $turno->tipo_consulta_id == 1)
-                                                    @if ($tipo_consulta->id == 1)
-                                                        <option value="{{$tipo_consulta->id}}" disabled>{{$tipo_consulta->tipo_consulta}}</option>
-                                                    @else
-                                                        <option value="{{$tipo_consulta->id}}" selected>{{$tipo_consulta->tipo_consulta}}</option>
-                                                    @endif
-                                                    <option value="2" selected>Seguimiento</option>
-                                                @else
-                                                    <option value="{{$tipo_consulta->id}}">{{$tipo_consulta->tipo_consulta}}</option>
-                                                @endif
-                                            @endforeach
+                                            <option value="{{$tipo_consulta->id}}">{{$tipo_consulta->tipo_consulta}}</option>
                                         @endforeach
                                     </select>
                                     @error('tipo_consulta')
@@ -147,10 +136,6 @@
                         </form>
                     </div>
                 </div>
-                @endif
-
-            @endforeach
-
         @endif
 
 @stop

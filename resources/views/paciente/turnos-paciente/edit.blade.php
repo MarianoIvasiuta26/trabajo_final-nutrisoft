@@ -14,8 +14,9 @@
         </div>
 
         <div class="card-body">
-            <form action="{{route('turnos.store')}}" method="POST">
+            <form action="{{route('turnos.update', $turno->id)}}" method="POST">
                 @csrf
+                @method('PUT')
 
                 <div class="row">
                     <div class="col-md-6">
@@ -104,7 +105,7 @@
                 </div>
 
                 <div class="row mt-3" id="horarios-disponibles">
-                    <div class="col-md-12" id="fecha-turno">
+                    <div class="col-md-6" id="fecha-turno">
                         <label class="form-label" for="fecha">Fecha</label>
                         <input class="form-control" type="date" name="fecha" id="fecha" value="{{$turno->fecha}}">
 
@@ -112,7 +113,30 @@
                             <small class="text-danger">{{$message}}</small>
                         @enderror
                     </div>
+                    <div class="col-md-6" id="estado">
+                        <label class="form-label" for="estado">Estado</label>
+                        <select class="form-select" name="estado" id="estado">
+                            <option value="Pendiente" @if ($turno->estado == 'Pendiente')
+                                selected
+                            @endif @if ($turno->estado == 'Cancelado')
+                                disabled
+                            @endif>Pendiente</option>
+                            <option value="Cancelado" @if ($turno->estado == 'Cancelado')
+                                selected
+                            @endif @if ($turno->estado == 'Cancelado')
+                                disabled
+                            @endif>Cancelado</option>
+                            <option value="Confirmar asistencia" @if ($turno->estado == 'Confirmar asistencia')
+                                selected
+                            @endif @if ($turno->estado == 'Cancelado')
+                                disabled
+                            @endif>Confirmar asistencia</option>
+                        </select>
 
+                        @error('fecha')
+                            <small class="text-danger">{{$message}}</small>
+                        @enderror
+                    </div>
                 </div>
 
                 <div class="row mt-3">
@@ -131,7 +155,8 @@
                     </div>
                 </div>
 
-                <button class="btn btn-success mt-3" type="submit">Solicitar turno</button>
+                <button class="btn btn-success mt-3" type="submit">Guardar</button>
+                <a href="{{route('turnos.index')}}" class="btn btn-danger mt-3">Volver</a>
 
             </form>
         </div>

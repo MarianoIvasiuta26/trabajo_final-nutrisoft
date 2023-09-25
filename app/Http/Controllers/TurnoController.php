@@ -223,7 +223,15 @@ class TurnoController extends Controller
      */
     public function show($id)
     {
-        //
+        $turno = Turno::find($id);
+        $paciente = Paciente::where('user_id', auth()->user()->id)->where('id', $turno->paciente_id)->first();
+        $horarios = HorariosAtencion::all();
+        $tipo_consultas = TipoConsulta::all();
+        $profesionales = Nutricionista::all();
+        $historias_clinicas = HistoriaClinica::all();
+
+        return view('paciente.turnos-paciente.show', compact('turno', 'paciente', 'horarios', 'tipo_consultas', 'profesionales', 'historias_clinicas'));
+
     }
 
     /**
@@ -264,7 +272,162 @@ class TurnoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $turno = Turno::find($id);
+
+        if(!$turno){
+            return redirect()->back()->with('error', 'El turno no existe.');
+        }
+
+        //Validamos el formulario
+        $request->validate([
+            'profesional' => ['required', 'integer'],
+            'tipo_consulta' => ['required', 'integer'],
+            'fecha' => ['required', 'date'],
+            'estado' => ['required', 'string'],
+            'hora' => ['required', 'date_format:H:i'],
+        ]);
+
+        //Obtenemos los datos del formulario
+        $profesional = $request->input('profesional');
+        $paciente = Paciente::where('user_id', auth()->user()->id)->first();
+        $tipo_consulta = $request->input('tipo_consulta');
+        $fecha = $request->input('fecha');
+        $estado = $request->input('estado');
+        $hora = $request->input('hora');
+
+        //Buscamos el profesional seleccionado
+        $profesionalExistente = Nutricionista::find($profesional);
+
+        //Verificamos que exista
+        if(!$profesionalExistente){
+            return redirect()->back()->with('error', 'Profesional no válido');
+        }
+
+        //Buscamos el paciente
+
+        $pacienteExistente = Paciente::find($paciente->id);
+
+        //Verificamos que exista
+        if(!$pacienteExistente){
+            return redirect()->back()->with('error', 'Paciente no válido');
+        }
+
+        //Buscamos y verificamos que exista el tipo de consulta
+
+        $tipoConsultaExistente = TipoConsulta::find($tipo_consulta);
+
+        if(!$tipoConsultaExistente){
+            return redirect()->back()->with('error', 'Tipo de consulta no válido');
+        }
+
+        //Validamos que se solicite el turno con al menos 24 horas de anticipación
+        // Obtener la fecha y hora actual
+        $fechaActual = Carbon::now();
+        // Calcular la fecha mínima permitida (24 horas de anticipación)
+        $fechaMinima = $fechaActual->copy()->addDay();
+        //Obtenemos la fecha y hora seleccionada
+        $fechaElegida = Carbon::parse($fecha . ' ' . $hora);
+        //Comparamos las fechas
+        if($fechaElegida < $fechaMinima){
+            return redirect()->back()->with('error', 'Debes solicitar un turno con al menos 24 horas de anticipación.');
+        }
+
+        //Obtenemos la fecha actual con formato: año-mes-día y validamos
+        $fechaActual = date('Y-m-d');
+
+        if($fecha < $fechaActual){
+            return redirect()->back()->with('error', 'La fecha no puede ser anterior a la fecha actual');
+        }
+
+        $fechaActual = date('Y-m-d');
+
+        if($fecha == $fechaActual){
+            $horaActual = date('H:i');
+            if($hora < $horaActual){
+                return redirect()->back()->with('error', 'La hora no puede ser anterior a la hora actual');
+            }
+        }
+
+        $fechaActual = date('Y-m-d');
+
+        if($fecha == $fechaActual){
+            $horaActual = date('H:i');
+            if($hora == $horaActual){
+                return redirect()->back()->with('error', 'La hora no puede ser igual a la hora actual');
+            }
+        }
+
+        $fechaSeleccionada = $request->input('fecha');
+        $fechaNueva = new DateTime($fechaSeleccionada);
+        //Obtenemos el número del día de la semana
+        $numeroDiaSemana = $fechaNueva->format('w'); // 0: Domingo, 1: Lunes, 2: Martes, etc.
+        switch ($numeroDiaSemana) {
+            case 0:
+                $diaSeleccionado = 'Domingo';
+                break;
+            case 1:
+                $diaSeleccionado = 'Lunes';
+                break;
+            case 2:
+                $diaSeleccionado = 'Martes';
+                break;
+            case 3:
+                $diaSeleccionado = 'Miercoles';
+                break;
+            case 4:
+                $diaSeleccionado = 'Jueves';
+                break;
+            case 5:
+                $diaSeleccionado = 'Viernes';
+                break;
+            case 6:
+                $diaSeleccionado = 'Sabado';
+                break;
+            default:
+
+                break;
+        }
+
+        $diasAtencion = DiasAtencion::where('dia', $diaSeleccionado)->get();
+        $horarios = HorariosAtencion::all();
+        $horasAtencion = HorasAtencion::all();
+
+        // Obtenemos la hora seleccionada en formato "H:i" (por ejemplo, "14:30")
+        $horaSeleccionada = $request->input('hora');
+
+        // Crea un objeto Carbon a partir de la hora seleccionada
+        $horaCarbon = Carbon::createFromFormat('H:i', $horaSeleccionada);
+
+        // Comprueba si la hora está en la mañana (antes de las 12:00 PM)
+        if ($horaCarbon->lt(Carbon::createFromTime(12, 0))) {
+            $periodoDelDia = 'Maniana';
+        } else {
+            $periodoDelDia = 'Tarde';
+        }
+
+        $horarioId = null;
+
+        foreach($diasAtencion as $diaAtencion){
+            foreach($horarios as $horario){
+                if($diaAtencion->id == $horario->dia_atencion_id && $horario->nutricionista_id == $profesionalExistente->id){
+                    foreach($horasAtencion as $horaAtencion){
+                        if($horaAtencion->id == $horario->hora_atencion_id && $periodoDelDia == $horaAtencion->etiqueta){
+                            $horarioId = $horario->id;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        $turno->tipo_consulta_id = $tipo_consulta;
+        $turno->horario_id = $horarioId;
+        $turno->fecha = $fecha;
+        $turno->hora = $hora;
+        $turno->estado = $estado;
+        $turno->save();
+
+        return redirect()->route('turnos.index')->with('success', 'Turno actualizado correctamente.');
     }
 
     /**
