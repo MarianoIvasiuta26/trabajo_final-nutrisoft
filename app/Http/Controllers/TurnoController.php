@@ -234,6 +234,24 @@ class TurnoController extends Controller
      */
     public function edit($id)
     {
+        $turno = Turno::find($id);
+
+        if(!$turno){
+            return redirect()->back()->with('error', 'El turno no existe.');
+        }
+
+        $paciente = Paciente::where('user_id', auth()->user()->id)->first();
+        $horarios = HorariosAtencion::all();
+        $tipo_consultas = TipoConsulta::all();
+        $turnos = Turno::all();
+        $pacientes = Paciente::all();
+        $profesionales = Nutricionista::all();
+        $historias_clinicas = HistoriaClinica::all();
+        $horas = HorasAtencion::all();
+        $dias = DiasAtencion::all();
+        $horaSeleccionada = $turno->hora;
+
+        return view('paciente.turnos-paciente.edit', compact('turno', 'paciente', 'horarios', 'tipo_consultas', 'turnos', 'pacientes', 'profesionales', 'historias_clinicas', 'horas', 'dias', 'paciente', 'horaSeleccionada'));
 
     }
 
