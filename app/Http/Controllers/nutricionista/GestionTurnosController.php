@@ -7,6 +7,7 @@ use App\Models\Paciente;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\TipoConsulta;
 use App\Models\Turno;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class GestionTurnosController extends Controller
@@ -20,7 +21,19 @@ class GestionTurnosController extends Controller
     {
         $turnos = Turno::all();
         $pacientes = Paciente::all();
-        return view ('nutricionista.gestion-turnos.index', compact('turnos', 'pacientes'));
+
+        $fechaActual = Carbon::now()->format('Y-m-d');
+        $hoy = Carbon::now();
+        $inicioSemana = $hoy->startOfWeek()->addDay();
+        $finSemana = $hoy->endOfWeek()->addDay();
+
+        //Obtenemos los turnos pendientes de la semana
+        $turnosSemanaPendiente = Turno::where('estado', 'Pendiente')
+            ->whereBetween('fecha', [$inicioSemana, $finSemana])
+            ->where('fecha', '!=', $fechaActual)
+            ->get();
+
+        return view ('nutricionista.gestion-turnos.index', compact('turnos', 'pacientes', 'fechaActual', 'turnosSemanaPendiente'));
     }
 
     /**
