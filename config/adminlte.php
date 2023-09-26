@@ -349,6 +349,23 @@ return [
         ],
 
         [
+            'text' => 'Gestionar Turnos',
+            'icon' => 'fas fa-file-medical fa-fw',
+            'submenu' => [
+                [
+                    'text' => 'Turnos Pendientes',
+                    'icon' =>'fas fa-fw fa-list',
+                    'route'  => 'gestion-turnos-nutricionista.index',
+                ],
+                [
+                    'text' => 'Historial de turnos',
+                    'icon' =>'fas fa-fw fa-plus',
+                    'route'  => 'gestion-turnos-nutricionista.showHistorialTurnos',
+                ],
+            ],
+        ],
+
+        [
             'text' => 'Horarios de Atención',
             'route'  => 'gestion-atencion.index',
             'icon' => 'fas fa-lock fa-fw',

@@ -16,6 +16,7 @@ use App\Http\Controllers\admin\GrupoAlimentoController;
 use App\Http\Controllers\admin\IntoleranciaController;
 use App\Http\Controllers\admin\NutrienteController;
 use App\Http\Controllers\admin\PatologiaController;
+use App\Http\Controllers\nutricionista\GestionTurnosController;
 use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
 use App\Http\Controllers\PacienteController;
@@ -78,8 +79,11 @@ Route::middleware([
     //Route::post('gestion-atencion/guardar', [NutricionistaController::class, 'guardarHorarios'])->name('gestion-atencion.guardarHorarios');
     Route::delete('gestion-atencion/{id}', [HorasDiasAtencionController::class, 'destroy'])->name('gestion-atencion.destroy');
     Route::post('gestion-atencion/guardar', [HorasDiasAtencionController::class, 'store'])->name('gestion-atencion.store');
+    Route::resource('gestion-turnos-nutricionista', GestionTurnosController::class)->names('gestion-turnos-nutricionista');
+    Route::get('gestion-turnos-nutricionista.showHistorialTurnos', [GestionTurnosController::class, 'showHistorialTurnos'])->name('gestion-turnos-nutricionista.showHistorialTurnos');
 
     //Paciente
+
     Route::resource('historia-clinica', HistoriaClinicaController::class)->names('historia-clinica');
     Route::get('/complete-history', [HistoriaClinicaController::class, 'index'])->name('complete-history');
     Route::post('datos-personales/store', [PacienteController::class, 'store'])->name('datos-personales.store');
@@ -88,6 +92,8 @@ Route::middleware([
     Route::post('datos-personales/update/{id}', [PacienteController::class, 'update'])->name('datos-personales.update');
 
     Route::resource('adelantamiento-turno', AdelantamientoTurnoController::class)->names('adelantamiento-turno');
+    Route::post('adelantamiento-turno.obtener-horas', [AdelantamientoTurnoController::class, 'obtenerHoras'])->name('adelantamiento-turno.obtener-horas');
+    Route::post('adelantamiento-turno/obtener-dias', [AdelantamientoTurnoController::class, 'obtenerDias'])->name('adelantamiento-turno.obtener-dias');
     Route::resource('datos-medicos', DatosMedicosController::class)->names('datos-medicos');
     Route::post('adelantamiento-turno/guardar', [AdelantamientoTurnoController::class, 'guardar'])->name('adelantamiento-turno.guardar');
 

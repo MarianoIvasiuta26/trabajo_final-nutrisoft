@@ -5,6 +5,8 @@ namespace App\Http\Controllers\paciente;
 use App\Http\Controllers\Controller;
 use App\Models\DiasAtencion;
 use App\Models\HorariosAtencion;
+use App\Models\HorasAtencion;
+use App\Models\Nutricionista;
 use App\Models\Paciente;
 use App\Models\Paciente\AdelantamientoTurno;
 use App\Models\Paciente\DatosMedicos;
@@ -33,7 +35,8 @@ class AdelantamientoTurnoController extends Controller
         $paciente = Paciente::where('user_id', auth()->id())->first();
         $dias = DiasAtencion::all();
         $horarios = HorariosAtencion::all();
-        return view('paciente.historia-clinica.adelantamiento-turnos.create', compact('dias', 'horarios', 'paciente'));
+        $profesionales = Nutricionista::all();
+        return view('paciente.historia-clinica.adelantamiento-turnos.create', compact('dias', 'horarios', 'paciente', 'profesionales'));
     }
 
     public function guardar(Request $request){
@@ -252,5 +255,64 @@ class AdelantamientoTurnoController extends Controller
         } else {
             return redirect()->route('historia-clinica.index')->with('error', 'No se pudo eliminar el día y hora disponible');
         }
+    }
+
+    public function obtenerDias(Request $request){
+        $profesionalSeleccionado = $request->input('profesional');
+        $profesional = Nutricionista::find($profesionalSeleccionado);
+
+        if(!$profesional){
+            return response()->json(['error' => 'No se encontró el profesional']);
+        }
+
+        $horarios = HorariosAtencion::where('nutricionista_id', $profesional->id)->get();
+
+        $diasDisponibles = [];
+
+        foreach($horarios as $horario){
+            $diasDisponibles[] = $horario->dia_atencion_id;
+        }
+
+        if(empty($diasDisponibles)){
+            return response()->json(['error' => 'No se encontraron días disponibles']);
+        }
+
+        foreach($diasDisponibles as $diaDisponible){
+            $diasFijos[] = DiasAtencion::where('id', $diaDisponible)->pluck('dia')->first();
+        }
+
+        return response()->json([
+            'diasFijos' => $diasFijos,
+        ]);
+
+    }
+
+    public function obtenerHoras(Request $request){
+
+        $profesionalSeleccionado = $request->input('profesional');
+        $profesional = Nutricionista::find($profesionalSeleccionado);
+
+        if(!$profesional){
+            return response()->json(['error' => 'No se encontró el profesional']);
+        }
+
+        $horarios = HorariosAtencion::where('nutricionista_id', $profesional->id)->get();
+        $horas = [];
+        foreach($horarios as $horario){
+            $horas[] = $horario->hora_atencion_id;
+        }
+
+        if(empty($horas)){
+            return response()->json(['error' => 'No se encontraron horas disponibles']);
+        }
+
+        foreach($horas as $hora){
+            $horasFijas[] = HorasAtencion::where('id', $hora)->pluck('hora')->first();
+        }
+
+        return response()->json([
+            'profesional' => $profesional,
+            'horasFijas' => $horasFijas,
+        ]);
     }
 }

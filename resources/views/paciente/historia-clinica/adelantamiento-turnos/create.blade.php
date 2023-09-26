@@ -17,22 +17,45 @@
                     @csrf
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col">
+                            <label class="form-label" for="profesional">Seleccione el profesional del que recibe atenciones</label>
+                            <select name="profesional" id="profesional" class="form-select">
+                                <option value="">Seleccione un profesional</option>
+                                @foreach($profesionales as $profesional)
+                                    <option value="{{$profesional->id}}">{{$profesional->user->name}} {{$profesional->user->apellido}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6" id="dias-consultas">
                             <h5>Seleccione los días que tiene disponibles:</h5>
-                            @foreach ($horarios as $horario)
-                                @foreach ($dias as $dia)
-                                    @if ($dia->id == $horario->dia_atencion_id)
-                                        <div class="col-md-2">
-                                            <div class="icheck-primary">
-                                                <input value="{{$dia->dia}}" type="checkbox" id="diasFijos-{{$dia->dia}}" name="diasFijos[]"/>
-                                                <label for="diasFijos-{{$dia->dia}}">{{$dia->dia}}</label>
+                            @php
+                            $diasAgregados = []; // Matriz para realizar un seguimiento de los días agregados
+                            @endphp
+                            @foreach ($profesionales as $profesional)
+                                @foreach ($horarios as $horario)
+                                    @foreach ($dias as $dia)
+                                        @if ($profesional->id == $horario->nutricionista_id && $dia->id == $horario->dia_atencion_id && $dia->seleccionado == 1 && !in_array($dia->dia, $diasAgregados))
+                                            <div class="col-md-2">
+                                                <div class="icheck-primary">
+                                                    <input value="{{$dia->dia}}" type="checkbox" id="diasFijos-{{$dia->dia}}" name="diasFijos[]"/>
+                                                    <label for="diasFijos-{{$dia->dia}}">{{$dia->dia}}</label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    @endif
+                                            @php
+                                            $diasAgregados[] = $dia->dia; // Agrega el día a la matriz de seguimiento
+                                            @endphp
+                                        @endif
+                                    @endforeach
                                 @endforeach
                             @endforeach
+
                         </div>
                         <!-- Horas -->
+
+
                         <div class="col-md-6">
                             <h5>Seleccione las horas disponibles:</h5>
                             <div class="row">
@@ -61,6 +84,8 @@
                                 </select>
                             </div>
                         </div>
+
+
                     </div>
 
                     <div class="row mt-3">
@@ -104,5 +129,99 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+        // Maneja el evento de cambio en el menú desplegable de profesionales para cargar los días
+        $('#profesional').on('change', function () {
+            var profesionalSeleccionado = this.value;
+
+            if (profesionalSeleccionado) {
+                cargarDiasDisponibles(profesionalSeleccionado);
+            } else {
+                // Si no se selecciona un profesional, vacía el contenedor de días
+                $('#dias-consultas').empty();
+            }
+        });
+
+        // Función para cargar los días disponibles
+        function cargarDiasDisponibles(profesionalSeleccionado) {
+            // Realiza una solicitud AJAX para obtener los días disponibles para el profesional seleccionado
+            $.ajax({
+                url: "{{ route('adelantamiento-turno.obtener-dias') }}",
+                type: "POST",
+                data: {
+                    profesional: profesionalSeleccionado,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (diasDisponibles) {
+                    var diasContainer = $('#dias-consultas');
+                    diasContainer.empty();
+
+                    $.each(diasDisponibles, function (index, dia) {
+                        var checkboxId = 'diasFijos-' + dia.dia;
+
+                        var divDia = $('<div>', { class: 'col-md-2' });
+                        var icheckDiv = $('<div>', { class: 'icheck-primary' });
+                        var checkboxInput = $('<input>', {
+                            value: dia.dia,
+                            type: 'checkbox',
+                            id: checkboxId,
+                            name: 'diasFijos[]'
+                        });
+                        var label = $('<label>', { for: checkboxId, text: dia.dia });
+
+                        icheckDiv.append(checkboxInput);
+                        icheckDiv.append(label);
+                        divDia.append(icheckDiv);
+                        diasContainer.append(divDia);
+                    });
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+    });
+
+    $(document).ready(function () {
+        // Maneja el evento de cambio en los checkboxes de los días
+        $('input[name="diasFijos[]"]').on('change', function () {
+            // Obtén los días seleccionados
+            var diasSeleccionados = $('input[name="diasFijos[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+
+            // Realiza una solicitud AJAX para obtener las horas disponibles
+            $.ajax({
+                url: "{{ route('adelantamiento-turno.obtener-horas') }}", // Define la ruta adecuada en tus rutas de Laravel
+                type: "POST",
+                data: {
+                    diasSeleccionados: diasSeleccionados,
+                    _token: "{{ csrf_token() }}" // Asegúrate de definir csrf_token en tu vista
+                },
+                success: function (horasDisponibles) {
+                    // Limpia las opciones actuales
+                    $('#horas-disponibles').empty();
+
+                    // Agrega las nuevas opciones de horas disponibles
+                    $.each(horasDisponibles, function (index, hora) {
+                        $('#horas-disponibles').append($('<option>', {
+                            value: hora,
+                            text: hora
+                        }));
+                    });
+
+                    // Actualiza el select de Bootstrap-Select
+                    $('#horas-disponibles').selectpicker('refresh');
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+    });
+    </script>
 
 @stop
