@@ -21,4 +21,8 @@ class Nutricionista extends Model
     public function horariosAtencion(){
         return $this->hasMany('App\Models\HorariosAtencion');
     }
+
+    public function consulta(){
+        return $this->hasMany('App\Models\Consulta');
+    }
 }

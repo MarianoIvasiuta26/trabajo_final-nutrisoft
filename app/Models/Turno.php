@@ -32,4 +32,9 @@ class Turno extends Model
     {
         return $this->belongsTo(TipoConsulta::class);
     }
+
+    public function consulta()
+    {
+        return $this->hasOne(Consulta::class);
+    }
 }

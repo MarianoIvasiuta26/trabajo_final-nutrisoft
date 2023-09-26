@@ -16,6 +16,7 @@ use App\Http\Controllers\admin\GrupoAlimentoController;
 use App\Http\Controllers\admin\IntoleranciaController;
 use App\Http\Controllers\admin\NutrienteController;
 use App\Http\Controllers\admin\PatologiaController;
+use App\Http\Controllers\nutricionista\GestionConsultasController;
 use App\Http\Controllers\nutricionista\GestionTurnosController;
 use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
@@ -81,6 +82,9 @@ Route::middleware([
     Route::post('gestion-atencion/guardar', [HorasDiasAtencionController::class, 'store'])->name('gestion-atencion.store');
     Route::resource('gestion-turnos-nutricionista', GestionTurnosController::class)->names('gestion-turnos-nutricionista');
     Route::get('gestion-turnos-nutricionista.showHistorialTurnos', [GestionTurnosController::class, 'showHistorialTurnos'])->name('gestion-turnos-nutricionista.showHistorialTurnos');
+    Route::get('gestion-turnos-nutricionista.iniciarConsulta/{id}', [GestionTurnosController::class, 'iniciarConsulta'])->name('gestion-turnos-nutricionista.iniciarConsulta');
+    Route::resource('gestion-consultas', GestionConsultasController::class)->names('gestion-consultas');
+    Route::post('gestion-consultas.store/{id}', [GestionConsultasController::class, 'store'])->name('gestion-consultas.store');
 
     //Paciente
 

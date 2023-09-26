@@ -97,4 +97,27 @@ class GestionTurnosController extends Controller
 
         return view('nutricionista.gestion-turnos.showHistorialTurno', compact('turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas'));
     }
+
+    public function iniciarConsulta($id){
+        $turno = Turno::find($id);
+
+        if(!$turno){
+            return redirect()->back()->with('error', 'No se encontró el turno');
+        }
+
+        $paciente = Paciente::where('id', $turno->paciente_id)->first();
+
+        if(!$paciente){
+            return redirect()->back()->with('error', 'No se encontró el paciente');
+        }
+
+        $tipoConsultas = TipoConsulta::all();
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        if(!$historiaClinica){
+            return redirect()->back()->with('error', 'No se encontró la historia clínica');
+        }
+
+        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica'));
+    }
 }

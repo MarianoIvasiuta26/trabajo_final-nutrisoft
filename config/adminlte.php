@@ -349,7 +349,7 @@ return [
         ],
 
         [
-            'text' => 'Gestionar Turnos',
+            'text' => 'Turnos y Consultas',
             'icon' => 'fas fa-file-medical fa-fw',
             'submenu' => [
                 [

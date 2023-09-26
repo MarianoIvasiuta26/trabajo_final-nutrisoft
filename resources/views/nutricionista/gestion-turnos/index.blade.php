@@ -26,30 +26,25 @@
 
                 <tbody>
                     @foreach ($turnos as $turno)
-                        @if ($turno->estado == 'Pendiente')
-                            <tr>
-                                <td>
-                                {{ $turno->fecha }}
-                                </td>
-                                <td>
-                                    {{ $turno->hora }}
-                                </td>
-                                <td>
-
-                                    @foreach ($pacientes as $paciente)
-                                        @if ($paciente->id == $turno->paciente_id && $turno->estado == 'Pendiente')
-                                            {{ $paciente->user->name }} {{ $paciente->user->apellido }}
-                                        @endif
-                                    @endforeach
-                                </td>
-                                <td>
-
-                                    <a class="btn btn-success" href="{{route('gestion-turnos-nutricionista.create')}}">Iniciar consulta</a>
-                                    <a class="btn btn-danger" href="{{route('gestion-turnos-nutricionista.create')}}">No asistió</a>
-
-                                </td>
-                            </tr>
-                        @endif
+                        @foreach ($pacientes as $paciente)
+                            @if ($paciente->id == $turno->paciente_id && $turno->estado == 'Pendiente')
+                                <tr>
+                                    <td>
+                                    {{ $turno->fecha }}
+                                    </td>
+                                    <td>
+                                        {{ $turno->hora }}
+                                    </td>
+                                    <td>
+                                        {{ $paciente->user->name }} {{ $paciente->user->apellido }}
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-success" href="{{route('gestion-turnos-nutricionista.iniciarConsulta', $turno->id)}}">Iniciar consulta</a>
+                                        <a class="btn btn-danger" href="{{route('gestion-turnos-nutricionista.create')}}">No asistió</a>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
                     @endforeach
 
                 </tbody>
