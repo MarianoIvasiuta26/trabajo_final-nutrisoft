@@ -82,6 +82,7 @@ Route::middleware([
     Route::post('gestion-atencion/guardar', [HorasDiasAtencionController::class, 'store'])->name('gestion-atencion.store');
     Route::resource('gestion-turnos-nutricionista', GestionTurnosController::class)->names('gestion-turnos-nutricionista');
     Route::get('gestion-turnos-nutricionista.showHistorialTurnos', [GestionTurnosController::class, 'showHistorialTurnos'])->name('gestion-turnos-nutricionista.showHistorialTurnos');
+    Route::post('gestion-turnos-nutricionista.confirmarInasistencia/{id}', [GestionTurnosController::class, 'confirmarInasistencia'])->name('gestion-turnos-nutricionista.confirmarInasistencia');
     Route::get('gestion-turnos-nutricionista.iniciarConsulta/{id}', [GestionTurnosController::class, 'iniciarConsulta'])->name('gestion-turnos-nutricionista.iniciarConsulta');
     Route::resource('gestion-consultas', GestionConsultasController::class)->names('gestion-consultas');
     Route::post('gestion-consultas.store/{id}', [GestionConsultasController::class, 'store'])->name('gestion-consultas.store');

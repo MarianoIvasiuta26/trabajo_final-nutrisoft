@@ -40,7 +40,10 @@
                                     </td>
                                     <td>
                                         <a class="btn btn-success" href="{{route('gestion-turnos-nutricionista.iniciarConsulta', $turno->id)}}">Iniciar consulta</a>
-                                        <a class="btn btn-danger" href="{{route('gestion-turnos-nutricionista.create')}}">No asistió</a>
+                                        <form action="{{ route('gestion-turnos-nutricionista.confirmarInasistencia', $turno->id) }}" method="POST" style="display: inline-block;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger">No asistió</button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endif

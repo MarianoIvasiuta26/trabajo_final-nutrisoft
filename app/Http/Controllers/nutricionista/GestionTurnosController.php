@@ -120,4 +120,18 @@ class GestionTurnosController extends Controller
 
         return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica'));
     }
+
+    public function confirmarInasistencia($id){
+        $turno = Turno::find($id);
+
+        if(!$turno){
+            return redirect()->back()->with('error', 'No se encontró el turno');
+        }
+
+        $turno->estado = 'Inasistencia';
+        $turno->save();
+
+        return redirect()->back()->with('success', 'Se confirmó la inasistencia del paciente');
+
+    }
 }

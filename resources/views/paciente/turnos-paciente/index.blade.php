@@ -27,10 +27,11 @@
                         <h5>Turno pendiente</h5>
                         Usted tiene un turno pendiente para el día {{ $turno->fecha }} a las {{ $turno->hora }} hs.
                         <br>Para cancelar el turno, haga click en el siguiente enlace:
-                        <br><a href="{{ route('turnos.edit', $turno->id) }}" class="alert-link">Cancelar turno</a>
+                        <br><a href="{{ route('turnos.destroy', $turno->id) }}" class="alert-link">Cancelar turno</a>
                     </div>
                 @endif
             @endif
+
         @endforeach
 
         <div class="card card-dark">
@@ -65,10 +66,10 @@
                                 <td>{{ $turno->estado }}</td>
                                 <td>
                                     <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary">Ver</a>
-                                    @if ($turno->estado != 'Cancelado')
+                                    @if ($turno->estado == 'Pendiente')
                                         <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
                                     @endif
-                                    @if ($turno->estado != 'Cancelado')
+                                    @if ($turno->estado == 'Pendiente')
                                         <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
                                             @csrf
                                             @method('DELETE')
