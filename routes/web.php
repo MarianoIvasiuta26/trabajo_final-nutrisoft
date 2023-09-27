@@ -74,6 +74,8 @@ Route::middleware([
         'horario' => HorarioController::class,
     ]);
 */
+    Route::get('completar-registro/{id}', [NutricionistaController::class, 'showRegistrationForm'])->name('mostrar-completar-registro');
+    Route::post('completar-registro', [NutricionistaController::class, 'completarRegistro'])->name('completar-registro');
 
     Route::get('gestion-atencion', [HorasDiasAtencionController::class, 'index'])->name('gestion-atencion.index');
     Route::get('gestion-atencion/consulta', [NutricionistaController::class, 'consultaForm'])->name('gestion-atencion.consultaForm');

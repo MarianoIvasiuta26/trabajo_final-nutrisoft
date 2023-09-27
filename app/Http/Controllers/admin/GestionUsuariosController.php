@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\RegistroNutricionista;
 use App\Models\Administrador;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Jetstream\Jetstream;
+use Illuminate\Support\Str;
 
 class GestionUsuariosController extends Controller
 {
@@ -52,11 +55,13 @@ class GestionUsuariosController extends Controller
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
 
+        $passwordTemporal = Str::random(8); //Se genera una contraseña aleatoria de 8 caracteres
+
         $user = User::create([
             'name' => $request['name'],
             'email' => $request['email'],
             'apellido' => $request['apellido'],
-            'password' => Hash::make('12345678'),
+            'password' => Hash::make($passwordTemporal),
             'tipo_usuario' => $request['tipo_usuario'],
         ]);
 
@@ -65,7 +70,14 @@ class GestionUsuariosController extends Controller
         } elseif ($request['tipo_usuario'] === 'Administrador') {
             Administrador::create(['user_id' => $user->id]);
         } elseif ($request['tipo_usuario'] === 'Nutricionista') {
-            Nutricionista::create(['user_id' => $user->id]);
+            $nutricionista = Nutricionista::create(['user_id' => $user->id, 'registrado' => false]);
+
+            if ($nutricionista) {
+                // Se envía el correo de completar registro solo si $nutricionista no es null
+                Mail::to($nutricionista->user->email)->send(new RegistroNutricionista($nutricionista));
+            } else {
+                return redirect()->route('gestion-usuarios.index')->with('error', 'Error al crear el usuario');
+            }
         }
 
         return redirect()->route('gestion-usuarios.index')->with('success', 'Usuario guardado correctamente');

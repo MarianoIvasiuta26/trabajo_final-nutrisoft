@@ -39,7 +39,7 @@
                 <h5>Historial de Turnos</h5>
             </div>
             <div class="card-body">
-                <table class="table table-striped" id="turnos">
+                <table id="tabla-mis-turnos" class="table table-striped" id="turnos">
                     <thead>
                     <tr>
                         <th scope="col">Fecha</th>
@@ -93,12 +93,44 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="/css/admin_custom.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="/css/admin_custom.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
 @stop
 
 @section('js')
     <script> console.log('Hi!'); </script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            var table = $('#tabla-mis-turnos').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ turnos por página",
+                    "zeroRecords": "No se encontró ningún turno",
+                    "info": "Mostrando la página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay registros de turnos",
+                    "infoFiltered": "(filtrado de _MAX_ turnos totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+                }
+            });
+        });
+    </script>
 @stop

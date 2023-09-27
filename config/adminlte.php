@@ -332,7 +332,6 @@ return [
 
         [
             'text' => 'Turnos',
-            'route'  => 'historia-clinica.index',
             'icon' => 'fas fa-file-medical fa-fw',
             'submenu' => [
                 [
