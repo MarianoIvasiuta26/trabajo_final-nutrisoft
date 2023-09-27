@@ -14,7 +14,7 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-striped">
+            <table id="turnos-dia" class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Fecha</th>
@@ -58,11 +58,7 @@
                             @endforeach
                         @endif
                     @endforeach
-                    @if (!$turnosPendientesEncontrados)
-                        <tr>
-                            <td colspan="4"><h5>No hay turnos pendientes para el día de hoy</h5></td>
-                        </tr>
-                    @endif
+
                 </tbody>
             </table>
         </div>
@@ -74,7 +70,7 @@
         </div>
 
         <div class="card-body">
-            <table class="table table-striped">
+            <table id="turnos-semana" class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Fecha</th>
@@ -118,11 +114,6 @@
                             @endforeach
                         @endif
                     @endforeach
-                    @if (!$turnosPendientesEncontrados)
-                        <tr>
-                            <td colspan="4"><h5>No hay turnos pendientes para esta semana</h5></td>
-                        </tr>
-                    @endif
                 </tbody>
             </table>
         </div>
@@ -133,10 +124,66 @@
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+
+
 @stop
 
 @section('js')
     <script> console.log('Hi!'); </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            $('#turnos-dia').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ turnos por página",
+                    "zeroRecords": "No se encontró ningún turno pendiente para el día de hoy",
+                    "info": "Mostrando la página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay turnos pendientes para el día de hoy",
+                    "infoFiltered": "(filtrado de _MAX_ turnos totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+
+                }
+            });
+        });
+
+        $(document).ready(function(){
+            $('#turnos-semana').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ turnos por página",
+                    "zeroRecords": "No se encontró ningún turno pendiente para esta semana",
+                    "info": "Mostrando la página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay turnos pendientes para esta semana",
+                    "infoFiltered": "(filtrado de _MAX_ turnos totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+
+                }
+            });
+        });
+    </script>
 @stop
