@@ -13,16 +13,16 @@ class RegistroNutricionista extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $nutricionista;
+    public $userId;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($nutricionista)
+    public function __construct($userId)
     {
-        $this->nutricionista = $nutricionista;
+        $this->userId = $userId;
     }
 
     /**
@@ -42,10 +42,6 @@ class RegistroNutricionista extends Mailable
      *
      * @return \Illuminate\Mail\Mailables\Content
      */
-    public function content()
-    {
-        return view('emails.registro-nutricionista');
-    }
 
     /**
      * Get the attachments for the message.
@@ -59,7 +55,7 @@ class RegistroNutricionista extends Mailable
 
     public function build(){
         return $this->view('emails.registro-nutricionista')
-        ->with(['nutricionista' => $this->nutricionista])
+        ->with(['userId' => $this->userId])
         ->subject('Finalice con el proceso de registro');
     }
 }

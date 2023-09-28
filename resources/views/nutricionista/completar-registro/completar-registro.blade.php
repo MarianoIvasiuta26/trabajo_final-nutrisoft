@@ -8,7 +8,7 @@
 
         <form method="POST" action="{{ route('completar-registro') }}" class="w-full max-w-lg mx-auto">
             @csrf
-            <input type="hidden" name="nutricionista_id" value="{{ $nutricionistaId }}">
+            <input type="hidden" name="userId" value="{{ $userId }}">
 
             <div class="mt-4 flex items-center space-x-4">
                 <div class="mt-2 w-1/2">
@@ -21,9 +21,12 @@
                     <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
                 </div>
             </div>
-            <x-button class="ml-4">
-                {{ __('Register') }}
-            </x-button>
+
+            <div class="flex items-center justify-center mt-4">
+                <x-button class="ml-4">
+                    {{ __('Register') }}
+                </x-button>
+            </div>
         </form>
     </x-authentication-card>
 </x-guest-layout>

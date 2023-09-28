@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\DiasAtencion;
 use App\Models\Nutricionista;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -36,14 +37,16 @@ class NutricionistaController extends Controller
     }
 
     public function showRegistrationForm($id){
-        return view('nutricionista.completar-registro', ['nutricionistaId' => $id]);
+        return view('nutricionista.completar-registro.completar-registro', ['userId' => $id]);
     }
 
     public function completarRegistro(Request $request){
-        $nutricionista = Nutricionista::find($request->nutricionista_id);
-        $nutricionista->user->password = Hash::make($request->password);
+        $user = User::find($request->userId);
+        $nutricionista = Nutricionista::where('user_id', $request->userId)->first();
+        $user->password = Hash::make($request->password);
         $nutricionista->registrado = true;
         $nutricionista->save();
+        $user->save();
         return redirect()->route('login')->with('success', 'Registro completado. Ahora puedes iniciar sesión.');
     }
 

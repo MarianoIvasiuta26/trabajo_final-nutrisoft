@@ -56,6 +56,7 @@ class GestionUsuariosController extends Controller
         ])->validate();
 
         $passwordTemporal = Str::random(8); //Se genera una contraseña aleatoria de 8 caracteres
+        $email = $request['email'];
 
         $user = User::create([
             'name' => $request['name'],
@@ -71,10 +72,10 @@ class GestionUsuariosController extends Controller
             Administrador::create(['user_id' => $user->id]);
         } elseif ($request['tipo_usuario'] === 'Nutricionista') {
             $nutricionista = Nutricionista::create(['user_id' => $user->id, 'registrado' => false]);
-
+            $userId = $user->id;
             if ($nutricionista) {
                 // Se envía el correo de completar registro solo si $nutricionista no es null
-                Mail::to($nutricionista->user->email)->send(new RegistroNutricionista($nutricionista));
+                Mail::to($email)->send(new RegistroNutricionista($userId));
             } else {
                 return redirect()->route('gestion-usuarios.index')->with('error', 'Error al crear el usuario');
             }
