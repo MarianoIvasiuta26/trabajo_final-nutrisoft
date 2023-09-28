@@ -11,7 +11,7 @@
     @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
         <div class="alert alert-warning" role="alert">
-            <h5>Historia Clínica icompleta</h5>
+            <h5>Historia Clínica incompleta</h5>
             Parece que aún no has completado tu Historia Clínica. <br>
             Para tener acceso a esta funcionalidad del sistema, necesita completar su historia clínica. <br>
             Haga click en el siguiente enlace para completar su historia clínica:

@@ -251,65 +251,370 @@
                             <!-- Datos Médicos -->
 
                             <div id="datos-medicos" class="tab-pane">
-                                <p>Anamnesis Alimentaria:</p>
-                                <!-- Iterar y mostrar alimentos preferidos y no gustados -->
-                                <ul>
-                                    @foreach ($alimentos as $alimento)
-                                        @forelse ($anamnesisAlimentaria as $anamnesis)
-                                            @if ($anamnesis->alimento_id == $alimento->id)
-                                                @if ($alimento->alimento == 'Ninguno')
-                                                    <li>No se registró ningún alimento para la anamnesis.</li>
-                                                @else
-                                                    @if ($alimento->gusta == 0)
-                                                        <li>{{ $alimento->alimento }} - No gusta</li>
+                                <div class="row">
+                                    <div class="col-9 mb-3">
+                                        <h5>Anamnesis Alimentaria</h5>
+                                    </div>
+                                    <div class="col-3">
+                                        <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
+                                            Agregar
+                                        </a>
+                                    </div>
+                                    <!-- Pestañas desplegables para anamnesis -->
+                                    <div class="accordion" id="alimentosPrefTabs">
+                                        <!-- Alimentos Preferidos -->
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="alimentosPrefHeading">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#alimentosPrefCollapse" aria-expanded="true" aria-controls="alimentosPrefCollapse">
+                                                    Alimentos Preferidos
+                                                </button>
+                                            </h2>
+                                            <div id="alimentosPrefCollapse" class="accordion-collapse collapse" aria-labelledby="alimentosPrefHeading">
+                                                <div class="accordion-body">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Alimento</th>
+                                                                <th>Opciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($alimentos as $alimento)
+                                                                @forelse ($anamnesisAlimentaria as $anamnesis)
+                                                                    @if ($anamnesis->alimento_id == $alimento->id)
+                                                                        @if ($anamnesis->gusta == 1 && $alimento->alimento != 'Sin Alimento' && count($anamnesisAlimentaria) > 1)
+                                                                            <tr>
+                                                                                <td>{{ $alimento->alimento }}</td>
+                                                                                <td>
+                                                                                    <div class="btn-group">
+                                                                                        <a class="btn btn-info" href="{{ route('datos-medicos.edit', $anamnesis->id) }}">Editar</a>
+                                                                                        <form action="{{ route('datos-medicos.destroy', $anamnesis->id) }}" method="POST">
+                                                                                            @csrf
+                                                                                            @method('DELETE')
+                                                                                            <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        @else
+                                                                            <tr>
+                                                                                <td colspan="2"> {{$alimento->alimento}} </td>
+                                                                            </tr>
+                                                                        @endif
+                                                                    @endif
+                                                                @empty
+                                                                    <h5>No se encontraron anamnesis alimentarias registradas.</h5>
+                                                                @endforelse
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="accordion-item mb-3" id="alimentosNoPrefTabs">
+                                            <!-- Alimentos Preferidos -->
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="alimentosNoPrefHeading">
+                                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#alimentosNoPrefCollapse" aria-expanded="true" aria-controls="alimentosNoPrefCollapse">
+                                                        Alimentos No Preferidos
+                                                    </button>
+                                                </h2>
+                                                <div id="alimentosNoPrefCollapse" class="accordion-collapse collapse" aria-labelledby="alimentosNoPrefHeading">
+                                                    <div class="accordion-body">
+                                                        <table class="table table-striped">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Alimento</th>
+                                                                    <th>Opciones</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($alimentos as $alimento)
+                                                                    @forelse ($anamnesisAlimentaria as $anamnesis)
+                                                                        @if ($anamnesis->alimento_id == $alimento->id)
+                                                                            @if ($anamnesis->gusta == 0 && $alimento->alimento != 'Sin Alimento' && count($anamnesisAlimentaria) > 1)
+                                                                                <tr>
+                                                                                    <td>{{ $alimento->alimento }}</td>
+                                                                                    <td>
+                                                                                        <div class="btn-group">
+                                                                                            <a class="btn btn-info" href="{{ route('datos-medicos.edit', $anamnesis->id) }}">Editar</a>
+                                                                                            <form action="{{ route('datos-medicos.destroy', $anamnesis->id) }}" method="POST">
+                                                                                                @csrf
+                                                                                                @method('DELETE')
+                                                                                                <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                                                            </form>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            @else
+                                                                                <tr>
+                                                                                    <td colspan="2"> {{$alimento->alimento}} </td>
+                                                                                </tr>
+                                                                            @endif
+                                                                        @endif
+                                                                    @empty
+                                                                        <h5>No se encontraron anamnesis alimentarias registradas.</h5>
+                                                                    @endforelse
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                                    @else
-                                                        <li>{{ $alimento->alimento }} - Gusta</li>
-                                                    @endif
-                                                @endif
+                                        </div>
+                                    </div>
 
-                                            @endif
-                                        @empty
-                                            <h5>No se encontraron anamnesis alimentarias registradas.</h5>
-                                        @endforelse
-                                    @endforeach
+                                    <!-- Fin de pestañas desplegables -->
+                                </div>
 
-                                </ul>
-                                <p>Alergias:</p>
-                                <!-- Iterar y mostrar alergias -->
-                                <ul>
-                                    @foreach ($alergias as $alergia)
-                                        <li>{{ $alergia->alergia }}</li>
-                                    @endforeach
-                                </ul>
-                                <p>Cirugías:</p>
-                                <!-- Iterar y mostrar cirugías -->
-                                <ul>
-                                    @foreach ($cirugias as $cirugia)
-                                        @forelse ($cirugiasPaciente as $cirugiaPaciente)
-                                            @if ($cirugiaPaciente->cirugia_id == $cirugia->id)
-                                                <li>{{ $cirugia->cirugia }} - {{ $cirugiaPaciente->tiempo }} {{ $cirugiaPaciente->unidad_tiempo }}</li>
-                                            @endif
-                                        @empty
-                                            <h5>No se encontraron cirugías registradas.</h5>
-                                        @endforelse
-                                    @endforeach
-                                </ul>
-                                <p>Patologías:</p>
-                                <!-- Iterar y mostrar patologías -->
-                                <ul>
-                                    @foreach ($patologias as $patologia)
-                                        <li>{{ $patologia->patologia }}</li>
-                                    @endforeach
-                                </ul>
-                                <p>Intolerancias:</p>
-                                <!-- Iterar y mostrar intolerancias -->
-                                <ul>
-                                    @foreach ($intolerancias as $intolerancia)
-                                        <li>{{ $intolerancia->intolerancia }}</li>
-                                    @endforeach
-                                </ul>
+                                <div class="row mt-3">
+                                    <div class="col-9 mb-3">
+                                        <h5>Alergias</h5>
+                                    </div>
+                                    <div class="col-3">
+                                        <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
+                                            Agregar
+                                        </a>
+                                    </div>
+                                    <!-- Pestañas desplegables para anamnesis -->
+                                    <div class="accordion" id="alergiaTabs">
+                                        <!-- Alimentos Preferidos -->
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="alergiaHeading">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#alergiaCollapse" aria-expanded="true" aria-controls="alergiaCollapse">
+                                                    Alergias
+                                                </button>
+                                            </h2>
+                                            <div id="alergiaCollapse" class="accordion-collapse collapse" aria-labelledby="alergiaHeading">
+                                                <div class="accordion-body">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Alergia</th>
+                                                                <th>Grupo de Alergia</th>
+                                                                <th>Opciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($alergias as $alergia)
+                                                                @if ($alergia->alergia != 'Ninguna' && count($alergias) > 1)
+                                                                    <tr>
+                                                                        <td>{{ $alergia->alergia }}</td>
+                                                                        <td>{{ $alergia->grupo_alergia}}</td>
+                                                                        <td>
+                                                                            <div class="btn-group">
+                                                                                <a class="btn btn-info" href="{{ route('datos-medicos.edit', $alergia->id) }}">Editar</a>
+                                                                                <form action="{{ route('datos-medicos.destroy', $alergia->id) }}" method="POST">
+                                                                                    @csrf
+                                                                                    @method('DELETE')
+                                                                                    <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                                                </form>
+                                                                            </div>
+                                                                    </tr>
+                                                                @else
+                                                                    <tr>
+                                                                        <td colspan="3"> {{$alergia->alergia}} </td>
+                                                                    </tr>
+                                                                @endif
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <!-- Fin de pestañas desplegables -->
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-9 mb-3">
+                                        <h5>Cirugías</h5>
+                                    </div>
+                                    <div class="col-3">
+                                        <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
+                                            Agregar
+                                        </a>
+                                    </div>
+                                    <!-- Pestañas desplegables para anamnesis -->
+                                    <div class="accordion" id="alergiaTabs">
+                                        <!-- Alimentos Preferidos -->
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="cirugiaHeading">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#cirugiaCollapse" aria-expanded="true" aria-controls="cirugiaCollapse">
+                                                    Cirugías
+                                                </button>
+                                            </h2>
+                                            <div id="cirugiaCollapse" class="accordion-collapse collapse" aria-labelledby="cirugiaHeading">
+                                                <div class="accordion-body">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Cirugía</th>
+                                                                <th>Grupo de Cirugía</th>
+                                                                <th>Tiempo Cirugía</th>
+                                                                <th>Unidad de Tiempo</th>
+                                                                <th>Opciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @forelse ($cirugiasPaciente as $cirugiaPaciente)
+                                                                @if ($cirugiaPaciente->cirugia->cirugia != 'Ninguna')
+                                                                    <tr>
+                                                                        <td>{{ $cirugiaPaciente->cirugia->cirugia }}</td>
+                                                                        <td>{{ $cirugiaPaciente->cirugia->grupo_cirugia }}</td>
+                                                                        <td>{{ $cirugiaPaciente->tiempo }}</td>
+                                                                        <td>{{ $cirugiaPaciente->unidad_tiempo }}</td>
+                                                                        <td>
+                                                                            <div class="btn-group">
+                                                                                <a class="btn btn-info" href="{{ route('datos-medicos.edit', $cirugiaPaciente->id) }}">Editar</a>
+                                                                                <form action="{{ route('datos-medicos.destroy', $cirugiaPaciente->id) }}" method="POST">
+                                                                                    @csrf
+                                                                                    @method('DELETE')
+                                                                                    <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                                                </form>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                @else
+                                                                    <tr>
+                                                                        <td colspan="5">{{$cirugiaPaciente->cirugia->cirugia}}</td>
+                                                                    </tr>
+                                                                @endif
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="5">No se encontraron cirugías seleccionadas por el paciente.</td>
+                                                                </tr>
+                                                            @endforelse
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Fin de pestañas desplegables -->
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-9 mb-3">
+                                        <h5>Patologías</h5>
+                                    </div>
+                                    <div class="col-3">
+                                        <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
+                                            Agregar
+                                        </a>
+                                    </div>
+                                    <!-- Pestañas desplegables para anamnesis -->
+                                    <div class="accordion" id="patologiaTabs">
+                                        <!-- Alimentos Preferidos -->
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="patologiaHeading">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#patologiaCollapse" aria-expanded="true" aria-controls="patologiaCollapse">
+                                                    Patologías
+                                                </button>
+                                            </h2>
+                                            <div id="patologiaCollapse" class="accordion-collapse collapse" aria-labelledby="patologiaHeading">
+                                                <div class="accordion-body">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Patología</th>
+                                                                <th>Grupo de Patología</th>
+                                                                <th>Opciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($patologias as $patologia)
+                                                                @if ($patologia->patologia != 'Ninguna' && count($patologias) > 1)
+                                                                    <tr>
+                                                                        <td>{{ $patologia->patologia }}</td>
+                                                                        <td>{{ $patologia->grupo_patologia}}</td>
+                                                                        <td>
+                                                                            <div class="btn-group">
+                                                                                <a class="btn btn-info" href="{{ route('datos-medicos.edit', $patologia->id) }}">Editar</a>
+                                                                                <form action="{{ route('datos-medicos.destroy', $patologia->id) }}" method="POST">
+                                                                                    @csrf
+                                                                                    @method('DELETE')
+                                                                                    <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                                                </form>
+                                                                            </div>
+                                                                    </tr>
+                                                                @else
+                                                                    <tr>
+                                                                        <td colspan="3"> {{$patologia->patologia}} </td>
+                                                                    </tr>
+                                                                @endif
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Fin de pestañas desplegables -->
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-9 mb-3">
+                                        <h5>Intolerancias</h5>
+                                    </div>
+                                    <div class="col-3">
+                                        <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
+                                            Agregar
+                                        </a>
+                                    </div>
+                                    <!-- Pestañas desplegables para anamnesis -->
+                                    <div class="accordion" id="intoleranciaTabs">
+                                        <!-- Alimentos Preferidos -->
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="intoleranciaHeading">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#intoleranciaCollapse" aria-expanded="true" aria-controls="patologiaCollapse">
+                                                    Intolerancias
+                                                </button>
+                                            </h2>
+                                            <div id="intoleranciaCollapse" class="accordion-collapse collapse" aria-labelledby="intoleranciaHeading">
+                                                <div class="accordion-body">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Intolerancia</th>
+                                                                <th>Opciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($intolerancias as $intolerancia)
+                                                                @if ($intolerancia->intolerancia != 'Ninguna' && count($intolerancias) > 1)
+                                                                    <tr>
+                                                                        <td>{{ $intolerancia->intolerancia }}</td>
+                                                                        <td>
+                                                                            <div class="btn-group">
+                                                                                <a class="btn btn-info" href="{{ route('datos-medicos.edit', $intolerancia->id) }}">Editar</a>
+                                                                                <form action="{{ route('datos-medicos.destroy', $intolerancia->id) }}" method="POST">
+                                                                                    @csrf
+                                                                                    @method('DELETE')
+                                                                                    <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                                                </form>
+                                                                            </div>
+                                                                    </tr>
+                                                                @else
+                                                                    <tr>
+                                                                        <td colspan="3"> {{$intolerancia->intolerancia}} </td>
+                                                                    </tr>
+                                                                @endif
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Fin de pestañas desplegables -->
+                                </div>
                                 <div class="row mt-3">
                                     <div class="col-12">
                                         <div class="float-right">

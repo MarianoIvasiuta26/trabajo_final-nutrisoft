@@ -11,6 +11,8 @@ use App\Models\Paciente;
 use App\Models\Paciente\AdelantamientoTurno;
 use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
+use DateInterval;
+use DateTime;
 use Illuminate\Http\Request;
 
 class AdelantamientoTurnoController extends Controller
@@ -266,19 +268,22 @@ class AdelantamientoTurnoController extends Controller
         }
 
         $horarios = HorariosAtencion::where('nutricionista_id', $profesional->id)->get();
+        $diasAtencion = DiasAtencion::all();
 
-        $diasDisponibles = [];
+        $diasFijos = [];
+        $diasAgregados = [];
 
         foreach($horarios as $horario){
-            $diasDisponibles[] = $horario->dia_atencion_id;
+            foreach($diasAtencion as $diaAtencion){
+                if($horario->dia_atencion_id == $diaAtencion->id && !in_array($diaAtencion->dia, $diasAgregados)){
+                    $diasFijos[] = $diaAtencion->dia;
+                    $diasAgregados[] = $diaAtencion->dia;
+                }
+            }
         }
 
-        if(empty($diasDisponibles)){
+        if(empty($diasFijos)){
             return response()->json(['error' => 'No se encontraron días disponibles']);
-        }
-
-        foreach($diasDisponibles as $diaDisponible){
-            $diasFijos[] = DiasAtencion::where('id', $diaDisponible)->pluck('dia')->first();
         }
 
         return response()->json([
@@ -291,6 +296,12 @@ class AdelantamientoTurnoController extends Controller
 
         $profesionalSeleccionado = $request->input('profesional');
         $profesional = Nutricionista::find($profesionalSeleccionado);
+        $diaSeleccionado = $request->input('dia');
+
+        $horasManiana = HorasAtencion::where('etiqueta', 'Maniana')->get();
+        $horasTarde = HorasAtencion::where('etiqueta', 'Tarde')->get();
+        $intervalo = new DateInterval('PT30M'); //Intervalo de 30 minutos
+        $diasAtencion = DiasAtencion::all();
 
         if(!$profesional){
             return response()->json(['error' => 'No se encontró el profesional']);
@@ -299,20 +310,42 @@ class AdelantamientoTurnoController extends Controller
         $horarios = HorariosAtencion::where('nutricionista_id', $profesional->id)->get();
         $horas = [];
         foreach($horarios as $horario){
-            $horas[] = $horario->hora_atencion_id;
+            foreach($diasAtencion as $diaAtencion){
+                foreach($horasManiana as $horaManiana){
+                    if($horario->dia_atencion_id == $diaAtencion->id && $horario->hora_atencion_id == $horaManiana->id && $diaAtencion->dia == $diaSeleccionado){
+                        $horaInicio = new DateTime($horaManiana->hora_inicio);
+                        $horaFin = new DateTime($horaManiana->hora_fin);
+                        while ($horaInicio < $horaFin) {
+                            $horas[] = $horaInicio->format('H:i');
+                            $horaInicio->add($intervalo);
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($horarios as $horario){
+            foreach($diasAtencion as $diaAtencion){
+                foreach($horasTarde as $horaTarde){
+                    if($horario->dia_atencion_id == $diaAtencion->id && $horario->hora_atencion_id == $horaTarde->id && $diaAtencion->dia == $diaSeleccionado){
+                        $horaInicio = new DateTime($horaTarde->hora_inicio);
+                        $horaFin = new DateTime($horaTarde->hora_fin);
+                        while ($horaInicio < $horaFin) {
+                            $horas[] = $horaInicio->format('H:i');
+                            $horaInicio->add($intervalo);
+                        }
+                    }
+                }
+            }
         }
 
         if(empty($horas)){
             return response()->json(['error' => 'No se encontraron horas disponibles']);
         }
 
-        foreach($horas as $hora){
-            $horasFijas[] = HorasAtencion::where('id', $hora)->pluck('hora')->first();
-        }
-
         return response()->json([
             'profesional' => $profesional,
-            'horasFijas' => $horasFijas,
+            'horas' => $horas,
         ]);
     }
 }

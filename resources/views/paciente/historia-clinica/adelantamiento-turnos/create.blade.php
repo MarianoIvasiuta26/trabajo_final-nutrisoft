@@ -29,9 +29,8 @@
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-6" id="dias-consultas">
-                            <h5>Seleccione los días que tiene disponibles:</h5>
-                            @php
+                        <div class="col-md-12" id="dias-consultas">
+                        {{-- @php
                             $diasAgregados = []; // Matriz para realizar un seguimiento de los días agregados
                             @endphp
                             @foreach ($profesionales as $profesional)
@@ -51,13 +50,14 @@
                                     @endforeach
                                 @endforeach
                             @endforeach
-
+                        --}}
                         </div>
+
                         <!-- Horas -->
 
 
-                        <div class="col-md-6">
-                            <h5>Seleccione las horas disponibles:</h5>
+                        <div class="col-md-12" id="horas-disponibles">
+                        {{--
                             <div class="row">
                                 <select name="horasFijas[]" class="selectpicker" multiple title="Seleccione las horas de la mañana disponibles..." data-style="btn-success" data-width="fit" data-live-search="true" data-size="5">
                                     <option value="8:00">8:00</option>
@@ -83,6 +83,8 @@
                                     <option value="19:30">19:30</option>
                                 </select>
                             </div>
+                        --}}
+
                         </div>
 
 
@@ -132,96 +134,99 @@
 
 
     <script>
-        $(document).ready(function () {
-        // Maneja el evento de cambio en el menú desplegable de profesionales para cargar los días
-        $('#profesional').on('change', function () {
-            var profesionalSeleccionado = this.value;
+        $(document).ready(function() {
+            $('#profesional').on('change', function () {
+                var profesionalSeleccionado = this.value;
 
-            if (profesionalSeleccionado) {
-                cargarDiasDisponibles(profesionalSeleccionado);
-            } else {
-                // Si no se selecciona un profesional, vacía el contenedor de días
-                $('#dias-consultas').empty();
-            }
-        });
-
-        // Función para cargar los días disponibles
-        function cargarDiasDisponibles(profesionalSeleccionado) {
-            // Realiza una solicitud AJAX para obtener los días disponibles para el profesional seleccionado
-            $.ajax({
-                url: "{{ route('adelantamiento-turno.obtener-dias') }}",
-                type: "POST",
-                data: {
-                    profesional: profesionalSeleccionado,
-                    _token: "{{ csrf_token() }}"
-                },
-                success: function (diasDisponibles) {
-                    var diasContainer = $('#dias-consultas');
-                    diasContainer.empty();
-
-                    $.each(diasDisponibles, function (index, dia) {
-                        var checkboxId = 'diasFijos-' + dia.dia;
-
-                        var divDia = $('<div>', { class: 'col-md-2' });
-                        var icheckDiv = $('<div>', { class: 'icheck-primary' });
-                        var checkboxInput = $('<input>', {
-                            value: dia.dia,
-                            type: 'checkbox',
-                            id: checkboxId,
-                            name: 'diasFijos[]'
-                        });
-                        var label = $('<label>', { for: checkboxId, text: dia.dia });
-
-                        icheckDiv.append(checkboxInput);
-                        icheckDiv.append(label);
-                        divDia.append(icheckDiv);
-                        diasContainer.append(divDia);
-                    });
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
-        }
-    });
-
-    $(document).ready(function () {
-        // Maneja el evento de cambio en los checkboxes de los días
-        $('input[name="diasFijos[]"]').on('change', function () {
-            // Obtén los días seleccionados
-            var diasSeleccionados = $('input[name="diasFijos[]"]:checked').map(function () {
-                return this.value;
-            }).get();
-
-            // Realiza una solicitud AJAX para obtener las horas disponibles
-            $.ajax({
-                url: "{{ route('adelantamiento-turno.obtener-horas') }}", // Define la ruta adecuada en tus rutas de Laravel
-                type: "POST",
-                data: {
-                    diasSeleccionados: diasSeleccionados,
-                    _token: "{{ csrf_token() }}" // Asegúrate de definir csrf_token en tu vista
-                },
-                success: function (horasDisponibles) {
-                    // Limpia las opciones actuales
+                if (profesionalSeleccionado) {
+                    cargarDiasDisponibles(profesionalSeleccionado);
+                } else {
+                    // Si no se selecciona un profesional, vacía el contenedor de días y horas
+                    $('#dias-consultas').empty();
                     $('#horas-disponibles').empty();
+                }
+                // Función para cargar los días disponibles
+            function cargarDiasDisponibles(profesionalSeleccionado) {
+                // Realiza una solicitud Ajax para obtener los días disponibles
+                $.ajax({
+                    url: "{{ route('adelantamiento-turno.obtener-dias') }}",
+                    type: "POST",
+                    data: {
+                        profesional: profesionalSeleccionado,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (diasDisponibles) {
+                        var diasContainer = $('#dias-consultas');
+                        diasContainer.empty();
+                        var indicacion = '<h5>Seleccione los días que tiene disponibles:</h5>'
+                        diasContainer.append(indicacion);
+                        $.each(diasDisponibles.diasFijos, function (index, dia) {
+                            // Agrega los checkboxes de días disponibles al contenedor
 
-                    // Agrega las nuevas opciones de horas disponibles
-                    $.each(horasDisponibles, function (index, hora) {
-                        $('#horas-disponibles').append($('<option>', {
-                            value: hora,
-                            text: hora
-                        }));
-                    });
+                            var checkbox = '<div class="col-md-2">' +
+                                '<div class="icheck-primary">' +
+                                '<input value="' + dia + '" type="checkbox" id="diasFijos-' + dia + '" name="diasFijos[]"/>' +
+                                '<label for="diasFijos-' + dia + '">' + dia + '</label>' +
+                                '</div>' +
+                                '</div>';
+                            diasContainer.append(checkbox);
+                        });
+                        console.log(diasDisponibles);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
 
-                    // Actualiza el select de Bootstrap-Select
-                    $('#horas-disponibles').selectpicker('refresh');
-                },
-                error: function (error) {
-                    console.log(error);
+            // Agrega un evento de cambio a los checkboxes de días
+            $(document).on('change', 'input[name="diasFijos[]"]', function() {
+                if (this.checked) {
+                    var diaSeleccionado = $(this).val();
+                    console.log('Día seleccionado: ' + diaSeleccionado);
+                    cargarHorasDisponibles(profesionalSeleccionado, diaSeleccionado);
+                } else {
+                    console.log('Se ha desmarcado el día.');
+                    // Si se desmarca el día, borra las horas correspondientes
+                    $('#horas-disponibles').empty();
                 }
             });
+
+            // Función para cargar las horas disponibles
+            function cargarHorasDisponibles(profesionalSeleccionado, diaSeleccionado) {
+                console.log('La función cargarHorasDisponibles se ha activado.');
+                // Realiza una solicitud Ajax para obtener las horas disponibles
+                $.ajax({
+                    url: "{{ route('adelantamiento-turno.obtener-horas') }}",
+                    type: "POST",
+                    data: {
+                        profesional: profesionalSeleccionado,
+                        dia: diaSeleccionado,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (horasDisponibles) {
+                        var horasContainer = $('#horas-disponibles');
+                        var indicacion = '<h5>Seleccione las horas disponibles:</h5>'
+                        horasContainer.append(indicacion);
+
+                        $.each(horasDisponibles.horas, function (index, hora) {
+                            // Agrega los checkboxes de horas disponibles al contenedor
+                            var checkbox = '<div class="col-md-2">' +
+                                '<div class="icheck-primary">' +
+                                '<input value="' + hora + '" type="checkbox" id="horasFijas-' + hora + '" name="horasFijas[]"/>' +
+                                '<label for="horasFijas-' + hora + '">' + hora + '</label>' +
+                                '</div>' +
+                                '</div>';
+                            horasContainer.append(checkbox);
+                        });
+                    },
+                    error: function (error) {
+                        console.log(error);xam
+                    }
+                });
+            }
+            });
         });
-    });
     </script>
 
 @stop
