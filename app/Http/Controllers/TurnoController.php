@@ -9,6 +9,7 @@ use App\Models\HorariosAtencion;
 use App\Models\HorasAtencion;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
+use App\Models\Paciente\AdelantamientoTurno;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\TipoConsulta;
 use App\Models\Turno;
@@ -447,7 +448,11 @@ class TurnoController extends Controller
         }
 
         $turno->estado = 'Cancelado';
+
         $turno->save();
+
+        //Llama a la función para el proceso automatizado
+        $this->asignacionInteligenteTurno($id);
 
         return redirect()->route('turnos.index')->with('success', 'Turno cancelado correctamente.');
     }
@@ -589,5 +594,82 @@ class TurnoController extends Controller
         $consultas = Consulta::all();
 
         return view('paciente.turnos-paciente.detalles-consulta', compact('historias_clinicas', 'consultas', 'turno', 'paciente', 'horarios', 'tipo_consultas', 'profesionales', 'historias_clinicas', 'consultas'));
+    }
+
+    public function asignacionInteligenteTurno($id){
+        //Buscamos el turno cancelado
+        $turnoCancelado = Turno::find($id);
+
+        //Verificamos que se canceló correctamente
+        if($turnoCancelado->estado != 'Cancelado'){
+            return redirect()->back()->with('error', 'El turno no se canceló correctamente.');
+        }
+
+        //Buscamos todos los turnos
+        $turnos = Turno::all();
+        //Buscamos el profesional del turno cancelado
+        $profesionalTurnoCancelado = Nutricionista::find($turnoCancelado->horario->nutricionista_id);
+        //Buscamos el día y hora del turno cancelado
+        $diaTurnoCancelado = DiasAtencion::find($turnoCancelado->fecha);
+        //Obtenemos el día de la semana de esta fecha
+        $fechaSeleccionada = $turnoCancelado->fecha;
+        $fecha = new DateTime($fechaSeleccionada);
+        //Obtenemos el número del día de la semana
+        $numeroDiaSemana = $fecha->format('w'); // 0: Domingo, 1: Lunes, 2: Martes, etc.
+        switch ($numeroDiaSemana) {
+            case 0:
+                $diaSeleccionado = 'Domingo';
+                break;
+            case 1:
+                $diaSeleccionado = 'Lunes';
+                break;
+            case 2:
+                $diaSeleccionado = 'Martes';
+                break;
+            case 3:
+                $diaSeleccionado = 'Miercoles';
+                break;
+            case 4:
+                $diaSeleccionado = 'Jueves';
+                break;
+            case 5:
+                $diaSeleccionado = 'Viernes';
+                break;
+            case 6:
+                $diaSeleccionado = 'Sabado';
+                break;
+            default:
+
+                break;
+        }
+
+        $horaTurnoCancelado = HorasAtencion::find($turnoCancelado->hora);
+
+        //Recorremos todos los turnos pendientes
+        foreach($turnos as $turno){
+            if($turno->estado == 'Pendiente' && $turno->horario->nutricionista_id == $profesionalTurnoCancelado && $turno->fecha >= $diaTurnoCancelado && $turno->hora >= $horaTurnoCancelado){
+                $pacienteTurnoNuevo = Paciente::find($turno->paciente_id);
+                $adelantamientosPaciente = AdelantamientoTurno::where('paciente_id', $pacienteTurnoNuevo->id)->get();
+                //Recorremos y verificamos si tiene fijo el mismo día y hora que el turno cancelado
+                foreach($adelantamientosPaciente as $adelantamientoPaciente){
+                    if($adelantamientoPaciente->dias_fijos == $diaSeleccionado && $adelantamientoPaciente->horas_fijas == $horaTurnoCancelado){
+                        //Si tiene fijo el mismo día y hora, se le asigna el turno cancelado
+                        $turno->paciente_id = $pacienteTurnoNuevo->id;
+                        $turno->horario_id = $turnoCancelado->horario_id;
+                        $turno->fecha = $turnoCancelado->fecha;
+                        $turno->hora = $turnoCancelado->hora;
+                        $turno->estado = 'Pendiente';
+                        $turno->save();
+                        return redirect()->route('turnos.index');
+                    }
+                }
+            }
+        }
+
+        //Si no hay ningún turno pendiente o pacientes con el mismo día y hora disponible retornamos
+
+        return redirect()->route('turnos.index');
+
+
     }
 }
