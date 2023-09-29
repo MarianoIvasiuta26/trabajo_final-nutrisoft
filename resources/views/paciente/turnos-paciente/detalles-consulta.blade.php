@@ -158,7 +158,7 @@
             </div>
 
 
-            <a href="{{route('turnos.index')}}" class="btn btn-danger mt-3 float-right">Volver</a>
+            <a href="{{route('historia-clinica.index')}}" class="btn btn-danger mt-3 float-right">Volver</a>
 
     </div>
 

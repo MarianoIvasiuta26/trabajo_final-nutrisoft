@@ -632,7 +632,102 @@
 
                             <!-- Historial de turnos -->
                             <div id="historial-turnos" class="tab-pane">
+                                <table id="tabla-mis-turnos" class="table table-striped" id="turnos">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Fecha</th>
+                                        <th scope="col">Hora</th>
+                                        <th scope="col">Tipo de consulta</th>
+                                        <th scope="col">Estado</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
 
+                                    @forelse($turnos as $turno)
+                                        @if ($turno->paciente_id == $paciente->id)
+                                            <tr>
+                                                <td>{{ $turno->fecha }}</td>
+                                                <td>{{ $turno->hora }}</td>
+                                                <td>
+                                                    @foreach ($tipo_consultas as $tipoConsulta)
+                                                        @if ($tipoConsulta->id == $turno->tipo_consulta_id)
+                                                            {{ $tipoConsulta->tipo_consulta }}
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+                                                <td>{{ $turno->estado }}</td>
+                                                <td>
+                                                    <button class="btn btn-primary ver-detalles">Ver detalles</button>
+                                                    @if ($turno->estado == 'Pendiente')
+                                                        <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
+                                                    @endif
+                                                    @if ($turno->estado == 'Pendiente')
+                                                        <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger">Cancelar</button>
+                                                        </form>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            <tr class="detalles-turno" style="display: none;">
+                                                <td colspan="5">
+                                                    <table class="table" id="turnos">
+                                                        <tbody>
+
+                                                                <tr>
+                                                                    <th scope="col">Paciente</th>
+                                                                    <td>{{ $paciente->user->name }} {{$paciente->user->apellido}}</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <th scope="col">Objetivo de salud</th>
+                                                                    <td>{{ $historiaClinica->objetivo_salud }}</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <th scope="col">Estilo de vida</th>
+                                                                    <td>{{ $historiaClinica->estilo_vida }}</td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    <th scope="col">Profesional</th>
+                                                                    <td>
+                                                                        @foreach ($profesionales as $profesional)
+                                                                            @foreach ($horarios as $horario)
+                                                                                @if ($horario->id == $turno->horario_id)
+                                                                                    @if ($horario->nutricionista_id == $profesional->id)
+                                                                                        {{ $profesional->user->name}} {{ $profesional->user->apellido}}
+                                                                                    @endif
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </td>
+                                                                </tr>
+
+                                                                <tr>
+                                                                    @if ($turno->estado == 'Cancelado' || $turno->estado == 'Inasistencia')
+                                                                        <th>Detalles de la consulta</th>
+                                                                        <td>Sin consulta.</td>
+                                                                    @else
+                                                                        <th scope="col">Detalles de la consulta</th>
+                                                                        <td><a href="{{route('turnos.show-detalles-consulta', $turno->id)}}">Ver detalles</a></td>
+                                                                    @endif
+                                                                </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @empty
+                                        <tr>
+                                            <td colspan="5">No hay turnos registrados</td>
+                                        </tr>
+                                    @endforelse
+
+                                    </tbody>
+                                </table>
                             </div>
 
                             <!-- Planes -->
@@ -675,6 +770,19 @@
                 $(this).tab('show');
             });
         });
+
+        $(document).ready(function() {
+        $('.ver-detalles').click(function() {
+            var filaTurno = $(this).closest('tr');
+            var filaDetalles = filaTurno.next('.detalles-turno');
+
+            if (filaDetalles.is(':visible')) {
+                filaDetalles.hide();
+            } else {
+                filaDetalles.show();
+            }
+        });
+    });
     </script>
 
 @stop

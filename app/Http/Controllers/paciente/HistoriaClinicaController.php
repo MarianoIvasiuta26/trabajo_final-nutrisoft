@@ -4,8 +4,10 @@ namespace App\Http\Controllers\paciente;
 
 use App\Http\Controllers\Controller;
 use App\Models\Alimento;
+use App\Models\Consulta;
 use App\Models\DiasAtencion;
 use App\Models\HorariosAtencion;
+use App\Models\Nutricionista;
 use App\Models\Paciente;
 use App\Models\Paciente\AdelantamientoTurno;
 use App\Models\Paciente\Alergia;
@@ -16,6 +18,8 @@ use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
+use App\Models\TipoConsulta;
+use App\Models\Turno;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -42,7 +46,12 @@ class HistoriaClinicaController extends Controller
         $adelantamientos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();
         $anamnesisAlimentaria = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->get();
         $alimentos = Alimento::all();
-        return view('paciente.historia-clinica.index', compact('paciente', 'historiaClinica', 'datosMedicos', 'adelantamientos', 'anamnesisAlimentaria', 'alimentos', 'alergias', 'cirugiasPaciente', 'cirugias', 'intolerancias', 'patologias'));
+        $turnos = Turno::all();
+        $consultas = Consulta::all();
+        $tipo_consultas = TipoConsulta::all();
+        $profesionales = Nutricionista::all();
+        $horarios = HorariosAtencion::all();
+        return view('paciente.historia-clinica.index', compact('paciente', 'historiaClinica', 'datosMedicos', 'adelantamientos', 'anamnesisAlimentaria', 'alimentos', 'alergias', 'cirugiasPaciente', 'cirugias', 'intolerancias', 'patologias', 'turnos', 'consultas', 'tipo_consultas', 'profesionales', 'horarios'));
     }
 
     /**

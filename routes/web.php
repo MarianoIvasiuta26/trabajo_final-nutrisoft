@@ -106,4 +106,6 @@ Route::middleware([
 
     Route::resource('gestion-turnos', TurnoController::class)->names('turnos');
     Route::post('turnos.horas-disponibles', [TurnoController::class, 'horasDisponibles'])->name('turnos.horas-disponibles');
+
+    Route::get('show-detalles-consulta/{id}', [TurnoController::class, 'showDetallesConsulta'])->name('turnos.show-detalles-consulta');
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Consulta;
 use App\Models\DiasAtencion;
 use App\Models\HorariosAtencion;
 use App\Models\HorasAtencion;
@@ -229,8 +230,9 @@ class TurnoController extends Controller
         $tipo_consultas = TipoConsulta::all();
         $profesionales = Nutricionista::all();
         $historias_clinicas = HistoriaClinica::all();
+        $consultas = Consulta::all();
 
-        return view('paciente.turnos-paciente.show', compact('turno', 'paciente', 'horarios', 'tipo_consultas', 'profesionales', 'historias_clinicas'));
+        return view('paciente.turnos-paciente.show', compact('turno', 'paciente', 'horarios', 'tipo_consultas', 'profesionales', 'historias_clinicas', 'consultas'));
 
     }
 
@@ -575,5 +577,17 @@ class TurnoController extends Controller
         } else {
             return response()->json(['error' => 'Profesional no válido']);
         }
+    }
+
+    public function showDetallesConsulta(Request $request, $id){
+        $turno = Turno::find($id);
+        $paciente = Paciente::where('user_id', auth()->user()->id)->where('id', $turno->paciente_id)->first();
+        $horarios = HorariosAtencion::all();
+        $tipo_consultas = TipoConsulta::all();
+        $profesionales = Nutricionista::all();
+        $historias_clinicas = HistoriaClinica::all();
+        $consultas = Consulta::all();
+
+        return view('paciente.turnos-paciente.detalles-consulta', compact('historias_clinicas', 'consultas', 'turno', 'paciente', 'horarios', 'tipo_consultas', 'profesionales', 'historias_clinicas', 'consultas'));
     }
 }
