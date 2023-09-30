@@ -66,14 +66,14 @@
                                 <td>{{ $turno->estado }}</td>
                                 <td>
                                     <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary">Ver</a>
-                                    @if ($turno->estado == 'Pendiente')
+                                {{--   @if ($turno->estado == 'Pendiente')
                                         <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
-                                    @endif
+                                    @endif--}} 
                                     @if ($turno->estado == 'Pendiente')
                                         <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Cancelar</button>
+                                            <button type="submit" class="btn btn-danger cancelar-button">Cancelar</button>
                                         </form>
                                     @endif
                                 </td>
@@ -132,5 +132,6 @@
                 }
             });
         });
+
     </script>
 @stop

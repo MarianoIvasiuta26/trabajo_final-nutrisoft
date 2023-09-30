@@ -43,7 +43,7 @@ class AdelantamientoTurnoController extends Controller
 
     public function guardar(Request $request){
         // Obtenemos el nutricionista autenticado
-        $paciente = Paciente::where('user_id', auth()->id())->first();
+        $paciente = Paciente::where('user_id', auth()->id())->first();/*
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
 
         //Si no existe la historia clinica del paciente, la creamos
@@ -59,22 +59,8 @@ class AdelantamientoTurnoController extends Controller
                 'estilo_vida' => '',
                 'objetivo_salud' => '',
             ]);
-        }
-/*
-        //Obtenemos los datos médicos de la historia clínica
-        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
+        }*/
 
-        if(!$datosMedicos){
-            //Si no existe se crea
-            $datosMedicos = DatosMedicos::create([
-                'historia_clinica_id' => $historiaClinica->id,
-                'alergia_id' => 0,
-                'patologia_id' => 0,
-                'intolerancia_id' => 0,
-                'valor_analisis_clinico_id' => 0,
-            ]);
-        }
-*/
         // Días y horarios fijos
         $diasFijos = $request->input('diasFijos');
         $horasFijas = $request->input('horasFijas');

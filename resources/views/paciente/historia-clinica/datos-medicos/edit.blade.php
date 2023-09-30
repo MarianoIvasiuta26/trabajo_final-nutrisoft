@@ -70,7 +70,13 @@
                     </div>
 
                     <div class="row mt-3" id="cirugias-container">
-                        <h5>Cirugías</h5>
+                        <div class="col-md-9">
+                            <h5>Cirugías</h5>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" id="agregar-cirugia" class="btn btn-primary btn-sm float-right">Agregar Cirugía</button>
+                        </div>
+                        @foreach ($cirugiasPaciente as $cirugiaPaciente)
                             <div class="cirugia-entry">
                                 <div class="row mt-3">
                                     <div class="col-md-6">
@@ -79,7 +85,7 @@
                                             @foreach ($cirugias->groupBy('grupo_cirugia') as $grupo_cirugia => $cirugias_del_grupo)
                                                 <optgroup label="{{$grupo_cirugia}}">
                                                     @foreach ($cirugias_del_grupo as $cirugia)
-                                                        <option value="{{$cirugia->id}}" @if ($cirugiasPaciente->cirugia_id == $cirugia->id)
+                                                        <option value="{{$cirugia->id}}" @if ($cirugiaPaciente->cirugia_id == $cirugia->id)
                                                             selected
                                                         @endif>{{$cirugia->cirugia}}</option>
                                                     @endforeach
@@ -89,28 +95,32 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="input-group">
-                                            <input type="number" name="tiempo[]" class="form-control tiempo-input" placeholder="Tiempo" value="{{$cirugiasPaciente->tiempo}}">
+                                            <input type="number" name="tiempo[]" class="form-control tiempo-input" placeholder="Tiempo" value="{{$cirugiaPaciente->tiempo}}">
                                             <select name="unidad[]" class="form-select unidad-select">
-                                                <option value="dias" @if ($cirugiasPaciente->unidad_tiempo == 'dias')
+                                                <option value="dias" @if ($cirugiaPaciente->unidad_tiempo == 'dias')
                                                     selected
                                                 @endif>Días</option>
-                                                <option value="semanas" @if ($cirugiasPaciente->unidad_tiempo == 'semanas')
+                                                <option value="semanas" @if ($cirugiaPaciente->unidad_tiempo == 'semanas')
                                                     selected
                                                 @endif>Semanas</option>
-                                                <option value="meses" @if ($cirugiasPaciente->unidad_tiempo == 'meses')
+                                                <option value="meses" @if ($cirugiaPaciente->unidad_tiempo == 'meses')
                                                     selected
                                                 @endif>Meses</option>
-                                                <option value="anios" @if ($cirugiasPaciente->unidad_tiempo == 'anios')
+                                                <option value="anios" @if ($cirugiaPaciente->unidad_tiempo == 'anios')
                                                     selected
                                                 @endif>Años</option>
                                             </select>
-                                            <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
-                                            <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
+                                            <form action="">
+                                                <button type="button" class="btn btn-danger remove-cirugia"><i class="bi bi-x"></i></button>
+                                            </form>
+                                            
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        @endforeach
                     </div>
+
 
                     <div class="row mt-3">
                         <h5>Patologías</h5>
@@ -252,6 +262,7 @@
             $('#cirugias-container').on('click', '.remove-cirugia', function() {
                 $(this).closest('.cirugia-entry').remove();
             });
+
         });
     </script>
 

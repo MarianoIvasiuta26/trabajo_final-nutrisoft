@@ -23,7 +23,7 @@
                         <form class="row g-3" action="{{route('datos-personales.store')}}" method="POST">
                            @csrf
                             <div class="col-md-6">
-                                <label for="dni" class="form-label">DNI</label>
+                                <label for="dni" class="form-label">DNI(*)</label>
                                 <input type="text" class="form-control @error('dni') is-invalid @enderror" id="dni" name="dni" value="{{old('dni')}}">
 
                                 @error('dni')
@@ -32,7 +32,7 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="telefono" class="form-label">Teléfono</label>
+                                <label for="telefono" class="form-label">Teléfono(*)</label>
                                 <input type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{old('telefono')}}">
 
                                 @error('telefono')
@@ -41,7 +41,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label for="sexo" class="form-label">Sexo</label>
+                                <label for="sexo" class="form-label">Sexo(*)</label>
                                 <select id="sexo" class="form-select @error('sexo') is-invalid @enderror" name="sexo">
                                     <option value="" disabled selected>Elija una opción...</option>
                                     <option value="Masculino">Masculino</option>
@@ -54,7 +54,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label for="edad" class="form-label">Edad</label>
+                                <label for="edad" class="form-label">Edad(*)</label>
                                 <input type="number" class="form-control @error('edad') is-invalid @enderror" id="edad" name="edad" value="{{old('edad')}}">
 
                                 @error('edad')
@@ -63,7 +63,7 @@
                             </div>
 
                             <div class="col-md-4">
-                                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento(*)</label>
                                 <input type="date" value="{{old('fecha_nacimiento')}}" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento">
 
                                 @error('fecha_nacimiento')
@@ -95,7 +95,7 @@
                     <div id="diasYHoras" class="card-body" style="display: none;">
                         <form action="{{route('adelantamiento-turno.store')}}" method="POST">
                             @csrf
-
+{{--
                             <div class="row">
                                 <div class="col-md-6">
                                     <h5>Seleccione los días que tiene disponibles:</h5>
@@ -151,7 +151,38 @@
                                     </div>
                                 </div>
                             </div>
+--}}
+                            <div class="row">
+                                <div class="col">
+                                    <label class="form-label" for="profesional">Seleccione el profesional del que recibe atenciones</label>
+                                    <select name="profesional" id="profesional" class="form-select">
+                                        <option value="">Seleccione un profesional</option>
+                                        @foreach($profesionales as $profesional)
+                                            <option value="{{$profesional->id}}">{{$profesional->user->name}} {{$profesional->user->apellido}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
 
+                            <div class="row mt-3">
+                                <div class="col-md-12" id="dias-consultas">
+
+                                </div>
+
+                                <!-- Horas -->
+                                <div class="col-md-12" id="horas-disponibles">
+
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="float-right">
+                                        <button type="submit" class="btn btn-success">Guardar</button>
+                                        <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -205,7 +236,7 @@
 
                             <div class="row mt-3">
                                 <div class="col-md-6">
-                                    <label for="estilo_vida" class="form-label">Estilo de vida actual</label>
+                                    <label for="estilo_vida" class="form-label">Estilo de vida actual(*)</label>
                                     <select id="estilo_vida" class="form-select @error('estilo_vida') is-invalid @enderror" name="estilo_vida">
                                         <option value="">Elija una opción...</option>
                                         <option value="Sedentario" {{ old('estilo_vida') == 'Sedentario' ? 'selected' : '' }}>Sedentario</option>
@@ -220,7 +251,7 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label for="objetivo_salud" class="form-label">Objetivo de salud</label>
+                                    <label for="objetivo_salud" class="form-label">Objetivo de salud(*)</label>
                                     <select name="objetivo_salud" id="objetivo_salud" class="form-select @error('objetivo_salud') is-invalid @enderror">
                                         <option value="">Elija una opción...</option>
                                         <option value="Adelgazar" {{ old('objetivo_salud') == 'Adelgazar' ? 'selected' : '' }}>Adelgazar</option>
@@ -507,6 +538,101 @@
             // Manejar clic en el botón "x" para eliminar una entrada de cirugía
             $('#cirugias-container').on('click', '.remove-cirugia', function() {
                 $(this).closest('.cirugia-entry').remove();
+            });
+        });
+
+        //Funciones para obtener días y horas fijos
+        $(document).ready(function() {
+            $('#profesional').on('change', function () {
+                var profesionalSeleccionado = this.value;
+
+                if (profesionalSeleccionado) {
+                    cargarDiasDisponibles(profesionalSeleccionado);
+                } else {
+                    // Si no se selecciona un profesional, vacía el contenedor de días y horas
+                    $('#dias-consultas').empty();
+                    $('#horas-disponibles').empty();
+                }
+                // Función para cargar los días disponibles
+            function cargarDiasDisponibles(profesionalSeleccionado) {
+                // Realiza una solicitud Ajax para obtener los días disponibles
+                $.ajax({
+                    url: "{{ route('adelantamiento-turno.obtener-dias') }}",
+                    type: "POST",
+                    data: {
+                        profesional: profesionalSeleccionado,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (diasDisponibles) {
+                        var diasContainer = $('#dias-consultas');
+                        diasContainer.empty();
+                        var indicacion = '<h5>Seleccione los días que tiene disponibles:</h5>'
+                        diasContainer.append(indicacion);
+                        $.each(diasDisponibles.diasFijos, function (index, dia) {
+                            // Agrega los checkboxes de días disponibles al contenedor
+
+                            var checkbox = '<div class="col-md-2">' +
+                                '<div class="icheck-primary">' +
+                                '<input value="' + dia + '" type="checkbox" id="diasFijos-' + dia + '" name="diasFijos[]"/>' +
+                                '<label for="diasFijos-' + dia + '">' + dia + '</label>' +
+                                '</div>' +
+                                '</div>';
+                            diasContainer.append(checkbox);
+                        });
+                        console.log(diasDisponibles);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            // Agrega un evento de cambio a los checkboxes de días
+            $(document).on('change', 'input[name="diasFijos[]"]', function() {
+                if (this.checked) {
+                    var diaSeleccionado = $(this).val();
+                    console.log('Día seleccionado: ' + diaSeleccionado);
+                    cargarHorasDisponibles(profesionalSeleccionado, diaSeleccionado);
+                } else {
+                    console.log('Se ha desmarcado el día.');
+                    // Si se desmarca el día, borra las horas correspondientes
+                    $('#horas-disponibles').empty();
+                }
+            });
+
+            // Función para cargar las horas disponibles
+            function cargarHorasDisponibles(profesionalSeleccionado, diaSeleccionado) {
+                console.log('La función cargarHorasDisponibles se ha activado.');
+                // Realiza una solicitud Ajax para obtener las horas disponibles
+                $.ajax({
+                    url: "{{ route('adelantamiento-turno.obtener-horas') }}",
+                    type: "POST",
+                    data: {
+                        profesional: profesionalSeleccionado,
+                        dia: diaSeleccionado,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (horasDisponibles) {
+                        var horasContainer = $('#horas-disponibles');
+                        var indicacion = '<h5>Seleccione las horas disponibles:</h5>'
+                        horasContainer.append(indicacion);
+
+                        $.each(horasDisponibles.horas, function (index, hora) {
+                            // Agrega los checkboxes de horas disponibles al contenedor
+                            var checkbox = '<div class="col-md-2">' +
+                                '<div class="icheck-primary">' +
+                                '<input value="' + hora + '" type="checkbox" id="horasFijas-' + hora + '" name="horasFijas[]"/>' +
+                                '<label for="horasFijas-' + hora + '">' + hora + '</label>' +
+                                '</div>' +
+                                '</div>';
+                            horasContainer.append(checkbox);
+                        });
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
             });
         });
 

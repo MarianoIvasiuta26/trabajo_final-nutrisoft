@@ -68,7 +68,8 @@ class HistoriaClinicaController extends Controller
         $cirugias = Cirugia::all();
         $intolerancias = Intolerancia::all();
         $alimentos = Alimento::all();
-        return view('paciente.historia-clinica.create', compact('dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos'));
+        $profesionales = Nutricionista::all();
+        return view('paciente.historia-clinica.create', compact('dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos', 'profesionales'));
     }
 
     /**

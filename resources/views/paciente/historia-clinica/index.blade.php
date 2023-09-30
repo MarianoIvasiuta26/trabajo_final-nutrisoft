@@ -7,7 +7,14 @@
 @stop
 
 @section('content')
+    @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
+    <div class="alert alert-warning" role="alert">
+        Parece que aún no has completado tu Historia Clínica. <br>
+        Haga click en el siguiente enlace para completar su historia clínica:
+        <a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar mi Historia Clínica</a>
+    </div>
+    @else
     {{-- Perfil de la HC --}}
     <div class="container">
         <div class="row">
@@ -53,22 +60,22 @@
                     <div class="card-header bg-success">
                         <ul class="nav nav-tabs justify-content-center card-header-tabs">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#datos-personales">Datos Personales</a>
+                                <a class="nav-link active" aria-current="page" href="#datos-personales" id="tab-datos-personales">Datos Personales</a>
                                 </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#dias-horas">Días y Horas Fijos disponibles</a>
+                                <a class="nav-link" href="#dias-horas" id="tab-dias-horas">Días y Horas Fijos disponibles</a>
                             </li>
                             <li class="nav-item">
-                            <a class="nav-link" href="#datos-fisicos">Datos Físicos</a>
+                            <a class="nav-link" href="#datos-fisicos" id="tab-datos-fisicos">Datos Físicos</a>
                             </li>
                             <li class="nav-item">
-                            <a class="nav-link" href="#datos-medicos">Datos Médicos</a>
+                            <a class="nav-link" href="#datos-medicos" id="tab-datos-medicos">Datos Médicos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#historial-turnos">Historial de turnos</a>
+                                <a class="nav-link" href="#historial-turnos" id="tab-historial-turnos">Historial de turnos</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#planes">Planes</a>
+                                <a class="nav-link" href="#planes" id="tab-planes">Planes</a>
                             </li>
                         </ul>
                     </div>
@@ -163,12 +170,12 @@
                                                 </td>
 
                                                 <td>
-                                                    <div class="btn-group">
-                                                        <a class="btn btn-info" href="{{ route('adelantamiento-turno.edit', $paciente->id) }}">Editar</a>
+                                                    <div class="btn-group">{{--
+                                                        <a class="btn btn-info" href="{{ route('adelantamiento-turno.edit', $paciente->id) }}">Editar</a>--}}
                                                         <form action="{{ route('adelantamiento-turno.destroy', $adelantamiento->id) }}" method="POST">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                            <button class="btn btn-danger ml-2 delete-button" type="button">Eliminar</button>
                                                         </form>
                                                     </div>
                                                 </td>
@@ -255,11 +262,13 @@
                                     <div class="col-9 mb-3">
                                         <h5>Anamnesis Alimentaria</h5>
                                     </div>
+                                    {{--
                                     <div class="col-3">
                                         <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
                                             Agregar
                                         </a>
                                     </div>
+                                    --}}
                                     <!-- Pestañas desplegables para anamnesis -->
                                     <div class="accordion" id="alimentosPrefTabs">
                                         <!-- Alimentos Preferidos -->
@@ -372,11 +381,12 @@
                                     <div class="col-9 mb-3">
                                         <h5>Alergias</h5>
                                     </div>
+                                    {{--
                                     <div class="col-3">
                                         <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
                                             Agregar
                                         </a>
-                                    </div>
+                                    </div>--}}
                                     <!-- Pestañas desplegables para anamnesis -->
                                     <div class="accordion" id="alergiaTabs">
                                         <!-- Alimentos Preferidos -->
@@ -398,7 +408,7 @@
                                                         </thead>
                                                         <tbody>
                                                             @foreach ($alergias as $alergia)
-                                                                @if ($alergia->alergia != 'Ninguna' && count($alergias) > 1)
+                                                                @if ($alergia->alergia != 'Ninguna')
                                                                     <tr>
                                                                         <td>{{ $alergia->alergia }}</td>
                                                                         <td>{{ $alergia->grupo_alergia}}</td>
@@ -432,11 +442,12 @@
                                     <div class="col-9 mb-3">
                                         <h5>Cirugías</h5>
                                     </div>
+                                    {{--
                                     <div class="col-3">
                                         <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
                                             Agregar
                                         </a>
-                                    </div>
+                                    </div>--}}
                                     <!-- Pestañas desplegables para anamnesis -->
                                     <div class="accordion" id="alergiaTabs">
                                         <!-- Alimentos Preferidos -->
@@ -502,11 +513,13 @@
                                     <div class="col-9 mb-3">
                                         <h5>Patologías</h5>
                                     </div>
+                                    {{--
                                     <div class="col-3">
                                         <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
                                             Agregar
                                         </a>
                                     </div>
+                                    --}}
                                     <!-- Pestañas desplegables para anamnesis -->
                                     <div class="accordion" id="patologiaTabs">
                                         <!-- Alimentos Preferidos -->
@@ -528,7 +541,7 @@
                                                         </thead>
                                                         <tbody>
                                                             @foreach ($patologias as $patologia)
-                                                                @if ($patologia->patologia != 'Ninguna' && count($patologias) > 1)
+                                                                @if ($patologia->patologia != 'Ninguna')
                                                                     <tr>
                                                                         <td>{{ $patologia->patologia }}</td>
                                                                         <td>{{ $patologia->grupo_patologia}}</td>
@@ -562,11 +575,13 @@
                                     <div class="col-9 mb-3">
                                         <h5>Intolerancias</h5>
                                     </div>
+                                    {{--x
                                     <div class="col-3">
                                         <a href="{{route('datos-medicos.create', $paciente->id)}}" class="btn btn-warning float-right">
                                             Agregar
                                         </a>
                                     </div>
+                                    --}}
                                     <!-- Pestañas desplegables para anamnesis -->
                                     <div class="accordion" id="intoleranciaTabs">
                                         <!-- Alimentos Preferidos -->
@@ -587,7 +602,7 @@
                                                         </thead>
                                                         <tbody>
                                                             @foreach ($intolerancias as $intolerancia)
-                                                                @if ($intolerancia->intolerancia != 'Ninguna' && count($intolerancias) > 1)
+                                                                @if ($intolerancia->intolerancia != 'Ninguna')
                                                                     <tr>
                                                                         <td>{{ $intolerancia->intolerancia }}</td>
                                                                         <td>
@@ -740,6 +755,9 @@
             </div>
         </div>
     </div>
+    @endif
+
+
     @if (session('info'))
         <div class="alert alert-info">
             {{ session('info') }}
@@ -762,6 +780,7 @@
     <script> console.log('Hi!'); </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         // Inicializa las pestañas al cargar la página
@@ -771,18 +790,44 @@
             });
         });
 
+        //desplegar detalles de cada turno en la pestaña de Turnos
         $(document).ready(function() {
-        $('.ver-detalles').click(function() {
-            var filaTurno = $(this).closest('tr');
-            var filaDetalles = filaTurno.next('.detalles-turno');
+            $('.ver-detalles').click(function() {
+                var filaTurno = $(this).closest('tr');
+                var filaDetalles = filaTurno.next('.detalles-turno');
 
-            if (filaDetalles.is(':visible')) {
-                filaDetalles.hide();
-            } else {
-                filaDetalles.show();
-            }
+                if (filaDetalles.is(':visible')) {
+                    filaDetalles.hide();
+                } else {
+                    filaDetalles.show();
+                }
+            });
         });
-    });
+
+        //SweetAlert para botón eliminar
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.delete-button');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    Swal.fire({
+                        title: '¿Estás seguro de eliminar?',
+                        text: "¡No podrás revertir esto!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Si, eliminarlo'
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = this.closest('form');
+                            form.submit();
+                        }
+                    })
+                });
+            });
+        });
     </script>
 
 @stop

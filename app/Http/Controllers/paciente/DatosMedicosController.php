@@ -279,7 +279,7 @@ class DatosMedicosController extends Controller
     {
         $historiaClinica = HistoriaClinica::find($id);
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
-        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->first();
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
         $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->first();
         $patologias = Patologia::all();
         $alergias = Alergia::all();
@@ -309,8 +309,9 @@ class DatosMedicosController extends Controller
     public function update(Request $request, $id)
     {
         $historiaClinica = HistoriaClinica::find($id);
+        $paciente = Paciente::where('user_id', auth()->id())->first();
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
-        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->first();
+
         $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->first();
         //Alergias
         $alergias = $request->input('alergias');
@@ -377,33 +378,45 @@ class DatosMedicosController extends Controller
             // Guarda los cambios en la base de datos
             $datosMedicos->save();
 
-            if($cirugiasPaciente){
+            $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
 
-                //Cirugías
-                $cirugias = $request->input('cirugias');
-                $tiempo = $request->input('tiempo');
-                $unidad = $request->input('unidad');
-                if(!empty($cirugias)){
-                    //Verificación de cirugias
-                    foreach ($cirugias as $key => $cirugia) {
-                        // Verificar si esta entrada de cirugía está vacía
-                        if ($cirugia !== '') {
-                            $tiempoCirugia = $tiempo[$key];
-                            $unidadCirugia = $unidad[$key];
+            foreach($cirugiasPaciente as $cirugiaPaciente){
+                if($cirugiaPaciente){
 
-                            $cirugiasPaciente = CirugiasPaciente::where('cirugia_id', $cirugia)->first();
+                    //Cirugías
+                    $cirugias = $request->input('cirugias');
+                    $tiempo = $request->input('tiempo');
+                    $unidad = $request->input('unidad');
+                    if(!empty($cirugias)){
+                        //Verificación de cirugias
+                        foreach ($cirugias as $key => $cirugia) {
+                            // Verificar si esta entrada de cirugía está vacía
+                            if ($cirugia !== '') {
+                                $tiempoCirugia = $tiempo[$key];
+                                $unidadCirugia = $unidad[$key];
 
-                            if($cirugiasPaciente){
-                                //Si existe, actualizarlo
-                                $cirugiasPaciente->cirugia_id = $cirugia;
-                                $cirugiasPaciente->tiempo = $tiempoCirugia;
-                                $cirugiasPaciente->unidad_tiempo = $unidadCirugia;
-                                $cirugiasPaciente->save();
+                                $cirugiaUpdate = CirugiasPaciente::where('cirugia_id', $cirugia)->where('historia_clinica_id', $historiaClinica->id)->first();
+
+                                if($cirugiaUpdate){
+                                    //Si existe, actualizarlo
+                                    $cirugiaUpdate->cirugia_id = $cirugia;
+                                    $cirugiaUpdate->tiempo = $tiempoCirugia;
+                                    $cirugiaUpdate->unidad_tiempo = $unidadCirugia;
+                                    $cirugiaUpdate->save();
+                                }else{
+                                    //Si no existe, crear un nuevo registro
+                                    CirugiasPaciente::create([
+                                        'historia_clinica_id' => $historiaClinica->id,
+                                        'cirugia_id' => $cirugia,
+                                        'tiempo' => $tiempoCirugia,
+                                        'unidad_tiempo' => $unidadCirugia,
+                                    ]);
+                                }
                             }
                         }
                     }
-                }
 
+                }
             }
 
             if($anamnesisPaciente){

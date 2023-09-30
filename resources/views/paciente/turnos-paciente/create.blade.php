@@ -131,7 +131,7 @@
                                 </div>
                             </div>
 
-                            <button class="btn btn-success mt-3" type="submit">Solicitar turno</button>
+                            <button class="btn btn-success mt-3 solicitar-turno-button" type="button">Solicitar turno</button>
 
                         </form>
                     </div>
@@ -149,6 +149,7 @@
     <script> console.log('Hi!'); </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         //Agregamos un evento change al input date
@@ -207,6 +208,55 @@
                 error: function (error) {
                     console.log(error);
                 }
+            });
+        });
+
+        //Aplicamos sweetAlert
+        document.addEventListener('DOMContentLoaded', function () {
+            const solicitarTurno = document.querySelectorAll('.solicitar-turno-button');
+
+            solicitarTurno.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de solicitar el turno para la fecha y hora seleccionada?',
+                        text: "",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: '¡Si, solicitar turno!',
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonText: '¡No, cancelar!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = this.closest('form');
+                            form.submit();
+                            swalWithBootstrapButtons.fire(
+                            '¡Turno solicitado!',
+                            'Puede ver los detalles del turno reservado en la sección "Mis turnos".',
+                            'success'
+                            )
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡Cancelado!',
+                            'La solicitud del turno para la fecha y seleccionada no se ha realizado.',
+                            'error'
+                            )
+                        }
+                    })
+                });
             });
         });
     </script>

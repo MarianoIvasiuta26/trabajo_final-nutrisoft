@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Mi Historia Clínica')
+@section('title', 'Días y Horarios Fijos')
 
 @section('content_header')
 
