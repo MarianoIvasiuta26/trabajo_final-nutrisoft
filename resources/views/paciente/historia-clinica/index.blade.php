@@ -15,6 +15,19 @@
         <a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar mi Historia Clínica</a>
     </div>
     @else
+
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
     {{-- Perfil de la HC --}}
     <div class="container">
         <div class="row">

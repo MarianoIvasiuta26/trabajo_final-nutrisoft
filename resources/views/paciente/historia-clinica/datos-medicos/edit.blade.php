@@ -110,10 +110,7 @@
                                                     selected
                                                 @endif>Años</option>
                                             </select>
-                                            <form action="">
                                                 <button type="button" class="btn btn-danger remove-cirugia"><i class="bi bi-x"></i></button>
-                                            </form>
-                                            
                                         </div>
                                     </div>
                                 </div>

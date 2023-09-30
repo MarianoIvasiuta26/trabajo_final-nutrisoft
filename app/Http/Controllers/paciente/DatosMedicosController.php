@@ -465,6 +465,14 @@ class DatosMedicosController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $cirugiaPaciente = CirugiasPaciente::find($id);
+
+        if($cirugiaPaciente){
+            $cirugiaPaciente->delete();
+            return redirect()->route('historia-clinica.index')->with('success', 'Cirugía eliminada correctamente');
+        }else{
+            return redirect()->route('historia-clinica.index')->with('error', 'Cirugía no encontrada');
+        }
+        
     }
 }
