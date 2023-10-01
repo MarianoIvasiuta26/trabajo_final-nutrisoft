@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Mis turnos')
+@section('title', 'Solicitar turno')
 
 @section('content_header')
-    <h1>Solicitar un turno</h1>
+
 @stop
 
 @section('content')
@@ -32,16 +32,20 @@
             @endforeach
                 <div class="card card-dark">
                     <div class="card-header">
-                        <h5>Solicitud de turno</h5>
+                        <h3>Solicitar un turno</h3>
                     </div>
 
                     <div class="card-body">
                         <form action="{{route('turnos.store')}}" method="POST">
                             @csrf
-
+                            <div class="alert alert-warning" role="alert">
+                                Los campos marcados con un (*) son obligatorios.
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label" for="profesional">Profesional</label>
+                                    <label class="form-label" for="profesional">
+                                        Profesional <span class="text-muted">(*)</span>
+                                    </label>
                                     <select name="profesional" id="profesional" class="form-select">
                                         <option value="">Seleccione un profesional</option>
                                         @foreach($profesionales as $profesional)
@@ -72,7 +76,9 @@
 
                             <div class="row mt-3">
                                 <div class="col-md-6">
-                                    <label class="form-label" for="tipo_consulta">Tipo de consulta</label>
+                                    <label class="form-label" for="tipo_consulta">
+                                        Tipo de consulta <span class="text-muted">(*)</span>
+                                    </label>
                                     <select class="form-select" name="tipo_consulta" id="tipo_consulta">
                                         <option value="">Seleccione un tipo de consulta</option>
                                         @foreach($tipo_consultas as $tipo_consulta)
@@ -85,7 +91,12 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label" for="objetivo_salud">Objetivo de salud</label>
+                                    <label class="form-label" for="objetivo_salud">
+                                        Objetivo de salud
+                                        <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Para seleccionar otro Objetivo de salud, debe modificar su historia clínica.">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    </label>
                                     <select class="form-select" name="objetivo_salud" id="objetivo_salud" disabled>
                                         @foreach ($pacientes as $paciente)
                                             @foreach ($historias_clinicas as $historia_clinica)
@@ -100,12 +111,15 @@
                                     @error('objetivo_salud')
                                         <small class="text-danger">{{$message}}</small>
                                     @enderror
+
                                 </div>
                             </div>
 
                             <div class="row mt-3" id="horarios-disponibles">
                                 <div class="col-md-12" id="fecha-turno">
-                                    <label class="form-label" for="fecha">Fecha</label>
+                                    <label class="form-label" for="fecha">
+                                        Fecha <span class="text-muted">(*)</span>
+                                    </label>
                                     <input class="form-control" type="date" name="fecha" id="fecha">
 
                                     @error('fecha')
@@ -117,7 +131,11 @@
 
                             <div class="row mt-3">
                                 <div class="col-md-12">
-                                    <label for="hora">Horas Disponibles</label>
+                                    <label for="hora">
+                                        Horas Disponibles <span class="text-muted">(*)</span></label>
+                                        <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Las horas disponibles se mostrarán al seleccionar el profeisonal y la fecha.">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
                                     <br>
                                     <div class="btn-group" data-toggle="buttons" id="horas-disponibles">
                                         <!-- Las horas disponibles se agregarán aquí dinámicamente -->
@@ -132,7 +150,7 @@
                             </div>
 
                             <button class="btn btn-success mt-3 solicitar-turno-button" type="button">Solicitar turno</button>
-
+                            <a href="{{route('turnos.index')}}" class="btn btn-danger mt-3">Volver</a>
                         </form>
                     </div>
                 </div>
@@ -143,6 +161,8 @@
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 @stop
 
 @section('js')
@@ -152,6 +172,33 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+
+        //Respuestas Flash del controlador con SweetAlert
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('success')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                text: "{{session('error')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        $(document).ready(function() {
+            $('[data-bs-toggle="popover"]').popover();
+        });
+
+
         //Agregamos un evento change al input date
         document.getElementById('fecha').addEventListener('change', function () {
             var fechaSeleccionada = this.value; // Obtenemos la fecha seleccionada
@@ -240,11 +287,6 @@
                             //Envia el form
                             const form = this.closest('form');
                             form.submit();
-                            swalWithBootstrapButtons.fire(
-                            '¡Turno solicitado!',
-                            'Puede ver los detalles del turno reservado en la sección "Mis turnos".',
-                            'success'
-                            )
                         } else if (
                             /* Read more about handling dismissals below */
                             result.dismiss === Swal.DismissReason.cancel

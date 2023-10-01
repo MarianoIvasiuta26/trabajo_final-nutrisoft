@@ -3,7 +3,7 @@
 @section('title', 'Mis turnos')
 
 @section('content_header')
-    <h1>Mis Turnos - {{auth()->user()->name}}</h1>
+
 @stop
 
 @section('content')
@@ -27,7 +27,7 @@
                         <h5>Turno pendiente</h5>
                         Usted tiene un turno pendiente para el día {{ $turno->fecha }} a las {{ $turno->hora }} hs.
                         <br>Para cancelar el turno, haga click en el siguiente enlace:
-                        <br><a href="{{ route('turnos.destroy', $turno->id) }}" class="alert-link">Cancelar turno</a>
+                        <br><a href="{{ route('turnos.destroy', $turno->id) }}" class="alert-link cancelar-turno-button">Cancelar turno</a>
                     </div>
                 @endif
             @endif
@@ -36,7 +36,7 @@
 
         <div class="card card-dark">
             <div class="card-header">
-                <h5>Historial de Turnos</h5>
+                <h3>Historial de Turnos</h3>
             </div>
             <div class="card-body">
                 <table id="tabla-mis-turnos" class="table table-striped" id="turnos">
@@ -68,12 +68,12 @@
                                     <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary">Ver</a>
                                 {{--   @if ($turno->estado == 'Pendiente')
                                         <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
-                                    @endif--}} 
+                                    @endif--}}
                                     @if ($turno->estado == 'Pendiente')
                                         <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger cancelar-button">Cancelar</button>
+                                            <button type="submit" class="btn btn-danger cancelar-turno-button">Cancelar</button>
                                         </form>
                                     @endif
                                 </td>
@@ -111,6 +111,32 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
+
+//Respuestas Flash del controlador con SweetAlert
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('success')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                text: "{{session('error')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        $(document).ready(function() {
+            $('[data-bs-toggle="popover"]').popover();
+        });
+
         $(document).ready(function(){
             var table = $('#tabla-mis-turnos').DataTable({
                 responsive: true,
@@ -133,5 +159,28 @@
             });
         });
 
+        document.addEventListener('DOMContentLoaded', function () {
+            const cancelarButtons = document.querySelectorAll('.cancelar-turno-button');
+
+            cancelarButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    Swal.fire({
+                        title: '¿Estás seguro de cancelar el turno?',
+                        text: "¡No podrás revertir esto!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Si, cancelar turno'
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = this.closest('form');
+                            form.submit();
+                        }
+                    })
+                });
+            });
+        });
     </script>
 @stop
