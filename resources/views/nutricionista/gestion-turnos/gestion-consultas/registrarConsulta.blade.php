@@ -29,7 +29,7 @@
                 </div>
 
                 <div class="row mt-3">
-                    <div class="col">
+                    <div class="col-md-6">
                         <label for="tipo_consulta">Tipo de Consulta</label>
                         <select class="form-select" name="tipo_consulta" id="tipo_consulta">
                             @foreach ($tipoConsultas as $tipoConsulta)
@@ -38,6 +38,20 @@
                                 @endif disabled>{{$tipoConsulta->tipo_consulta}}</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="tratamiento_paciente">Tratamiento <span class="text-muted">(*)</span></label>
+                        <div class="input-group">
+                            <select class="form-select" name="tratamiento_paciente" id="tratamiento_paciente">
+                                @foreach ($tratamientos as $tratamiento)
+                                    <option value="{{$tratamiento->id}}">{{$tratamiento->tratamiento}}</option>
+                                @endforeach
+                            </select>
+                            <div class="input-group-append">
+                                <a href="{{route('gestion-tratamientos.create')}}" class="btn btn-primary">Nuevo</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -64,11 +78,11 @@
 
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label for="peso_actual">Peso actual</label>
+                        <label for="peso_actual">Peso actual <span class="text-muted">(*)</span> </label>
                         <div class="input-group">
-                            <input class="form-control" name="peso_actual" id="peso_actual" type="number">
+                            <input class="form-control" name="peso_actual" id="peso_actual" type="text">
                             <div class="input-group-append">
-                                <span class="input-group-text">cm</span>
+                                <span class="input-group-text">kg</span>
                             </div>
                         </div>
                         @error('peso_actual')
@@ -77,9 +91,9 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="altura_actual">Altura actual</label>
+                        <label for="altura_actual">Altura actual <span class="text-muted">(*)</span></label>
                         <div class="input-group">
-                            <input class="form-control" name="altura_actual" id="altura_actual" type="number">
+                            <input class="form-control" name="altura_actual" id="altura_actual" type="text">
                             <div class="input-group-append">
                                 <span class="input-group-text">cm</span>
                             </div>
@@ -92,9 +106,9 @@
 
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label for="circ_munieca_actual">Circunferencia de muñeca</label>
+                        <label for="circ_munieca_actual">Circunferencia de muñeca <span class="text-muted">(*)</span></label>
                         <div class="input-group">
-                            <input class="form-control" name="circ_munieca_actual" id="circ_munieca_actual" type="number">
+                            <input class="form-control" name="circ_munieca_actual" id="circ_munieca_actual" type="text">
                             <div class="input-group-append">
                                 <span class="input-group-text">cm</span>
                             </div>
@@ -105,9 +119,9 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="circ_cadera_actual">Circunferencia de cadera</label>
+                        <label for="circ_cadera_actual">Circunferencia de cadera <span class="text-muted">(*)</span></label>
                         <div class="input-group">
-                            <input class="form-control" name="circ_cadera_actual" id="circ_cadera_actual" type="number">
+                            <input class="form-control" name="circ_cadera_actual" id="circ_cadera_actual" type="text">
                             <div class="input-group-append">
                                 <span class="input-group-text">cm</span>
                             </div>
@@ -120,9 +134,9 @@
 
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label for="circ_cintura_actual">Circunferencia de cintura</label>
+                        <label for="circ_cintura_actual">Circunferencia de cintura <span class="text-muted">(*)</span></label>
                         <div class="input-group">
-                            <input class="form-control" name="circ_cintura_actual" id="circ_cintura_actual" type="number">
+                            <input class="form-control" name="circ_cintura_actual" id="circ_cintura_actual" type="text">
                             <div class="input-group-append">
                                 <span class="input-group-text">cm</span>
                             </div>
@@ -133,9 +147,9 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="circ_pecho_actual">Circunferencia de pecho</label>
+                        <label for="circ_pecho_actual">Circunferencia de pecho <span class="text-muted">(*)</span></label>
                         <div class="input-group">
-                            <input class="form-control" name="circ_pecho_actual" id="circ_pecho_actual" type="number">
+                            <input class="form-control" name="circ_pecho_actual" id="circ_pecho_actual" type="text">
                             <div class="input-group-append">
                                 <span class="input-group-text">cm</span>
                             </div>
@@ -148,8 +162,11 @@
 
                 <div class="row mt-3">
                     <div class="col">
-                        <label for="diagnostico">Diagnóstico</label>
+                        <label for="diagnostico">Diagnóstico <span class="text-muted">(*)</span></label>
                         <textarea class="form-control" name="diagnostico" id="diagnostico" cols="30" rows="5"></textarea>
+                        @error('diagnostico')
+                            <span class="text-danger">{{$message}}</span>
+                        @enderror
                     </div>
                 </div>
 

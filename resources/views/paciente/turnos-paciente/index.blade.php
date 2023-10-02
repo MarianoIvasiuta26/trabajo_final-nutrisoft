@@ -133,6 +133,16 @@
             })
         @endif
 
+        @if(session('info'))
+            Swal.fire({
+                icon: 'info',
+                title: '¡Información!',
+                text: "{{session('info')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
         $(document).ready(function() {
             $('[data-bs-toggle="popover"]').popover();
         });

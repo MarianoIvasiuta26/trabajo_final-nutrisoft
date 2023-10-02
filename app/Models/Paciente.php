@@ -37,4 +37,10 @@ class Paciente extends Model
     {
         return $this->hasMany('App\Models\Turno');
     }
+
+    public function tratamientoPorPaciente()
+    {
+        return $this->hasMany('App\Models\Paciente\TratamientoPorPaciente');
+    }
+    
 }

@@ -42,6 +42,7 @@ class GestionConsultasController extends Controller
     {
         //Validamos el form
         $request->validate([
+            'tratamiento_paciente' => ['required', 'integer'],
             'peso_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'altura_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'circ_munieca_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
@@ -52,6 +53,7 @@ class GestionConsultasController extends Controller
         ]);
 
         //Obtenemos los datos del formulario
+        $tratamientoPaciente = $request->input('tratamiento_paciente');
         $pesoActual = $request->input('peso_actual');
         $alturaActual = $request->input('altura_actual');
         $circMuniecaActual = $request->input('circ_munieca_actual');

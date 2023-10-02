@@ -549,9 +549,9 @@ class TurnoController extends Controller
                                         $turno->fecha = $turnoCancelado->fecha;
                                         $turno->hora = $turnoCancelado->hora;
                                         $turno->estado = 'Pendiente';
-
+                                        
                                         $turno->save();
-                                        return redirect()->route('turnos.index')->with('success', 'Turno adelantado');
+                                        return redirect()->route('turnos.index')->with('info', 'Turno adelantado');
                                     }
                                 }
                             }
@@ -569,8 +569,9 @@ class TurnoController extends Controller
                                 $turno->fecha = $turnoCancelado->fecha;
                                 $turno->hora = $turnoCancelado->hora;
                                 $turno->estado = 'Pendiente';
+
                                 $turno->save();
-                                return redirect()->route('turnos.index');
+                                return redirect()->route('turnos.index')->with('info', 'Turno adelantado');
                             }
                         }
                     }
@@ -580,7 +581,7 @@ class TurnoController extends Controller
 
         //Si no hay ningún turno pendiente o pacientes con el mismo día y hora disponible retornamos
 
-        return redirect()->route('turnos.index');
+        return redirect()->route('turnos.index')->with('info', 'No se adelantó ningún turno');
     }
 
     public function horasDisponibles(Request $request){

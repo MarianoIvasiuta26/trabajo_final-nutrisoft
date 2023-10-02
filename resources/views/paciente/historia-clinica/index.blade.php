@@ -687,9 +687,10 @@
                                                 <td>{{ $turno->estado }}</td>
                                                 <td>
                                                     <button class="btn btn-primary ver-detalles">Ver detalles</button>
+                                                    {{--
                                                     @if ($turno->estado == 'Pendiente')
                                                         <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
-                                                    @endif
+                                                    @endif--}}
                                                     @if ($turno->estado == 'Pendiente')
                                                         <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
                                                             @csrf

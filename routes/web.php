@@ -21,6 +21,7 @@ use App\Http\Controllers\nutricionista\GestionTurnosController;
 use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\TratramientoController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -88,6 +89,8 @@ Route::middleware([
     Route::get('gestion-turnos-nutricionista.iniciarConsulta/{id}', [GestionTurnosController::class, 'iniciarConsulta'])->name('gestion-turnos-nutricionista.iniciarConsulta');
     Route::resource('gestion-consultas', GestionConsultasController::class)->names('gestion-consultas');
     Route::post('gestion-consultas.store/{id}', [GestionConsultasController::class, 'store'])->name('gestion-consultas.store');
+
+    Route::resource('gestion-tratamientos', TratramientoController::class)->names('gestion-tratamientos');
 
     //Paciente
 
