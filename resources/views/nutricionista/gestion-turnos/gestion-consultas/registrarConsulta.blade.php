@@ -39,7 +39,7 @@
                             @endforeach
                         </select>
                     </div>
-
+                    
                     <div class="col-md-6">
                         <label for="tratamiento_paciente">Tratamiento <span class="text-muted">(*)</span></label>
                         <div class="input-group">
@@ -52,6 +52,17 @@
                                 <a href="{{route('gestion-tratamientos.create')}}" class="btn btn-primary">Nuevo</a>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+
+                    <div class="col-md-12 mt-3">
+                        <label for="observacion">Observaciones de Tratamiento <span class="text-muted">(*)</span></label>
+                        <textarea class="form-control" name="observacion" id="observacion" cols="30" rows="2"></textarea>
+                        @error('observacion')
+                            <span class="text-danger">{{$message}}</span>
+                        @enderror
                     </div>
                 </div>
 

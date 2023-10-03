@@ -40,8 +40,8 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-4">
-                                <label for="sexo" class="form-label">Sexo(*)</label>
+                            <div class="col-md-6">
+                                <label for="sexo" class="form-label">Sexo biológico(*)</label>
                                 <select id="sexo" class="form-select @error('sexo') is-invalid @enderror" name="sexo">
                                     <option value="" disabled selected>Elija una opción...</option>
                                     <option value="Masculino">Masculino</option>
@@ -53,16 +53,7 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-4">
-                                <label for="edad" class="form-label">Edad(*)</label>
-                                <input type="number" class="form-control @error('edad') is-invalid @enderror" id="edad" name="edad" value="{{old('edad')}}">
-
-                                @error('edad')
-                                    <div class="invalid-feedback">{{ $message}}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento(*)</label>
                                 <input type="date" value="{{old('fecha_nacimiento')}}" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento">
 
@@ -95,63 +86,63 @@
                     <div id="diasYHoras" class="card-body" style="display: none;">
                         <form action="{{route('adelantamiento-turno.store')}}" method="POST">
                             @csrf
-{{--
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h5>Seleccione los días que tiene disponibles:</h5>
-                                    @foreach ($horarios as $horario)
-                                        @foreach ($dias as $dia)
-                                            @if ($dia->id == $horario->dia_atencion_id && $dia->seleccionado == true)
-                                                <div class="col-md-2">
-                                                    <div class="icheck-primary">
-                                                        <input value="{{$dia->dia}}" type="checkbox" id="diasFijos-{{$dia->dia}}" name="diasFijos[]"/>
-                                                        <label for="diasFijos-{{$dia->dia}}">{{$dia->dia}}</label>
+                        {{--
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <h5>Seleccione los días que tiene disponibles:</h5>
+                                                            @foreach ($horarios as $horario)
+                                                                @foreach ($dias as $dia)
+                                                                    @if ($dia->id == $horario->dia_atencion_id && $dia->seleccionado == true)
+                                                                        <div class="col-md-2">
+                                                                            <div class="icheck-primary">
+                                                                                <input value="{{$dia->dia}}" type="checkbox" id="diasFijos-{{$dia->dia}}" name="diasFijos[]"/>
+                                                                                <label for="diasFijos-{{$dia->dia}}">{{$dia->dia}}</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endif
+                                                                @endforeach
+                                                            @endforeach
+                                                        </div>
+                                                        <!-- Horas -->
+                                                        <div class="col-md-6">
+                                                            <h5>Seleccione las horas disponibles:</h5>
+                                                            <div class="row">
+                                                                <select name="horasFijas[]" class="selectpicker" multiple title="Seleccione las horas de la mañana disponibles..." data-style="btn-success" data-width="fit" data-live-search="true" data-size="5">
+                                                                    <option value="8:00">8:00</option>
+                                                                    <option value="8:30">8:30</option>
+                                                                    <option value="9:00">9:00</option>
+                                                                    <option value="9:30">9:30</option>
+                                                                    <option value="10:00">10:00</option>
+                                                                    <option value="10:30">10:30</option>
+                                                                    <option value="11:00">11:00</option>
+                                                                    <option value="11:30">11:30</option>
+                                                                    <option value="12:00">12:00</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <select name="horasFijas[]" class="selectpicker mt-4" data-style="btn-success" multiple title="Seleccione las horas de la tarde disponibles..." data-width="fit" data-size="5" data-live-search="true">
+                                                                    <option value="16:30">16:30</option>
+                                                                    <option value="17:00">17:00</option>
+                                                                    <option value="17:30">17:30</option>
+                                                                    <option value="18:00">18:00</option>
+                                                                    <option value="18:30">18:30</option>
+                                                                    <option value="19:00">19:00</option>
+                                                                    <option value="19:30">19:30</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            @endif
-                                        @endforeach
-                                    @endforeach
-                                </div>
-                                <!-- Horas -->
-                                <div class="col-md-6">
-                                    <h5>Seleccione las horas disponibles:</h5>
-                                    <div class="row">
-                                        <select name="horasFijas[]" class="selectpicker" multiple title="Seleccione las horas de la mañana disponibles..." data-style="btn-success" data-width="fit" data-live-search="true" data-size="5">
-                                            <option value="8:00">8:00</option>
-                                            <option value="8:30">8:30</option>
-                                            <option value="9:00">9:00</option>
-                                            <option value="9:30">9:30</option>
-                                            <option value="10:00">10:00</option>
-                                            <option value="10:30">10:30</option>
-                                            <option value="11:00">11:00</option>
-                                            <option value="11:30">11:30</option>
-                                            <option value="12:00">12:00</option>
-                                        </select>
-                                    </div>
 
-                                    <div class="row">
-                                        <select name="horasFijas[]" class="selectpicker mt-4" data-style="btn-success" multiple title="Seleccione las horas de la tarde disponibles..." data-width="fit" data-size="5" data-live-search="true">
-                                            <option value="16:30">16:30</option>
-                                            <option value="17:00">17:00</option>
-                                            <option value="17:30">17:30</option>
-                                            <option value="18:00">18:00</option>
-                                            <option value="18:30">18:30</option>
-                                            <option value="19:00">19:00</option>
-                                            <option value="19:30">19:30</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <div class="float-right">
-                                        <button type="submit" class="btn btn-success">Guardar</button>
-                                        <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
-                                    </div>
-                                </div>
-                            </div>
---}}
+                                                    <div class="row mt-3">
+                                                        <div class="col-12">
+                                                            <div class="float-right">
+                                                                <button type="submit" class="btn btn-success">Guardar</button>
+                                                                <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                        --}}
                             <div class="row">
                                 <div class="col">
                                     <label class="form-label" for="profesional">Seleccione el profesional del que recibe atenciones</label>

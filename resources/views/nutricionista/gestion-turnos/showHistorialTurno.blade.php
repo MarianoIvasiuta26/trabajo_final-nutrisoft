@@ -30,7 +30,7 @@
                         <option value="">Todos</option>
                         <option value="Pendiente">Pendiente</option>
                         <option value="Cancelado">Cancelado</option>
-                        <option value="Realizado">Realizado</option>
+                        <option value="Realizado" selected>Realizado</option>
                     </select>
                 </div>
             </div>
@@ -154,7 +154,8 @@
                         "next": "Siguiente",
                         "previous": "Anterior"
                     },
-                }
+                },
+                "order": [[ 0, "desc" ]],
             });
 
             // Aplicar los filtros personalizados
@@ -169,6 +170,11 @@
             $('#filtro-estado').on('change', function(){
                 table.column(3).search(this.value).draw(); // Columna 3 para el estado
             });
+
+            //Filtro estado or defecto
+            var filtroEstado = $('#filtro-estado');
+            filtroEstado.val('Realizado');
+            table.column(3).search('Realizado').draw();
 
             $('#filtro-tipo-consulta').on('change', function(){
                 table.column(4).search(this.value).draw(); // Columna 4 para el tipo de consulta

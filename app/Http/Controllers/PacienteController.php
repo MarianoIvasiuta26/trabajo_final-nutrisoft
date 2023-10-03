@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Paciente;
 use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PacienteController extends Controller
@@ -27,7 +28,6 @@ class PacienteController extends Controller
             'dni' => ['required', 'string', 'max:8'],
             'sexo' => ['required', 'string', 'max:10'],
             'fecha_nacimiento' => ['required', 'date'],
-            'edad' => ['required', 'integer'],
             'telefono' => ['required', 'string', 'max:10'],
         ]);
 
@@ -35,7 +35,6 @@ class PacienteController extends Controller
         $dni = $request->input('dni');
         $sexo = $request->input('sexo');
         $fechaNacimiento = $request->input('fecha_nacimiento');
-        $edad = $request->input('edad');
         $telefono = $request->input('telefono');
 
         //Validamos si existen estos ya registrados
@@ -43,7 +42,6 @@ class PacienteController extends Controller
             ['fecha_nacimiento', $fechaNacimiento],
             ['dni', $dni],
             ['sexo', $sexo],
-            ['edad', $edad],
             ['telefono', $telefono],
         ])->first();
 
@@ -51,6 +49,11 @@ class PacienteController extends Controller
         if(!$datosPersonales){
             // Obtenemos el paciente autenticado
             $paciente = Paciente::where('user_id', auth()->id())->first();
+
+            //Calculamos edad
+            $fecha_nacimientoIngresado = Carbon::parse($request->fecha_nacimiento);
+            $fecha_actual = Carbon::now();
+            $edad = $fecha_actual->diffInYears($fecha_nacimientoIngresado);
 
             //Si no existen los datos ingresados Agregamos estos datos al paciente
             $paciente->dni = $dni;

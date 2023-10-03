@@ -7,6 +7,7 @@ use App\Models\Consulta;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
 use App\Models\TipoConsulta;
+use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
 use Illuminate\Http\Request;
 
@@ -43,6 +44,7 @@ class GestionConsultasController extends Controller
         //Validamos el form
         $request->validate([
             'tratamiento_paciente' => ['required', 'integer'],
+            'observacion' => ['required', 'string', 'max:255'],
             'peso_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'altura_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'circ_munieca_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
@@ -54,6 +56,7 @@ class GestionConsultasController extends Controller
 
         //Obtenemos los datos del formulario
         $tratamientoPaciente = $request->input('tratamiento_paciente');
+        $observacion = $request->input('observacion');
         $pesoActual = $request->input('peso_actual');
         $alturaActual = $request->input('altura_actual');
         $circMuniecaActual = $request->input('circ_munieca_actual');
@@ -85,6 +88,14 @@ class GestionConsultasController extends Controller
             'circunferencia_cadera_actual' => $circCaderaActual,
             'circunferencia_pecho_actual' => $circPechoActual,
             'diagnostico' => $diagnostico,
+        ]);
+
+        TratamientoPorPaciente::create([
+            'tratamiento_id' => $tratamientoPaciente,
+            'paciente_id' => $turno->paciente_id,
+            'fecha_alta' => $turno->fecha,
+            'observaciones' => $observacion,
+            'estado' => 'Activo',
         ]);
 
         $turno->estado = 'Realizado';
