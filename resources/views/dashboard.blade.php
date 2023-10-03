@@ -28,6 +28,17 @@
                 </div>
 
             @endif
+
+            @if(auth()->user()->tipo_usuario === 'Paciente' && app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
+                @if (!app('App\Http\Controllers\PacienteController')->hasCompletedDatosMedicos() || !app('App\Http\Controllers\PacienteController')->hasCompletedCirugias() || !app('App\Http\Controllers\PacienteController')->hasCompletedAnamnesis())
+                    <div class="alert alert-warning" role="alert">
+                        Parece que aún no has terminado de completar tu Historia Clínica. Recuerda que es importante que lo completes para tener acceso a todas las funcionalidades del sistema.<br>
+                        Haga click en el siguiente enlace para completar su historia clínica:
+                        <a href="{{ route('historia-clinica.create') }}" class="alert-link">Continuar completando mi Historia Clínica</a>
+                    </div>
+                @endif
+            @endif
+
         </div>
     </div>
 </div>

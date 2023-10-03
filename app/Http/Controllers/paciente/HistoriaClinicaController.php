@@ -38,20 +38,27 @@ class HistoriaClinicaController extends Controller
             return view('paciente.historia-clinica.index')->with('info', 'No se ha registrado la historia clínica');
         }
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
-        $alergias = Alergia::where('id', $datosMedicos->alergia_id)->get();
-        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
-        $cirugias = Cirugia::all();
-        $intolerancias = Intolerancia::where('id', $datosMedicos->intolerancia_id)->get();
-        $patologias = Patologia::where('id', $datosMedicos->patologia_id)->get();
         $adelantamientos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();
-        $anamnesisAlimentaria = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->get();
         $alimentos = Alimento::all();
         $turnos = Turno::all();
         $consultas = Consulta::all();
         $tipo_consultas = TipoConsulta::all();
         $profesionales = Nutricionista::all();
         $horarios = HorariosAtencion::all();
-        return view('paciente.historia-clinica.index', compact('paciente', 'historiaClinica', 'datosMedicos', 'adelantamientos', 'anamnesisAlimentaria', 'alimentos', 'alergias', 'cirugiasPaciente', 'cirugias', 'intolerancias', 'patologias', 'turnos', 'consultas', 'tipo_consultas', 'profesionales', 'horarios'));
+        $cirugias = Cirugia::all();
+
+        if($historiaClinica && $datosMedicos){
+            $alergias = Alergia::where('id', $datosMedicos->alergia_id)->get();
+            $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
+
+            $intolerancias = Intolerancia::where('id', $datosMedicos->intolerancia_id)->get();
+            $patologias = Patologia::where('id', $datosMedicos->patologia_id)->get();
+            $anamnesisAlimentaria = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->get();
+
+            return view('paciente.historia-clinica.index', compact('paciente', 'historiaClinica', 'datosMedicos', 'adelantamientos', 'anamnesisAlimentaria', 'alimentos', 'alergias', 'cirugiasPaciente', 'cirugias', 'intolerancias', 'patologias', 'turnos', 'consultas', 'tipo_consultas', 'profesionales', 'horarios'));
+        }
+
+        return view('paciente.historia-clinica.index', compact('paciente', 'historiaClinica', 'adelantamientos','alimentos', 'cirugias', 'turnos', 'consultas', 'tipo_consultas', 'profesionales', 'horarios'));
     }
 
     /**
@@ -69,7 +76,27 @@ class HistoriaClinicaController extends Controller
         $intolerancias = Intolerancia::all();
         $alimentos = Alimento::all();
         $profesionales = Nutricionista::all();
-        return view('paciente.historia-clinica.create', compact('dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos', 'profesionales'));
+        //Obtener paciente autenticado
+        $paciente = Paciente::where('user_id', auth()->user()->id)->first();
+        // Verificar si el formulario se ha completado
+        $formularioCompletado = false;
+        if (session('dni') && session('telefono') && session('sexo') && session('fecha_nacimiento')) {
+            $formularioCompletado = true;
+        }
+
+        $hc = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        if($hc){
+            $datosMedicos = DatosMedicos::where('historia_clinica_id', $paciente->historiaClinica->id)->get();
+            $anamnesis = AnamnesisAlimentaria::where('historia_clinica_id', $paciente->historiaClinica->id)->get();
+            $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $paciente->historiaClinica->id)->get();
+            $adelantamientoTurnos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();
+
+            return view('paciente.historia-clinica.create', compact('dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos', 'profesionales', 'formularioCompletado', 'paciente', 'datosMedicos', 'anamnesis', 'cirugiasPaciente', 'adelantamientoTurnos'));
+        }
+
+
+        return view('paciente.historia-clinica.create', compact('dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos', 'profesionales', 'formularioCompletado', 'paciente'));
     }
 
     /**
@@ -139,7 +166,9 @@ class HistoriaClinicaController extends Controller
             'objetivo_salud' => $request->input('objetivo_salud', ''),
         ]);
 
-        return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
+        session()->put('datos_fisicos', true);
+
+        return redirect()->route('historia-clinica.create')->with('success', 'Datos físicos registrados');
     }
 
 

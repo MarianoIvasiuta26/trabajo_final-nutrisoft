@@ -97,8 +97,9 @@ class AdelantamientoTurnoController extends Controller
     {
         // Obtenemos el nutricionista autenticado
         $paciente = Paciente::where('user_id', auth()->id())->first();
-        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
 
+/*
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
         //Si no existe la historia clinica del paciente, la creamos
         if (!$historiaClinica) {
             $historiaClinica = HistoriaClinica::create([
@@ -113,7 +114,7 @@ class AdelantamientoTurnoController extends Controller
                 'objetivo_salud' => '',
             ]);
         }
-/*
+
         //Obtenemos los datos médicos de la historia clínica
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
 
@@ -129,6 +130,7 @@ class AdelantamientoTurnoController extends Controller
         }
 */
         // Días y horarios fijos
+        $profesional = $request->input('profesional');
         $diasFijos = $request->input('diasFijos');
         $horasFijas = $request->input('horasFijas');
 
@@ -150,7 +152,8 @@ class AdelantamientoTurnoController extends Controller
                 }
             }
         }
-
+        session()->put('profesional', $profesional);
+        session()->put('dias_y_horas_fijas', true);
         return redirect()->route('historia-clinica.create')->with('success', 'Días y horas disponibles registrados');
     }
 

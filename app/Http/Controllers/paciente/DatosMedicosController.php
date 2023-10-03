@@ -71,6 +71,7 @@ class DatosMedicosController extends Controller
         //Verificamos si existe ya la historia clínica para el paciente
         if(!$historiaClinica){
             //Si no existe se crea
+            /*
             $historiaClinica = HistoriaClinica::create([
                 'paciente_id' => $paciente->id,
                 'peso' => 0,
@@ -81,7 +82,8 @@ class DatosMedicosController extends Controller
                 'circunferencia_pecho' => 0,
                 'estilo_vida' => '',
                 'objetivo_salud' => '',
-            ]);
+            ]);*/
+            return redirect()->back()->with('error', 'Debe completar los formlarios de arriba primero para registrar esta información.');
         }
 
 
@@ -106,7 +108,7 @@ class DatosMedicosController extends Controller
         }
 
         $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->first();
-        $alimentoID = Alimento::where('alimento', 'Ninguno')->first();
+        $alimentoID = Alimento::where('alimento', 'Sin Alimento')->first();
 
         if(!$anamnesisPaciente){
             //Si no existe se crea
@@ -253,7 +255,7 @@ class DatosMedicosController extends Controller
                 }
             }
         }
-
+        session()->put('datos_medicos', true);
         return redirect()->route('historia-clinica.create')->with('success', 'Datos médicos registrados correctamente');
 
     }
@@ -473,6 +475,6 @@ class DatosMedicosController extends Controller
         }else{
             return redirect()->route('historia-clinica.index')->with('error', 'Cirugía no encontrada');
         }
-        
+
     }
 }

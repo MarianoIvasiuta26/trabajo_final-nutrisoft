@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Paciente;
+use App\Models\Paciente\AdelantamientoTurno;
+use App\Models\Paciente\AnamnesisAlimentaria;
+use App\Models\Paciente\CirugiasPaciente;
 use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use Carbon\Carbon;
@@ -20,6 +23,52 @@ class PacienteController extends Controller
 
         // Si se encuentra un registro, el paciente ha completado la Historia Clínica.
         return $history !== null;
+    }
+
+    function hasCompletedDatosMedicos(){
+        // Obtén el ID del paciente autenticado.
+        $pacienteId = auth()->user()->paciente->id;
+
+        //Buscamos su HC
+        $historiaPaciente = HistoriaClinica::where('paciente_id', $pacienteId)->first();
+
+        if($historiaPaciente){
+            //Buscamos los datos médicos
+            $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaPaciente->id)->first();
+        }
+
+        return $datosMedicos !== null;
+
+    }
+
+    function hasCompletedCirugias(){
+        // Obtén el ID del paciente autenticado.
+        $pacienteId = auth()->user()->paciente->id;
+
+        //Buscamos su HC
+        $historiaPaciente = HistoriaClinica::where('paciente_id', $pacienteId)->first();
+
+        if($historiaPaciente){
+            //Buscamos los datos médicos
+            $cirugias = CirugiasPaciente::where('historia_clinica_id', $historiaPaciente->id)->first();
+        }
+
+        return $cirugias !== null;
+    }
+
+    function hasCompletedAnamnesis(){
+        // Obtén el ID del paciente autenticado.
+        $pacienteId = auth()->user()->paciente->id;
+
+        //Buscamos su HC
+        $historiaPaciente = HistoriaClinica::where('paciente_id', $pacienteId)->first();
+
+        if($historiaPaciente){
+            //Buscamos los datos médicos
+            $anamnesis = AnamnesisAlimentaria::where('historia_clinica_id', $historiaPaciente->id)->first();
+        }
+
+        return $anamnesis !== null;
     }
 
     function store(Request $request){
@@ -39,9 +88,7 @@ class PacienteController extends Controller
 
         //Validamos si existen estos ya registrados
         $datosPersonales = Paciente::where([
-            ['fecha_nacimiento', $fechaNacimiento],
             ['dni', $dni],
-            ['sexo', $sexo],
             ['telefono', $telefono],
         ])->first();
 
@@ -64,6 +111,18 @@ class PacienteController extends Controller
 
             $paciente->save();
 
+            session()->put('dni', $dni);
+            session()->put('sexo', $sexo);
+            session()->put('fecha_nacimiento', $fechaNacimiento);
+            session()->put('telefono', $telefono);
+            session()->put('edad', $edad);
+            session()->put('datos_personales', true);
+
+            return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
+        }else{
+            return redirect()->route('historia-clinica.create')->with('error', 'Ya existe un paciente con estos datos');
+        }
+/*
             //Verificacimos que no existe ya la historia clínica para el paciente
             $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
 
@@ -80,7 +139,7 @@ class PacienteController extends Controller
                     'estilo_vida' => '',
                     'objetivo_salud' => '',
                 ]);
-            }
+            }*/
 /*
             //Obtenemos los datos médicos de la historia clínica
             $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
@@ -95,11 +154,11 @@ class PacienteController extends Controller
                     'valor_analisis_clinico_id' => 0,
                 ]);
             }
-*/
             return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
         }else{
             return redirect()->route('historia-clinica.create')->with('error', 'Ya existe un paciente con estos datos');
         }
+*/
     }
 
     public function edit($id)
