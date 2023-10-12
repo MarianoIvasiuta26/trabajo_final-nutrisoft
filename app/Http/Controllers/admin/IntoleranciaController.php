@@ -100,7 +100,8 @@ class IntoleranciaController extends Controller
      */
     public function edit($id)
     {
-        //
+        $intolerancia = Intolerancia::find($id);
+        return view('admin.gestion-medica.intolerancias.edit', compact('intolerancia'));
     }
 
     /**
@@ -112,8 +113,24 @@ class IntoleranciaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $intolerancia = Intolerancia::find($id);
+
+        $request->validate([
+            'intolerancia' => ['required', 'string', 'max:50'],
+        ]);
+
+        if(!$intolerancia){
+            return redirect()->route('gestion-intolerancias.index')->with('error', 'Intolerancia no encontrada');
+        }
+
+        $intolerancia->intolerancia = $request->input('intolerancia');
+
+        $intolerancia->save();
+
+        return redirect()->route('gestion-intolerancias.index')->with('success', 'Intolerancia actualizada correctamente');
+
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -123,6 +140,14 @@ class IntoleranciaController extends Controller
      */
     public function destroy($id)
     {
-        //
+        //Validamos que la intolerancia exista
+        $intolerancia = Intolerancia::find($id);
+        if(!$intolerancia){
+            return redirect()->route('gestion-intolerancias.index')->with('error', 'La intolerancia no existe');
+        }
+
+        $intolerancia->delete();
+
+        return redirect()->route('gestion-intolerancias.index')->with('success', 'Intolerancia eliminada correctamente');
     }
 }

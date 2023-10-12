@@ -103,7 +103,8 @@ class CirugiaController extends Controller
      */
     public function edit($id)
     {
-        //
+        $cirugia = Cirugia::find($id);
+        return view('admin.gestion-medica.cirugias.edit')->with('cirugia', $cirugia);
     }
 
     /**
@@ -115,7 +116,27 @@ class CirugiaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $cirugia = Cirugia::find($id);
+
+        $request->validate([
+            'cirugia' => ['required', 'string', 'max:50'],
+            'grupo_cirugia' => ['required', 'string', 'max:50'],
+        ]);
+
+        $cirugiaIngresada = $request->input('cirugia');
+        $grupo_cirugia = $request->input('grupo_cirugia');
+
+        if(!$cirugia){
+            return redirect()->route('gestion-cirugias.index')->with('error', 'La cirugía no existe');
+        }
+
+        $cirugia->cirugia = $cirugiaIngresada;
+
+        $cirugia->grupo_cirugia = $grupo_cirugia;
+
+        $cirugia->save();
+
+        return redirect()->route('gestion-cirugias.index')->with('success', 'Cirugía actualizada correctamente');
     }
 
     /**
@@ -126,6 +147,14 @@ class CirugiaController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $cirugia = Cirugia::find($id);
+
+        if(!$cirugia){
+            return redirect()->route('gestion-cirugias.index')->with('error', 'La cirugía no existe');
+        }
+
+        $cirugia->delete();
+
+        return redirect()->route('gestion-cirugias.index')->with('success', 'Cirugía eliminada correctamente');
     }
 }

@@ -103,7 +103,8 @@ class PatologiaController extends Controller
      */
     public function edit($id)
     {
-        //
+        $patologia = Patologia::find($id);
+        return view('admin.gestion-medica.patologias.edit', compact('patologia'));
     }
 
     /**
@@ -115,7 +116,24 @@ class PatologiaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $patologia = Patologia::find($id);
+
+        $request->validate([
+            'patologia' => ['required', 'string', 'max:50'],
+            'grupo_patologia' => ['required', 'string', 'max:50'],
+        ]);
+
+        if(!$patologia){
+            return redirect()->back()->with('error', 'Error al editar la patología, inténtelo de nuevo.');
+        }
+
+        $patologia->patologia = $request->input('patologia');
+        $patologia->grupo_patologia = $request->input('grupo_patologia');
+
+        $patologia->save();
+
+        return redirect()->route('gestion-patologias.index')->with('success', 'Patología editada correctamente');
+
     }
 
     /**
@@ -126,6 +144,14 @@ class PatologiaController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $patologia = Patologia::find($id);
+
+        if(!$patologia){
+            return redirect()->back()->with('error', 'Error al eliminar la patología, inténtelo de nuevo.');
+        }
+
+        $patologia->delete();
+
+        return redirect()->route('gestion-patologias.index')->with('success', 'Patología eliminada correctamente');
     }
 }

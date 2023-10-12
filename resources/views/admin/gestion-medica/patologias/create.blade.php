@@ -16,7 +16,7 @@
                 @csrf
 
                 <div class="mb-3">
-                    <label for="patologia" class="form-label">Cirugía</label>
+                    <label for="patologia" class="form-label">Patología</label>
                     <input type="text" name="patologia" id="patologia" class="form-control" tabindex="2">
                 </div>
                 <div class="mb-3">

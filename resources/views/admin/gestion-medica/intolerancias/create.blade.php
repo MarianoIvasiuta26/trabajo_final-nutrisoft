@@ -29,8 +29,8 @@
                     </select>
                 </div>--}}
 
-                <a href="{{ route('gestion-intolerancias.index') }}" class="btn btn-secondary" tabindex="7">Cancelar</a>
-                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a href="{{ route('gestion-intolerancias.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+                <button type="submit" class="btn btn-success">Guardar</button>
             </form>
         </div>
     </div>

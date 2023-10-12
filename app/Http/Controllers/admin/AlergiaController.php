@@ -95,7 +95,7 @@ class AlergiaController extends Controller
      */
     public function show($id)
     {
-        
+
     }
 
     /**
@@ -119,7 +119,20 @@ class AlergiaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $alergia = Alergia::find($id);
+
+        $request->validate([
+            'alergia' => ['required', 'string', 'max:50'],
+            'grupo_alergia' => ['required', 'string', 'max:50'],
+        ]);
+
+        $alergia->alergia = $request->input('alergia');
+
+        $alergia->grupo_alergia = $request->input('grupo_alergia');
+
+        $alergia->save();
+
+        return redirect()->route('gestion-alergias.index')->with('success', 'Alergia actualizada correctamente');
     }
 
     /**
