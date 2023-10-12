@@ -110,59 +110,55 @@ class HorasDiasAtencionController extends Controller
     public function edit($id){
         $horario = HorariosAtencion::find($id);
         $nutricionista = Nutricionista::where('user_id', auth()->id())->first(); //Obtenemos al nutricionista
-        $dias = DiasAtencion::where('id', $horario->dia_atencion_id)->get(); //Obtenemos los días
+        $dia = DiasAtencion::where('id', $horario->dia_atencion_id)->first(); //Obtenemos los días
         $hora = HorasAtencion::where('id', $horario->hora_atencion_id)->first(); //Obtenemos las horas registradas
-        return view('nutricionista.atencion.edit', compact('horario', 'nutricionista', 'dias', 'hora'));
+        return view('nutricionista.atencion.edit', compact('horario', 'nutricionista', 'dia', 'hora'));
     }
 
     public function update(Request $request, $id)
     {
-         // Obtén el horario a actualizar
         $horario = HorariosAtencion::find($id);
 
-        // Validar los datos
-        $data = $request->validate([
-            'hora_inicio' => ['required', 'date_format:H:i'],
-            'hora_fin' => ['required', 'date_format:H:i'],
+        $rules = [
             'etiqueta' => ['required', 'string'],
-            'dias_atencion' => ['array', 'min:1'], // Validar que al menos un día esté seleccionado
-        ]);
+        ];
 
-        // Obtener las horas de atención actuales
-        $horaInicio = $data['hora_inicio'];
-        $horaFin = $data['hora_fin'];
-        $etiqueta = $data['etiqueta'];
-
-        // Obtener las horas de atención actuales
-        $horasAtencion = $horario->horasAtencion;
-
-        if ($horasAtencion) {
-            $horasAtencion->hora_inicio = $horaInicio;
-            $horasAtencion->hora_fin = $horaFin;
-            $horasAtencion->etiqueta = $etiqueta;
-            $horasAtencion->save();
-        } else {
-            return redirect()->back()->with('error', 'Horas de atención no encontradas');
+        // Agrega validación de hora solo si se proporciona un valor
+        if ($request->filled('hora_inicio') || $request->filled('hora_fin')) {
+            $rules['hora_inicio'] = ['required', 'date_format:H:i'];
+            $rules['hora_fin'] = ['required', 'date_format:H:i'];
         }
 
-        // Obtener los días de atención seleccionados
-        $dias = $data['dias_atencion'];
+        $datos = $request->validate($rules);
 
-        $diaIds = [];
+        if ($horario) {
 
-        // Obtener los IDs de los días de atención
-        foreach ($dias as $dia) {
-            $diaExistente = DiasAtencion::where('dia', $dia)->first();
-            if ($diaExistente) {
-                $diaIds[] = $diaExistente->id;
+            // Obtén las horas existentes con los mismos valores
+            $horaExistente = HorasAtencion::where([
+                'hora_inicio' => $request->input('hora_inicio'),
+                'hora_fin' => $request->input('hora_fin'),
+                'etiqueta' => $request->input('etiqueta'),
+            ])->first();
+
+            if (!$horaExistente) {
+                // Si no existe una hora con los mismos valores, crea una nueva
+                $horaExistente = HorasAtencion::create([
+                    'hora_inicio' => $request->input('hora_inicio'),
+                    'hora_fin' => $request->input('hora_fin'),
+                    'etiqueta' => $request->input('etiqueta'),
+                ]);
             }
+
+            // Asigna la hora existente al horario
+            $horario->hora_atencion_id = $horaExistente->id;
+            $horario->save();
+            
+            return redirect()->route('gestion-atencion.index')->with('success', 'Horario editado correctamente');
+        } else {
+            return redirect()->route('gestion-atencion.index')->with('error', 'No se pudo editar el horario');
         }
-
-        // Actualizar los días de atención
-        $horario->diasAtencion()->sync($diaIds);
-
-        return redirect()->route('nutricionista.atencion.index')->with('success', 'Horario modificado.');
     }
+
 
     public function destroy($id){
 

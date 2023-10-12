@@ -106,8 +106,10 @@
                                             @if ($hora->id == $horario->hora_atencion_id)
                                                 @if ($hora->etiqueta == 'Maniana')
                                                     @php $horarioManana = $hora->hora_inicio . ' - ' . $hora->hora_fin; @endphp
+                                                    @php $horarioIdManana = $horario->id; @endphp
                                                 @elseif ($hora->etiqueta == 'Tarde')
                                                     @php $horarioTarde = $hora->hora_inicio . ' - ' . $hora->hora_fin; @endphp
+                                                    @php $horarioIdTarde = $horario->id; @endphp
                                                 @endif
                                             @endif
                                         @endforeach
@@ -123,7 +125,7 @@
                                 <td>
                                     <div class="row">
                                         <div class="col-3">
-                                            <form action="{{ route('gestion-atencion.edit', $horario->id) }}" method="GET">
+                                            <form action="{{ route('gestion-atencion.edit', $horarioIdManana) }}" method="GET">
                                                 @csrf
                                                 <button type="submit" class="btn btn-primary">
                                                     <span class="far fa-edit"></span>
@@ -131,7 +133,7 @@
                                             </form>
                                         </div>
                                         <div class="col-3">
-                                            <form action="{{ route('gestion-atencion.destroy', $horario->id) }}" method="POST">
+                                            <form action="{{ route('gestion-atencion.destroy', $horarioIdManana) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger">
@@ -151,7 +153,7 @@
                                 <td>
                                     <div class="row">
                                         <div class="col-3">
-                                            <form action="{{ route('gestion-atencion.edit', $horario->id) }}" method="GET">
+                                            <form action="{{ route('gestion-atencion.edit', $horarioIdTarde) }}" method="GET">
                                                 @csrf
                                                 <button type="submit" class="btn btn-primary">
                                                     <span class="far fa-edit"></span>
@@ -159,7 +161,7 @@
                                             </form>
                                         </div>
                                         <div class="col-3">
-                                            <form action="{{ route('gestion-atencion.destroy', $horario->id) }}" method="POST">
+                                            <form action="{{ route('gestion-atencion.destroy', $horarioIdTarde) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger">

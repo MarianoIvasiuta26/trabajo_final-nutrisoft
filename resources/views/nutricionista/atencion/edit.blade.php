@@ -3,7 +3,6 @@
 @section('title', 'Editar horario de atención')
 
 @section('content_header')
-    <h1>Editar horario de atención</h1>
 @stop
 
 @section('content')
@@ -18,94 +17,52 @@
                 <div class="col-md-12">
                     <div class="card card-dark">
                         <div class="card-header">
-                            <h5>Días y horarios de Atención</h5>
+                            <h5>Editar horario de atención - {{$dia->dia}}</h5>
                         </div>
 
                         <div class="card-body">
+
+                            @if (session('success'))
+                                <div class="alert alert-success">
+                                    {{session('success')}}
+                                </div>
+                            @endif
+
+                            @if (session('error'))
+                                <div class="alert alert-danger">
+                                    {{session('error')}}
+                                </div>
+                            @endif
+
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <div class="mb-3">
-                                        <label class="form-label">Seleccione los días que realiza consultas:</label>
-
+                                        <label class="form-label">Día de consulta:</label>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Lunes" id="lunes"
-                                                @foreach ($dias as $dia)
-                                                    @if ($dia->dia == 'Lunes')
-                                                        checked
-                                                    @endif>
-                                                @endforeach
-                                                <label class="form-check-label" for="lunes">Lunes</label>
+                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="{{$dia->dia}}" id="lunes" checked disabled>
+                                                <label class="form-check-label" for="lunes">{{$dia->dia}}</label>
                                             </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Martes" id="martes"
-                                                @foreach ($dias as $dia)
-                                                    @if ($dia->dia == 'Martes')
-                                                        checked
-                                                    @endif>
-                                                @endforeach
-                                                <label class="form-check-label" for="martes">Martes</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Miercoles" id="miercoles"
-                                                @foreach ($dias as $dia)
-                                                    @if ($dia->dia == 'Miercoles')
-                                                        checked
-                                                    @endif>
-                                                @endforeach
-                                                <label class="form-check-label" for="miercoles">Miércoles</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Jueves" id="jueves"
-                                                @foreach ($dias as $dia)
-                                                    @if ($dia->dia == 'Jueves')
-                                                        checked
-                                                    @endif>
-                                                @endforeach
-                                                <label class="form-check-label" for="jueves">Jueves</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Viernes" id="viernes"
-                                                @foreach ($dias as $dia)
-                                                    @if ($dia->dia == 'Viernes')
-                                                        checked
-                                                    @endif>
-                                                @endforeach
-                                                <label class="form-check-label" for="viernes">Viernes</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Sabado" id="sabado"
-                                                @foreach ($dias as $dia)
-                                                    @if ($dia->dia == 'Sabado')
-                                                        checked
-                                                    @endif>
-                                                @endforeach
-                                                <label class="form-check-label" for="sabado">Sábado</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="dias_atencion[]" value="Domingo" id="domingo"
-                                                @foreach ($dias as $dia)
-                                                    @if ($dia->dia == 'Domingo')
-                                                        checked
-                                                    @endif>
-                                                @endforeach
-                                                <label class="form-check-label" for="domingo">Domingo</label>
-                                            </div>
-
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-9">
                                     <label class="form-label">Seleccione las horas que realiza consultas:</label>
                                     <div class="row mb-3">
                                         <div class="col">
                                             <label for="hora_inicio" class="form-label">Hora de Apertura</label>
                                             <input type="time" name="hora_inicio" id="hora_inicio" class="form-control" value="{{$hora->hora_inicio}}">
+                                            @error('hora_inicio')
+                                                <small class="text-danger">{{$message}}</small>
+                                            @enderror
                                         </div>
 
                                         <div class="col">
                                             <div class="mb-3">
                                                 <label for="hora_fin" class="form-label">Hora de Cierre</label>
                                                 <input type="time" name="hora_fin" id="hora_fin" class="form-control" value="{{$hora->hora_fin}}">
+                                                @error('hora_fin')
+                                                    <small class="text-danger">{{$message}}</small>
+                                                @enderror
                                             </div>
                                         </div>
 
@@ -113,14 +70,23 @@
                                             <label for="etiqueta">Seleccione la etiqueta del horario</label><br>
                                             <select name="etiqueta" class="selectpicker" data-style="btn-primary" title="Etiqueta del Horario...">
                                                 <option value="Maniana"
-                                                @if ($hora->etiqueta == 'Maniana')
-                                                    selected
-                                                @endif>Consultas de Mañana</option>
+                                                    @if ($hora->etiqueta == 'Maniana')
+                                                        selected
+                                                    @else
+                                                        disabled
+                                                    @endif
+                                                >Consultas de Mañana</option>
                                                 <option value="Tarde"
-                                                @if ($hora->etiqueta == 'Tarde')
-                                                    selected
-                                                @endif>Consultas de Tarde</option>
+                                                    @if ($hora->etiqueta == 'Tarde')
+                                                        selected
+                                                    @else
+                                                        disabled
+                                                    @endif
+                                                >Consultas de Tarde</option>
                                             </select>
+                                            @error('etiqueta')
+                                                <small class="text-danger">{{$message}}</small>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>
