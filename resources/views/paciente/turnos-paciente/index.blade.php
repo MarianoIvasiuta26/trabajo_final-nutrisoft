@@ -26,8 +26,13 @@
                     <div class="alert alert-warning" role="alert">
                         <h5>Turno pendiente</h5>
                         Usted tiene un turno pendiente para el día {{ \Carbon\Carbon::parse($turno->fecha)->format('d-m-Y') }} a las {{ $turno->hora }} hs.
-                        <br>Para cancelar el turno, haga click en el siguiente enlace:
-                        <br><a href="{{ route('turnos.destroy', $turno->id) }}" class="alert-link cancelar-turno-button">Cancelar turno</a>
+                        <br>Para cancelar el turno, haga click en el siguiente botón:
+                        <br>
+                        <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger cancelar-turno-button mt-3">Cancelar turno</button>
+                        </form>
                     </div>
                 @endif
             @endif

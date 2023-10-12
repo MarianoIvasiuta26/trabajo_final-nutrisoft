@@ -3,13 +3,13 @@
 @section('title', 'Editar Alimento')
 
 @section('content_header')
-    <h1>Editar Alimento</h1>
+
 @stop
 
 @section('content')
-    <div class="card card-dark">
+    <div class="card card-dark mt-3">
         <div class="card-header">
-            <h5>Alimento - {{$alimento->alimento}} </h5>
+            <h3>Editar Alimento</h3>
         </div>
         <div class="card-body">
 
@@ -95,7 +95,13 @@
                             </select>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary next-step">Siguiente</button>
+
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary next-step">Siguiente</button>
+                            <a href="{{route('gestion-alimentos.index')}}" class="btn btn-danger">Cancelar</a>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="step" id="step2">

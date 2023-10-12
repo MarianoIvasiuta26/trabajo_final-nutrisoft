@@ -37,14 +37,28 @@
                         </td>
                         <td>{{$alimento->estacional}}</td>
                         <td>{{$alimento->estacion}}</td>
-                        <td><a href="#">Ver valores nutricionales</a></td>
+                        <td><a class="btn btn-primary" href="{{route('gestion-alimentos.show', $alimento->id)}}">Ver valores nutricionales</a></td>
                         <td>
-                            <a class="btn btn-info" href="{{ route('gestion-alimentos.edit', $alimento->id) }}">Editar</a>
-                            <form action="{{ route('gestion-alimentos.destroy', $alimento->id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Borrar</button>
-                            </form>
+                            <div class="row">
+                                <div class="col-4">
+                                    <form action="{{ route('gestion-alimentos.edit', $alimento->id) }}" method="GET">
+                                        @csrf
+                                        <button type="submit" class="btn btn-primary">
+                                            <span class="far fa-edit"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="col-4">
+                                    <form action="{{ route('gestion-alimentos.destroy', $alimento->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">
+                                            <span class="far fa-trash-alt"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
                         </td>
                     </tr>
                 @endforeach

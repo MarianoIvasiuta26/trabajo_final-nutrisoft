@@ -19,16 +19,16 @@ class ValorNutricional extends Model
 
     public function alimento()
     {
-        return $this->belongsTo(Alimento::class, 'id_alimento');
+        return $this->belongsTo(Alimento::class, 'alimento_id');
     }
 
     public function fuenteAlimento()
     {
-        return $this->belongsTo(FuenteAlimento::class, 'id_fuente_alimento');
+        return $this->belongsTo(FuenteAlimento::class, 'fuente_alimento_id');
     }
 
     public function nutriente()
     {
-        return $this->belongsTo(Nutriente::class, 'id_nutriente');
+        return $this->belongsTo(Nutriente::class, 'nutriente_id');
     }
 }

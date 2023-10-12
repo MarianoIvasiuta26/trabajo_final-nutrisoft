@@ -108,34 +108,60 @@ class HorasDiasAtencionController extends Controller
 
 
     public function edit($id){
-        $nutricionista = Nutricionista::find($id);
-        return view('nutricionista.atencion.edit')->with('nutricionista', $nutricionista);
+        $horario = HorariosAtencion::find($id);
+        $nutricionista = Nutricionista::where('user_id', auth()->id())->first(); //Obtenemos al nutricionista
+        $dias = DiasAtencion::where('id', $horario->dia_atencion_id)->get(); //Obtenemos los días
+        $hora = HorasAtencion::where('id', $horario->hora_atencion_id)->first(); //Obtenemos las horas registradas
+        return view('nutricionista.atencion.edit', compact('horario', 'nutricionista', 'dias', 'hora'));
     }
 
     public function update(Request $request, $id)
     {
-        $nutri = Nutricionista::find($id);
+         // Obtén el horario a actualizar
+        $horario = HorariosAtencion::find($id);
 
-        Validator::make($request->all(), [
-            // Tus reglas de validación aquí...
-            'hora_inicio_maniana' => ['required', 'date_format:H:i'],
-            'hora_fin_maniana' => ['required', 'date_format:H:i'],
-            'hora_inicio_tarde' => ['required', 'date_format:H:i'],
-            'hora_fin_tarde' => ['required', 'date_format:H:i'],
-        ])->validate();
+        // Validar los datos
+        $data = $request->validate([
+            'hora_inicio' => ['required', 'date_format:H:i'],
+            'hora_fin' => ['required', 'date_format:H:i'],
+            'etiqueta' => ['required', 'string'],
+            'dias_atencion' => ['array', 'min:1'], // Validar que al menos un día esté seleccionado
+        ]);
 
-        if (!$nutri) {
-            $nutri->hora_inicio_maniana = $request->input('hora_inicio_maniana');
-            $nutri->hora_fin_maniana = $request->input('hora_fin_maniana');
-            $nutri->hora_inicio_tarde = $request->input('hora_inicio_tarde');
-            $nutri->hora_fin_tarde = $request->input('hora_fin_tarde');
-            $nutri->save();
+        // Obtener las horas de atención actuales
+        $horaInicio = $data['hora_inicio'];
+        $horaFin = $data['hora_fin'];
+        $etiqueta = $data['etiqueta'];
 
-            return $nutri;
-        } else{
-            return redirect()->route('nutricionista.atencion.index')->with('error', 'Usuario no encontrado');
+        // Obtener las horas de atención actuales
+        $horasAtencion = $horario->horasAtencion;
+
+        if ($horasAtencion) {
+            $horasAtencion->hora_inicio = $horaInicio;
+            $horasAtencion->hora_fin = $horaFin;
+            $horasAtencion->etiqueta = $etiqueta;
+            $horasAtencion->save();
+        } else {
+            return redirect()->back()->with('error', 'Horas de atención no encontradas');
         }
 
+        // Obtener los días de atención seleccionados
+        $dias = $data['dias_atencion'];
+
+        $diaIds = [];
+
+        // Obtener los IDs de los días de atención
+        foreach ($dias as $dia) {
+            $diaExistente = DiasAtencion::where('dia', $dia)->first();
+            if ($diaExistente) {
+                $diaIds[] = $diaExistente->id;
+            }
+        }
+
+        // Actualizar los días de atención
+        $horario->diasAtencion()->sync($diaIds);
+
+        return redirect()->route('nutricionista.atencion.index')->with('success', 'Horario modificado.');
     }
 
     public function destroy($id){

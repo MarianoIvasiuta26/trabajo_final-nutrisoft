@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ConfirmarAdelantamientoTurno;
 use App\Models\Consulta;
 use App\Models\DiasAtencion;
 use App\Models\HorariosAtencion;
@@ -13,10 +14,12 @@ use App\Models\Paciente\AdelantamientoTurno;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\TipoConsulta;
 use App\Models\Turno;
+use App\Models\TurnosTemporales;
 use Carbon\Carbon;
 use DateInterval;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class TurnoController extends Controller
 {
@@ -542,16 +545,22 @@ class TurnoController extends Controller
                                 //Recorremos y verificamos si tiene fijo el mismo día y hora que el turno cancelado
                                 foreach($adelantamientosPaciente as $adelantamientoPaciente){
                                     if($adelantamientoPaciente->dias_fijos == $diaSeleccionado && $adelantamientoPaciente->horas_fijas == $turnoCancelado->hora){
-                                        //Si tiene fijo el mismo día y hora, se le asigna el turno cancelado
 
-                                        $turno->paciente_id = $pacienteTurnoNuevo->id;
-                                        $turno->horario_id = $turnoCancelado->horario_id;
-                                        $turno->fecha = $turnoCancelado->fecha;
-                                        $turno->hora = $turnoCancelado->hora;
-                                        $turno->estado = 'Pendiente';
-                                        
-                                        $turno->save();
-                                        return redirect()->route('turnos.index')->with('info', 'Turno adelantado');
+                                        //Si encontramos el turno posible para adelantamientos, creamos el turno temporal
+                                        $turnoTemporal = TurnosTemporales::create([
+                                            'turno_id_cancelado' => $turnoCancelado->id,
+                                            'turno_id_adelantado' => $turno->id,
+                                            'confirmado' => 0,
+                                        ]);
+
+                                        $turnoTemporalId = $turnoTemporal->id;
+                                        $fechaAdelantado = $turnoCancelado->fecha;
+                                        $horaAdelantado = $turnoCancelado->hora;
+
+                                        //Una vez creado el turno temproal se envía el correo esperando la confirmación de este usuario
+                                        Mail::to($pacienteTurnoNuevo->user->email)->send(new ConfirmarAdelantamientoTurno($turnoTemporalId, $fechaAdelantado, $horaAdelantado));
+
+                                        return redirect()->route('turnos.index')->with('info', 'Esperando confirmación para adelantar turno.');
                                     }
                                 }
                             }
@@ -562,16 +571,21 @@ class TurnoController extends Controller
                         //Recorremos y verificamos si tiene fijo el mismo día y hora que el turno cancelado
                         foreach($adelantamientosPaciente as $adelantamientoPaciente){
                             if($adelantamientoPaciente->dias_fijos == $diaSeleccionado && $adelantamientoPaciente->horas_fijas == $turnoCancelado->hora){
-                                //Si tiene fijo el mismo día y hora, se le asigna el turno cancelado
 
-                                $turno->paciente_id = $pacienteTurnoNuevo->id;
-                                $turno->horario_id = $turnoCancelado->horario_id;
-                                $turno->fecha = $turnoCancelado->fecha;
-                                $turno->hora = $turnoCancelado->hora;
-                                $turno->estado = 'Pendiente';
+                                //Si encontramos el turno posible para adelantamientos, creamos el turno temporal
+                                $turnoTemporal = TurnosTemporales::create([
+                                    'turno_id_cancelado' => $turnoCancelado->id,
+                                    'turno_id_adelantado' => $turno->id,
+                                    'confirmado' => 0,
+                                ]);
 
-                                $turno->save();
-                                return redirect()->route('turnos.index')->with('info', 'Turno adelantado');
+                                $turnoTemporalId = $turnoTemporal->id;
+                                $fechaAdelantado = $turnoCancelado->fecha;
+                                $horaAdelantado = $turnoCancelado->hora;
+                                //Una vez creado el turno temproal se envía el correo esperando la confirmación de este usuario
+                                Mail::to($pacienteTurnoNuevo->user->email)->send(new ConfirmarAdelantamientoTurno($turnoTemporalId, $fechaAdelantado, $horaAdelantado));
+
+                                return redirect()->route('turnos.index')->with('info', 'Esperando confirmación para adelantar turno.');
                             }
                         }
                     }
@@ -582,6 +596,72 @@ class TurnoController extends Controller
         //Si no hay ningún turno pendiente o pacientes con el mismo día y hora disponible retornamos
 
         return redirect()->route('turnos.index')->with('info', 'No se adelantó ningún turno');
+    }
+
+    public function showConfirmacionNuevoTurno($turnoTemporalId){
+        //Buscamos en la tabla de turnos temporales el turno temporal
+        $turnoTemporal = TurnosTemporales::find($turnoTemporalId);
+
+        if($turnoTemporal){
+            //Buscamos la fecha y hora del turno cancelado
+            $turnoCancelado = Turno::find($turnoTemporal->turno_id_cancelado);
+
+            //Si se confirma el adelantamiento, buscamos el turno adelantado del turno temporal
+            $turnoAdelantado = Turno::find($turnoTemporal->turno_id_adelantado);
+
+            $pacienteTurnoNuevo = Paciente::find($turnoAdelantado->paciente_id);
+
+            return view('paciente.turnos-paciente.confirmacion-nuevo-turno', compact('turnoTemporal', 'turnoCancelado', 'turnoAdelantado', 'pacienteTurnoNuevo'));
+        }else{
+            return redirect()->route('turnos.index')->with('error', 'El turno temporal no existe.');
+        }
+    }
+
+    public function confirmarAdelantamientoTurno($turnoTemporalId){
+        //Buscamos en la tabla de turnos temporales el turno temporal
+        $turnoTemporal = TurnosTemporales::find($turnoTemporalId);
+
+        if($turnoTemporal){
+            //Buscamos la fecha y hora del turno cancelado
+            $turnoCancelado = Turno::find($turnoTemporal->turno_id_cancelado);
+
+            //Si se confirma el adelantamiento, buscamos el turno adelantado del turno temporal
+            $turnoAdelantado = Turno::find($turnoTemporal->turno_id_adelantado);
+
+            $turnoAdelantado->horario_id = $turnoCancelado->horario_id;
+            $turnoAdelantado->fecha = $turnoCancelado->fecha;
+            $turnoAdelantado->hora = $turnoCancelado->hora;
+            $turnoAdelantado->estado = 'Pendiente';
+
+            $turnoAdelantado->save();
+
+            //Cambiamos el estado del turno temporal a confirmado
+            $turnoTemporal->confirmado = 1;
+
+            $turnoTemporal->save();
+
+            return redirect()->route('turnos.index')->with('success', 'Turno adelantado correctamente.');
+        }else{
+            return redirect()->route('turnos.index')->with('error', 'El turno temporal no existe.');
+        }
+
+    }
+
+    public function rechazarAdelantamientoTurno($turnoTemporalId){
+        //Buscamos en la tabla de turnos temporales el turno temporal
+        $turnoTemporal = TurnosTemporales::find($turnoTemporalId);
+
+        if($turnoTemporal){
+            //Cambiamos el estado del turno temporal a rechazado
+            $turnoTemporal->rechazado = 1;
+
+            $turnoTemporal->save();
+
+            return redirect()->route('turnos.index')->with('success', 'Turno rechazado correctamente.');
+        } else{
+            return redirect()->route('turnos.index')->with('error', 'El turno temporal no existe.');
+        }
+
     }
 
     public function horasDisponibles(Request $request){
@@ -651,6 +731,19 @@ class TurnoController extends Controller
                                         $horaOcupada = true;
                                         break; // No necesitamos seguir buscando
                                     }
+
+                                    //Verificamos que tampoco hayan turnos temporales para adelantamientos
+                                    $turnoTemporalCancelado = TurnosTemporales::where('turno_id_cancelado', $turno->id)->where('confirmado', 0)->where('rechazado', 0);
+                                    $turnoTemporalAdelantado = TurnosTemporales::where('turno_id_adelantado', $turno->id)->where('confirmado', 0)->where('rechazado', 0);
+
+                                    if($turnoTemporalCancelado->exists() || $turnoTemporalAdelantado->exists()){
+                                        $horaTurno = Carbon::parse($turno->hora)->format('H:i');
+                                        if ($turno->fecha == $fechaSeleccionada && $horaTurno == $horaActual && $turno->estado == 'Pendiente') {
+                                            $horaOcupada = true;
+                                            break; // No necesitamos seguir buscando
+                                        }
+                                    }
+
                                 }
 
                                 // Si la hora no está ocupada, la agregamos a las disponibles
@@ -680,6 +773,17 @@ class TurnoController extends Controller
 
                                 // Comprobamos si hay un turno pendiente en esta hora
                                 foreach ($turnos as $turno) {
+                                    if ($turno->fecha == $fechaSeleccionada && $turno->hora == $horaActual && $turno->estado == 'Pendiente') {
+                                        $horaOcupada = true;
+                                        break; // No necesitamos seguir buscando
+                                    }
+                                }
+
+                                //Verificamos que tampoco hayan turnos temporales para adelantamientos
+                                $turnoTemporalCancelado = TurnosTemporales::where('turno_id_cancelado', $turno->id)->where('confirmado', 0);
+                                $turnoTemporalAdelantado = TurnosTemporales::where('turno_id_adelantado', $turno->id)->where('confirmado', 0);
+
+                                if($turnoTemporalCancelado->exists() || $turnoTemporalAdelantado->exists()){
                                     if ($turno->fecha == $fechaSeleccionada && $turno->hora == $horaActual && $turno->estado == 'Pendiente') {
                                         $horaOcupada = true;
                                         break; // No necesitamos seguir buscando

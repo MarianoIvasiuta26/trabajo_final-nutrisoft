@@ -105,7 +105,14 @@ class AlimentoController extends Controller
      */
     public function show($id)
     {
-        //
+        $alimento = Alimento::find($id);
+        $valoresNutricionales = ValorNutricional::all()->where('alimento_id', $alimento->id);
+        $grupos = GrupoAlimento::all();
+        $fuentes = FuenteAlimento::all();
+        $nutrientes = Nutriente::all();
+        $tipo_nutrientes = TipoNutriente::all();
+
+        return view('admin.gestion-alimentos.show', compact('fuentes', 'alimento', 'grupos', 'nutrientes', 'tipo_nutrientes', 'valoresNutricionales'));
     }
 
     /**
@@ -191,9 +198,13 @@ class AlimentoController extends Controller
     public function destroy($id)
     {
         $alimento = Alimento::find($id);
+        $valorNutricionales = ValorNutricional::all()->where('alimento_id', $id);
+
+        foreach($valorNutricionales as $valor){
+            $valor->delete();
+        }
+
         $alimento->delete();
-        $valorNutricional = ValorNutricional::where('alimento_id', $id);
-        $valorNutricional->delete();
         return redirect()->route('gestion-alimentos.index')->with('success', 'Alimento eliminado correctamente');
     }
 }

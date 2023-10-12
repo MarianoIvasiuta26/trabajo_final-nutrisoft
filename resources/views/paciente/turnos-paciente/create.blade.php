@@ -25,9 +25,12 @@
                     <div class="alert alert-warning" role="alert">
                         <h5>Ya tienes un turno solicitado</h5>
                         <p>Ya tienes un turno solicitado para el día {{$turno->fecha}} a las {{$turno->hora}} hs.</p>
-                        <p>Si desea cancelar su turno, haga click en el siguiente enlace:</p>
-                        <a href="{{ route('turnos.destroy', $turno->id) }}" class="alert-link">Cancelar mi turno</a>
-                    </div>
+                        <p>Si desea cancelar su turno, haga click en el siguiente botón:</p>
+                        <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger cancelar-turno-button">Cancelar turno</button>
+                        </form>                    </div>
                 @endif
             @endforeach
                 <div class="card card-dark">

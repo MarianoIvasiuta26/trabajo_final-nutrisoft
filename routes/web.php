@@ -82,6 +82,8 @@ Route::middleware([
     Route::get('gestion-atencion/consulta', [NutricionistaController::class, 'consultaForm'])->name('gestion-atencion.consultaForm');
     //Route::post('gestion-atencion/guardar', [NutricionistaController::class, 'guardarHorarios'])->name('gestion-atencion.guardarHorarios');
     Route::delete('gestion-atencion/{id}', [HorasDiasAtencionController::class, 'destroy'])->name('gestion-atencion.destroy');
+    Route::get('gestion-atencion/{id}', [HorasDiasAtencionController::class, 'edit'])->name('gestion-atencion.edit');
+    Route::post('gestion-atencion/update/{id}', [HorasDiasAtencionController::class, 'update'])->name('gestion-atencion.update');
     Route::post('gestion-atencion/guardar', [HorasDiasAtencionController::class, 'store'])->name('gestion-atencion.store');
     Route::resource('gestion-turnos-nutricionista', GestionTurnosController::class)->names('gestion-turnos-nutricionista');
     Route::get('gestion-turnos-nutricionista.showHistorialTurnos', [GestionTurnosController::class, 'showHistorialTurnos'])->name('gestion-turnos-nutricionista.showHistorialTurnos');
@@ -111,4 +113,8 @@ Route::middleware([
     Route::post('turnos.horas-disponibles', [TurnoController::class, 'horasDisponibles'])->name('turnos.horas-disponibles');
 
     Route::get('show-detalles-consulta/{id}', [TurnoController::class, 'showDetallesConsulta'])->name('turnos.show-detalles-consulta');
+
+    Route::get('obtener-confirmacion-nuevo-turno/{id}', [TurnoController::class, 'showConfirmacionNuevoTurno'])->name('obtener-confirmacion-nuevo-turno');
+    Route::post('confirmar-adelantamiento-turno/{id}', [TurnoController::class, 'confirmarAdelantamientoTurno'])->name('confirmar-adelantamiento-turno');
+    Route::post('rechazar-adelantamiento-turno/{id}', [TurnoController::class, 'rechazarAdelantamientoTurno'])->name('rechazar-adelantamiento-turno');
 });

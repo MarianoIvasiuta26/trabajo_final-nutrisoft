@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Lista de usuarios')
+@section('title', 'Horarios de atención')
 
 @section('content_header')
     <h1>Horas y días de atención</h1>
@@ -16,12 +16,13 @@
                 <tr>
                     <th scope="col">Días</th>
                     <th scope="col">Horario Mañana</th>
+                    <th scope="col">Acciones</th>
                     <th scope="col">Horario Tarde</th>
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {{--
+            {{--
                 @if ($nutricionista)
                     <tr>
                         <td>
@@ -90,50 +91,87 @@
                     @endif
                 @else
 
-                @endif --}}
+                @endif
+            --}}
 
                 @if (isset($nutricionista))
-
-                    @forelse ($dias as $dia)
+                    @foreach ($dias as $dia)
                         @if ($dia->seleccionado == true)
-                        <tr>
-                            <td>
-                                {{ $dia->dia }}
-                            </td>
-
-                            @php $morning = ''; $afternoon = ''; @endphp
-                            @foreach ($horarios as $horario)
-                                @if ($horario->dia_atencion_id == $dia->id)
-                                    @foreach ($horas as $hora)
-                                        @if ($hora->id == $horario->hora_atencion_id)
-                                            @if ($hora->etiqueta == 'Maniana')
-                                                @php $morning = $hora->hora_inicio . ' - ' . $hora->hora_fin; @endphp
-                                            @elseif ($hora->etiqueta == 'Tarde')
-                                                @php $afternoon = $hora->hora_inicio . ' - ' . $hora->hora_fin; @endphp
+                            <tr>
+                                <td>{{ $dia->dia }}</td>
+                                @php $horarioManana = ''; $horarioTarde = ''; @endphp
+                                @foreach ($horarios as $horario)
+                                    @if ($horario->dia_atencion_id == $dia->id)
+                                        @foreach ($horas as $hora)
+                                            @if ($hora->id == $horario->hora_atencion_id)
+                                                @if ($hora->etiqueta == 'Maniana')
+                                                    @php $horarioManana = $hora->hora_inicio . ' - ' . $hora->hora_fin; @endphp
+                                                @elseif ($hora->etiqueta == 'Tarde')
+                                                    @php $horarioTarde = $hora->hora_inicio . ' - ' . $hora->hora_fin; @endphp
+                                                @endif
                                             @endif
-                                        @endif
-                                    @endforeach
-                                @endif
-                            @endforeach
-
-                            <td>{{ $morning }}</td>
-                            <td>{{ $afternoon }}</td>
-
-                            <td>
-                                <form action="{{ route('gestion-atencion.destroy', $horario->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <input type="submit" value="Eliminar" class="btn btn-danger">
-                                </form>
-                            </td>
-                        </tr>
+                                        @endforeach
+                                    @endif
+                                @endforeach
+                                <td>
+                                    @if ($horarioManana)
+                                        {{ $horarioManana }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <form action="{{ route('gestion-atencion.edit', $horario->id) }}" method="GET">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary">
+                                                    <span class="far fa-edit"></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="col-3">
+                                            <form action="{{ route('gestion-atencion.destroy', $horario->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">
+                                                    <span class="far fa-trash-alt"></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if ($horarioTarde)
+                                        {{ $horarioTarde }}
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <form action="{{ route('gestion-atencion.edit', $horario->id) }}" method="GET">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary">
+                                                    <span class="far fa-edit"></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="col-3">
+                                            <form action="{{ route('gestion-atencion.destroy', $horario->id) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger">
+                                                    <span class="far fa-trash-alt"></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
                         @endif
-
-                    @empty
-                        <tr>
-                            <td colspan="4">No se encontraron registros de días y horarios de atención.</td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 @endif
             </tbody>
         </table>
@@ -164,10 +202,10 @@
                 "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
                 "language": {
                     "lengthMenu": "Mostrar _MENU_ turnos por página",
-                    "zeroRecords": "No se encontró ningún turno",
+                    "zeroRecords": "No se encontró ningún horario de atención.",
                     "info": "Mostrando la página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay registros de turnos",
-                    "infoFiltered": "(filtrado de _MAX_ turnos totales)",
+                    "infoEmpty": "No hay registros de horarios de atención.",
+                    "infoFiltered": "(filtrado de _MAX_ horarios de atención totales)",
                     "search": "Buscar:",
                     "paginate": {
                         "first": "Primero",
@@ -178,5 +216,25 @@
                 }
             });
         });
+
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('success')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                text: "{{session('error')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
     </script>
 @stop

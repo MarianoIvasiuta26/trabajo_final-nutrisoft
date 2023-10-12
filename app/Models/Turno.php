@@ -37,4 +37,15 @@ class Turno extends Model
     {
         return $this->hasOne(Consulta::class);
     }
+
+    public function turnosTemporalesCancelados()
+    {
+        return $this->hasMany(TurnosTemporales::class, 'turno_id_cancelado');
+    }
+
+    public function turnosTemporalesAdelantados()
+    {
+        return $this->hasMany(TurnosTemporales::class, 'turno_id_adelantado');
+    }
+
 }
