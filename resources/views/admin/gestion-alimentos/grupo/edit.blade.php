@@ -14,6 +14,7 @@
         <div class="card-body">
                 <form action="{{ route('gestion-grupos-alimento.update', $grupo->id)}}" method="POST">
                     @csrf
+                    @method('PUT')
 
                     <div class="col mb-3">
                         <label for="grupo">Nutriente</label>

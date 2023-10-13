@@ -311,23 +311,21 @@
                                                                         @foreach ($alimentos as $alimento)
                                                                             @forelse ($anamnesisAlimentaria as $anamnesis)
                                                                                 @if ($anamnesis->alimento_id == $alimento->id)
-                                                                                    @if ($anamnesis->gusta == 1 && $alimento->alimento != 'Sin Alimento' && count($anamnesisAlimentaria) > 1)
+                                                                                    @if ($anamnesis->gusta == 1)
                                                                                         <tr>
                                                                                             <td>{{ $alimento->alimento }}</td>
                                                                                             <td>
-                                                                                                <div class="btn-group">
-                                                                                                    <a class="btn btn-info" href="{{ route('datos-medicos.edit', $anamnesis->id) }}">Editar</a>
-                                                                                                    <form action="{{ route('datos-medicos.destroy', $anamnesis->id) }}" method="POST">
-                                                                                                        @csrf
-                                                                                                        @method('DELETE')
-                                                                                                        <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
-                                                                                                    </form>
-                                                                                                </div>
+                                                                                                @if ($alimento->alimento != 'Sin Alimento')
+                                                                                                    <div class="btn-group">
+                                                                                                        {{--<a class="btn btn-info" href="{{ route('datos-medicos.edit', $anamnesis->id) }}">Editar</a>--}}
+                                                                                                        <form action="{{ route('datos-medicos.destroy', $anamnesis->id) }}" method="POST">
+                                                                                                            @csrf
+                                                                                                            @method('DELETE')
+                                                                                                            <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                                                                        </form>
+                                                                                                    </div>
+                                                                                                @endif
                                                                                             </td>
-                                                                                        </tr>
-                                                                                    @else
-                                                                                        <tr>
-                                                                                            <td colspan="2"> {{$alimento->alimento}} </td>
                                                                                         </tr>
                                                                                     @endif
                                                                                 @endif
@@ -341,7 +339,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="accordion-item mb-3" id="alimentosNoPrefTabs">
-                                                        <!-- Alimentos Preferidos -->
+                                                        <!-- Alimentos No Preferidos -->
                                                         <div class="accordion-item">
                                                             <h2 class="accordion-header" id="alimentosNoPrefHeading">
                                                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#alimentosNoPrefCollapse" aria-expanded="true" aria-controls="alimentosNoPrefCollapse">
@@ -361,23 +359,21 @@
                                                                             @foreach ($alimentos as $alimento)
                                                                                 @forelse ($anamnesisAlimentaria as $anamnesis)
                                                                                     @if ($anamnesis->alimento_id == $alimento->id)
-                                                                                        @if ($anamnesis->gusta == 0 && $alimento->alimento != 'Sin Alimento' && count($anamnesisAlimentaria) > 1)
+                                                                                        @if ($anamnesis->gusta == 0)
                                                                                             <tr>
                                                                                                 <td>{{ $alimento->alimento }}</td>
                                                                                                 <td>
-                                                                                                    <div class="btn-group">
-                                                                                                        <a class="btn btn-info" href="{{ route('datos-medicos.edit', $anamnesis->id) }}">Editar</a>
-                                                                                                        <form action="{{ route('datos-medicos.destroy', $anamnesis->id) }}" method="POST">
-                                                                                                            @csrf
-                                                                                                            @method('DELETE')
-                                                                                                            <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
-                                                                                                        </form>
-                                                                                                    </div>
+                                                                                                    @if ($alimento->alimento != 'Sin Alimento')
+                                                                                                        <div class="btn-group">
+                                                                                                            {{--<a class="btn btn-info" href="{{ route('datos-medicos.edit', $anamnesis->id) }}">Editar</a>--}}
+                                                                                                            <form action="{{ route('datos-medicos.destroy', $anamnesis->id) }}" method="POST">
+                                                                                                                @csrf
+                                                                                                                @method('DELETE')
+                                                                                                                <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
+                                                                                                            </form>
+                                                                                                        </div>
+                                                                                                    @endif
                                                                                                 </td>
-                                                                                            </tr>
-                                                                                        @else
-                                                                                            <tr>
-                                                                                                <td colspan="2"> {{$alimento->alimento}} </td>
                                                                                             </tr>
                                                                                         @endif
                                                                                     @endif

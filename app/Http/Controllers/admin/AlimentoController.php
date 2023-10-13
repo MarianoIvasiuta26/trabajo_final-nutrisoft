@@ -94,7 +94,7 @@ class AlimentoController extends Controller
             }
 
         }
-        return redirect()->route('gestion-alimentos.create')->with('success', 'Alimento y sus valores nutricionales creados correctamente');
+        return redirect()->route('gestion-alimentos.index')->with('success', 'Alimento y sus valores nutricionales creados correctamente');
     }
 
     /**

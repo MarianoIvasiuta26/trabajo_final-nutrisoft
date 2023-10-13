@@ -177,7 +177,7 @@
                         <!-- Fin de pestañas desplegables -->
                     </div>
                     <button type="button" class="btn btn-primary prev-step">Anterior</button>
-                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-success guardar-button">Guardar</button>
                 </div>
             </form>
         </div>
@@ -192,9 +192,23 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+
+    <style>
+        .swal2-confirm {
+            margin-right: 5px; /* Ajusta el margen derecho del botón de confirmación */
+            font-size: 18px;
+        }
+
+        .swal2-cancel {
+            margin-left: 5px; /* Ajusta el margen izquierdo del botón de cancelación */
+            font-size: 18px;
+        }
+    </style>
 @stop
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script> console.log('Hi!'); </script>
     <!-- Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
@@ -244,6 +258,37 @@
         }
     });
 
+        //SweetAlert
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+        })
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const guardarButtons = document.querySelectorAll('.guardar-button');
 
+            // Agrega un controlador de clic a cada botón de eliminar
+            guardarButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Estás seguro de guardar el alimento con sus valores nutricionales?',
+                        text: 'Esta acción guardará el registro de alimento.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, Guardar alimento',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 @stop

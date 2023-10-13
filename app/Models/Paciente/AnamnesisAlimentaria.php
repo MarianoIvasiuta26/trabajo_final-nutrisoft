@@ -22,4 +22,5 @@ class AnamnesisAlimentaria extends Model
     public function alimento(){
         return $this->belongsTo('App\Models\Alimento');
     }
+    
 }

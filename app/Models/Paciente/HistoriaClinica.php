@@ -29,7 +29,7 @@ class HistoriaClinica extends Model
     }
 
     public function anamnesisAlimentaria(){
-        return $this->hasOne('App/Models/Paciente/AnamnesisAlimentaria');
+        return $this->hasMany('App/Models/Paciente/AnamnesisAlimentaria');
     }
 
     public function cirugiasPaciente(){
