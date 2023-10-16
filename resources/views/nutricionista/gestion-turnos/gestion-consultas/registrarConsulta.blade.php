@@ -49,7 +49,13 @@
                                 @endforeach
                             </select>
                             <div class="input-group-append">
-                                <a href="{{route('gestion-tratamientos.create')}}" class="btn btn-primary">Nuevo</a>
+                                <form action="{{route('gestion-tratamientos.create')}}" method="GET">
+                                    @csrf
+
+                                    <button type="button" class="btn btn-primary nuevo-tratamiento-button">
+                                        Nuevo
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -112,7 +118,7 @@
                         @error('altura_actual')
                             <span class="text-danger">{{$message}}</span>
                         @enderror
-                        
+
                     </div>
                 </div>
 
@@ -172,6 +178,99 @@
                     </div>
                 </div>
 
+                <div class="seccion mt-3">
+                    <h3>Datos para cálculos necesarios</h3>
+                    <div class="contenido">
+                        <div class="row mt-3">
+                            <h5>
+                                Cálculos necesarios
+                                <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="En esta sección debe seleccionar los cálculos que considere necesario para la generación del diagnóstico y del plan de alimentación del paciente.">
+                                    <i class="bi bi-question-circle"></i>
+                                </button>
+                            </h5>
+
+                            <span class="text-muted">Los cálculos con la etiqueta (*) significa que son obligatorios</span>
+                        </div>
+
+                        <div class="row">
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-outline-success">
+                                    <input class="btn-check" type="checkbox" name="calculo[]" value="imc" checked disabled> IMC (*)
+                                </label>
+                                <label class="btn btn-outline-success">
+                                    <input class="btn-check" type="checkbox" name="calculo[]" value="masa_grasa"> Masa Grasa
+                                </label>
+                                <label class="btn btn-outline-success">
+                                    <input class="btn-check" type="checkbox" name="calculo[]" value="masa_osea"> Masa Ósea
+                                </label>
+                                <label class="btn btn-outline-success">
+                                    <input class="btn-check" type="checkbox" name="calculo[]" value="masa_muscular"> Masa Muscular
+                                </label>
+                                <label class="btn btn-outline-success">
+                                    <input class="btn-check" type="checkbox" name="calculo[]" value="masa_residual"> Masa Residual
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <h5>
+                                Mediciones de Pliegues Cutáneos
+                                <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="(OPCIONAL) En esta sección puede ingresar las medidas de distintos pliegues cutáneos según sea necesario para los cálculos seleccionados arriba.">
+                                    <i class="bi bi-question-circle"></i>
+                                </button>
+                            </h5>
+
+                            <span class="text-muted">Si un pliegue cutáneo no es necesario para los cálculos a realizar puede dejarlo en blanco o escribir '0.00'</span>
+
+                        </div>
+
+                        <div class="row mt-3">
+                            @foreach ($plieguesCutaneos as $pliegue)
+                                <div class="col-md-6">
+                                    <label for="pliegue_{{$pliegue->id}}">{{$pliegue->nombre_pliegue}}</label>
+                                    <div class="input-group">
+                                        <input class="form-control" name="pliegue_{{$pliegue->id}}" id="pliegue_{{$pliegue->id}}" type="text">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">{{$pliegue->unidad_de_medida}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if ($loop->iteration % 2 == 0)
+                                    </div>
+                                    <div class="row mt-3">
+                                @endif
+
+                            @endforeach
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="float-right">
+                                    <form action="" method="POST">
+                                        @csrf
+                                        <button type="button" class="btn btn-success calcular-button">
+                                            Realizar cálculos
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="float-left">
+                                    <form action="{{route('gestion-pliegues-cutaneos.create')}}" method="GET">
+                                        @csrf
+
+                                        <button type="button" class="btn btn-primary nuevo-pliegue-button">
+                                            Nuevo pliegue cutáneo
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
                 <div class="row mt-3">
                     <div class="col">
                         <label for="diagnostico">Diagnóstico <span class="text-muted">(*)</span></label>
@@ -183,14 +282,16 @@
                 </div>
 
                 <div class="row mt-3">
-                    <div class="col-12">
-                        <div class="float-right">
-                            <button type="submit" class="btn btn-success">Guardar</button>
-                            <a href="{{ route('gestion-turnos-nutricionista.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
-                        </div>
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="button" class="btn btn-success guardar-button">Guardar</button>
+                        <form action="{{ route('gestion-turnos-nutricionista.index') }}" method="GET">
+                            @csrf
+                            <button class="btn btn-danger ml-2 cancelar-button" type="button">
+                                Cancelar
+                            </button>
+                        </form>
                     </div>
                 </div>
-
             </form>
         </div>
     </div>
@@ -200,10 +301,190 @@
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        .seccion {
+            border: 1px solid #ccc;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .seccion h3 {
+            background-color: #f2f2f2;
+            padding: 5px;
+            margin: 0;
+            border-bottom: 1px solid #ccc; /* Línea que separa el título del contenido */
+            text-align: center; /* Centra el título */
+        }
+
+        .seccion .contenido {
+            padding: 10px;
+        }
+
+        .swal2-confirm {
+            margin-right: 5px; /* Ajusta el margen derecho del botón de confirmación */
+            font-size: 18px;
+        }
+
+        .swal2-cancel {
+            margin-left: 5px; /* Ajusta el margen izquierdo del botón de cancelación */
+            font-size: 18px;
+        }
+    </style>
+
 @stop
 
 @section('js')
     <script> console.log('Hi!'); </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+        $(document).ready(function() {
+            $('[data-bs-toggle="popover"]').popover();
+        });
+
+        //SweetAlert2
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+        })
+
+        //SweetAlert botón de agregar un nuevo registro de tratamiento
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const nuevoTratamientoButton = document.querySelectorAll('.nuevo-tratamiento-button');
+
+            // Agrega un controlador de clic a cada botón de eliminar
+            nuevoTratamientoButton.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de agregar un nuevo tratamiento?',
+                        text: 'Al confirmar, se redirigirá a la página para registrar un nuevo tratamiento.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, registrar un nuevo tratamiento',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+        });
+
+        //SweetAlert botón de agregar un nuevo registro de pliegue
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const nuevoPliegueButton = document.querySelectorAll('.nuevo-pliegue-button');
+
+            // Agrega un controlador de clic a cada botón de eliminar
+            nuevoPliegueButton.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de agregar un nuevo Pliegue cutáneo?',
+                        text: 'Al confirmar, se redirigirá a la página para registrar un nuevo pliegue.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, registrar un nuevo pliegue cutáneo',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+        });
+
+        //SweetAlert botón de calcular los cálculos necesarios
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const calcularButton = document.querySelectorAll('.calcular-button');
+
+            // Agrega un controlador de clic a cada botón de eliminar
+            calcularButton.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de realizar los cálculos?',
+                        text: 'Al confirmar se calcularán automáticamente los cálculos seleccionados.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, realizar cálculos necesarios',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+        });
+
+        //SweetAlert botón cancelar registro de consulta
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const cancelarButton = document.querySelectorAll('.cancelar-button');
+
+            // Agrega un controlador de clic a cada botón de eliminar
+            cancelarButton.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de cancelar el registro de la consulta?',
+                        text: 'Al confirmar se redirigirá a la página de turnos pendientes y el turno no se habrá registrado perdiénse toda la información.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, cancelar registro de consulta.',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+        });
+
+        //SweetAlert para guardar consulta
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const guardarButton = document.querySelectorAll('.guardar-button');
+
+            // Agrega un controlador de clic a cada botón de eliminar
+            guardarButton.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar el registro de la consulta?',
+                        text: 'Al confirmar se generarán los planes de alimentación y de seguimiento para el paciente.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, registrar consulta.',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+        });
+
+    </script>
 @stop

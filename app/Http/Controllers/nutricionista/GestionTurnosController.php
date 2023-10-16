@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Paciente;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\TipoConsulta;
+use App\Models\TiposDePliegueCutaneo;
 use App\Models\Tratamiento;
 use App\Models\Turno;
 use Carbon\Carbon;
@@ -128,12 +129,13 @@ class GestionTurnosController extends Controller
         $tipoConsultas = TipoConsulta::all();
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
         $tratamientos = Tratamiento::all();
+        $plieguesCutaneos = TiposDePliegueCutaneo::all();
 
         if(!$historiaClinica){
             return redirect()->back()->with('error', 'No se encontró la historia clínica');
         }
 
-        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'tratamientos'));
+        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'tratamientos', 'plieguesCutaneos'));
     }
 
     public function confirmarInasistencia($id){
