@@ -36,4 +36,8 @@ class HistoriaClinica extends Model
         return $this->hasMany('App/Models/Paciente/CirugiasPaciente');
     }
 
+    public function medicionesDePlieguesCutaneos(){
+        return $this->hasMany('App/Models/MedicionesDePlieguesCutaneos');
+    }
+
 }

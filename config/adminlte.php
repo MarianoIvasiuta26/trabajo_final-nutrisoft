@@ -371,6 +371,12 @@ return [
         ],
 
         [
+            'text' => 'Pliegues Cutáneos',
+            'route' => 'gestion-pliegues-cutaneos.index',
+            'icon' => 'fas fa-ruler fa-fw',
+        ],
+
+        [
             'text' => 'Horarios de Atención',
             'route'  => 'gestion-atencion.index',
             'icon' => 'fas fa-lock fa-fw',

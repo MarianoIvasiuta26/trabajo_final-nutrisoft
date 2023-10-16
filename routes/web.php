@@ -17,6 +17,7 @@ use App\Http\Controllers\admin\IntoleranciaController;
 use App\Http\Controllers\admin\NutrienteController;
 use App\Http\Controllers\admin\PatologiaController;
 use App\Http\Controllers\nutricionista\GestionConsultasController;
+use App\Http\Controllers\nutricionista\GestionPlieguesCutaneosController;
 use App\Http\Controllers\nutricionista\GestionTurnosController;
 use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
@@ -65,7 +66,7 @@ Route::middleware([
 
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 
-    //Nutricionista
+
 
 /*
     Route::resources([
@@ -75,6 +76,9 @@ Route::middleware([
         'horario' => HorarioController::class,
     ]);
 */
+
+    //Nutricionista
+
     Route::get('completar-registro/{id}', [NutricionistaController::class, 'showRegistrationForm'])->name('mostrar-completar-registro');
     Route::post('completar-registro', [NutricionistaController::class, 'completarRegistro'])->name('completar-registro');
 
@@ -93,6 +97,8 @@ Route::middleware([
     Route::post('gestion-consultas.store/{id}', [GestionConsultasController::class, 'store'])->name('gestion-consultas.store');
 
     Route::resource('gestion-tratamientos', TratramientoController::class)->names('gestion-tratamientos');
+
+    Route::resource('gestion-pliegues-cutaneos', GestionPlieguesCutaneosController::class)->names('gestion-pliegues-cutaneos');
 
     //Paciente
 

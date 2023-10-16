@@ -28,4 +28,8 @@ class Consulta extends Model
     public function nutricionista(){
         return $this->belongsTo('App\Models\Nutricionista');
     }
+
+    public function medicionesDePlieguesCutaneos() {
+        return $this->hasMany(MedicionesDePlieguesCutaneos::class);
+    }
 }
