@@ -117,4 +117,7 @@ Route::middleware([
     Route::get('obtener-confirmacion-nuevo-turno/{id}', [TurnoController::class, 'showConfirmacionNuevoTurno'])->name('obtener-confirmacion-nuevo-turno');
     Route::post('confirmar-adelantamiento-turno/{id}', [TurnoController::class, 'confirmarAdelantamientoTurno'])->name('confirmar-adelantamiento-turno');
     Route::post('rechazar-adelantamiento-turno/{id}', [TurnoController::class, 'rechazarAdelantamientoTurno'])->name('rechazar-adelantamiento-turno');
+
+    //Proceso automatizado Generación automática de Planes de Alimentación
+    Route::get('generar-plan-alimentacion', [GestionConsultasController::class, 'generarPlanesAlimentacion'])->name('generar-plan-alimentacion');
 });

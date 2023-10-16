@@ -15,7 +15,9 @@ class TratramientoController extends Controller
      */
     public function index()
     {
-        //
+        $tratamientos = Tratamiento::all();
+
+        return view('nutricionista.gestion-tratamientos.index', compact('tratamientos'));
     }
 
     /**
@@ -73,8 +75,18 @@ class TratramientoController extends Controller
      */
     public function edit($id)
     {
-        //
+        // Buscamos el tratamiento
+        $tratamiento = Tratamiento::find($id);
+
+        // Si no existe lanzamos error
+        if(!$tratamiento){
+            return redirect()->back()->with('error', 'Error al encontrar el tratamiento a editar');
+        }
+
+        // Si existe retornamos la vista con el tratamiento
+        return view('nutricionista.gestion-tratamientos.edit', compact('tratamiento'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -85,7 +97,24 @@ class TratramientoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $tratamiento = Tratamiento::find($id);
+
+        if(!$tratamiento){
+            return redirect()->back()->with('error', 'Tratamiento no encontrado');
+        }
+
+        $request->validate([
+            'tratamiento' => ['required', 'string', 'max:50'],
+        ]);
+
+        $tratamiento->tratamiento = $request->input('tratamiento');
+
+        if($tratamiento->save()){
+            return redirect()->route('gestion-tratamientos.index')->with('success', 'Tratamiento actualizado correctamente');
+        } else {
+            return redirect()->back()->with('error', 'Error al actualizar el tratamiento');
+        }
+
     }
 
     /**
@@ -96,6 +125,16 @@ class TratramientoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $tratamiento = Tratamiento::find($id);
+
+        if(!$tratamiento){
+            return redirect()->back()->with('error', 'Tratamiento no encontrado');
+        }
+
+        if($tratamiento->delete()){
+            return redirect()->back()->with('success', 'Tratamiento eliminado correctamente');
+        } else {
+            return redirect()->back()->with('error', 'Error al eliminar el tratamiento');
+        }
     }
 }

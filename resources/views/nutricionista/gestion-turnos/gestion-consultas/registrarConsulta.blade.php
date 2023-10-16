@@ -39,7 +39,7 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <label for="tratamiento_paciente">Tratamiento <span class="text-muted">(*)</span></label>
                         <div class="input-group">
@@ -112,6 +112,7 @@
                         @error('altura_actual')
                             <span class="text-danger">{{$message}}</span>
                         @enderror
+                        
                     </div>
                 </div>
 

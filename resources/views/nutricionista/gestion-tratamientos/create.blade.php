@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Agregar nuevo usuario')
+@section('title', 'Agregar nuevo tratamiento')
 
 @section('content_header')
 @stop

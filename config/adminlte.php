@@ -365,6 +365,12 @@ return [
         ],
 
         [
+            'text' => 'Gestión Tratamientos',
+            'route' => 'gestion-tratamientos.index',
+            'icon' => 'fas fa-comment-medical fa-fw',
+        ],
+
+        [
             'text' => 'Horarios de Atención',
             'route'  => 'gestion-atencion.index',
             'icon' => 'fas fa-lock fa-fw',

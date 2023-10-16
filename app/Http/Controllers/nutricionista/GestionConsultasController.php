@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Consulta;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
+use App\Models\Paciente\AnamnesisAlimentaria;
+use App\Models\Paciente\CirugiasPaciente;
+use App\Models\Paciente\DatosMedicos;
+use App\Models\Paciente\HistoriaClinica;
 use App\Models\TipoConsulta;
 use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
@@ -100,8 +104,175 @@ class GestionConsultasController extends Controller
 
         $turno->estado = 'Realizado';
         $turno->save();
+
+        //Obtener paciente de la consulta
+        $paciente = Paciente::find($turno->paciente_id);
+
+        if( $turno->estado = 'Realizado'){
+            $this->generarPlanesAlimentacion($paciente->id);
+        }
+
         return redirect()->route('gestion-turnos-nutricionista.index')->with('success', 'Consulta realizada con éxito');
 
+
+    }
+
+    //Función para el 2do proceso automatizado: Generación automática de Plan de alimentación
+    public function generarPlanesAlimentacion($id){
+        //Buscamos el paciente
+        $paciente = Paciente::find($id);
+
+        //Buscamos historia clínica del paciente
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        //Buscamos datos médicos del paciente
+        $datosMedicos = DatosMedicos::where('historia_clinica', $historiaClinica->id)->get();
+
+        //Cirugías del paciente
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica', $historiaClinica->id)->get();
+
+        //Anamnesis alimentaria del paciente
+        $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica', $historiaClinica->id)->get();
+
+        //Obtenemos el tratamiento activo del paciente
+        $tratamientoActivo = TratamientoPorPaciente::where('paciente_id', $paciente->id)->where('estado', 'Activo')->first();
+
+        //Obtenemos el tipo de consulta
+        $tipoConsulta = TipoConsulta::where('nombre', 'Primera consulta')->first();
+
+        //Obtenemos el nutricionista
+        $nutricionista = Nutricionista::where('user_id', auth()->user()->id)->first();
+
+        /* Ver si usar estos o no */
+
+        //Obtenemos el turno
+        $turno = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')->first();
+
+        //Obtenemos la consulta
+        $consulta = Consulta::where('turno_id', $turno->id)->first();
+
+        //Comenzamos a implementar la lógica para generar el plan
+
+        //Primero debemos calcular el IMC del paciente para saber si está normal o no
+        $imc = $consulta->peso_actual / ($consulta->altura_actual * $consulta->altura_actual);
+
+        //Si el IMC es menor a 18.5, el paciente está bajo de peso
+        if($imc >= 18.5 && $imc <= 25){
+            //IMC normal
+            //Usamos la fórmula de Mifflin St. Jeor (No recomendable en pacientes menores de 18 años)
+            //para calcular el gasto energético basal
+            if($paciente->edad > 18){
+                if($paciente->sexo == 'Masculino'){
+                    $gastoEnergeticoBasal = (10 * $consulta->peso_actual) + (6.25 * $consulta->altura_actual) - (5 * $paciente->edad) + 5;
+                }else{
+                    $gastoEnergeticoBasal = (10 * $consulta->peso_actual) + (6.25 * $consulta->altura_actual) - (5 * $paciente->edad) - 161;
+                }
+
+                //Calculamos el gasto energético total
+
+                if($historiaClinica->estilo_vida == 'Sedentario'){
+                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.2;
+                } else if ($historiaClinica->estilo_vida == 'Ligeramente activo'){
+                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.375;
+                } else if ($historiaClinica->estilo_vida == 'Moderadamente activo'){
+                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.55;
+                } else if ($historiaClinica->estilo_vida == 'Muy activo'){
+                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.725;
+                } else if ($historiaClinica->estilo_vida == 'Extra activo'){
+                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.9;
+                }
+
+                //Verificamos cual es el objetivo de salud del paciente
+                if($historiaClinica->objetivo_salud == 'Adelgazar'){
+                    $gastoEnergeticoTotal = $gastoEnergeticoTotal - 500;
+                } else if ($historiaClinica->objetivo_salud == 'Ganar masa muscular'){
+                    $gastoEnergeticoTotal = $gastoEnergeticoTotal + 500;
+                } else if ($historiaClinica->objetivo_salud == 'Mantener peso'){
+                    $gastoEnergeticoTotal = $gastoEnergeticoTotal;
+                }
+                    //Calculamos el porcentaje de macronutrientes
+                    $proteinas = $gastoEnergeticoTotal * 0.15;
+                    $grasas = $gastoEnergeticoTotal * 0.3;
+                    $carbohidratos = $gastoEnergeticoTotal * 0.55;
+
+                    //Calculamos el porcentaje de micronutrientes
+
+                    $calcio = $gastoEnergeticoTotal * 0.01;
+                    $fosforo = $gastoEnergeticoTotal * 0.01;
+                    $magnesio = $gastoEnergeticoTotal * 0.004;
+                    $potasio = $gastoEnergeticoTotal * 0.004;
+                    $sodio = $gastoEnergeticoTotal * 0.0015;
+                    $cloro = $gastoEnergeticoTotal * 0.0023;
+                    $hierro = $gastoEnergeticoTotal * 0.00002;
+                    $zinc = $gastoEnergeticoTotal * 0.00002;
+                    $selenio = $gastoEnergeticoTotal * 0.0000004;
+                    $yodo = $gastoEnergeticoTotal * 0.00000015;
+                    $vitaminaA = $gastoEnergeticoTotal * 0.0000009;
+                    $vitaminaD = $gastoEnergeticoTotal * 0.000000015;
+                    $vitaminaE = $gastoEnergeticoTotal * 0.0000009;
+                    $vitaminaC = $gastoEnergeticoTotal * 0.000009;
+                    $vitaminaB1 = $gastoEnergeticoTotal * 0.0000009;
+                    $vitaminaB2 = $gastoEnergeticoTotal * 0.0000009;
+                    $vitaminaB3 = $gastoEnergeticoTotal * 0.0000009;
+                    $vitaminaB6 = $gastoEnergeticoTotal * 0.0000009;
+                    $vitaminaB9 = $gastoEnergeticoTotal * 0.0000009;
+                    $vitaminaB12 = $gastoEnergeticoTotal * 0.0000009;
+
+                    //Calculamos el porcentaje de fibra
+
+                    $fibra = $gastoEnergeticoTotal * 0.0000009;
+
+                    //Calculamos el porcentaje de agua
+
+                    $agua = $gastoEnergeticoTotal * 0.0000009;
+
+                    //Calculamos el porcentaje de colesterol
+
+                    $colesterol = $gastoEnergeticoTotal * 0.0000009;
+
+                    //Calculamos el porcentaje de alcohol
+
+                    $alcohol = $gastoEnergeticoTotal * 0.0000009;
+
+                    //Calculamos el porcentaje de cafeína
+
+                    $cafeina = $gastoEnergeticoTotal * 0.0000009;
+
+                    //Calculamos el porcentaje de azúcar
+
+                    $azucar = $gastoEnergeticoTotal * 0.0000009;
+
+            } else if($paciente->edad < 3){
+                //Usamos fórmula de Schofield
+
+                if($paciente->sexo == 'Masculino'){
+                    $gastoEnergeticoBasal = (0.0007 * $consulta->peso_actual) + (6.349 * $consulta->altura_actual) - 2.584;
+                }else if ($paciente->sexo == 'Femenino'){
+                    $gastoEnergeticoBasal = (0.068 * $consulta->peso_actual) + (4.281 * $consulta->altura_actual) - 1.730;
+                }
+
+            }else if($paciente->edad >= 3 && $paciente->edad < 10){
+                //Usamos fórmula de Schofield
+
+                if($paciente->sexo == 'Masculino'){
+                    $gastoEnergeticoBasal = (0.082 * $consulta->peso_actual) + (0.545 * $consulta->altura_actual) - 1.736;
+
+                }else if($paciente->sexo == 'Femenino'){
+                    $gastoEnergeticoBasal = (0.071 * $consulta->peso_actual) + (0.677 * $consulta->altura_actual) - 1.553;
+                }
+            }else if($paciente->edad >= 11 && $paciente->edad <18){
+                //Usamos fórmula de Schofield
+
+                if($paciente->sexo == 'Masculino'){
+                    $gastoEnergeticoBasal = (0.068 * $consulta->peso_actual) + (0.574 * $consulta->altura_actual) - 2.157;
+
+                }else if($paciente->sexo == 'Femenino'){
+                    $gastoEnergeticoBasal = (0.035 * $consulta->peso_actual) + (1.9484 * $consulta->altura_actual) - 0.837;
+                }
+            }
+
+        }
+        return view('nutricionista.gestion-consultas.generar-plan-alimentacion', compact('paciente', 'historiaClinica', 'datosMedicos', 'cirugiasPaciente', 'anamnesisPaciente', 'tratamientoActivo', 'tipoConsulta', 'nutricionista', 'turno', 'consulta', 'imc', 'gastoEnergeticoBasal', 'gastoEnergeticoTotal', 'proteinas', 'grasas', 'carbohidratos', 'calcio', 'fosforo', 'magnesio', 'potasio', 'sodio', 'cloro', 'hierro', 'zinc', 'selenio', 'yodo', 'vitaminaA', 'vitaminaD', 'vitaminaE', 'vitaminaC', 'vitaminaB1', 'vitaminaB2', 'vitaminaB3', 'vitaminaB6', 'vitaminaB9', 'vitaminaB12', 'fibra', 'agua', 'colesterol', 'alcohol', 'cafeina', 'azucar'));
 
     }
 
@@ -149,4 +320,7 @@ class GestionConsultasController extends Controller
     {
         //
     }
+
+
+
 }
