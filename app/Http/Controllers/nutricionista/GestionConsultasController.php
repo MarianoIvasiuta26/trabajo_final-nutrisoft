@@ -11,6 +11,7 @@ use App\Models\Paciente\CirugiasPaciente;
 use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\TipoConsulta;
+use App\Models\TiposDePliegueCutaneo;
 use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
 use Illuminate\Http\Request;
@@ -108,10 +109,12 @@ class GestionConsultasController extends Controller
         //Obtener paciente de la consulta
         $paciente = Paciente::find($turno->paciente_id);
 
-        if( $turno->estado = 'Realizado'){
+        //DESCOMENTAR
+    /*
+        if( $turno->estado == 'Realizado'){
             $this->generarPlanesAlimentacion($paciente->id);
         }
-
+    */
         return redirect()->route('gestion-turnos-nutricionista.index')->with('success', 'Consulta realizada con éxito');
 
 
@@ -273,7 +276,6 @@ class GestionConsultasController extends Controller
 
         }
         return view('nutricionista.gestion-consultas.generar-plan-alimentacion', compact('paciente', 'historiaClinica', 'datosMedicos', 'cirugiasPaciente', 'anamnesisPaciente', 'tratamientoActivo', 'tipoConsulta', 'nutricionista', 'turno', 'consulta', 'imc', 'gastoEnergeticoBasal', 'gastoEnergeticoTotal', 'proteinas', 'grasas', 'carbohidratos', 'calcio', 'fosforo', 'magnesio', 'potasio', 'sodio', 'cloro', 'hierro', 'zinc', 'selenio', 'yodo', 'vitaminaA', 'vitaminaD', 'vitaminaE', 'vitaminaC', 'vitaminaB1', 'vitaminaB2', 'vitaminaB3', 'vitaminaB6', 'vitaminaB9', 'vitaminaB12', 'fibra', 'agua', 'colesterol', 'alcohol', 'cafeina', 'azucar'));
-
     }
 
     /**
@@ -321,6 +323,213 @@ class GestionConsultasController extends Controller
         //
     }
 
+    //Función para realizar los cálculos necesarios que selecciona en la consulta
 
+    public function realizarCalculos(Request $request){
+
+        // Obtenemos los datos del formulario
+        $paciente = Paciente::find($request->input('paciente'));
+
+        // Recopilamos los datos de la solicitud
+        $pesoActual = floatval($request->input('peso'));
+        $alturaActual = floatval($request->input('altura'));
+        $calculosSeleccionados = $request->input('calculosSeleccionado');
+        $plieguesSeleccionado = $request->input('plieguesSeleccionado');
+
+        // Realiza los cálculos necesarios aquí
+
+        $imc = 0;
+        $pesoIdeal = 0;
+        $masaGrasa = 0;
+        $masaOsea = 0;
+        $masaResidual = 0;
+        $masaMuscular = 0;
+
+        //Calculamos el IMC
+        if(in_array('imc', $calculosSeleccionados) && $pesoActual && $alturaActual){
+            //Primero pasamos la altura de cm a m
+            $alturaMetro = $alturaActual / 100;
+            $imc = $pesoActual / ($alturaMetro * $alturaMetro);
+
+            //Calculamos el peso ideal
+
+            if($imc < 18.5){
+                $pesoIdeal = 18.5 * ($alturaMetro * $alturaMetro); //Bajo peso
+            }else if($imc >= 18.5 && $imc <= 25){
+                $pesoIdeal = $pesoActual; //Peso normal
+            }else if($imc > 25){
+                $pesoIdeal = 25 * ($alturaMetro * $alturaMetro); //Sobrepeso
+            }else if($imc >= 30 && $imc < 35){
+                $pesoIdeal = 30 * ($alturaMetro * $alturaMetro); //Obesidad grado 1
+            }else if($imc >= 35 && $imc <= 40){
+                $pesoIdeal = 35 * ($alturaMetro * $alturaMetro); //Obesidad grado 2
+            }else if($imc > 40){
+                $pesoIdeal = 40 * ($alturaMetro * $alturaMetro); //Obesidad grado 3 o mórbida
+            }
+        }
+
+        //Calculamos masa grasa
+
+        if(in_array('masa_grasa', $calculosSeleccionados)){
+
+            // Calcula la sumatoria de los pliegues cutáneos
+            $sumatoriaPliegues = 0;
+
+            //Pliegues a sumar
+            $biceps = TiposDePliegueCutaneo::where('nombre_pliegue', '=', 'Pliegue del Bíceps')->first();
+            $triceps = TiposDePliegueCutaneo::where('nombre_pliegue', '=', 'Pliegue del Tríceps')->first();
+            $subescapular = TiposDePliegueCutaneo::where('nombre_pliegue', '=', 'Pliegue Subescapular')->first();
+            $suprailiaco = TiposDePliegueCutaneo::where('nombre_pliegue', '=', 'Pliegue del Suprailiaco')->first();
+
+            $plieguesASumar = ['pliegue_'.$triceps->id, 'pliegue_'.$biceps->id, 'pliegue_'.$subescapular->id, 'pliegue_'.$suprailiaco->id];
+
+            // Suma los valores de los pliegues cutáneos
+            foreach ($plieguesASumar as $nombreCampo) {
+                if (array_key_exists($nombreCampo, $plieguesSeleccionado)) {
+                    $valorPliegue = floatval($plieguesSeleccionado[$nombreCampo]);
+                    $sumatoriaPliegues += $valorPliegue;
+                }
+            }
+
+            //Ecuación deDurnin & Womersley
+
+            $densidadCorporal = 0;
+
+            //Separamos según sexo y edad
+            if($paciente->sexo == 'Masculino'){
+                //Hombres entre 17 y 19 años
+                if($paciente->edad >= 17 && $paciente->edad <= 19){
+                    $densidadCorporal = 1.1620 - (0.0630 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }
+                //Hombres entre 20 y 29 años
+                if($paciente->edad >= 20 && $paciente->edad <= 29){
+                    $densidadCorporal = 1.1631 - (0.0632 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }else if($paciente->edad >= 30 && $paciente->edad <= 39){
+                    //Hombres entre 30 y 39 años
+                    $densidadCorporal = 1.1422 - (0.0544 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }else if($paciente->edad >= 40 && $paciente->edad <= 49){
+                    //Hombres entre 40 y 49 años
+                    $densidadCorporal = 1.1620 - (0.0700 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }else if($paciente->edad >= 50 && $paciente->edad <= 72){
+                    //Hombres entre 50 y 72 años
+                    $densidadCorporal = 1.1715 - (0.0779 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }
+            } else if($paciente->sexo == 'Femenino'){
+                //Mujeres entre 17 y 19 años
+                if($paciente->edad >= 17 && $paciente->edad <= 19){
+                    $densidadCorporal = 1.1549 - (0.0678 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }
+                //Mujeres entre 20 y 29 años
+                if($paciente->edad >= 20 && $paciente->edad <= 29){
+                    $densidadCorporal = 1.1599 - (0.0717 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }else if($paciente->edad >= 30 && $paciente->edad <= 39){
+                    //Mujeres entre 30 y 39 años
+                    $densidadCorporal = 1.1423 - (0.0632 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }else if($paciente->edad >= 40 && $paciente->edad <= 49){
+                    //Mujeres entre 40 y 49 años
+                    $densidadCorporal = 1.1333 - (0.0612 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }else if($paciente->edad >= 50 && $paciente->edad <= 68){
+                    //Mujeres entre 50 y 68 años
+                    $densidadCorporal = 1.1339 - (0.0645 * log10($sumatoriaPliegues));
+                    $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                }
+            }
+        }
+
+        //Calculamos masa residual
+        $masaResidual = 0;
+        if(in_array('masa_residual', $calculosSeleccionados)){
+            if($paciente->sexo == 'Masculino'){
+                $masaResidual = 0.241 * $pesoActual; //en Kg
+            }else if($paciente->sexo == 'Femenino'){
+                $masaResidual = 0.209 * $pesoActual; //en Kg
+            }
+        }
+
+
+        //Calculamos masa ósea
+        //Ecuación de Martin
+        if(in_array('masa_osea', $calculosSeleccionados)){
+            $sumatoriaDiametros = 0;
+
+            //Diametros a sumar
+            $humero = TiposDePliegueCutaneo::where('nombre_pliegue', '=', 'Diámetro de Húmero')->first();
+            $femur = TiposDePliegueCutaneo::where('nombre_pliegue', '=', 'Diámetro de Fémur')->first();
+            $muneca = TiposDePliegueCutaneo::where('nombre_pliegue', '=', 'Diámetro de Muñeca')->first();
+            $tobillo = TiposDePliegueCutaneo::where('nombre_pliegue', '=', 'Diámetro de Tobillo')->first();
+
+            $diametrosASumar = ['pliegue_'.$humero->id, 'pliegue_'.$femur->id, 'pliegue_'.$muneca->id, 'pliegue_'.$tobillo->id];
+
+            // Suma los valores de los pliegues cutáneos
+            foreach ($diametrosASumar as $nombreCampo) {
+                // Asegúrate de que el nombre del campo comienza con "pliegue_"
+                if (array_key_exists($nombreCampo, $plieguesSeleccionado)) {
+                    $valorDiametro = floatval($plieguesSeleccionado[$nombreCampo]);
+                    $sumatoriaDiametros += $valorDiametro;
+                }
+            }
+
+            //Masa osea Kg
+            $masaOsea = 0.00006*$pesoActual*($sumatoriaDiametros*$sumatoriaDiametros);
+        }
+
+        //Calculamos masa muscular
+        //Ecuación de De Rose y Guimaraes
+
+        if(in_array('masa_muscular', $calculosSeleccionados)){
+            $sumatoriaMasas = ($masaGrasa + $masaOsea + $masaResidual);
+
+            //Masa muscular Kg
+            $masaMuscular = $pesoActual - $sumatoriaMasas;
+        }
+
+        //Generamos diagnóstico
+
+        $diagnostico = '';
+
+        if(in_array('imc', $calculosSeleccionados)){
+            $diagnostico .= "IMC: $imc, ";
+        }
+
+
+        if (in_array('masa_grasa', $calculosSeleccionados)) {
+            $diagnostico .= "Masa Grasa: $masaGrasa%, ";
+        }
+
+        if (in_array('masa_osea', $calculosSeleccionados)) {
+            $diagnostico .= "Masa Ósea: $masaOsea Kg, ";
+        }
+
+        if (in_array('masa_residual', $calculosSeleccionados)) {
+            $diagnostico .= "Masa Residual: $masaResidual Kg, ";
+        }
+
+        if (in_array('masa_muscular', $calculosSeleccionados)) {
+            $diagnostico .= "Masa Muscular: $masaMuscular Kg, ";
+        }
+
+        // Quita la coma y el espacio extra al final del diagnóstico
+        $diagnostico = rtrim($diagnostico, ', ');
+
+        return response()->json([
+            'diagnostico' => $diagnostico,
+            'imc' => $imc,
+            'pesoIdeal' => $pesoIdeal,
+            'masaGrasa' => $masaGrasa,
+            'masaOsea' => $masaOsea,
+            'masaResidual' => $masaResidual,
+            'masaMuscular' => $masaMuscular,
+        ]);
+
+    }
 
 }
