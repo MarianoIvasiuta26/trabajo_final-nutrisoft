@@ -389,11 +389,15 @@
                     },
                     success: function(data){
                         //Si la petición es correcta, mostramos los resultados
-                        // Convierte el objeto en una cadena JSON legible
-                        var jsonData = JSON.stringify(data);
+                        // Formatea los datos y asigna la representación de cadena al textarea
+                        const formattedData = "IMC: " + data.imc + "\n" +
+                            "Peso Ideal: " + data.pesoIdeal + "\n" +
+                            "Masa Grasa: " + data.masaGrasa + "\n" +
+                            "Masa Ósea: " + data.masaOsea + " Kg\n" +
+                            "Masa Residual: " + data.masaResidual + " Kg\n" +
+                            "Masa Muscular: " + data.masaMuscular + " Kg";
 
-                        // Asigna la cadena al elemento "resultados"
-                        document.getElementById('diagnostico').value = jsonData;
+                        document.getElementById('diagnostico').value = formattedData;
                     },
                     error: function (error) {
                         console.log(error);
@@ -462,7 +466,7 @@
                     });
                 });
             });
-
+/*
             //SweetAlert botón de calcular los cálculos necesarios
             document.addEventListener('DOMContentLoaded', function () {
                 // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -488,7 +492,7 @@
                     });
                 });
             });
-
+*/
             //SweetAlert botón cancelar registro de consulta
             document.addEventListener('DOMContentLoaded', function () {
                 // Selecciona todos los botones de eliminar con la clase 'delete-button'
