@@ -13,7 +13,7 @@
         </div>
 
         <div class="card-body">
-            <form action="{{route('gestion-consultas.store', $turno->id)}}" method="post">
+            <form id="consulta-form" action="{{route('gestion-consultas.store', $turno->id)}}" method="post">
                 @csrf
 
                 <div class="row">
@@ -281,7 +281,7 @@
 
                 <div class="row mt-3">
                     <div class="col-12 d-flex justify-content-end">
-                        <button type="submit" class="btn btn-success guardar-button">Guardar</button>
+                        <button type="button" class="btn btn-success guardar-button">Guardar</button>
                         <form action="{{ route('gestion-turnos-nutricionista.index') }}" method="GET">
                             @csrf
                             <button class="btn btn-danger ml-2 cancelar-button" type="button">
@@ -345,67 +345,6 @@
             $('[data-bs-toggle="popover"]').popover();
         });
 
-
-        //Llamada AJAX para los cálculos
-        document.addEventListener('DOMContentLoaded', function(){
-            //Agregaomos un controlador de click al botón
-            document.getElementById('realizar-calculos-button').addEventListener('click', function(){
-                //Recogemos datos del form
-                let paciente = document.getElementById('paciente_id').value;
-                let peso = document.getElementById('peso_actual').value;
-                let altura = document.getElementById('altura_actual').value;
-                let calculosSeleccionado = [];
-                let plieguesSeleccionado = [];
-
-                //Recorremos los checkbox de los cálculos
-                let calculos = document.querySelectorAll('input[name="calculo[]"]:checked');
-                calculos.forEach(function(calculo){
-                    calculosSeleccionado.push(calculo.value);
-                });
-
-                //Recorremos los input de los pliegues
-                let pliegues = document.querySelectorAll('input[name^="pliegue_"]');
-                pliegues.forEach(function(pliegue){
-                    plieguesSeleccionado.push(pliegue.value);
-                });
-
-                console.log(paciente);
-                console.log(peso);
-                console.log(altura);
-                console.log(calculosSeleccionado);
-                console.log(plieguesSeleccionado);
-
-                //Enviamos la petición AJAX
-                $.ajax({
-                    url: '{{route('gestion-consultas.realizarCalculos')}}',
-                    method: 'POST',
-                    data: {
-                        paciente: paciente,
-                        peso: peso,
-                        altura: altura,
-                        calculosSeleccionado: calculosSeleccionado,
-                        plieguesSeleccionado: plieguesSeleccionado,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(data){
-                        //Si la petición es correcta, mostramos los resultados
-                        // Formatea los datos y asigna la representación de cadena al textarea
-                        const formattedData = "IMC: " + data.imc + "\n" +
-                            "Peso Ideal: " + data.pesoIdeal + "\n" +
-                            "Masa Grasa: " + data.masaGrasa + "\n" +
-                            "Masa Ósea: " + data.masaOsea + " Kg\n" +
-                            "Masa Residual: " + data.masaResidual + " Kg\n" +
-                            "Masa Muscular: " + data.masaMuscular + " Kg";
-
-                        document.getElementById('diagnostico').value = formattedData;
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    },
-                });
-            });
-        });
-
         //SweetAlert2
         const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
@@ -466,16 +405,13 @@
                     });
                 });
             });
-/*
+
             //SweetAlert botón de calcular los cálculos necesarios
             document.addEventListener('DOMContentLoaded', function () {
-                // Selecciona todos los botones de eliminar con la clase 'delete-button'
-                const calcularButton = document.querySelectorAll('.calcular-button');
+                const calcularButton = document.getElementById('realizar-calculos-button');
 
-                // Agrega un controlador de clic a cada botón de eliminar
-                calcularButton.forEach(function (button) {
-                    button.addEventListener('click', function () {
-                        // Muestra un SweetAlert de confirmación
+                if (calcularButton) {
+                    calcularButton.addEventListener('click', function () {
                         swalWithBootstrapButtons.fire({
                             title: '¿Está seguro de realizar los cálculos?',
                             text: 'Al confirmar se calcularán automáticamente los cálculos seleccionados.',
@@ -485,14 +421,65 @@
                             cancelButtonText: 'Cancelar',
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // Si el usuario confirma, envía el formulario
-                                button.closest('form').submit();
+                                //Recogemos datos del form
+                                let paciente = document.getElementById('paciente_id').value;
+                                let peso = document.getElementById('peso_actual').value;
+                                let altura = document.getElementById('altura_actual').value;
+                                let calculosSeleccionado = [];
+                                let plieguesSeleccionado = [];
+
+                                //Recorremos los checkbox de los cálculos
+                                let calculos = document.querySelectorAll('input[name="calculo[]"]:checked');
+                                calculos.forEach(function(calculo){
+                                    calculosSeleccionado.push(calculo.value);
+                                });
+
+                                //Recorremos los input de los pliegues
+                                let pliegues = document.querySelectorAll('input[name^="pliegue_"]');
+                                pliegues.forEach(function(pliegue){
+                                    plieguesSeleccionado.push(pliegue.value);
+                                });
+
+                                console.log(paciente);
+                                console.log(peso);
+                                console.log(altura);
+                                console.log(calculosSeleccionado);
+                                console.log(plieguesSeleccionado);
+
+                                //Enviamos la petición AJAX
+                                $.ajax({
+                                    url: '{{route('gestion-consultas.realizarCalculos')}}',
+                                    method: 'POST',
+                                    data: {
+                                        paciente: paciente,
+                                        peso: peso,
+                                        altura: altura,
+                                        calculosSeleccionado: calculosSeleccionado,
+                                        plieguesSeleccionado: plieguesSeleccionado,
+                                        _token: "{{ csrf_token() }}"
+                                    },
+                                    success: function(data){
+                                        //Si la petición es correcta, mostramos los resultados
+                                        // Formatea los datos y asigna la representación de cadena al textarea
+                                        const formattedData = "IMC: " + data.imc + "\n" +
+                                            "Peso Ideal: " + data.pesoIdeal + "\n" +
+                                            "Masa Grasa: " + data.masaGrasa + "\n" +
+                                            "Masa Ósea: " + data.masaOsea + " Kg\n" +
+                                            "Masa Residual: " + data.masaResidual + " Kg\n" +
+                                            "Masa Muscular: " + data.masaMuscular + " Kg";
+
+                                        document.getElementById('diagnostico').value = formattedData;
+                                    },
+                                    error: function (error) {
+                                        console.log(error);
+                                    },
+                                });
                             }
                         });
                     });
-                });
+                }
             });
-*/
+
             //SweetAlert botón cancelar registro de consulta
             document.addEventListener('DOMContentLoaded', function () {
                 // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -521,28 +508,44 @@
 
             //SweetAlert para guardar consulta
             document.addEventListener('DOMContentLoaded', function () {
-                // Selecciona todos los botones de eliminar con la clase 'delete-button'
-                const guardarButton = document.querySelectorAll('.guardar-button');
+                const guardarConsulta = document.querySelectorAll('.guardar-button');
 
-                guardarButton.forEach(function (button) {
+                guardarConsulta.forEach(button => {
                     button.addEventListener('click', function () {
-                        const form = button.closest('form');
-                        if (form) {
+                        const swalWithBootstrapButtons = Swal.mixin({
+                            customClass: {
+                                confirmButton: 'btn btn-success',
+                                cancelButton: 'btn btn-danger'
+                            },
+                            buttonsStyling: true
+                            })
+
                             swalWithBootstrapButtons.fire({
-                                title: '¿Está seguro de guardar el registro de la consulta?',
-                                text: 'Al confirmar se generarán los planes de alimentación y de seguimiento para el paciente.',
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonText: 'Sí, registrar consulta.',
-                                cancelButtonText: 'Cancelar',
+                            title: '¿Está seguro de guardar el registro de la consulta?',
+                            text: "Al confirmar se generarán los planes de alimentación y de seguimiento para el paciente.",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: '¡Si, registrar consulta!',
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonText: '¡No, cancelar!',
+                            cancelButtonColor: '#d33',
+                            reverseButtons: true
                             }).then((result) => {
-                                if (result.isConfirmed) {
-                                    form.submit();
-                                }
-                            });
-                        } else {
-                            console.error('No se encontró el formulario.');
-                        }
+                            if (result.isConfirmed) {
+                                //Envia el form
+                                const form = document.getElementById('consulta-form');
+                                form.submit();
+                            } else if (
+                                /* Read more about handling dismissals below */
+                                result.dismiss === Swal.DismissReason.cancel
+                            ) {
+                                swalWithBootstrapButtons.fire(
+                                '¡Consulta no registrada!',
+                                'La consulta no se ha registrado, puede seguir modificando el formulario.',
+                                'error'
+                                )
+                            }
+                        })
                     });
                 });
             });
