@@ -344,6 +344,8 @@ class GestionConsultasController extends Controller
         $masaOsea = 0;
         $masaResidual = 0;
         $masaMuscular = 0;
+        //Generamos diagnóstico
+        $diagnostico = '';
 
         //Calculamos el IMC
         if(in_array('imc', $calculosSeleccionados) && $pesoActual && $alturaActual){
@@ -354,16 +356,22 @@ class GestionConsultasController extends Controller
             //Calculamos el peso ideal
 
             if($imc < 18.5){
+                $diagnostico .= 'Paciente con bajo peso. ';
                 $pesoIdeal = 18.5 * ($alturaMetro * $alturaMetro); //Bajo peso
             }else if($imc >= 18.5 && $imc <= 25){
+                $diagnostico .= 'Paciente con un peso saludable. ';
                 $pesoIdeal = $pesoActual; //Peso normal
             }else if($imc > 25){
+                $diagnostico .= 'Paciente con sobrepeso. ';
                 $pesoIdeal = 25 * ($alturaMetro * $alturaMetro); //Sobrepeso
             }else if($imc >= 30 && $imc < 35){
+                $diagnostico .= 'Paciente con obesidad de grado 1. ';
                 $pesoIdeal = 30 * ($alturaMetro * $alturaMetro); //Obesidad grado 1
             }else if($imc >= 35 && $imc <= 40){
+                $diagnostico .= 'Paciente con obesidad de grado 2. ';
                 $pesoIdeal = 35 * ($alturaMetro * $alturaMetro); //Obesidad grado 2
             }else if($imc > 40){
+                $diagnostico .= 'Paciente con obesidad mórbida. ';
                 $pesoIdeal = 40 * ($alturaMetro * $alturaMetro); //Obesidad grado 3 o mórbida
             }
         }
@@ -400,46 +408,56 @@ class GestionConsultasController extends Controller
                 //Hombres entre 17 y 19 años
                 if($paciente->edad >= 17 && $paciente->edad <= 19){
                     $densidadCorporal = 1.1620 - (0.0630 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }
                 //Hombres entre 20 y 29 años
                 if($paciente->edad >= 20 && $paciente->edad <= 29){
                     $densidadCorporal = 1.1631 - (0.0632 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }else if($paciente->edad >= 30 && $paciente->edad <= 39){
                     //Hombres entre 30 y 39 años
                     $densidadCorporal = 1.1422 - (0.0544 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }else if($paciente->edad >= 40 && $paciente->edad <= 49){
                     //Hombres entre 40 y 49 años
                     $densidadCorporal = 1.1620 - (0.0700 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }else if($paciente->edad >= 50 && $paciente->edad <= 72){
                     //Hombres entre 50 y 72 años
                     $densidadCorporal = 1.1715 - (0.0779 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }
             } else if($paciente->sexo == 'Femenino'){
                 //Mujeres entre 17 y 19 años
                 if($paciente->edad >= 17 && $paciente->edad <= 19){
                     $densidadCorporal = 1.1549 - (0.0678 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }
                 //Mujeres entre 20 y 29 años
                 if($paciente->edad >= 20 && $paciente->edad <= 29){
                     $densidadCorporal = 1.1599 - (0.0717 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }else if($paciente->edad >= 30 && $paciente->edad <= 39){
                     //Mujeres entre 30 y 39 años
                     $densidadCorporal = 1.1423 - (0.0632 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }else if($paciente->edad >= 40 && $paciente->edad <= 49){
                     //Mujeres entre 40 y 49 años
                     $densidadCorporal = 1.1333 - (0.0612 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }else if($paciente->edad >= 50 && $paciente->edad <= 68){
                     //Mujeres entre 50 y 68 años
                     $densidadCorporal = 1.1339 - (0.0645 * log10($sumatoriaPliegues));
+                    //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
                 }
             }
@@ -479,7 +497,7 @@ class GestionConsultasController extends Controller
             }
 
             //Masa osea Kg
-            $masaOsea = 0.00006*$pesoActual*($sumatoriaDiametros*$sumatoriaDiametros);
+            $masaOsea = 0.00006*$alturaActual*($sumatoriaDiametros*$sumatoriaDiametros);
         }
 
         //Calculamos masa muscular
@@ -492,29 +510,49 @@ class GestionConsultasController extends Controller
             $masaMuscular = $pesoActual - $sumatoriaMasas;
         }
 
-        //Generamos diagnóstico
-
-        $diagnostico = '';
-
-        if(in_array('imc', $calculosSeleccionados)){
-            $diagnostico .= "IMC: $imc, ";
-        }
-
-
+        //Seguimos generando el diagnóstico según los cálculos realizados.
         if (in_array('masa_grasa', $calculosSeleccionados)) {
-            $diagnostico .= "Masa Grasa: $masaGrasa%, ";
+            if ($masaGrasa < 10) {
+                $diagnostico .= 'Porcentaje de grasa extremadamente bajo, lo que puede ser preocupante. ';
+            } elseif ($masaGrasa >= 10 && $masaGrasa <= 20) {
+                $diagnostico .= 'Porcentaje de grasa bajo, indicativo de un nivel saludable. ';
+            } elseif ($masaGrasa > 20 && $masaGrasa <= 30) {
+                $diagnostico .= 'Porcentaje de grasa moderado, se recomienda un seguimiento. ';
+            } elseif ($masaGrasa > 30) {
+                $diagnostico .= 'Porcentaje de grasa elevado, lo que podría requerir atención. ';
+            }
         }
 
         if (in_array('masa_osea', $calculosSeleccionados)) {
-            $diagnostico .= "Masa Ósea: $masaOsea Kg, ";
+            if ($masaOsea < 2) {
+                $diagnostico .= 'Masa ósea baja, lo que podría indicar un riesgo de osteoporosis. ';
+            } elseif ($masaOsea >= 2 && $masaOsea <= 2.5) {
+                $diagnostico .= 'Masa ósea en el rango normal. ';
+            } elseif ($masaOsea > 2.5) {
+                $diagnostico .= 'Masa ósea alta, lo que es positivo para la salud ósea. ';
+            }
         }
 
         if (in_array('masa_residual', $calculosSeleccionados)) {
-            $diagnostico .= "Masa Residual: $masaResidual Kg, ";
+            if ($masaResidual < 5) {
+                $diagnostico .= 'Masa residual baja, se debe investigar la posible causa. ';
+            } elseif ($masaResidual >= 5 && $masaResidual <= 10) {
+                $diagnostico .= 'Masa residual en el rango normal. ';
+            } elseif ($masaResidual > 10) {
+                $diagnostico .= 'Masa residual alta, lo que podría indicar retención de líquidos u otros problemas. ';
+            }
         }
 
         if (in_array('masa_muscular', $calculosSeleccionados)) {
-            $diagnostico .= "Masa Muscular: $masaMuscular Kg, ";
+            if ($masaMuscular < 20) {
+                $diagnostico .= 'Cantidad de masa muscular extremadamente baja. ';
+            } elseif ($masaMuscular >= 20 && $masaMuscular <= 30) {
+                $diagnostico .= 'Cantidad de masa muscular baja. ';
+            } elseif ($masaMuscular > 30 && $masaMuscular <= 40) {
+                $diagnostico .= 'Cantidad de masa muscular moderada. ';
+            } elseif ($masaMuscular > 40) {
+                $diagnostico .= 'Cantidad de masa muscular elevada. ';
+            }
         }
 
         // Quita la coma y el espacio extra al final del diagnóstico

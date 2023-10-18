@@ -228,7 +228,7 @@
                                 <div class="col-md-6">
                                     <label for="pliegue_{{$pliegue->id}}">{{$pliegue->nombre_pliegue}}</label>
                                     <div class="input-group">
-                                        <input class="form-control pliegue-input" name="pliegue_{{$pliegue->id}}" id="pliegue_{{$pliegue->id}}" type="text">
+                                        <input class="form-control pliegue-input" name="pliegue_{{$pliegue->id}}" id="pliegue_{{$pliegue->id}}" type="text" data-pliegue-key="{{$pliegue->id}}">
                                         <div class="input-group-append">
                                             <span class="input-group-text">{{$pliegue->unidad_de_medida}}</span>
                                         </div>
@@ -262,11 +262,11 @@
                             </div>
                         </div>
 
+                        <div class="row mt-3" id="resultados">
+
+                        </div>
+
                     </div>
-                </div>
-
-                <div class="row mt-3" id="resultados">
-
                 </div>
 
                 <div class="row mt-3">
@@ -277,6 +277,10 @@
                             <span class="text-danger">{{$message}}</span>
                         @enderror
                     </div>
+                </div>
+
+                <div id="resultados">
+
                 </div>
 
                 <div class="row mt-3">
@@ -426,7 +430,7 @@
                                 let peso = document.getElementById('peso_actual').value;
                                 let altura = document.getElementById('altura_actual').value;
                                 let calculosSeleccionado = [];
-                                let plieguesSeleccionado = [];
+                                let plieguesSeleccionado = {};
 
                                 //Recorremos los checkbox de los cálculos
                                 let calculos = document.querySelectorAll('input[name="calculo[]"]:checked');
@@ -436,8 +440,12 @@
 
                                 //Recorremos los input de los pliegues
                                 let pliegues = document.querySelectorAll('input[name^="pliegue_"]');
-                                pliegues.forEach(function(pliegue){
-                                    plieguesSeleccionado.push(pliegue.value);
+                                pliegues.forEach(function (pliegue) {
+                                    // Obtenemos la clave del atributo 'data-pliegue-key'
+                                    let pliegueKey = pliegue.getAttribute('data-pliegue-key');
+                                    let pliegueValue = pliegue.value;
+                                    // Almacenamos la clave y el valor en un objeto
+                                    plieguesSeleccionado['pliegue_' + pliegueKey] = pliegueValue;
                                 });
 
                                 console.log(paciente);
@@ -461,6 +469,7 @@
                                     success: function(data){
                                         //Si la petición es correcta, mostramos los resultados
                                         // Formatea los datos y asigna la representación de cadena al textarea
+                                    /*
                                         const formattedData = "IMC: " + data.imc + "\n" +
                                             "Peso Ideal: " + data.pesoIdeal + "\n" +
                                             "Masa Grasa: " + data.masaGrasa + "\n" +
@@ -469,6 +478,45 @@
                                             "Masa Muscular: " + data.masaMuscular + " Kg";
 
                                         document.getElementById('diagnostico').value = formattedData;
+                                    */
+                                        document.getElementById('diagnostico').value = data.diagnostico;
+
+                                        //Mostramos los resultados en el div resultados en input:hidden
+                                        document.getElementById('resultados').innerHTML = `
+                                            <div class="col-md-12 mt-3"> <!-- Resultados de los cálculos -->
+                                                <h5>Resultados de los cálculos</h5>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="imc">IMC</label>
+                                                <input class="form-control" name="imc" id="imc" type="text" value="${data.imc}" disabled>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="peso_ideal">Peso Ideal</label>
+                                                <input class="form-control" name="peso_ideal" id="peso_ideal" type="text" value="${data.pesoIdeal}" disabled>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="masa_grasa">Masa Grasa</label>
+                                                <input class="form-control" name="masa_grasa" id="masa_grasa" type="text" value="${data.masaGrasa}" disabled>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="masa_osea">Masa Ósea</label>
+                                                <input class="form-control" name="masa_osea" id="masa_osea" type="text" value="${data.masaOsea}" disabled>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="masa_residual">Masa Residual</label>
+                                                <input class="form-control" name="masa_residual" id="masa_residual" type="text" value="${data.masaResidual}" disabled>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label for="masa_muscular">Masa Muscular</label>
+                                                <input class="form-control" name="masa_muscular" id="masa_muscular" type="text" value="${data.masaMuscular}" disabled>
+                                            </div>
+                                        `;
+
                                     },
                                     error: function (error) {
                                         console.log(error);
