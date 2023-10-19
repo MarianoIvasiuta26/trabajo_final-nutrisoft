@@ -4,6 +4,7 @@ namespace App\Http\Controllers\nutricionista;
 
 use App\Http\Controllers\Controller;
 use App\Models\Consulta;
+use App\Models\MedicionesDePlieguesCutaneos;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
 use App\Models\Paciente\AnamnesisAlimentaria;
@@ -46,6 +47,9 @@ class GestionConsultasController extends Controller
      */
     public function store(Request $request, $id)
     {
+        //dd($request->input('imc'), $request->input('masa_grasa'), $request->input('masa_osea'), $request->input('masa_residual'), $request->input('masa_muscular'));
+        //dd($request->input('diagnostico'), $request->input('peso_actual'), $request->input('observacion'), $request->input('altura_actual'));
+        //dd($request->all());
         //Validamos el form
         $request->validate([
             'tratamiento_paciente' => ['required', 'integer'],
@@ -57,6 +61,11 @@ class GestionConsultasController extends Controller
             'circ_cadera_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'circ_pecho_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'diagnostico' => ['required', 'string', 'max:255'],
+            'imc_actual' => ['required', 'numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'],
+            'masa_grasa_actual' => ['numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'] ,
+            'masa_osea_actual' => ['numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'],
+            'masa_residual_actual' => ['numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'],
+            'masa_muscular_actual' => ['numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'],
         ]);
 
         //Obtenemos los datos del formulario
@@ -69,6 +78,17 @@ class GestionConsultasController extends Controller
         $circCaderaActual = $request->input('circ_cadera_actual');
         $circPechoActual = $request->input('circ_pecho_actual');
         $diagnostico = $request->input('diagnostico');
+
+        $imcActual = $request->input('imc_actual');
+        $masaGrasaActual = $request->input('masa_grasa_actual');
+        $masaOseaActual = $request->input('masa_osea_actual');
+        $masaResidualActual = $request->input('masa_residual_actual');
+        $masaMuscularActual = $request->input('masa_muscular_actual');
+
+        $pacienteId = $request->input('paciente_id');
+        $historiaClinica = HistoriaClinica::where('paciente_id', $pacienteId)->first();
+
+        //Buscamos el turno
         $turno = Turno::find($id);
         $nutricionista = Nutricionista::where('user_id', auth()->user()->id)->first();
         if(!$turno){
@@ -95,6 +115,25 @@ class GestionConsultasController extends Controller
             'diagnostico' => $diagnostico,
         ]);
 
+        if($imcActual != 0){
+            $consulta->imc_Actual = $imcActual;
+            $consulta->save();
+        }
+
+        if($masaGrasaActual != 0 && $masaOseaActual != 0 && $masaResidualActual != 0 && $masaMuscularActual != 0){
+            $consulta->masa_grasa_actual = $masaGrasaActual;
+            $consulta->masa_osea_actual = $masaOseaActual;
+            $consulta->masa_residual_actual = $masaResidualActual;
+            $consulta->masa_muscular_actual = $masaMuscularActual;
+            $consulta->save();
+        }
+
+        $consulta->masa_grasa_actual = $masaGrasaActual != 0 ? $masaGrasaActual : $consulta->masa_grasa_actual;
+        $consulta->masa_osea_actual = $masaOseaActual != 0 ? $masaOseaActual : $consulta->masa_osea_actual;
+        $consulta->masa_residual_actual = $masaResidualActual != 0 ? $masaResidualActual : $consulta->masa_residual_actual;
+        $consulta->masa_muscular_actual = $masaMuscularActual != 0 ? $masaMuscularActual : $consulta->masa_muscular_actual;
+        $consulta->save();
+
         TratamientoPorPaciente::create([
             'tratamiento_id' => $tratamientoPaciente,
             'paciente_id' => $turno->paciente_id,
@@ -102,6 +141,21 @@ class GestionConsultasController extends Controller
             'observaciones' => $observacion,
             'estado' => 'Activo',
         ]);
+
+        //Obtenemos los pliegues y medidas de pliegues
+        $pliegues = TiposDePliegueCutaneo::all();
+
+        foreach($pliegues as $pliegue){
+            $campo = 'pliegue_'.$pliegue->id;
+            $valor = $request->input($campo);
+            MedicionesDePlieguesCutaneos::create([
+                'historia_clinica_id' => $historiaClinica->id,
+                'consulta_id' => $consulta->id,
+                'pliegue_id' => $pliegue->id,
+                'valor_medicion' => $valor,
+            ]);
+
+        }
 
         $turno->estado = 'Realizado';
         $turno->save();
@@ -336,6 +390,7 @@ class GestionConsultasController extends Controller
         $calculosSeleccionados = $request->input('calculosSeleccionado');
         $plieguesSeleccionado = $request->input('plieguesSeleccionado');
 
+
         // Realiza los cálculos necesarios aquí
 
         $imc = 0;
@@ -353,8 +408,10 @@ class GestionConsultasController extends Controller
             $alturaMetro = $alturaActual / 100;
             $imc = $pesoActual / ($alturaMetro * $alturaMetro);
 
-            //Calculamos el peso ideal
+            // Redondeamos el IMC a 2 decimales
+            $imc = number_format($imc, 2, '.', ''); // Formato decimal(8,2)
 
+            //Calculamos el peso ideal
             if($imc < 18.5){
                 $diagnostico .= 'Paciente con bajo peso. ';
                 $pesoIdeal = 18.5 * ($alturaMetro * $alturaMetro); //Bajo peso
@@ -410,27 +467,38 @@ class GestionConsultasController extends Controller
                     $densidadCorporal = 1.1620 - (0.0630 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }
                 //Hombres entre 20 y 29 años
                 if($paciente->edad >= 20 && $paciente->edad <= 29){
                     $densidadCorporal = 1.1631 - (0.0632 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }else if($paciente->edad >= 30 && $paciente->edad <= 39){
                     //Hombres entre 30 y 39 años
                     $densidadCorporal = 1.1422 - (0.0544 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }else if($paciente->edad >= 40 && $paciente->edad <= 49){
                     //Hombres entre 40 y 49 años
                     $densidadCorporal = 1.1620 - (0.0700 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }else if($paciente->edad >= 50 && $paciente->edad <= 72){
                     //Hombres entre 50 y 72 años
                     $densidadCorporal = 1.1715 - (0.0779 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }
             } else if($paciente->sexo == 'Femenino'){
                 //Mujeres entre 17 y 19 años
@@ -438,27 +506,37 @@ class GestionConsultasController extends Controller
                     $densidadCorporal = 1.1549 - (0.0678 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }
                 //Mujeres entre 20 y 29 años
                 if($paciente->edad >= 20 && $paciente->edad <= 29){
                     $densidadCorporal = 1.1599 - (0.0717 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }else if($paciente->edad >= 30 && $paciente->edad <= 39){
                     //Mujeres entre 30 y 39 años
                     $densidadCorporal = 1.1423 - (0.0632 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }else if($paciente->edad >= 40 && $paciente->edad <= 49){
                     //Mujeres entre 40 y 49 años
                     $densidadCorporal = 1.1333 - (0.0612 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }else if($paciente->edad >= 50 && $paciente->edad <= 68){
                     //Mujeres entre 50 y 68 años
                     $densidadCorporal = 1.1339 - (0.0645 * log10($sumatoriaPliegues));
                     //Ecuación de Siri
                     $masaGrasa = (495/$densidadCorporal) - 450; // % de masa grasa
+                    // Redondeamos la masa grasa a 2 decimales
+                    $masaGrasa = number_format($masaGrasa, 2, '.', ''); // Formato decimal(5,2)
                 }
             }
         }
@@ -468,8 +546,12 @@ class GestionConsultasController extends Controller
         if(in_array('masa_residual', $calculosSeleccionados)){
             if($paciente->sexo == 'Masculino'){
                 $masaResidual = 0.241 * $pesoActual; //en Kg
+                // Redondeamos la masa residual a 2 decimales
+                $masaResidual = number_format($masaResidual, 2, '.', ''); // Formato decimal(5,2)
             }else if($paciente->sexo == 'Femenino'){
                 $masaResidual = 0.209 * $pesoActual; //en Kg
+                // Redondeamos la masa residual a 2 decimales
+                $masaResidual = number_format($masaResidual, 2, '.', ''); // Formato decimal(5,2)
             }
         }
 
@@ -498,6 +580,9 @@ class GestionConsultasController extends Controller
 
             //Masa osea Kg
             $masaOsea = 0.00006*$alturaActual*($sumatoriaDiametros*$sumatoriaDiametros);
+
+            // Redondeamos la masa ósea a 2 decimales
+            $masaOsea = number_format($masaOsea, 2, '.', ''); // Formato decimal(5,2)
         }
 
         //Calculamos masa muscular
@@ -508,6 +593,8 @@ class GestionConsultasController extends Controller
 
             //Masa muscular Kg
             $masaMuscular = $pesoActual - $sumatoriaMasas;
+            // Redondeamos la masa muscular a 2 decimales
+            $masaMuscular = number_format($masaMuscular, 2, '.', ''); // Formato decimal(5,2)
         }
 
         //Seguimos generando el diagnóstico según los cálculos realizados.
