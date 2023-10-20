@@ -15,6 +15,13 @@ use App\Models\TipoConsulta;
 use App\Models\TiposDePliegueCutaneo;
 use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
+use App\Models\GrupoAlimento;
+use App\Models\Nutriente;
+use App\Models\Paciente\Alergia;
+use App\Models\Paciente\Cirugia;
+use App\Models\Paciente\Intolerancia;
+use App\Models\Paciente\Patologia;
+use App\Models\ValorNutricional;
 use Illuminate\Http\Request;
 
 class GestionConsultasController extends Controller
@@ -182,15 +189,6 @@ class GestionConsultasController extends Controller
         //Buscamos historia clínica del paciente
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
 
-        //Buscamos datos médicos del paciente
-        $datosMedicos = DatosMedicos::where('historia_clinica', $historiaClinica->id)->get();
-
-        //Cirugías del paciente
-        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica', $historiaClinica->id)->get();
-
-        //Anamnesis alimentaria del paciente
-        $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica', $historiaClinica->id)->get();
-
         //Obtenemos el tratamiento activo del paciente
         $tratamientoActivo = TratamientoPorPaciente::where('paciente_id', $paciente->id)->where('estado', 'Activo')->first();
 
@@ -211,125 +209,531 @@ class GestionConsultasController extends Controller
         //Comenzamos a implementar la lógica para generar el plan
 
         //Primero debemos calcular el IMC del paciente para saber si está normal o no
-        $imc = $consulta->peso_actual / ($consulta->altura_actual * $consulta->altura_actual);
+        //$imc = $consulta->peso_actual / ($consulta->altura_actual * $consulta->altura_actual);
+        $imc = $consulta->imc_actual;
+
+        //Altura en metros
+        $alturaMetro = $consulta->altura_actual / 100;
 
         //Si el IMC es menor a 18.5, el paciente está bajo de peso
-        if($imc >= 18.5 && $imc <= 25){
-            //IMC normal
-            //Usamos la fórmula de Mifflin St. Jeor (No recomendable en pacientes menores de 18 años)
-            //para calcular el gasto energético basal
+        //Dieta HIPERCALÓRICA
+        if($imc < 18.50){
+            //Bajo peso
+            if($imc < 16){
+                //Delgadez severa
+            }else if($imc >= 16 && $imc <= 16.99){
+                //Delgadez moderada
+            }else if($imc >= 17 && $imc <= 18.49){
+                //Delgadez aceptable
+            }
+        }
+
+        //Si el IMC está entre 18.5 y 24.99, el paciente está normal
+        //IMC normal -> Dieta NORMOCALÓRICA
+        if($imc >= 18.5 && $imc <= 24.99){
+            //Usamos la fórmula de Mifflin St. Jeor (No recomendable en pacientes menores de 18 años) para calcular el gasto energético basal
+
             if($paciente->edad > 18){
                 if($paciente->sexo == 'Masculino'){
                     $gastoEnergeticoBasal = (10 * $consulta->peso_actual) + (6.25 * $consulta->altura_actual) - (5 * $paciente->edad) + 5;
                 }else{
                     $gastoEnergeticoBasal = (10 * $consulta->peso_actual) + (6.25 * $consulta->altura_actual) - (5 * $paciente->edad) - 161;
                 }
+            }else if($paciente->edad < 18){
+                if($paciente->edad < 3){
+                    //Usamos fórmula de Schofield
 
-                //Calculamos el gasto energético total
+                    if($paciente->sexo == 'Masculino'){
+                        $gastoEnergeticoBasalMj = (0.0007 * $consulta->peso_actual) + (6.349 * $alturaMetro) - 2.584; //en Mj
 
-                if($historiaClinica->estilo_vida == 'Sedentario'){
-                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.2;
-                } else if ($historiaClinica->estilo_vida == 'Ligeramente activo'){
-                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.375;
-                } else if ($historiaClinica->estilo_vida == 'Moderadamente activo'){
-                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.55;
-                } else if ($historiaClinica->estilo_vida == 'Muy activo'){
-                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.725;
-                } else if ($historiaClinica->estilo_vida == 'Extra activo'){
-                    $gastoEnergeticoTotal = $gastoEnergeticoBasal * 1.9;
-                }
+                        //Pasamos de Mj a kj
+                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
-                //Verificamos cual es el objetivo de salud del paciente
-                if($historiaClinica->objetivo_salud == 'Adelgazar'){
-                    $gastoEnergeticoTotal = $gastoEnergeticoTotal - 500;
-                } else if ($historiaClinica->objetivo_salud == 'Ganar masa muscular'){
-                    $gastoEnergeticoTotal = $gastoEnergeticoTotal + 500;
-                } else if ($historiaClinica->objetivo_salud == 'Mantener peso'){
-                    $gastoEnergeticoTotal = $gastoEnergeticoTotal;
-                }
-                    //Calculamos el porcentaje de macronutrientes
-                    $proteinas = $gastoEnergeticoTotal * 0.15;
-                    $grasas = $gastoEnergeticoTotal * 0.3;
-                    $carbohidratos = $gastoEnergeticoTotal * 0.55;
+                        //Pasamos de kj a kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
 
-                    //Calculamos el porcentaje de micronutrientes
+                    }else if ($paciente->sexo == 'Femenino'){
+                        $gastoEnergeticoBasalMj = (0.068 * $consulta->peso_actual) + (4.281 * $alturaMetro) - 1.730;
 
-                    $calcio = $gastoEnergeticoTotal * 0.01;
-                    $fosforo = $gastoEnergeticoTotal * 0.01;
-                    $magnesio = $gastoEnergeticoTotal * 0.004;
-                    $potasio = $gastoEnergeticoTotal * 0.004;
-                    $sodio = $gastoEnergeticoTotal * 0.0015;
-                    $cloro = $gastoEnergeticoTotal * 0.0023;
-                    $hierro = $gastoEnergeticoTotal * 0.00002;
-                    $zinc = $gastoEnergeticoTotal * 0.00002;
-                    $selenio = $gastoEnergeticoTotal * 0.0000004;
-                    $yodo = $gastoEnergeticoTotal * 0.00000015;
-                    $vitaminaA = $gastoEnergeticoTotal * 0.0000009;
-                    $vitaminaD = $gastoEnergeticoTotal * 0.000000015;
-                    $vitaminaE = $gastoEnergeticoTotal * 0.0000009;
-                    $vitaminaC = $gastoEnergeticoTotal * 0.000009;
-                    $vitaminaB1 = $gastoEnergeticoTotal * 0.0000009;
-                    $vitaminaB2 = $gastoEnergeticoTotal * 0.0000009;
-                    $vitaminaB3 = $gastoEnergeticoTotal * 0.0000009;
-                    $vitaminaB6 = $gastoEnergeticoTotal * 0.0000009;
-                    $vitaminaB9 = $gastoEnergeticoTotal * 0.0000009;
-                    $vitaminaB12 = $gastoEnergeticoTotal * 0.0000009;
+                        //Pasamos de Mj a kj
+                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
-                    //Calculamos el porcentaje de fibra
+                        //Pasamos de kj a kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                    }
+                }else if($paciente->edad >= 3 && $paciente->edad < 10){
+                    //Usamos fórmula de Schofield
 
-                    $fibra = $gastoEnergeticoTotal * 0.0000009;
+                    if($paciente->sexo == 'Masculino'){
+                        $gastoEnergeticoBasalMj = (0.082 * $consulta->peso_actual) + (0.545 * $alturaMetro) - 1.736;
 
-                    //Calculamos el porcentaje de agua
+                        //Pasamos de Mj a kj
+                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
-                    $agua = $gastoEnergeticoTotal * 0.0000009;
+                        //Pasamos de kj a kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
 
-                    //Calculamos el porcentaje de colesterol
+                    }else if($paciente->sexo == 'Femenino'){
+                        $gastoEnergeticoBasalMj = (0.071 * $consulta->peso_actual) + (0.677 * $alturaMetro) - 1.553;
 
-                    $colesterol = $gastoEnergeticoTotal * 0.0000009;
+                        //Pasamos de Mj a kj
+                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
-                    //Calculamos el porcentaje de alcohol
+                        //Pasamos de kj a kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                    }
+                }else if($paciente->edad >= 11 && $paciente->edad <18){
+                    //Usamos fórmula de Schofield
 
-                    $alcohol = $gastoEnergeticoTotal * 0.0000009;
+                    if($paciente->sexo == 'Masculino'){
+                        $gastoEnergeticoBasalMj = (0.068 * $consulta->peso_actual) + (0.574 * $alturaMetro) - 2.157;
 
-                    //Calculamos el porcentaje de cafeína
+                        //Pasamos de Mj a kj
+                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
-                    $cafeina = $gastoEnergeticoTotal * 0.0000009;
+                        //Pasamos de kj a kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
 
-                    //Calculamos el porcentaje de azúcar
+                    }else if($paciente->sexo == 'Femenino'){
+                        $gastoEnergeticoBasalMj= (0.035 * $consulta->peso_actual) + (1.9484 * $alturaMetro) - 0.837;
 
-                    $azucar = $gastoEnergeticoTotal * 0.0000009;
+                        //Pasamos de Mj a kj
+                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
-            } else if($paciente->edad < 3){
-                //Usamos fórmula de Schofield
-
-                if($paciente->sexo == 'Masculino'){
-                    $gastoEnergeticoBasal = (0.0007 * $consulta->peso_actual) + (6.349 * $consulta->altura_actual) - 2.584;
-                }else if ($paciente->sexo == 'Femenino'){
-                    $gastoEnergeticoBasal = (0.068 * $consulta->peso_actual) + (4.281 * $consulta->altura_actual) - 1.730;
-                }
-
-            }else if($paciente->edad >= 3 && $paciente->edad < 10){
-                //Usamos fórmula de Schofield
-
-                if($paciente->sexo == 'Masculino'){
-                    $gastoEnergeticoBasal = (0.082 * $consulta->peso_actual) + (0.545 * $consulta->altura_actual) - 1.736;
-
-                }else if($paciente->sexo == 'Femenino'){
-                    $gastoEnergeticoBasal = (0.071 * $consulta->peso_actual) + (0.677 * $consulta->altura_actual) - 1.553;
-                }
-            }else if($paciente->edad >= 11 && $paciente->edad <18){
-                //Usamos fórmula de Schofield
-
-                if($paciente->sexo == 'Masculino'){
-                    $gastoEnergeticoBasal = (0.068 * $consulta->peso_actual) + (0.574 * $consulta->altura_actual) - 2.157;
-
-                }else if($paciente->sexo == 'Femenino'){
-                    $gastoEnergeticoBasal = (0.035 * $consulta->peso_actual) + (1.9484 * $consulta->altura_actual) - 0.837;
+                        //Pasamos de kj a kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                    }
                 }
             }
 
         }
-        return view('nutricionista.gestion-consultas.generar-plan-alimentacion', compact('paciente', 'historiaClinica', 'datosMedicos', 'cirugiasPaciente', 'anamnesisPaciente', 'tratamientoActivo', 'tipoConsulta', 'nutricionista', 'turno', 'consulta', 'imc', 'gastoEnergeticoBasal', 'gastoEnergeticoTotal', 'proteinas', 'grasas', 'carbohidratos', 'calcio', 'fosforo', 'magnesio', 'potasio', 'sodio', 'cloro', 'hierro', 'zinc', 'selenio', 'yodo', 'vitaminaA', 'vitaminaD', 'vitaminaE', 'vitaminaC', 'vitaminaB1', 'vitaminaB2', 'vitaminaB3', 'vitaminaB6', 'vitaminaB9', 'vitaminaB12', 'fibra', 'agua', 'colesterol', 'alcohol', 'cafeina', 'azucar'));
+
+        //Si el IMC es mayor a 25, el paciente tiene sobrepeso
+        //Dieta HIPOCALÓRICA
+        if($imc >= 25){
+            //Sobrepeso
+            if($imc >= 25 && $imc <= 29.99){
+                //Preobesidad
+            }else if($imc >= 30 && $imc <= 34.99){
+                //Obesidad grado 1
+            }else if($imc >= 35 && $imc <= 39.99){
+                //Obesidad grado 2
+            }else if($imc >= 40){
+                //Obesidad grado 3 o mórbida
+            }
+        }
+
+        //Calculamos el gasto energético total
+        $resultadoGET = $this->determinacionGET($gastoEnergeticoBasal, $historiaClinica->estilo_vida);
+
+        $gastoEnergeticoTotal = $resultadoGET['get'];
+
+        //Verificamos cual es el objetivo de salud del paciente
+        if($historiaClinica->objetivo_salud == 'Adelgazar'){
+            $gastoEnergeticoTotal = $gastoEnergeticoTotal - 500;
+        } else if ($historiaClinica->objetivo_salud == 'Ganar masa muscular'){
+            $gastoEnergeticoTotal = $gastoEnergeticoTotal + 500;
+        } else if ($historiaClinica->objetivo_salud == 'Mantener peso'){
+            $gastoEnergeticoTotal = $gastoEnergeticoTotal;
+        }
+
+        //Determinación de gramos de proteínas, carbohidratos y lípidos (Adultos)
+        $resultadoNutriente = $this->determinacionNutrientes($gastoEnergeticoTotal, $paciente->edad);
+
+        $carbohidratosRecomendados = $resultadoNutriente['carbohidratos'];
+        $lipidosRecomendados = $resultadoNutriente['lipidos'];
+        $proteinasRecomendadas = $resultadoNutriente['proteinas'];
+
+        //Evaluamos el porcentaje necesario por grupo de alimentos (Según Guia Argentina)
+        $resultadoEleccionAlimentos = $this->porcentajeAlimentos($gastoEnergeticoTotal);
+
+        $porcentajeFrutasVerduras = $resultadoEleccionAlimentos['porcentajeFrutasVerduras'];
+        $porcentajeLegumbresCereales = $resultadoEleccionAlimentos['porcentajeLegumbresCereales'];
+        $porcentajeLecheYogurQueso = $resultadoEleccionAlimentos['porcentajeLecheYogurQueso'];
+        $porcentajeCarnesHuevo = $resultadoEleccionAlimentos['porcentajeCarnesHuevo'];
+        $porcentajeAceitesFrutasSecasSemillas = $resultadoEleccionAlimentos['porcentajeAceitesFrutasSecasSemillas'];
+        $porcentajeAzucarDulcesGolosinas = $resultadoEleccionAlimentos['porcentajeAzucarDulcesGolosinas'];
+
+        //Selección de alimentos
+        $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas);
+
+
+        return view('nutricionista.gestion-consultas.generar-plan-alimentacion', compact('paciente', 'historiaClinica', 'datosMedicos', 'cirugiasPaciente', 'anamnesisPaciente', 'tratamientoActivo', 'tipoConsulta', 'nutricionista', 'turno', 'consulta', 'imc', 'gastoEnergeticoBasal', 'gastoEnergeticoTotal', 'proteinasRecomendadas', 'lipidosRecomendados', 'carbohidratosRecomendados'));
+    }
+
+    public function determinacionGET($geb, $estilo_vida){
+        if($estilo_vida == 'Sedentario'){
+            $gastoEnergeticoTotal = $geb * 1.2;
+        } else if ($estilo_vida == 'Ligeramente activo'){
+            $gastoEnergeticoTotal = $geb * 1.375;
+        } else if ($estilo_vida == 'Moderadamente activo'){
+            $gastoEnergeticoTotal = $geb * 1.55;
+        } else if ($estilo_vida == 'Muy activo'){
+            $gastoEnergeticoTotal = $geb * 1.725;
+        } else if ($estilo_vida == 'Extra activo'){
+            $gastoEnergeticoTotal = $geb * 1.9;
+        }
+
+        return [
+            'get' => $gastoEnergeticoTotal
+        ];
+    }
+
+    public function determinacionNutrientes($get, $edad){
+
+        $carbohidratosRecomendados = 0;
+        $lipidosRecomendados = 0;
+        $proteinasRecomendadas = 0;
+
+        if($edad <= 10){
+            //Determinación de gramos de proteínas, carbohidratos y lípidos (Niños)
+            $carbohidratosRecomendados = ($get * 0.55) / 4;
+            $lipidosRecomendados = ($get * 0.30) / 9;
+            $proteinasRecomendadas = ($get * 0.15) / 4;
+        }
+
+        if($edad >= 11 && $edad <18){
+            //Determinación de gramos de proteínas, carbohidratos y lípidos (Adolescentes)
+            $carbohidratosRecomendados = ($get * 0.6) / 4;
+            $lipidosRecomendados = ($get * 0.25) / 9;
+            $proteinasRecomendadas = ($get * 0.15) / 4;
+        }
+
+        if($edad >= 18){
+            //Determinación de gramos de proteínas, carbohidratos y lípidos (Adultos)
+            $carbohidratosRecomendados = ($get * 0.6) / 4;
+            $lipidosRecomendados = ($get * 0.28) / 9;
+            $proteinasRecomendadas = ($get * 0.12) / 4;
+        }
+
+        return [
+            'carbohidratos' => $carbohidratosRecomendados,
+            'lipidos' => $lipidosRecomendados,
+            'proteinas' => $proteinasRecomendadas
+        ];
+
+    }
+
+    public function porcentajeAlimentos($get){
+        //Función para determinar los alimentos que debe consumir el paciente según grupos de alimentos.
+        /* Tenemos en cuenta:
+            40% Cereales y derivados.
+            30% Frutas y verduras.
+            20% Legunmbres y alimentos de origen animal
+            8% Grasas y aceites.
+            2% Azúcares refinados
+
+            Argentina:
+            50% Verduras y frutas
+            25% Legumbres, cereales, papa, pan y pastas.
+            10% Leche, yogur y queso.
+            5% Carnes, huevo.
+            5% Aceites, frutas secas y semillas
+            5% Azúcar, dulces y golosinas (OPCIONAL).
+        */
+
+        //Resultados en Kcal/día
+        $frutasVerduras = ($get * 0.5);
+        $legumbresCereales = ($get * 0.25);
+        $lecheYogurQueso = ($get * 0.1);
+        $carnesHuevo = ($get * 0.05);
+        $aceitesFrutasSecasSemillas = ($get * 0.05);
+        $azucarDulcesGolosinas = ($get * 0.05);
+
+
+
+        return [
+            'porcentajeFrutasVerduras' => $frutasVerduras,
+            'porcentajeLegumbresCereales' => $legumbresCereales,
+            'porcentajeLecheYogurQueso' => $lecheYogurQueso,
+            'porcentajeCarnesHuevo' => $carnesHuevo,
+            'porcentajeAceitesFrutasSecasSemillas' => $aceitesFrutasSecasSemillas,
+            'porcentajeAzucarDulcesGolosinas' => $azucarDulcesGolosinas,
+        ];
+    }
+
+    public function eleccionAlimentos($historiaClinicaId, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas){
+
+        //Obtenemos los grupos de alimentos
+        //50%
+        $grupoAlimentoFruta = GrupoAlimento::where('grupo', 'Frutas')->first();
+        $grupoAlimentoVerdura = GrupoAlimento::where('grupo', 'Verduras')->first();
+        //25%
+        $grupoAlimentoLegumbres = GrupoAlimento::where('grupo', 'Legumbres, cereales, papa, choclo, batata, pan y pastas');
+        //10%
+        $grupoAlimentoLeche = GrupoAlimento::where('grupo', 'Leche y postres de leche')->first();
+        $grupoAlimentoYogur = GrupoAlimento::where('grupo', 'Yogures')->first();
+        $grupoAlimentoQueso = GrupoAlimento::where('grupo', 'Quesos')->first();
+        //5%
+        $grupoAlimentoCarnes = GrupoAlimento::where('grupo', 'Carnes')->first();
+        $grupoAlimentoHuevos = GrupoAlimento::where('grupo', 'Huevos')->first();
+        $grupoAlimentoPescados = GrupoAlimento::where('grupo', 'Pescados y mariscos')->first();
+        //5%
+        $grupoAlimentoAceites = GrupoAlimento::where('grupo', 'Aceites')->first();
+        $grupoAlimentoFrutasSecas = GrupoAlimento::where('grupo', 'Frutas secas y semillas')->first();
+        //5%
+        $grupoAlimentoAzucar = GrupoAlimento::where('grupo', 'Azúcares, mermeladas y dulces')->first();
+        $grupoGolosinas = GrupoAlimento::where('grupo', 'Golosinas y chocolates')->first();
+
+        //Obtenemos los alimentos de cada grupo
+        //50%
+        $alimentosFruta = $grupoAlimentoFruta->alimento;
+        $alimentosVerdura = $grupoAlimentoVerdura->alimento;
+        //25%
+        $alimentosLegumbres = $grupoAlimentoLegumbres->alimento;
+        //10%
+        $alimentosLeche = $grupoAlimentoLeche->alimento;
+        $alimentosYogur = $grupoAlimentoYogur->alimento;
+        $alimentosQueso = $grupoAlimentoQueso->alimento;
+        //5%
+        $alimentosCarnes = $grupoAlimentoCarnes->alimento;
+        $alimentosHuevos = $grupoAlimentoHuevos->alimento;
+        $alimentosPescados = $grupoAlimentoPescados->alimento;
+        //5%
+        $alimentosAceites = $grupoAlimentoAceites->alimento;
+        $alimentosFrutasSecas = $grupoAlimentoFrutasSecas->alimento;
+        //5%
+        $alimentosAzucar = $grupoAlimentoAzucar->alimento;
+        $alimentosGolosinas = $grupoGolosinas->alimento;
+
+        //Buscamos la historia Clinica
+        $historiaClinica = HistoriaClinica::find($historiaClinicaId);
+        //Buscamos datos médicos del paciente
+        $datosMedicos = DatosMedicos::where('historia_clinica', $historiaClinicaId)->get();
+        //Cirugías del paciente
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica', $historiaClinicaId)->get();
+        //Anamnesis alimentaria del paciente
+        $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica', $historiaClinicaId)->get();
+        //ValoresNutricionales y nutrientes
+        $nutrientesKcal = Nutriente::where('nombre_nutriente', 'Valor energético');
+        $ValoresNutricionales = ValorNutricional::all();
+
+        //Obtenemos datos necesarios
+        $alergias = Alergia::all();
+        $patologias = Patologia::all();
+        $intolerancias = Intolerancia::all();
+        $cirugias = Cirugia::all();
+
+        //Obtenemos los alimentos que debe consumir el paciente según su porcentaje
+        //Tenemos en cuenta los datos médicos (Si tiene o no patologías, alergias etc.). Si tiene, se le recomienda alimentos que no le hagan mal.
+        //También comprobamos la anamnesis alimentatia para saber sus preferencias alimenticias. Si no le gusta un alimento, se le recomienda otro.
+
+        //Frutas y verduras -> 50%
+        $alimentosRecomendadosFrutas = [];
+        $alimentosRecomendadosVerduras = [];
+        $porcentajeFrutas = $porcentajeFrutasVerduras / 2;
+        $porcentajeVerduras = $porcentajeFrutasVerduras / 2;
+
+        //Evaluación de alimentos por 100 gramos
+        foreach($alimentosFruta as $fruta){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($fruta->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeFrutas){
+                        if($porcentajeFrutas > 0){
+                            $alimentosRecomendadosFrutas[] = $fruta->alimento;
+                            $porcentajeFrutas = $porcentajeFrutas - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($alimentosVerdura as $verdura){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($verdura->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeVerduras){
+                        if($porcentajeVerduras > 0){
+                            $alimentosRecomendadosVerduras[] = $verdura->alimento;
+                            $porcentajeVerduras = $porcentajeVerduras - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Legumbres -> 25%
+        $alimentosRecomendadosLegumbres = [];
+        foreach($nutrientesKcal as $nutriente){
+            foreach($ValoresNutricionales as $valorN){
+                foreach($alimentosLegumbres as $legumbre){
+                    if($legumbre->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeLegumbres){
+                        if($porcentajeLegumbresCereales > 0){
+                            $alimentosRecomendadosLegumbres[] = $legumbre->alimento;
+                            $porcentajeLegumbresCereales = $porcentajeLegumbresCereales - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Leche, yogur y queso -> 10%
+        $alimentosRecomendadosLeche = [];
+        $alimentosRecomendadosYogur = [];
+        $alimentosRecomendadosQueso = [];
+
+        $porcentajeLeche = $porcentajeLecheYogurQueso / 3;
+        $porcentajeYogur = $porcentajeLecheYogurQueso / 3;
+        $porcentajeQueso = $porcentajeLecheYogurQueso / 3;
+
+        foreach($alimentosLeche as $leche){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($leche->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeLeche){
+                        if($porcentajeLeche > 0){
+                            $alimentosRecomendadosLeche[] = $leche->alimento;
+                            $porcentajeLeche = $porcentajeLeche - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($alimentosYogur as $yogur){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($yogur->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeYogur){
+                        if($porcentajeYogur > 0){
+                            $alimentosRecomendadosYogur[] = $yogur->alimento;
+                            $porcentajeYogur = $porcentajeYogur - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($alimentosQueso as $queso){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($queso->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeQueso){
+                        if($porcentajeQueso > 0){
+                            $alimentosRecomendadosQueso[] = $queso->alimento;
+                            $porcentajeQueso = $porcentajeQueso - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Carnes, huevo y pescados y mariscos -> 5%
+        $alimentosRecomendadosCarnes = [];
+        $alimentosRecomendadosHuevos = [];
+        $alimentosRecomendadosPescados = [];
+
+        $porcentajeCarnes = $porcentajeCarnesHuevo / 3;
+        $porcentajeHuevos = $porcentajeCarnesHuevo / 3;
+        $porcentajePescados = $porcentajeCarnesHuevo / 3;
+
+        foreach($alimentosCarnes as $carne){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($carne->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeCarnes){
+                        if($porcentajeCarnes > 0){
+                            $alimentosRecomendadosCarnes[] = $carne->alimento;
+                            $porcentajeCarnes = $porcentajeCarnes - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($alimentosHuevos as $huevo){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($huevo->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeHuevos){
+                        if($porcentajeHuevos > 0){
+                            $alimentosRecomendadosHuevos[] = $huevo->alimento;
+                            $porcentajeHuevos = $porcentajeHuevos - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($alimentosPescados as $pescado){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($pescado->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajePescados){
+                        if($porcentajePescados > 0){
+                            $alimentosRecomendadosPescados[] = $pescado->alimento;
+                            $porcentajePescados = $porcentajePescados - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Aceites y frutas secas -> 5%
+
+        $alimentosRecomendadosAceites = [];
+        $alimentosRecomendadosFrutasSecas = [];
+
+        $porcentajeAceites = $porcentajeAceitesFrutasSecasSemillas / 2;
+        $porcentajeFrutasSecas = $porcentajeAceitesFrutasSecasSemillas / 2;
+
+        foreach($alimentosAceites as $aceite){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($aceite->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeAceites){
+                        if($porcentajeAceites > 0){
+                            $alimentosRecomendadosAceites[] = $aceite->alimento;
+                            $porcentajeAceites = $porcentajeAceites - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($alimentosFrutasSecas as $frutaSeca){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($frutaSeca->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeFrutasSecas){
+                        if($porcentajeFrutasSecas > 0){
+                            $alimentosRecomendadosFrutasSecas[] = $frutaSeca->alimento;
+                            $porcentajeFrutasSecas = $porcentajeFrutasSecas - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        //Azúcares y golosinas -> 5%
+
+        $alimentosRecomendadosAzucar = [];
+        $alimentosRecomendadosGolosinas = [];
+
+        $porcentajeAzucar = $porcentajeAzucarDulcesGolosinas / 2;
+        $porcentajeGolosinas = $porcentajeAzucarDulcesGolosinas / 2;
+
+        foreach($alimentosAzucar as $azucar){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($azucar->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeAzucar){
+                        if($porcentajeAzucar > 0){
+                            $alimentosRecomendadosAzucar[] = $azucar->alimento;
+                            $porcentajeAzucar = $porcentajeAzucar - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        foreach($alimentosGolosinas as $golosina){
+            foreach($nutrientesKcal as $nutriente){
+                foreach($ValoresNutricionales as $valorN){
+                    if($golosina->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeGolosinas){
+                        if($porcentajeGolosinas > 0){
+                            $alimentosRecomendadosGolosinas[] = $golosina->alimento;
+                            $porcentajeGolosinas = $porcentajeGolosinas - $valorN->valor;
+                        }
+                    }
+                }
+            }
+        }
+
+        
+
+
+
     }
 
     /**
@@ -415,19 +819,19 @@ class GestionConsultasController extends Controller
             if($imc < 18.5){
                 $diagnostico .= 'Paciente con bajo peso. ';
                 $pesoIdeal = 18.5 * ($alturaMetro * $alturaMetro); //Bajo peso
-            }else if($imc >= 18.5 && $imc <= 25){
+            }else if($imc >= 18.5 && $imc <= 24.99){
                 $diagnostico .= 'Paciente con un peso saludable. ';
                 $pesoIdeal = $pesoActual; //Peso normal
-            }else if($imc > 25){
+            }else if($imc >= 25 && $imc <= 29.99){
                 $diagnostico .= 'Paciente con sobrepeso. ';
                 $pesoIdeal = 25 * ($alturaMetro * $alturaMetro); //Sobrepeso
-            }else if($imc >= 30 && $imc < 35){
+            }else if($imc >= 30 && $imc <= 34.99){
                 $diagnostico .= 'Paciente con obesidad de grado 1. ';
                 $pesoIdeal = 30 * ($alturaMetro * $alturaMetro); //Obesidad grado 1
-            }else if($imc >= 35 && $imc <= 40){
+            }else if($imc >= 35 && $imc <= 39.99){
                 $diagnostico .= 'Paciente con obesidad de grado 2. ';
                 $pesoIdeal = 35 * ($alturaMetro * $alturaMetro); //Obesidad grado 2
-            }else if($imc > 40){
+            }else if($imc >= 40){
                 $diagnostico .= 'Paciente con obesidad mórbida. ';
                 $pesoIdeal = 40 * ($alturaMetro * $alturaMetro); //Obesidad grado 3 o mórbida
             }
