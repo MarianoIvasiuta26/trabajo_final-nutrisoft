@@ -8,6 +8,17 @@
 
 @section('content')
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <form action="{{ route('plan-alimentacion.consultarPlanGenerado', ['pacienteId' => session('pacienteId'), 'turnoId' => session('turnoId'), 'nutricionistaId' => session('nutricionistaId')]) }}" method="get">
+                @csrf
+                <button type="submit" class="btn btn-primary">Consultar Plan</button>
+            </form>
+        </div>
+    @endif
+
+
     <div class="card card-dark">
         <div class="card-header">
             <h5>Turnos del día</h5>
@@ -119,6 +130,7 @@
         </div>
     </div>
 
+
 @stop
 
 @section('css')
@@ -138,20 +150,10 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
-        @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: "{{ session('success') }}",
-                showConfirmButton: false,
-                timer: 3000
-            }).then(function() {
-                window.location.href = "{{ route('ver-plan-generado', $pacienteId, $turno->id, $nutricionista->id) }}";
-            });
-        @endif
+
 
         $(document).ready(function(){
             $('#turnos-dia').DataTable({

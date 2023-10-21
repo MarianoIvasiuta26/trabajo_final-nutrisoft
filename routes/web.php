@@ -132,7 +132,7 @@ Route::middleware([
     Route::get('generar-plan-alimentacion', [GestionConsultasController::class, 'generarPlanesAlimentacion'])->name('generar-plan-alimentacion');
 
     Route::resource('plan-alimentacion', PlanAlimentacionController::class)->names('plan-alimentacion');
-    Route::get('plan-alimentacion.consultarPlanGenerado', [PlanAlimentacionController::class, 'consultarPlanGenerado'])->name('plan-alimentacion.consultarPlanGenerado');
+    Route::get('plan-alimentacion.consultarPlanGenerado/{pacienteId}/{turnoId}/{nutricionistaId}', [PlanAlimentacionController::class, 'consultarPlanGenerado'])->name('plan-alimentacion.consultarPlanGenerado');
 
     Route::get('planAlimentacion/index', function(){
         return view ('plan-alimentacion.index');

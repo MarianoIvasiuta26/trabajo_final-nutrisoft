@@ -138,13 +138,20 @@ class GestionConsultasController extends Controller
             $consulta->masa_residual_actual = $masaResidualActual;
             $consulta->masa_muscular_actual = $masaMuscularActual;
             $consulta->save();
+        }else{
+            $consulta->masa_grasa_actual = 0.00;
+            $consulta->masa_osea_actual = 0.00;
+            $consulta->masa_residual_actual = 0.00;
+            $consulta->masa_muscular_actual = 0.00;
+            $consulta->save();
         }
 
-        $consulta->masa_grasa_actual = $masaGrasaActual != 0 ? $masaGrasaActual : $consulta->masa_grasa_actual;
-        $consulta->masa_osea_actual = $masaOseaActual != 0 ? $masaOseaActual : $consulta->masa_osea_actual;
-        $consulta->masa_residual_actual = $masaResidualActual != 0 ? $masaResidualActual : $consulta->masa_residual_actual;
-        $consulta->masa_muscular_actual = $masaMuscularActual != 0 ? $masaMuscularActual : $consulta->masa_muscular_actual;
+        $consulta->masa_grasa_actual = ($masaGrasaActual !== 0) ? $masaGrasaActual : 0.00;
+        $consulta->masa_osea_actual = ($masaOseaActual !== 0) ? $masaOseaActual : 0.00;
+        $consulta->masa_residual_actual = ($masaResidualActual !== 0) ? $masaResidualActual : 0.00;
+        $consulta->masa_muscular_actual = ($masaMuscularActual !== 0) ? $masaMuscularActual : 0.00;
         $consulta->save();
+
 
         TratamientoPorPaciente::create([
             'tratamiento_id' => $tratamientoPaciente,
@@ -160,6 +167,9 @@ class GestionConsultasController extends Controller
         foreach($pliegues as $pliegue){
             $campo = 'pliegue_'.$pliegue->id;
             $valor = $request->input($campo);
+            if(!$valor){
+                $valor = 0.00;
+            }
             MedicionesDePlieguesCutaneos::create([
                 'historia_clinica_id' => $historiaClinica->id,
                 'consulta_id' => $consulta->id,
@@ -180,11 +190,12 @@ class GestionConsultasController extends Controller
         }
 
         if($planGenerado){
-            return redirect()->route('gestion-turnos-nutricionista.index', [
-                'pacienteId' => $paciente->id,
-                'turno' => $turno,
-                'nutricionista' => $nutricionista,
-                ])->with('success', 'Consulta realizada con éxito. Se generó el plan de alimentación');
+            return redirect()->route('gestion-turnos-nutricionista.index')
+            ->with('success', 'Consulta realizada con éxito. Se generó el plan de alimentación')
+            ->with('pacienteId', $pacienteId)
+            ->with('turnoId', $turno->id)
+            ->with('nutricionistaId', $nutricionista->id);
+
         }else{
             return back()->with('error', 'No se pudo generar el plan');
         }
@@ -203,7 +214,7 @@ class GestionConsultasController extends Controller
         $tratamientoActivo = TratamientoPorPaciente::where('paciente_id', $paciente->id)->where('estado', 'Activo')->first();
 
         //Obtenemos el tipo de consulta
-        $tipoConsulta = TipoConsulta::where('nombre', 'Primera consulta')->first();
+        $tipoConsulta = TipoConsulta::where('tipo_consulta', 'Primera consulta')->first();
 
         //Obtenemos el nutricionista
         $nutricionista = Nutricionista::where('user_id', auth()->user()->id)->first();
@@ -224,6 +235,7 @@ class GestionConsultasController extends Controller
 
         //Altura en metros
         $alturaMetro = $consulta->altura_actual / 100;
+        $gastoEnergeticoBasal = 0;
 
         //Si el IMC es menor a 18.5, el paciente está bajo de peso
         //Dieta HIPERCALÓRICA
@@ -257,19 +269,19 @@ class GestionConsultasController extends Controller
                         $gastoEnergeticoBasalMj = (0.0007 * $consulta->peso_actual) + (6.349 * $alturaMetro) - 2.584; //en Mj
 
                         //Pasamos de Mj a kj
-                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
+                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
                         //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
 
                     }else if ($paciente->sexo == 'Femenino'){
                         $gastoEnergeticoBasalMj = (0.068 * $consulta->peso_actual) + (4.281 * $alturaMetro) - 1.730;
 
                         //Pasamos de Mj a kj
-                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
+                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
                         //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
                     }
                 }else if($paciente->edad >= 3 && $paciente->edad < 10){
                     //Usamos fórmula de Schofield
@@ -278,19 +290,19 @@ class GestionConsultasController extends Controller
                         $gastoEnergeticoBasalMj = (0.082 * $consulta->peso_actual) + (0.545 * $alturaMetro) - 1.736;
 
                         //Pasamos de Mj a kj
-                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
+                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
                         //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
 
                     }else if($paciente->sexo == 'Femenino'){
                         $gastoEnergeticoBasalMj = (0.071 * $consulta->peso_actual) + (0.677 * $alturaMetro) - 1.553;
 
                         //Pasamos de Mj a kj
-                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
+                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
                         //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
                     }
                 }else if($paciente->edad >= 11 && $paciente->edad <18){
                     //Usamos fórmula de Schofield
@@ -299,19 +311,19 @@ class GestionConsultasController extends Controller
                         $gastoEnergeticoBasalMj = (0.068 * $consulta->peso_actual) + (0.574 * $alturaMetro) - 2.157;
 
                         //Pasamos de Mj a kj
-                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
+                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
                         //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
 
                     }else if($paciente->sexo == 'Femenino'){
                         $gastoEnergeticoBasalMj= (0.035 * $consulta->peso_actual) + (1.9484 * $alturaMetro) - 0.837;
 
                         //Pasamos de Mj a kj
-                        $gatoEnergeticoBasesKj = $gastoEnergeticoBasalMj * 1000; //Kj
+                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
                         //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasesKj * (1 / 4.184); //rn Kcal
+                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
                     }
                 }
             }
@@ -368,19 +380,19 @@ class GestionConsultasController extends Controller
         $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas);
 
         //Obtenemos los alimentos recomendados
-        $alimentosRecomendadosFrutas = $alimentosPaciente['alimentosRecomendadosFrutas'];
-        $alimentosRecomendadosVerduras = $alimentosPaciente['alimentosRecomendadosVerduras'];
-        $alimentosRecomendadosLegumbres = $alimentosPaciente['alimentosRecomendadosLegumbres'];
-        $alimentosRecomendadosLeche = $alimentosPaciente['alimentosRecomendadosLeche'];
-        $alimentosRecomendadosYogur = $alimentosPaciente['alimentosRecomendadosYogur'];
-        $alimentosRecomendadosQueso = $alimentosPaciente['alimentosRecomendadosQueso'];
-        $alimentosRecomendadosCarnes = $alimentosPaciente['alimentosRecomendadosCarnes'];
-        $alimentosRecomendadosHuevos = $alimentosPaciente['alimentosRecomendadosHuevos'];
-        $alimentosRecomendadosPescados = $alimentosPaciente['alimentosRecomendadosPescados'];
-        $alimentosRecomendadosAceites = $alimentosPaciente['alimentosRecomendadosAceites'];
-        $alimentosRecomendadosFrutasSecas = $alimentosPaciente['alimentosRecomendadosFrutasSecas'];
-        $alimentosRecomendadosAzucar = $alimentosPaciente['alimentosRecomendadosAzucar'];
-        $alimentosRecomendadosGolosinas = $alimentosPaciente['alimentosRecomendadosGolosinas'];
+        $alimentosRecomendadosFrutas = $alimentosPaciente['alimentosFrutas'];
+        $alimentosRecomendadosVerduras = $alimentosPaciente['alimentosVerduras'];
+        $alimentosRecomendadosLegumbres = $alimentosPaciente['alimentosLegumbres'];
+        $alimentosRecomendadosLeche = $alimentosPaciente['alimentosLeche'];
+        $alimentosRecomendadosYogur = $alimentosPaciente['alimentosYogur'];
+        $alimentosRecomendadosQueso = $alimentosPaciente['alimentosQueso'];
+        $alimentosRecomendadosCarnes = $alimentosPaciente['alimentosCarnes'];
+        $alimentosRecomendadosHuevos = $alimentosPaciente['alimentosHuevos'];
+        $alimentosRecomendadosPescados = $alimentosPaciente['alimentosPescados'];
+        $alimentosRecomendadosAceites = $alimentosPaciente['alimentosAceites'];
+        $alimentosRecomendadosFrutasSecas = $alimentosPaciente['alimentosFrutasSecas'];
+        $alimentosRecomendadosAzucar = $alimentosPaciente['alimentosAzucar'];
+        $alimentosRecomendadosGolosinas = $alimentosPaciente['alimentosGolosinas'];
 
         //Crea un array con todos estos alimentos
         $alimentosRecomendados = array_merge(
@@ -406,7 +418,7 @@ class GestionConsultasController extends Controller
             'consulta_id' => $consulta->id, // Asocia el plan a la consulta
             'paciente_id' => $paciente->id, // Asocia el plan al paciente
             'descripcion' => 'Descripción del plan', // Añade una descripción
-            'estado' => 'Activo', // Establece el estado según tus necesidades
+            'estado' => 1, // Establece el estado según tus necesidades
         ]);
 
         $planAlimentacion->save(); // Guarda el nuevo plan de alimentación
@@ -568,7 +580,7 @@ class GestionConsultasController extends Controller
         $grupoAlimentoFruta = GrupoAlimento::where('grupo', 'Frutas')->first();
         $grupoAlimentoVerdura = GrupoAlimento::where('grupo', 'Verduras')->first();
         //25%
-        $grupoAlimentoLegumbres = GrupoAlimento::where('grupo', 'Legumbres, cereales, papa, choclo, batata, pan y pastas');
+        $grupoAlimentoLegumbres = GrupoAlimento::where('grupo', 'Legumbres, cereales, papa, choclo, batata, pan y pastas')->first();
         //10%
         $grupoAlimentoLeche = GrupoAlimento::where('grupo', 'Leche y postres de leche')->first();
         $grupoAlimentoYogur = GrupoAlimento::where('grupo', 'Yogures')->first();
@@ -608,11 +620,11 @@ class GestionConsultasController extends Controller
         //Buscamos la historia Clinica
         $historiaClinica = HistoriaClinica::find($historiaClinicaId);
         //Buscamos datos médicos del paciente
-        $datosMedicos = DatosMedicos::where('historia_clinica', $historiaClinicaId)->get();
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinicaId)->get();
         //Cirugías del paciente
-        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica', $historiaClinicaId)->get();
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinicaId)->get();
         //Anamnesis alimentaria del paciente
-        $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica', $historiaClinicaId)->get();
+        $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinicaId)->get();
         //ValoresNutricionales y nutrientes
         $nutrientesKcal = Nutriente::where('nombre_nutriente', 'Valor energético');
         $ValoresNutricionales = ValorNutricional::all();
