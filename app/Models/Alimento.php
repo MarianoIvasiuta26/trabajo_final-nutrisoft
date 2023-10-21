@@ -28,4 +28,16 @@ class Alimento extends Model
         return $this->belongsTo('App\Models\GrupoAlimento');
     }
 
+    public function fuenteAlimento(){
+        return $this->belongsToMany('App\Models\FuenteAlimento');
+    }
+
+    public function nutrientes(){
+        return $this->belongsToMany('App\Models\Nutriente');
+    }
+
+    public function detallePlanAlimentaciones(){
+        return $this->belongsToMany('App\Models\DetallePlanAlimentaciones');
+    }
+
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\nutricionista;
 
 use App\Http\Controllers\Controller;
+use App\Models\Alimento;
 use App\Models\Consulta;
+use App\Models\DetallePlanAlimentaciones;
 use App\Models\MedicionesDePlieguesCutaneos;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
@@ -21,6 +23,7 @@ use App\Models\Paciente\Alergia;
 use App\Models\Paciente\Cirugia;
 use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
+use App\Models\PlanAlimentaciones;
 use App\Models\ValorNutricional;
 use Illuminate\Http\Request;
 
@@ -50,8 +53,10 @@ class GestionConsultasController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     *
      */
+
+     //@return \Illuminate\Http\Response
     public function store(Request $request, $id)
     {
         //dd($request->input('imc'), $request->input('masa_grasa'), $request->input('masa_osea'), $request->input('masa_residual'), $request->input('masa_muscular'));
@@ -170,14 +175,19 @@ class GestionConsultasController extends Controller
         //Obtener paciente de la consulta
         $paciente = Paciente::find($turno->paciente_id);
 
-        //DESCOMENTAR
-    /*
         if( $turno->estado == 'Realizado'){
-            $this->generarPlanesAlimentacion($paciente->id);
+            $planGenerado = $this->generarPlanesAlimentacion($paciente->id);
         }
-    */
-        return redirect()->route('gestion-turnos-nutricionista.index')->with('success', 'Consulta realizada con éxito');
 
+        if($planGenerado){
+            return redirect()->route('gestion-turnos-nutricionista.index', [
+                'pacienteId' => $paciente->id,
+                'turno' => $turno,
+                'nutricionista' => $nutricionista,
+                ])->with('success', 'Consulta realizada con éxito. Se generó el plan de alimentación');
+        }else{
+            return back()->with('error', 'No se pudo generar el plan');
+        }
 
     }
 
@@ -357,8 +367,107 @@ class GestionConsultasController extends Controller
         //Selección de alimentos
         $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas);
 
+        //Obtenemos los alimentos recomendados
+        $alimentosRecomendadosFrutas = $alimentosPaciente['alimentosRecomendadosFrutas'];
+        $alimentosRecomendadosVerduras = $alimentosPaciente['alimentosRecomendadosVerduras'];
+        $alimentosRecomendadosLegumbres = $alimentosPaciente['alimentosRecomendadosLegumbres'];
+        $alimentosRecomendadosLeche = $alimentosPaciente['alimentosRecomendadosLeche'];
+        $alimentosRecomendadosYogur = $alimentosPaciente['alimentosRecomendadosYogur'];
+        $alimentosRecomendadosQueso = $alimentosPaciente['alimentosRecomendadosQueso'];
+        $alimentosRecomendadosCarnes = $alimentosPaciente['alimentosRecomendadosCarnes'];
+        $alimentosRecomendadosHuevos = $alimentosPaciente['alimentosRecomendadosHuevos'];
+        $alimentosRecomendadosPescados = $alimentosPaciente['alimentosRecomendadosPescados'];
+        $alimentosRecomendadosAceites = $alimentosPaciente['alimentosRecomendadosAceites'];
+        $alimentosRecomendadosFrutasSecas = $alimentosPaciente['alimentosRecomendadosFrutasSecas'];
+        $alimentosRecomendadosAzucar = $alimentosPaciente['alimentosRecomendadosAzucar'];
+        $alimentosRecomendadosGolosinas = $alimentosPaciente['alimentosRecomendadosGolosinas'];
 
-        return view('nutricionista.gestion-consultas.generar-plan-alimentacion', compact('paciente', 'historiaClinica', 'datosMedicos', 'cirugiasPaciente', 'anamnesisPaciente', 'tratamientoActivo', 'tipoConsulta', 'nutricionista', 'turno', 'consulta', 'imc', 'gastoEnergeticoBasal', 'gastoEnergeticoTotal', 'proteinasRecomendadas', 'lipidosRecomendados', 'carbohidratosRecomendados'));
+        //Crea un array con todos estos alimentos
+        $alimentosRecomendados = array_merge(
+            $alimentosRecomendadosFrutas,
+            $alimentosRecomendadosVerduras,
+            $alimentosRecomendadosLegumbres,
+            $alimentosRecomendadosLeche,
+            $alimentosRecomendadosYogur,
+            $alimentosRecomendadosQueso,
+            $alimentosRecomendadosCarnes,
+            $alimentosRecomendadosHuevos,
+            $alimentosRecomendadosPescados,
+            $alimentosRecomendadosAceites,
+            $alimentosRecomendadosFrutasSecas,
+            $alimentosRecomendadosAzucar,
+            $alimentosRecomendadosGolosinas
+        );
+
+        $alimentos = Alimento::All();
+
+        // Crea un nuevo plan de alimentación
+        $planAlimentacion = new PlanAlimentaciones([
+            'consulta_id' => $consulta->id, // Asocia el plan a la consulta
+            'paciente_id' => $paciente->id, // Asocia el plan al paciente
+            'descripcion' => 'Descripción del plan', // Añade una descripción
+            'estado' => 'Activo', // Establece el estado según tus necesidades
+        ]);
+
+        $planAlimentacion->save(); // Guarda el nuevo plan de alimentación
+
+        // Asocia los detalles del plan de alimentación al plan recién creado
+        foreach ($alimentosRecomendados as $alimento) {
+            foreach ($alimentos as $alim) {
+                if ($alim->alimento == $alimento) {
+                    $detallePlan = new DetallePlanAlimentaciones([
+                        'alimento_id' => $alim->id, // Asocia el alimento al detalle del plan
+                        'horario_consumicion' => 'Horario', // Establece el horario según tus necesidades
+                        'cantidad' => 100, // Establece la cantidad según tus necesidades
+                        'unidad_medida' => 'gramos', // Establece la unidad de medida según tus necesidades
+                        'observacion' => 'Observación', // Añade una observación según tus necesidades
+                    ]);
+
+                    $planAlimentacion->detallePlanAlimentaciones()->save($detallePlan);
+                }
+            }
+        }
+
+/*
+        return view('plan-alimentacion.index',
+        compact(
+            'paciente', 'historiaClinica', 'datosMedicos', 'cirugiasPaciente', 'anamnesisPaciente',
+            'tratamientoActivo', 'tipoConsulta', 'nutricionista', 'turno', 'consulta', 'imc',
+            'gastoEnergeticoBasal', 'gastoEnergeticoTotal', 'proteinasRecomendadas', 'lipidosRecomendados',
+            'carbohidratosRecomendados', 'alimentosRecomendadosFrutas', 'alimentosRecomendadosVerduras',
+            'alimentosRecomendadosLegumbres', 'alimentosRecomendadosLeche', 'alimentosRecomendadosYogur',
+            'alimentosRecomendadosQueso', 'alimentosRecomendadosCarnes', 'alimentosRecomendadosHuevos',
+            'alimentosRecomendadosPescados', 'alimentosRecomendadosAceites', 'alimentosRecomendadosFrutasSecas',
+            'alimentosRecomendadosAzucar', 'alimentosRecomendadosGolosinas'
+        ));
+*/
+        return [
+            'paciente' => $paciente,
+            'historiaClinica' => $historiaClinica,
+            'tratamientoActivo' => $tratamientoActivo,
+            'tipoConsulta' => $tipoConsulta,
+            'nutricionista' => $nutricionista,
+            'imc' => $imc,
+            'gastoEnergeticoBasal' => $gastoEnergeticoBasal,
+            'gastoEnergeticoTotal' => $gastoEnergeticoTotal,
+            'proteinasRecomendadas' => $proteinasRecomendadas,
+            'lipidosRecomendados' => $lipidosRecomendados,
+            'carbohidratosRecomendados' => $carbohidratosRecomendados,
+            'alimentosRecomendadosFrutas' => $alimentosRecomendadosFrutas,
+            'alimentosRecomendadosVerduras' => $alimentosRecomendadosVerduras,
+            'alimentosRecomendadosLegumbres' => $alimentosRecomendadosLegumbres,
+            'alimentosRecomendadosLeche' => $alimentosRecomendadosLeche,
+            'alimentosRecomendadosYogur' => $alimentosRecomendadosYogur,
+            'alimentosRecomendadosQueso' => $alimentosRecomendadosQueso,
+            'alimentosRecomendadosCarnes' => $alimentosRecomendadosCarnes,
+            'alimentosRecomendadosHuevos' => $alimentosRecomendadosHuevos,
+            'alimentosRecomendadosPescados' => $alimentosRecomendadosPescados,
+            'alimentosRecomendadosAceites' => $alimentosRecomendadosAceites,
+            'alimentosRecomendadosFrutasSecas' => $alimentosRecomendadosFrutasSecas,
+            'alimentosRecomendadosAzucar' => $alimentosRecomendadosAzucar,
+            'alimentosRecomendadosGolosinas' => $alimentosRecomendadosGolosinas,
+        ];
+
     }
 
     public function determinacionGET($geb, $estilo_vida){
@@ -556,7 +665,7 @@ class GestionConsultasController extends Controller
         foreach($nutrientesKcal as $nutriente){
             foreach($ValoresNutricionales as $valorN){
                 foreach($alimentosLegumbres as $legumbre){
-                    if($legumbre->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeLegumbres){
+                    if($legumbre->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeLegumbresCereales){
                         if($porcentajeLegumbresCereales > 0){
                             $alimentosRecomendadosLegumbres[] = $legumbre->alimento;
                             $porcentajeLegumbresCereales = $porcentajeLegumbresCereales - $valorN->valor;
@@ -729,8 +838,31 @@ class GestionConsultasController extends Controller
                 }
             }
         }
+/*
+        //Obtenemos los alimentos que no le gustan al paciente
+        $alimentosNoGustan = [];
+        foreach($anamnesisPaciente as $anamnesis){
+            if($anamnesis->gusta == 0){
+                $alimentosNoGustan[] = $anamnesis->alimento;
+            }
+        }
+*/
 
-        
+        return [
+            'alimentosFrutas' => $alimentosRecomendadosFrutas,
+            'alimentosVerduras' => $alimentosRecomendadosVerduras,
+            'alimentosLegumbres' => $alimentosRecomendadosLegumbres,
+            'alimentosLeche' => $alimentosRecomendadosLeche,
+            'alimentosYogur' => $alimentosRecomendadosYogur,
+            'alimentosQueso' => $alimentosRecomendadosQueso,
+            'alimentosCarnes' => $alimentosRecomendadosCarnes,
+            'alimentosHuevos' => $alimentosRecomendadosHuevos,
+            'alimentosPescados' => $alimentosRecomendadosPescados,
+            'alimentosAceites' => $alimentosRecomendadosAceites,
+            'alimentosFrutasSecas' => $alimentosRecomendadosFrutasSecas,
+            'alimentosAzucar' => $alimentosRecomendadosAzucar,
+            'alimentosGolosinas' => $alimentosRecomendadosGolosinas,
+        ];
 
 
 

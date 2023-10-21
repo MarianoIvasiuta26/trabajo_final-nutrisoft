@@ -22,6 +22,7 @@ use App\Http\Controllers\nutricionista\GestionTurnosController;
 use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
 use App\Http\Controllers\PacienteController;
+use App\Http\Controllers\PlanAlimentacionController;
 use App\Http\Controllers\TratramientoController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\UserController;
@@ -129,4 +130,11 @@ Route::middleware([
 
     //Proceso automatizado Generación automática de Planes de Alimentación
     Route::get('generar-plan-alimentacion', [GestionConsultasController::class, 'generarPlanesAlimentacion'])->name('generar-plan-alimentacion');
+
+    Route::resource('plan-alimentacion', PlanAlimentacionController::class)->names('plan-alimentacion');
+    Route::get('plan-alimentacion.consultarPlanGenerado', [PlanAlimentacionController::class, 'consultarPlanGenerado'])->name('plan-alimentacion.consultarPlanGenerado');
+
+    Route::get('planAlimentacion/index', function(){
+        return view ('plan-alimentacion.index');
+    });
 });

@@ -32,4 +32,8 @@ class Consulta extends Model
     public function medicionesDePlieguesCutaneos() {
         return $this->hasMany(MedicionesDePlieguesCutaneos::class);
     }
+
+    public function planAlimentaciones(){
+        return $this->hasMany('App\Models\PlanAlimentaciones');
+    }
 }

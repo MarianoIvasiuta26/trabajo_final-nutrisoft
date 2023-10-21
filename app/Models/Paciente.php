@@ -42,5 +42,10 @@ class Paciente extends Model
     {
         return $this->hasMany('App\Models\Paciente\TratamientoPorPaciente');
     }
-    
+
+    public function planAlimentaciones()
+    {
+        return $this->hasMany('App\Models\PlanAlimentaciones');
+    }
+
 }

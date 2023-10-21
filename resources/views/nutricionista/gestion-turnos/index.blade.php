@@ -140,6 +140,19 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
+
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 3000
+            }).then(function() {
+                window.location.href = "{{ route('ver-plan-generado', $pacienteId, $turno->id, $nutricionista->id) }}";
+            });
+        @endif
+
         $(document).ready(function(){
             $('#turnos-dia').DataTable({
                 responsive: true,
