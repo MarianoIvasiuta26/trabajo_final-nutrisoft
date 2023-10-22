@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Alimento;
 use App\Models\DetallePlanAlimentaciones;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
@@ -93,10 +94,12 @@ class PlanAlimentacionController extends Controller
         $turno = Turno::find($turnoId);
         $nutricionista = Nutricionista::find($nutriconistaId);
 
-        $planGenerado = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 'Activo')->first();
+        $planGenerado = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 1)->first();
         $detallesPlan = DetallePlanAlimentaciones::where('plan_alimentacion_id', $planGenerado->id)->get();
 
-        return view('plan-alimentacion.plan-generado', compact('paciente', 'turno', 'nutricionista' , 'planGenerado', 'detallesPlan'));
+        $alimentos = Alimento::all();
+
+        return view('plan-alimentacion.plan-generado', compact('paciente', 'turno', 'nutricionista' , 'planGenerado', 'detallesPlan', 'alimentos'));
 
     }
 }

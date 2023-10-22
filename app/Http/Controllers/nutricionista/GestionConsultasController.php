@@ -186,7 +186,7 @@ class GestionConsultasController extends Controller
         $paciente = Paciente::find($turno->paciente_id);
 
         if( $turno->estado == 'Realizado'){
-            $planGenerado = $this->generarPlanesAlimentacion($paciente->id);
+            $planGenerado = $this->generarPlanesAlimentacion($paciente->id, $turno->id);
         }
 
         if($planGenerado){
@@ -203,7 +203,7 @@ class GestionConsultasController extends Controller
     }
 
     //Función para el 2do proceso automatizado: Generación automática de Plan de alimentación
-    public function generarPlanesAlimentacion($id){
+    public function generarPlanesAlimentacion($id, $turnoId){
         //Buscamos el paciente
         $paciente = Paciente::find($id);
 
@@ -222,7 +222,7 @@ class GestionConsultasController extends Controller
         /* Ver si usar estos o no */
 
         //Obtenemos el turno
-        $turno = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')->first();
+        $turno = Turno::find($turnoId);
 
         //Obtenemos la consulta
         $consulta = Consulta::where('turno_id', $turno->id)->first();
@@ -394,6 +394,8 @@ class GestionConsultasController extends Controller
         $alimentosRecomendadosAzucar = $alimentosPaciente['alimentosAzucar'];
         $alimentosRecomendadosGolosinas = $alimentosPaciente['alimentosGolosinas'];
 
+        //dd($alimentosRecomendadosFrutas, $alimentosRecomendadosVerduras, $alimentosRecomendadosLegumbres, $alimentosRecomendadosLeche, $alimentosRecomendadosYogur, $alimentosRecomendadosQueso, $alimentosRecomendadosCarnes, $alimentosRecomendadosHuevos, $alimentosRecomendadosPescados, $alimentosRecomendadosAceites, $alimentosRecomendadosFrutasSecas, $alimentosRecomendadosAzucar, $alimentosRecomendadosGolosinas);
+
         //Crea un array con todos estos alimentos
         $alimentosRecomendados = array_merge(
             $alimentosRecomendadosFrutas,
@@ -411,10 +413,12 @@ class GestionConsultasController extends Controller
             $alimentosRecomendadosGolosinas
         );
 
+        //dd($imc, $consulta->peso_actual, $consulta->altura_actual, $paciente->edad, $gastoEnergeticoTotal, $gastoEnergeticoBasal, $alimentosRecomendados, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas,  $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas);
+
         $alimentos = Alimento::All();
 
         // Crea un nuevo plan de alimentación
-        $planAlimentacion = new PlanAlimentaciones([
+        $planAlimentacion = PlanAlimentaciones::create([
             'consulta_id' => $consulta->id, // Asocia el plan a la consulta
             'paciente_id' => $paciente->id, // Asocia el plan al paciente
             'descripcion' => 'Descripción del plan', // Añade una descripción
@@ -422,12 +426,14 @@ class GestionConsultasController extends Controller
         ]);
 
         $planAlimentacion->save(); // Guarda el nuevo plan de alimentación
+        //dd($consulta, $planAlimentacion);
 
         // Asocia los detalles del plan de alimentación al plan recién creado
         foreach ($alimentosRecomendados as $alimento) {
             foreach ($alimentos as $alim) {
                 if ($alim->alimento == $alimento) {
-                    $detallePlan = new DetallePlanAlimentaciones([
+                    $detallePlan = DetallePlanAlimentaciones::create([
+                        'plan_alimentacion_id' => $planAlimentacion->id, // Asocia el plan al detalle del plan
                         'alimento_id' => $alim->id, // Asocia el alimento al detalle del plan
                         'horario_consumicion' => 'Horario', // Establece el horario según tus necesidades
                         'cantidad' => 100, // Establece la cantidad según tus necesidades
@@ -435,7 +441,7 @@ class GestionConsultasController extends Controller
                         'observacion' => 'Observación', // Añade una observación según tus necesidades
                     ]);
 
-                    $planAlimentacion->detallePlanAlimentaciones()->save($detallePlan);
+                    $detallePlan->save(); // Guarda el detalle del plan
                 }
             }
         }
@@ -598,24 +604,26 @@ class GestionConsultasController extends Controller
 
         //Obtenemos los alimentos de cada grupo
         //50%
-        $alimentosFruta = $grupoAlimentoFruta->alimento;
-        $alimentosVerdura = $grupoAlimentoVerdura->alimento;
+        $alimentosFruta = Alimento::where('grupo_alimento_id', $grupoAlimentoFruta->id)->get();
+        $alimentosVerdura = Alimento::where('grupo_alimento_id', $grupoAlimentoVerdura->id)->get();
         //25%
-        $alimentosLegumbres = $grupoAlimentoLegumbres->alimento;
+        $alimentosLegumbres = Alimento::where('grupo_alimento_id', $grupoAlimentoLegumbres->id)->get();
         //10%
-        $alimentosLeche = $grupoAlimentoLeche->alimento;
-        $alimentosYogur = $grupoAlimentoYogur->alimento;
-        $alimentosQueso = $grupoAlimentoQueso->alimento;
+        $alimentosLeche = Alimento::where('grupo_alimento_id', $grupoAlimentoLeche->id)->get();
+        $alimentosYogur = Alimento::where('grupo_alimento_id', $grupoAlimentoYogur->id)->get();
+        $alimentosQueso = Alimento::where('grupo_alimento_id', $grupoAlimentoQueso->id)->get();
         //5%
-        $alimentosCarnes = $grupoAlimentoCarnes->alimento;
-        $alimentosHuevos = $grupoAlimentoHuevos->alimento;
-        $alimentosPescados = $grupoAlimentoPescados->alimento;
+        $alimentosCarnes = Alimento::where('grupo_alimento_id', $grupoAlimentoCarnes->id)->get();
+        $alimentosHuevos = Alimento::where('grupo_alimento_id', $grupoAlimentoHuevos->id)->get();
+        $alimentosPescados = Alimento::where('grupo_alimento_id', $grupoAlimentoPescados->id)->get();
         //5%
-        $alimentosAceites = $grupoAlimentoAceites->alimento;
-        $alimentosFrutasSecas = $grupoAlimentoFrutasSecas->alimento;
+        $alimentosAceites = Alimento::where('grupo_alimento_id', $grupoAlimentoAceites->id)->get();
+        $alimentosFrutasSecas = Alimento::where('grupo_alimento_id', $grupoAlimentoFrutasSecas->id)->get();
         //5%
-        $alimentosAzucar = $grupoAlimentoAzucar->alimento;
-        $alimentosGolosinas = $grupoGolosinas->alimento;
+        $alimentosAzucar = Alimento::where('grupo_alimento_id', $grupoAlimentoAzucar->id)->get();
+        $alimentosGolosinas = Alimento::where('grupo_alimento_id', $grupoGolosinas->id)->get();
+
+        //dd('Alimentos:', $alimentosVerdura);
 
         //Buscamos la historia Clinica
         $historiaClinica = HistoriaClinica::find($historiaClinicaId);
@@ -626,7 +634,7 @@ class GestionConsultasController extends Controller
         //Anamnesis alimentaria del paciente
         $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinicaId)->get();
         //ValoresNutricionales y nutrientes
-        $nutrientesKcal = Nutriente::where('nombre_nutriente', 'Valor energético');
+        $nutrientesKcal = Nutriente::where('nombre_nutriente', 'Valor energético')->first();
         $ValoresNutricionales = ValorNutricional::all();
 
         //Obtenemos datos necesarios
@@ -647,26 +655,23 @@ class GestionConsultasController extends Controller
 
         //Evaluación de alimentos por 100 gramos
         foreach($alimentosFruta as $fruta){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($fruta->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeFrutas){
-                        if($porcentajeFrutas > 0){
-                            $alimentosRecomendadosFrutas[] = $fruta->alimento;
-                            $porcentajeFrutas = $porcentajeFrutas - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($fruta->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeFrutas){
+                    if($porcentajeFrutas > 0){
+                        $alimentosRecomendadosFrutas[] = $fruta->alimento;
+                        $porcentajeFrutas = $porcentajeFrutas - $valorN->valor;
                     }
                 }
             }
+
         }
 
         foreach($alimentosVerdura as $verdura){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($verdura->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeVerduras){
-                        if($porcentajeVerduras > 0){
-                            $alimentosRecomendadosVerduras[] = $verdura->alimento;
-                            $porcentajeVerduras = $porcentajeVerduras - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($verdura->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeVerduras){
+                    if($porcentajeVerduras > 0){
+                        $alimentosRecomendadosVerduras[] = $verdura->alimento;
+                        $porcentajeVerduras = $porcentajeVerduras - $valorN->valor;
                     }
                 }
             }
@@ -674,17 +679,15 @@ class GestionConsultasController extends Controller
 
         //Legumbres -> 25%
         $alimentosRecomendadosLegumbres = [];
-        foreach($nutrientesKcal as $nutriente){
             foreach($ValoresNutricionales as $valorN){
                 foreach($alimentosLegumbres as $legumbre){
-                    if($legumbre->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeLegumbresCereales){
+                    if($legumbre->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeLegumbresCereales){
                         if($porcentajeLegumbresCereales > 0){
                             $alimentosRecomendadosLegumbres[] = $legumbre->alimento;
                             $porcentajeLegumbresCereales = $porcentajeLegumbresCereales - $valorN->valor;
                         }
                     }
                 }
-            }
         }
 
         //Leche, yogur y queso -> 10%
@@ -697,39 +700,33 @@ class GestionConsultasController extends Controller
         $porcentajeQueso = $porcentajeLecheYogurQueso / 3;
 
         foreach($alimentosLeche as $leche){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($leche->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeLeche){
-                        if($porcentajeLeche > 0){
-                            $alimentosRecomendadosLeche[] = $leche->alimento;
-                            $porcentajeLeche = $porcentajeLeche - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($leche->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeLeche){
+                    if($porcentajeLeche > 0){
+                        $alimentosRecomendadosLeche[] = $leche->alimento;
+                        $porcentajeLeche = $porcentajeLeche - $valorN->valor;
                     }
                 }
             }
         }
 
         foreach($alimentosYogur as $yogur){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($yogur->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeYogur){
-                        if($porcentajeYogur > 0){
-                            $alimentosRecomendadosYogur[] = $yogur->alimento;
-                            $porcentajeYogur = $porcentajeYogur - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($yogur->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeYogur){
+                    if($porcentajeYogur > 0){
+                        $alimentosRecomendadosYogur[] = $yogur->alimento;
+                        $porcentajeYogur = $porcentajeYogur - $valorN->valor;
                     }
                 }
             }
         }
 
         foreach($alimentosQueso as $queso){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($queso->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeQueso){
-                        if($porcentajeQueso > 0){
-                            $alimentosRecomendadosQueso[] = $queso->alimento;
-                            $porcentajeQueso = $porcentajeQueso - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($queso->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeQueso){
+                    if($porcentajeQueso > 0){
+                        $alimentosRecomendadosQueso[] = $queso->alimento;
+                        $porcentajeQueso = $porcentajeQueso - $valorN->valor;
                     }
                 }
             }
@@ -745,39 +742,33 @@ class GestionConsultasController extends Controller
         $porcentajePescados = $porcentajeCarnesHuevo / 3;
 
         foreach($alimentosCarnes as $carne){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($carne->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeCarnes){
-                        if($porcentajeCarnes > 0){
-                            $alimentosRecomendadosCarnes[] = $carne->alimento;
-                            $porcentajeCarnes = $porcentajeCarnes - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($carne->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeCarnes){
+                    if($porcentajeCarnes > 0){
+                        $alimentosRecomendadosCarnes[] = $carne->alimento;
+                        $porcentajeCarnes = $porcentajeCarnes - $valorN->valor;
                     }
                 }
             }
         }
 
         foreach($alimentosHuevos as $huevo){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($huevo->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeHuevos){
-                        if($porcentajeHuevos > 0){
-                            $alimentosRecomendadosHuevos[] = $huevo->alimento;
-                            $porcentajeHuevos = $porcentajeHuevos - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($huevo->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeHuevos){
+                    if($porcentajeHuevos > 0){
+                        $alimentosRecomendadosHuevos[] = $huevo->alimento;
+                        $porcentajeHuevos = $porcentajeHuevos - $valorN->valor;
                     }
                 }
             }
         }
 
         foreach($alimentosPescados as $pescado){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($pescado->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajePescados){
-                        if($porcentajePescados > 0){
-                            $alimentosRecomendadosPescados[] = $pescado->alimento;
-                            $porcentajePescados = $porcentajePescados - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($pescado->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajePescados){
+                    if($porcentajePescados > 0){
+                        $alimentosRecomendadosPescados[] = $pescado->alimento;
+                        $porcentajePescados = $porcentajePescados - $valorN->valor;
                     }
                 }
             }
@@ -792,26 +783,22 @@ class GestionConsultasController extends Controller
         $porcentajeFrutasSecas = $porcentajeAceitesFrutasSecasSemillas / 2;
 
         foreach($alimentosAceites as $aceite){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($aceite->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeAceites){
-                        if($porcentajeAceites > 0){
-                            $alimentosRecomendadosAceites[] = $aceite->alimento;
-                            $porcentajeAceites = $porcentajeAceites - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($aceite->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeAceites){
+                    if($porcentajeAceites > 0){
+                        $alimentosRecomendadosAceites[] = $aceite->alimento;
+                        $porcentajeAceites = $porcentajeAceites - $valorN->valor;
                     }
                 }
             }
         }
 
         foreach($alimentosFrutasSecas as $frutaSeca){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($frutaSeca->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeFrutasSecas){
-                        if($porcentajeFrutasSecas > 0){
-                            $alimentosRecomendadosFrutasSecas[] = $frutaSeca->alimento;
-                            $porcentajeFrutasSecas = $porcentajeFrutasSecas - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($frutaSeca->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeFrutasSecas){
+                    if($porcentajeFrutasSecas > 0){
+                        $alimentosRecomendadosFrutasSecas[] = $frutaSeca->alimento;
+                        $porcentajeFrutasSecas = $porcentajeFrutasSecas - $valorN->valor;
                     }
                 }
             }
@@ -826,26 +813,22 @@ class GestionConsultasController extends Controller
         $porcentajeGolosinas = $porcentajeAzucarDulcesGolosinas / 2;
 
         foreach($alimentosAzucar as $azucar){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($azucar->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeAzucar){
-                        if($porcentajeAzucar > 0){
-                            $alimentosRecomendadosAzucar[] = $azucar->alimento;
-                            $porcentajeAzucar = $porcentajeAzucar - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($azucar->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeAzucar){
+                    if($porcentajeAzucar > 0){
+                        $alimentosRecomendadosAzucar[] = $azucar->alimento;
+                        $porcentajeAzucar = $porcentajeAzucar - $valorN->valor;
                     }
                 }
             }
         }
 
         foreach($alimentosGolosinas as $golosina){
-            foreach($nutrientesKcal as $nutriente){
-                foreach($ValoresNutricionales as $valorN){
-                    if($golosina->id == $valorN->alimento_id && $valorN->nutriente_id == $nutriente->id && $valorN->valor < $porcentajeGolosinas){
-                        if($porcentajeGolosinas > 0){
-                            $alimentosRecomendadosGolosinas[] = $golosina->alimento;
-                            $porcentajeGolosinas = $porcentajeGolosinas - $valorN->valor;
-                        }
+            foreach($ValoresNutricionales as $valorN){
+                if($golosina->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeGolosinas){
+                    if($porcentajeGolosinas > 0){
+                        $alimentosRecomendadosGolosinas[] = $golosina->alimento;
+                        $porcentajeGolosinas = $porcentajeGolosinas - $valorN->valor;
                     }
                 }
             }

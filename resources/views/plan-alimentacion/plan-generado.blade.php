@@ -26,7 +26,7 @@
 
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <h5>Paciente: </h5> <p class="ms-2">{{$paciente->user->apellido}}, {{paciente->user->name}}</p>
+                        <h5>Paciente: </h5> <p class="ms-2">{{$paciente->user->apellido}}, {{$paciente->user->name}}</p>
                     </div>
                     <div class="col-md-6">
                         <h5>Profesional: </h5> <p class="ms-2">{{$nutricionista->user->apellido}}, {{$nutricionista->user->name}}</p>
@@ -63,22 +63,24 @@
                     </div>
                     <div class="col-md-12">
                         @forelse ($detallesPlan as $detallePlan)
-                            @if ($detallePlan->horario_consumicion == 'Desayuno')
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <h5>Alimento: </h5> <p class="ms-2">{{$detallePlan->alimento->alimento}}</p>
+                            @foreach ($alimentos as $alimento)
+                                @if ($detallePlan->horario_consumicion == 'Desayuno' && $detallePlan->alimento_id == $alimento->id)
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <h5>Alimento: </h5> <p class="ms-2">{{$alimento->alimento}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
-                                    </div>
-                                </div>
-                            @endif
+                                @endif
+                            @endforeach
                         @empty
                             <p>No hay alimentos asignados para este horario</p>
                         @endforelse
@@ -90,22 +92,24 @@
                     </div>
                     <div class="col-md-12">
                         @forelse ($detallesPlan as $detallePlan)
-                            @if ($detallePlan->horario_consumicion == 'Media maniana')
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <h5>Alimento: </h5> <p class="ms-2">{{$detallePlan->alimento->alimento}}</p>
+                            @foreach ($alimentos as $alimento)
+                                @if ($detallePlan->horario_consumicion == 'Media maniana' && $detallePlan->alimento_id == $alimento->id)
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <h5>Alimento: </h5> <p class="ms-2">{{$alimento->alimento}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
-                                    </div>
-                                </div>
-                            @endif
+                                @endif
+                            @endforeach
                         @empty
                             <p>No hay alimentos asignados para este horario</p>
                         @endforelse
@@ -118,22 +122,24 @@
                     </div>
                     <div class="col-md-12">
                         @forelse ($detallesPlan as $detallePlan)
-                            @if ($detallePlan->horario_consumicion == 'Almuerzo')
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <h5>Alimento: </h5> <p class="ms-2">{{$detallePlan->alimento->alimento}}</p>
+                            @foreach ($alimentos as $alimento)
+                                @if ($detallePlan->horario_consumicion == 'Almuerzo' && $detallePlan->alimento_id == $alimento->id)
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <h5>Alimento: </h5> <p class="ms-2">{{$alimento->alimento}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
-                                    </div>
-                                </div>
-                            @endif
+                                @endif
+                            @endforeach
                         @empty
                             <p>No hay alimentos asignados para este horario</p>
                         @endforelse
@@ -146,22 +152,24 @@
                     </div>
                     <div class="col-md-12">
                         @forelse ($detallesPlan as $detallePlan)
-                            @if ($detallePlan->horario_consumicion == 'Media tarde')
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <h5>Alimento: </h5> <p class="ms-2">{{$detallePlan->alimento->alimento}}</p>
+                            @foreach ($alimentos as $alimento)
+                                @if ($detallePlan->horario_consumicion == 'Media tarde' && $detallePlan->alimento_id == $alimento->id)
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <h5>Alimento: </h5> <p class="ms-2">{{$detallePlan->alimento->alimento}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
-                                    </div>
-                                </div>
-                            @endif
+                                @endif
+                            @endforeach
                         @empty
                             <p>No hay alimentos asignados para este horario</p>
                         @endforelse
@@ -174,22 +182,24 @@
                     </div>
                     <div class="col-md-12">
                         @forelse ($detallesPlan as $detallePlan)
-                            @if ($detallePlan->horario_consumicion == 'Cena')
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <h5>Alimento: </h5> <p class="ms-2">{{$detallePlan->alimento->alimento}}</p>
+                            @foreach ($alimentos as $alimento)
+                                @if ($detallePlan->horario_consumicion == 'Cena' && $detallePlan->alimento_id == $alimento->id)
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <h5>Alimento: </h5> <p class="ms-2">{{$detallePlan->alimento->alimento}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h5>Cantidad: </h5> <p class="ms-2">{{$detallePlan->cantidad}}</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h5>Unidad de medida: </h5> <p class="ms-2">{{$detallePlan->unidad_medida}}</p>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <h5>Observaciones: </h5> <p class="ms-2">{{$detallePlan->observaciones}}</p>
-                                    </div>
-                                </div>
-                            @endif
+                                @endif
+                            @endforeach
                         @empty
                             <p>No hay alimentos asignados para este horario</p>
                         @endforelse
