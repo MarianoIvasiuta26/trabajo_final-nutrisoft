@@ -68,10 +68,10 @@ class GestionConsultasController extends Controller
             'observacion' => ['required', 'string', 'max:255'],
             'peso_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'altura_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'circ_munieca_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'circ_cintura_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'circ_cadera_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'circ_pecho_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circ_munieca_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circ_cintura_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circ_cadera_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'circ_pecho_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'diagnostico' => ['required', 'string', 'max:255'],
             'imc_actual' => ['required', 'numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'],
             'masa_grasa_actual' => ['numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'] ,
@@ -173,7 +173,7 @@ class GestionConsultasController extends Controller
             MedicionesDePlieguesCutaneos::create([
                 'historia_clinica_id' => $historiaClinica->id,
                 'consulta_id' => $consulta->id,
-                'pliegue_id' => $pliegue->id,
+                'tipos_de_pliegue_cutaneo_id' => $pliegue->id,
                 'valor_medicion' => $valor,
             ]);
 
@@ -377,7 +377,7 @@ class GestionConsultasController extends Controller
         $porcentajeAzucarDulcesGolosinas = $resultadoEleccionAlimentos['porcentajeAzucarDulcesGolosinas'];
 
         //Selección de alimentos
-        $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas);
+        $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas);
 
         //Obtenemos los alimentos recomendados
         $alimentosRecomendadosFrutas = $alimentosPaciente['alimentosFrutas'];
@@ -512,25 +512,27 @@ class GestionConsultasController extends Controller
         $lipidosRecomendados = 0;
         $proteinasRecomendadas = 0;
 
+        //ESTABLECER SEGÚN EL TIPO DE DIETA QUE NECESITA
+
         if($edad <= 10){
             //Determinación de gramos de proteínas, carbohidratos y lípidos (Niños)
-            $carbohidratosRecomendados = ($get * 0.55) / 4;
-            $lipidosRecomendados = ($get * 0.30) / 9;
-            $proteinasRecomendadas = ($get * 0.15) / 4;
+            $carbohidratosRecomendados = ($get * 0.55) / 4;//Gramos
+            $lipidosRecomendados = ($get * 0.30) / 9;//Gramos
+            $proteinasRecomendadas = ($get * 0.15) / 4;//Gramos
         }
 
         if($edad >= 11 && $edad <18){
             //Determinación de gramos de proteínas, carbohidratos y lípidos (Adolescentes)
-            $carbohidratosRecomendados = ($get * 0.6) / 4;
-            $lipidosRecomendados = ($get * 0.25) / 9;
-            $proteinasRecomendadas = ($get * 0.15) / 4;
+            $carbohidratosRecomendados = ($get * 0.6) / 4; //Gramos
+            $lipidosRecomendados = ($get * 0.25) / 9;//Gramos
+            $proteinasRecomendadas = ($get * 0.15) / 4;//Gramos
         }
 
         if($edad >= 18){
             //Determinación de gramos de proteínas, carbohidratos y lípidos (Adultos)
-            $carbohidratosRecomendados = ($get * 0.6) / 4;
-            $lipidosRecomendados = ($get * 0.28) / 9;
-            $proteinasRecomendadas = ($get * 0.12) / 4;
+            $carbohidratosRecomendados = ($get * 0.6) / 4; //Gramos
+            $lipidosRecomendados = ($get * 0.28) / 9; //Gramos
+            $proteinasRecomendadas = ($get * 0.12) / 4; //Gramos
         }
 
         return [
@@ -579,7 +581,7 @@ class GestionConsultasController extends Controller
         ];
     }
 
-    public function eleccionAlimentos($historiaClinicaId, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas){
+    public function eleccionAlimentos($historiaClinicaId, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas,  $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas){
 
         //Obtenemos los grupos de alimentos
         //50%
@@ -627,6 +629,7 @@ class GestionConsultasController extends Controller
 
         //Buscamos la historia Clinica
         $historiaClinica = HistoriaClinica::find($historiaClinicaId);
+        $paciente = Paciente::wherE('id', $historiaClinica->paciente_id)->first();
         //Buscamos datos médicos del paciente
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinicaId)->get();
         //Cirugías del paciente
@@ -636,6 +639,7 @@ class GestionConsultasController extends Controller
         //ValoresNutricionales y nutrientes
         $nutrientesKcal = Nutriente::where('nombre_nutriente', 'Valor energético')->first();
         $ValoresNutricionales = ValorNutricional::all();
+        $nutrientes = Nutriente::all();
 
         //Obtenemos datos necesarios
         $alergias = Alergia::all();
@@ -650,16 +654,82 @@ class GestionConsultasController extends Controller
         //Frutas y verduras -> 50%
         $alimentosRecomendadosFrutas = [];
         $alimentosRecomendadosVerduras = [];
-        $porcentajeFrutas = $porcentajeFrutasVerduras / 2;
-        $porcentajeVerduras = $porcentajeFrutasVerduras / 2;
+        $caloriasTotalesFrutas = $porcentajeFrutasVerduras / 2; //en kcal
+        $caloriasTotalesVerduras = $porcentajeFrutasVerduras / 2; //kcal
+
+        //Porcentajes por comida
+        $porcentajeDesayuno = 0.25;
+        $porcentajeMediaManiana = 0.1;
+        $porcentajeAlmuerzo = 0.35;
+        $porcentajeMediaTarde = 0.1;
+        $porcentajeCena = 0.20;
+
+        //Macronutrientes por comida en gramos
+        $carbohidratosDesayuno = $carbohidratosRecomendados * $porcentajeDesayuno; //Total de gramos de carbohidratos para el desayuno
+        $lipidosDesayuno = $lipidosRecomendados * $porcentajeDesayuno; //Total de gramos de lípidos para el desayuno
+        $proteinasDesayuno = $proteinasRecomendadas * $porcentajeDesayuno;  //Total de gramos de proteínas para el desayuno
+        $carbohidratosMediaManiana = $carbohidratosRecomendados * $porcentajeMediaManiana; //Total de gramos de carbohidratos para la media mañana
+        $lipidosMediaManiana = $lipidosRecomendados * $porcentajeMediaManiana; //Total de gramos de lípidos para la media mañana
+        $proteinasMediaManiana = $proteinasRecomendadas * $porcentajeMediaManiana; //Total de gramos de proteínas para la media mañana
+        $carbohidratosAlmuerzo = $carbohidratosRecomendados * $porcentajeAlmuerzo; //Total de gramos de carbohidratos para el almuerzo
+        $lipidosAlmuerzo = $lipidosRecomendados * $porcentajeAlmuerzo; //Total de gramos de lípidos para el almuerzo
+        $proteinasAlmuerzo = $proteinasRecomendadas * $porcentajeAlmuerzo; //Total de gramos de proteinas para el almuerzo
+        $carbohidratosMediaTarde = $carbohidratosRecomendados * $porcentajeMediaTarde; //Total de gramos de carbohidratos para la media tarde
+        $lipidosMediaTarde = $lipidosRecomendados * $porcentajeMediaTarde; //Total de gramos de lípidos para la media tarde
+        $proteinasMediaTarde = $proteinasRecomendadas * $porcentajeMediaTarde; //Total de gramos de proteínas para la media tarde
+        $carbohidratosCena = $carbohidratosRecomendados * $porcentajeCena; //Total de gramos de carbohidratos para la cena
+        $lipidosCena = $lipidosRecomendados * $porcentajeCena; //Total de gramos de lípidos para la cena
+        $proteinasCena = $proteinasRecomendadas * $porcentajeCena;  //Total de gramos de proteínas para la cena
+
+
+        //Frutas por comida y por macronutriente
+        $carbohidratoFrutasDesayuno = (($carbohidratosDesayuno * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en desayuno
+        $lipidoFrutasDesayuno = (($lipidosDesayuno * 9) * ($caloriasTotalesFrutas/3))/9; //Gramos totales de frutas en desayuno
+        $proteinaFrutasDesayuno = (($proteinasDesayuno * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en desayuno
+
+        $carbohidratoFrutasMediaManiana = (($carbohidratosMediaManiana * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en media mañana
+        $lipidoFrutasMediaManiana = (($lipidosMediaManiana * 9) * ($caloriasTotalesFrutas/3))/9; //Gramos totales de frutas en media mañana
+        $proteinaFrutasMediaManiana = (($proteinasMediaManiana * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en media mañana
+
+        $carbohidratoFrutasMediaTarde = (($carbohidratosMediaTarde * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en media tarde
+        $lipidoFrutasMediaTarde = (($lipidosMediaTarde * 9) * ($caloriasTotalesFrutas/3))/9; //Gramos totales de frutas en media tarde
+        $proteinaFrutasMediaTarde = (($proteinasMediaTarde * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en media tarde
+
+        //Verduras por comida y por macronutriente
+        $carbohidratoVerdurasAlmuerzo = (($carbohidratosAlmuerzo * 4) * ($caloriasTotalesVerduras/2))/4; //Gramos totales de verduras en almuerzo
+        $lipidoVerdurasAlmuerzo = (($lipidosAlmuerzo * 9) * ($caloriasTotalesVerduras/2))/9; //Gramos totales de verduras en almuerzo
+        $proteinaVerdurasAlmuerzo = (($proteinasAlmuerzo * 4) * ($caloriasTotalesVerduras/2))/4; //Gramos totales de verduras en almuerzo
+
+        $carbohidratoVerdurasCena = (($carbohidratosCena * 4) * ($caloriasTotalesVerduras/2))/4; //Gramos totales de verduras en cena
+        $lipidoVerdurasCena = (($lipidosCena * 9) * ($caloriasTotalesVerduras/2))/9; //Gramos totales de verduras en cena
+        $proteinaVerdurasCena = (($proteinasCena * 4) * ($caloriasTotalesVerduras/2))/4; //Gramos totales de verduras en cena
+
+        $desayuno = [];
+
+        foreach($alimentosFruta as $fruta){
+            foreach($ValoresNutricionales as $valorN){
+                foreach($nutrientes as $nutriente){
+                    if($fruta->id == $valorN->alimenot_id && $valorN->nutriente_id == $nutriente->id && $nutriente->nombre_nutriente == 'Valor energético'){
+
+                    }
+                }
+                if($fruta->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $carbohidratoFrutasDesayuno){
+                    if($carbohidratoFrutasDesayuno > 0){
+                        $alimentosRecomendadosFrutasDesayuno[] = $fruta->alimento;
+                        $carbohidratoFrutasDesayuno = $carbohidratoFrutasDesayuno - $valorN->valor;
+                    }
+                }
+            }
+        }
+
 
         //Evaluación de alimentos por 100 gramos
         foreach($alimentosFruta as $fruta){
             foreach($ValoresNutricionales as $valorN){
-                if($fruta->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeFrutas){
-                    if($porcentajeFrutas > 0){
+                if($fruta->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $caloriasTotalesFrutas){
+                    if($caloriasTotalesFrutas > 0){
                         $alimentosRecomendadosFrutas[] = $fruta->alimento;
-                        $porcentajeFrutas = $porcentajeFrutas - $valorN->valor;
+                        $caloriasTotalesFrutas = $caloriasTotalesFrutas - $valorN->valor;
                     }
                 }
             }
@@ -668,10 +738,10 @@ class GestionConsultasController extends Controller
 
         foreach($alimentosVerdura as $verdura){
             foreach($ValoresNutricionales as $valorN){
-                if($verdura->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $porcentajeVerduras){
-                    if($porcentajeVerduras > 0){
+                if($verdura->id == $valorN->alimento_id && $valorN->nutriente_id == $nutrientesKcal->id && $valorN->valor < $caloriasTotalesVerduras){
+                    if($caloriasTotalesVerduras > 0){
                         $alimentosRecomendadosVerduras[] = $verdura->alimento;
-                        $porcentajeVerduras = $porcentajeVerduras - $valorN->valor;
+                        $caloriasTotalesVerduras = $caloriasTotalesVerduras - $valorN->valor;
                     }
                 }
             }
@@ -1123,7 +1193,8 @@ class GestionConsultasController extends Controller
             $sumatoriaMasas = ($masaGrasa + $masaOsea + $masaResidual);
 
             //Masa muscular Kg
-            $masaMuscular = $pesoActual - $sumatoriaMasas;
+            $masaMuscular = abs($pesoActual - $sumatoriaMasas);
+
             // Redondeamos la masa muscular a 2 decimales
             $masaMuscular = number_format($masaMuscular, 2, '.', ''); // Formato decimal(5,2)
         }
@@ -1131,45 +1202,45 @@ class GestionConsultasController extends Controller
         //Seguimos generando el diagnóstico según los cálculos realizados.
         if (in_array('masa_grasa', $calculosSeleccionados)) {
             if ($masaGrasa < 10) {
-                $diagnostico .= 'Porcentaje de grasa extremadamente bajo, lo que puede ser preocupante. ';
+                $diagnostico .= 'Porcentaje de grasa extremadamente bajo (Preocupante). ';
             } elseif ($masaGrasa >= 10 && $masaGrasa <= 20) {
-                $diagnostico .= 'Porcentaje de grasa bajo, indicativo de un nivel saludable. ';
+                $diagnostico .= 'Porcentaje de grasa bajo (Saludable). ';
             } elseif ($masaGrasa > 20 && $masaGrasa <= 30) {
                 $diagnostico .= 'Porcentaje de grasa moderado, se recomienda un seguimiento. ';
             } elseif ($masaGrasa > 30) {
-                $diagnostico .= 'Porcentaje de grasa elevado, lo que podría requerir atención. ';
+                $diagnostico .= 'Porcentaje de grasa elevado (podría requerir atención). ';
             }
         }
 
         if (in_array('masa_osea', $calculosSeleccionados)) {
             if ($masaOsea < 2) {
-                $diagnostico .= 'Masa ósea baja, lo que podría indicar un riesgo de osteoporosis. ';
+                $diagnostico .= 'Masa ósea baja (riesgo de osteoporosis). ';
             } elseif ($masaOsea >= 2 && $masaOsea <= 2.5) {
-                $diagnostico .= 'Masa ósea en el rango normal. ';
+                $diagnostico .= 'Masa ósea normal. ';
             } elseif ($masaOsea > 2.5) {
-                $diagnostico .= 'Masa ósea alta, lo que es positivo para la salud ósea. ';
+                $diagnostico .= 'Masa ósea alta (positivo). ';
             }
         }
 
         if (in_array('masa_residual', $calculosSeleccionados)) {
             if ($masaResidual < 5) {
-                $diagnostico .= 'Masa residual baja, se debe investigar la posible causa. ';
+                $diagnostico .= 'Masa residual baja (investigar posible causa). ';
             } elseif ($masaResidual >= 5 && $masaResidual <= 10) {
-                $diagnostico .= 'Masa residual en el rango normal. ';
+                $diagnostico .= 'Masa residual normal. ';
             } elseif ($masaResidual > 10) {
-                $diagnostico .= 'Masa residual alta, lo que podría indicar retención de líquidos u otros problemas. ';
+                $diagnostico .= 'Masa residual alta (retención de líquidos u otros problemas). ';
             }
         }
 
         if (in_array('masa_muscular', $calculosSeleccionados)) {
             if ($masaMuscular < 20) {
-                $diagnostico .= 'Cantidad de masa muscular extremadamente baja. ';
+                $diagnostico .= 'Masa muscular extremadamente baja. ';
             } elseif ($masaMuscular >= 20 && $masaMuscular <= 30) {
-                $diagnostico .= 'Cantidad de masa muscular baja. ';
+                $diagnostico .= 'Masa muscular baja. ';
             } elseif ($masaMuscular > 30 && $masaMuscular <= 40) {
-                $diagnostico .= 'Cantidad de masa muscular moderada. ';
+                $diagnostico .= 'Masa muscular moderada. ';
             } elseif ($masaMuscular > 40) {
-                $diagnostico .= 'Cantidad de masa muscular elevada. ';
+                $diagnostico .= 'Masa muscular elevada. ';
             }
         }
 

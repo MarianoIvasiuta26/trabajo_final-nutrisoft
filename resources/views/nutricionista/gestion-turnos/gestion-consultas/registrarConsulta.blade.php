@@ -9,14 +9,129 @@
 @section('content')
     <div class="card card-dark">
         <div class="card-header">
-            <h5>Paciente: {{$paciente->user->name}} {{$paciente->user->apellido}}</h5>
+           <h5>Paciente: {{$paciente->user->name}} {{$paciente->user->apellido}}</h5>
+
         </div>
 
         <div class="card-body">
             <form id="consulta-form" action="{{route('gestion-consultas.store', $turno->id)}}" method="post">
                 @csrf
 
-                <div class="row">
+                <input type="hidden" value="{{$paciente->id}}" id="paciente_id">
+
+                <div class="accordion accordion-flush-success" id="accordionFlushExample">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="flush-headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                            Datos del paciente
+                        </button>
+                      </h2>
+                      <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <table class="table table-striped" id="turnos">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Sexo</th>
+                                        <th scope="col">Edad</th>
+                                        <th scope="col">Altura</th>
+                                        <th scope="col">Peso</th>
+                                        <th scope="col">Objetivo de salud</th>
+                                        <th scope="col">Estilo de vida</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                            <tr>
+                                                <td>{{ $paciente->sexo }}</td>
+                                                <td>{{ $paciente->edad }}</td>
+                                                <td>{{ $historiaClinica->altura }} cm</td>
+                                                <td>{{ $historiaClinica->peso }} kg</td>
+                                                <td>{{ $historiaClinica->objetivo_salud }}</td>
+                                                <td>{{ $historiaClinica->estilo_vida  }}</td>
+                                            </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="flush-headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                            Historial de turnos
+                        </button>
+                      </h2>
+                      <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <table class="table table-striped" id="turnos">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Fecha</th>
+                                        <th scope="col">Tipo de consulta</th>
+                                        <th scope="col">Tratamiento</th>
+                                        <th scope="col">Observaciones</th>
+                                        <th scope="col">Peso registrado</th>
+                                        <th scope="col">Diagnóstico</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($turnosPaciente as $turno)
+                                            <tr>
+                                                <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}</td>
+                                                <td>{{ $turno->tipoConsulta->tipo_consulta }}</td>
+                                                <td>
+                                                    @foreach ($tratamientos as $tratamiento)
+                                                        @forelse ($tratamientosPaciente as $tratamientoPaciente)
+                                                            @if ($turno->fecha == $tratamientoPaciente->fecha_alta)
+                                                                @if ($tratamiento->id == $tratamientoPaciente->tratamiento_id)
+                                                                    {{ $tratamiento->tratamiento }}
+                                                                @endif
+                                                            @endif
+                                                        @empty
+                                                            <span class="text-danger">No se registró tratamiento</span>
+                                                        @endforelse
+
+                                                    @endforeach
+                                                </td>
+                                                <td>
+                                                    @forelse ($tratamientosPaciente as $tratamientoPaciente)
+                                                        @if ($turno->fecha == $tratamientoPaciente->fecha_alta)
+                                                            {{ $tratamientoPaciente->observaciones }}
+                                                        @endif
+                                                    @empty
+                                                        <span class="text-danger">No se registró tratamiento</span>
+                                                    @endforelse
+                                                </td>
+                                                <td>
+                                                    @if ($turno->consulta)
+                                                        {{ $turno->consulta->peso_actual }} kg
+                                                    @else
+                                                        Sin consulta relacionada
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if ($turno->consulta)
+                                                        {{ $turno->consulta->diagnostico }}
+                                                    @else
+                                                        Sin consulta relacionada
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+
+                </div>
+            {{--
+                <div class="row mt-3">
                     <div class="col-md-6">
                         <label for="fecha">Fecha</label>
                         <input class="form-control" name="fecha" id="fecha" type="date" readonly value="{{$turno->fecha}}">
@@ -27,7 +142,7 @@
                         <input class="form-control" name="hora" id="hora" type="time" readonly value="{{$turno->hora}}">
                     </div>
                 </div>
-
+            --}}
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <label for="tipo_consulta">Tipo de Consulta</label>
@@ -68,210 +183,254 @@
                     </div>
                 </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-4">
-                        <label for="paciente">Paciente</label>
-                        <input class="form-control" name="paciente" id="paciente" type="text" readonly value="{{$paciente->user->name}} {{$paciente->user->apellido}}">
-                        <input type="hidden" name="paciente_id" id="paciente_id" value="{{$paciente->id}}">
+                    <div class="row mt-3">
+                        <h5>Datos Físicos del paciente</h5>
+                    </div>
+                    <span class="text-muted">Los datos con la etiqueta (*) significa que son obligatorios</span>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="peso_actual">Peso actual <span class="text-muted">(*)</span> </label>
+                            <div class="input-group">
+                                <input value="{{old('peso_actual')}}" class="form-control" name="peso_actual" id="peso_actual" type="text">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
+                            @error('peso_actual')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="altura_actual">Altura
+                                @if($turno->tipo_consulta_id == 1)
+                                    <span class="text-muted">(*)</span>
+                                    <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Debe ingresar la altura en la primera consulta aunque el paciente haya registrado su altura al completar su historia clínica antes de la consulta para tener resultados más aproximados.">
+                                        <i class="bi bi-question-circle"></i>
+                                    </button>
+                                @endif
+                            </label>
+
+                            <div class="input-group">
+                                <input @if($turno->tipo_consulta_id == 2) value="{{$turnoAnteriorPaciente->consulta->altura_actual}}" readonly @endif value="{{old('altura_actual')}}" class="form-control" name="altura_actual" id="altura_actual" type="text">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                            </div>
+                            @error('altura_actual')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
+
+                        </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="objetivo_salud">Objetivo de Salud</label>
-                        <input class="form-control" name="objetivo_salud" id="objetivo_salud" type="text" readonly value="{{$historiaClinica->objetivo_salud}}">
-                        <input id="objetivo_salud" type="hidden" name="objetivo_salud" value="{{$historiaClinica->objetivo_salud}}">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="estilo_vida">Estilo de vida</label>
-                        <input class="form-control" name="estilo_vida" id="estilo_vida" type="text" readonly value="{{$historiaClinica->estilo_vida}}">
-                        <input id="estilo_vida" type="hidden" name="estilo_vida" value="{{$historiaClinica->estilo_vida}}">
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <h5>Datos Físicos del paciente</h5>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label for="peso_actual">Peso actual <span class="text-muted">(*)</span> </label>
-                        <div class="input-group">
-                            <input value="{{old('peso_actual')}}" class="form-control" name="peso_actual" id="peso_actual" type="text">
-                            <div class="input-group-append">
-                                <span class="input-group-text">kg</span>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label>Nuevas mediciones de circunferencias</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="nuevas-mediciones-circunferencias" name="nuevas_mediciones-circunferencias" value="1">
+                                <label class="form-check-label" for="nuevas-mediciones-circunferencias">Sí</label>
                             </div>
                         </div>
-                        @error('peso_actual')
-                            <span class="text-danger">{{$message}}</span>
-                        @enderror
-                    </div>
 
-                    <div class="col-md-6">
-                        <label for="altura_actual">Altura actual <span class="text-muted">(*)</span></label>
-                        <div class="input-group">
-                            <input value="{{old('altura_actual')}}" class="form-control" name="altura_actual" id="altura_actual" type="text">
-                            <div class="input-group-append">
-                                <span class="input-group-text">cm</span>
+                        <div class="col-md-6">
+                            <label>Nuevas mediciones de pliegues</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="nuevas-mediciones-pliegues" name="nuevas_mediciones-pliegues" value="1">
+                                <label class="form-check-label" for="nuevas-mediciones-pliegues">Sí</label>
                             </div>
                         </div>
-                        @error('altura_actual')
-                            <span class="text-danger">{{$message}}</span>
-                        @enderror
-
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label for="circ_munieca_actual">Circunferencia de muñeca <span class="text-muted">(*)</span></label>
-                        <div class="input-group">
-                            <input value="{{old('circ_munieca_actual')}}" class="form-control" name="circ_munieca_actual" id="circ_munieca_actual" type="text">
-                            <div class="input-group-append">
-                                <span class="input-group-text">cm</span>
-                            </div>
-                        </div>
-                        @error('circ_munieca_actual')
-                            <span class="text-danger">{{$message}}</span>
-                        @enderror
                     </div>
 
-                    <div class="col-md-6">
-                        <label for="circ_cadera_actual">Circunferencia de cadera <span class="text-muted">(*)</span></label>
-                        <div class="input-group">
-                            <input value="{{old('circ_cadera_actual')}}" class="form-control" name="circ_cadera_actual" id="circ_cadera_actual" type="text">
-                            <div class="input-group-append">
-                                <span class="input-group-text">cm</span>
-                            </div>
-                        </div>
-                        @error('circ_cadera_actual')
-                            <span class="text-danger">{{$message}}</span>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label for="circ_cintura_actual">Circunferencia de cintura <span class="text-muted">(*)</span></label>
-                        <div class="input-group">
-                            <input value="{{old('circ_cintura_actual')}}" class="form-control" name="circ_cintura_actual" id="circ_cintura_actual" type="text">
-                            <div class="input-group-append">
-                                <span class="input-group-text">cm</span>
-                            </div>
-                        </div>
-                        @error('circ_cintura_actual')
-                            <span class="text-danger">{{$message}}</span>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="circ_pecho_actual">Circunferencia de pecho <span class="text-muted">(*)</span></label>
-                        <div class="input-group">
-                            <input value="{{old('circ_pecho_actual')}}" class="form-control" name="circ_pecho_actual" id="circ_pecho_actual" type="text">
-                            <div class="input-group-append">
-                                <span class="input-group-text">cm</span>
-                            </div>
-                        </div>
-                        @error('circ_pecho_actual')
-                            <span class="text-danger">{{$message}}</span>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="seccion mt-3">
-                    <h3>Datos para cálculos necesarios</h3>
-                    <div class="contenido">
+                    <!-- Contenedor con las circunferencias necesarias -->
+                    <div class="medidas-circunferencias" id="medidas-circunferencias" style="display: none;">
                         <div class="row mt-3">
-                            <h5>
-                                Cálculos necesarios
-                                <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="En esta sección debe seleccionar los cálculos que considere necesario para la generación del diagnóstico y del plan de alimentación del paciente.">
-                                    <i class="bi bi-question-circle"></i>
-                                </button>
-                            </h5>
+                            <div class="col-md-6">
+                                <label for="circ_munieca_actual">Circunferencia de muñeca
+                                    @if($turno->tipo_consulta_id == 2)
+                                        <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Circunferencia completada con el valor registrado en la última consulta. Puede modificarla en caso de realizar una nueva medición.">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    @endif
+                                </label>
+                                <div class="input-group">
+                                    <input @if($turno->tipo_consulta_id == 2) value="{{$turnoAnteriorPaciente->consulta->circunferencia_munieca_actual}}"  @endif value="{{old('circ_munieca_actual')}}" class="form-control" name="circ_munieca_actual" id="circ_munieca_actual" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
+                                @error('circ_munieca_actual')
+                                    <span class="text-danger">{{$message}}</span>
+                                @enderror
+                            </div>
 
-                            <span class="text-muted">Los cálculos con la etiqueta (*) significa que son obligatorios</span>
-                        </div>
-
-                        <div class="row">
-                            <div class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-outline-success">
-                                    <input class="btn-check" type="checkbox" name="calculo[]" id="imc" value="imc" checked readonly> IMC (*)
+                            <div class="col-md-6">
+                                <label for="circ_cadera_actual">Circunferencia de cadera
+                                    @if($turno->tipo_consulta_id == 2)
+                                        <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Circunferencia completada con el valor registrado en la última consulta. Puede modificarla en caso de realizar una nueva medición.">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    @endif
                                 </label>
-                                <label class="btn btn-outline-success">
-                                    <input class="btn-check" type="checkbox" name="calculo[]" id="masa_grasa" value="masa_grasa"
-                                    @if(old('calculo') && in_array('masa_grasa', old('calculo'))) checked @endif readonly> Masa Grasa
-                                </label>
-                                <label class="btn btn-outline-success">
-                                    <input class="btn-check" type="checkbox" name="calculo[]" id="masa_osea" value="masa_osea"
-                                    @if(old('calculo') && in_array('masa_osea', old('calculo'))) checked @endif readonly> Masa Ósea
-                                </label>
-                                <label class="btn btn-outline-success">
-                                    <input class="btn-check" type="checkbox" name="calculo[]" id="masa_muscular" value="masa_muscular"
-                                    @if(old('calculo') && in_array('masa_muscular', old('calculo'))) checked @endif readonly> Masa Muscular
-                                </label>
-                                <label class="btn btn-outline-success">
-                                    <input class="btn-check" type="checkbox" name="calculo[]" id="masa_residual" value="masa_residual"
-                                    @if(old('calculo') && in_array('masa_residual', old('calculo'))) checked @endif readonly> Masa Residual
-                                </label>
+                                <div class="input-group">
+                                    <input @if($turno->tipo_consulta_id == 2) value="{{$turnoAnteriorPaciente->consulta->circunferencia_cadera_actual}}"  @endif value="{{old('circ_cadera_actual')}}" class="form-control" name="circ_cadera_actual" id="circ_cadera_actual" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
+                                @error('circ_cadera_actual')
+                                    <span class="text-danger">{{$message}}</span>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="row mt-3">
-                            <h5>
-                                Mediciones de Pliegues Cutáneos
-                                <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="(OPCIONAL) En esta sección puede ingresar las medidas de distintos pliegues cutáneos según sea necesario para los cálculos seleccionados arriba.">
-                                    <i class="bi bi-question-circle"></i>
-                                </button>
-                            </h5>
+                            <div class="col-md-6">
+                                <label for="circ_cintura_actual">Circunferencia de cintura
+                                    @if($turno->tipo_consulta_id == 2)
+                                        <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Circunferencia completada con el valor registrado en la última consulta. Puede modificarla en caso de realizar una nueva medición.">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    @endif
+                                </label>
+                                <div class="input-group">
+                                    <input @if($turno->tipo_consulta_id == 2) value="{{$turnoAnteriorPaciente->consulta->circunferencia_cintura_actual}}"  @endif value="{{old('circ_cintura_actual')}}" class="form-control" name="circ_cintura_actual" id="circ_cintura_actual" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
+                                @error('circ_cintura_actual')
+                                    <span class="text-danger">{{$message}}</span>
+                                @enderror
+                            </div>
 
-                            <span class="text-muted">Si un pliegue cutáneo no es necesario para los cálculos a realizar puede dejarlo en blanco o escribir '0.00'</span>
-
+                            <div class="col-md-6">
+                                <label for="circ_pecho_actual">Circunferencia de pecho
+                                    @if($turno->tipo_consulta_id == 2)
+                                        <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Circunferencia completada con el valor registrado en la última consulta. Puede modificarla en caso de realizar una nueva medición.">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    @endif
+                                </label>
+                                <div class="input-group">
+                                    <input @if($turno->tipo_consulta_id == 2) value="{{$turnoAnteriorPaciente->consulta->circunferencia_pecho_actual}}"  @endif value="{{old('circ_pecho_actual')}}" class="form-control" name="circ_pecho_actual" id="circ_pecho_actual" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
+                                @error('circ_pecho_actual')
+                                    <span class="text-danger">{{$message}}</span>
+                                @enderror
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="row mt-3">
-                            @foreach ($plieguesCutaneos as $pliegue)
-                                <div class="col-md-6">
-                                    <label for="pliegue_{{$pliegue->id}}">{{$pliegue->nombre_pliegue}}</label>
-                                    <div class="input-group">
-                                        <input class="form-control pliegue-input" name="pliegue_{{$pliegue->id}}" id="pliegue_{{$pliegue->id}}" type="text" data-pliegue-key="{{$pliegue->id}}"
-                                        value="{{ old('pliegue_'.$pliegue->id) }}">
+                    <!-- Contenedor con las masas corporales necesarias -->
+                    <div class="medidas-masas" id="medidas-masas" style="display: none;">
+                        <div class="seccion mt-3">
+                            <h3>Datos para cálculos necesarios</h3>
+                            <div class="contenido">
+                                <div class="row mt-3">
+                                    <h5>
+                                        Cálculos necesarios
+                                        <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="En esta sección debe seleccionar los cálculos que considere necesario para la generación del diagnóstico y del plan de alimentación del paciente.">
+                                            <i class="bi bi-question-circle"></i>
+                                        </button>
+                                    </h5>
+
+                                    <span class="text-muted">Los cálculos con la etiqueta (*) significa que son obligatorios</span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="btn-group" data-toggle="buttons">
+                                        <label class="btn btn-outline-success">
+                                            <input class="btn-check" type="checkbox" name="calculo[]" id="imc" value="imc" checked readonly disabled> IMC (*)
+                                        </label>
+                                        <label class="btn btn-outline-success">
+                                            <input class="btn-check" type="checkbox" name="calculo[]" id="masa_grasa" value="masa_grasa"
+                                            @if(old('calculo') && in_array('masa_grasa', old('calculo'))) checked @endif readonly> Masa Grasa
+                                        </label>
+                                        <label class="btn btn-outline-success">
+                                            <input class="btn-check" type="checkbox" name="calculo[]" id="masa_osea" value="masa_osea"
+                                            @if(old('calculo') && in_array('masa_osea', old('calculo'))) checked @endif readonly> Masa Ósea
+                                        </label>
+                                        <label class="btn btn-outline-success">
+                                            <input class="btn-check" type="checkbox" name="calculo[]" id="masa_muscular" value="masa_muscular"
+                                            @if(old('calculo') && in_array('masa_muscular', old('calculo'))) checked @endif readonly> Masa Muscular
+                                        </label>
+                                        <label class="btn btn-outline-success">
+                                            <input class="btn-check" type="checkbox" name="calculo[]" id="masa_residual" value="masa_residual"
+                                            @if(old('calculo') && in_array('masa_residual', old('calculo'))) checked @endif readonly> Masa Residual
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="container-mediciones" id="container-mediciones" style="display: none;">
+                                    <div class="row mt-3">
+                                        <h5>
+                                            Mediciones de Pliegues Cutáneos
+                                            <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="(OPCIONAL) En esta sección puede ingresar las medidas de distintos pliegues cutáneos según sea necesario para los cálculos seleccionados arriba.">
+                                                <i class="bi bi-question-circle"></i>
+                                            </button>
+                                        </h5>
+
+                                        <span class="text-muted">Si un pliegue cutáneo no es necesario para los cálculos a realizar puede dejarlo en blanco o escribir '0.00'</span>
+
+                                    </div>
+
+                                    <div class="row mt-3">
+                                        @foreach ($plieguesCutaneos as $pliegue)
+                                            <div class="col-md-6">
+                                                <label for="pliegue_{{$pliegue->id}}">{{$pliegue->nombre_pliegue}}</label>
+                                                <div class="input-group">
+                                                    <input class="form-control pliegue-input" name="pliegue_{{$pliegue->id}}" id="pliegue_{{$pliegue->id}}" type="text" data-pliegue-key="{{$pliegue->id}}"
+                                                    value="{{ old('pliegue_'.$pliegue->id) }}">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">{{$pliegue->unidad_de_medida}}</span>
+                                                    </div>
+                                                </div>
+                                                @error('pliegue_{{$pliegue->id}}')
+                                                    <span class="text-danger">{{$message}}</span>
+                                                @enderror
+                                            </div>
+
+                                            @if ($loop->iteration % 2 == 0)
+                                                </div>
+                                                <div class="row mt-3">
+                                            @endif
+
+                                        @endforeach
+                                    </div>
+                                    <div class="float-left">
                                         <div class="input-group-append">
-                                            <span class="input-group-text">{{$pliegue->unidad_de_medida}}</span>
+                                            <button type="button" class="btn btn-primary nuevo-pliegue-button">
+                                                Nuevo Pliegue Cutáneo
+                                            </button>
                                         </div>
                                     </div>
-                                    @error('pliegue_{{$pliegue->id}}')
-                                        <span class="text-danger">{{$message}}</span>
-                                    @enderror
                                 </div>
 
-                                @if ($loop->iteration % 2 == 0)
-                                    </div>
-                                    <div class="row mt-3">
-                                @endif
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <div class="float-right">
+                                            <button type="button" class="btn btn-success calcular-button" id="realizar-calculos-button">
+                                                Realizar cálculos
+                                            </button>
+                                        </div>
 
-                            @endforeach
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="float-right">
-                                    <button type="button" class="btn btn-success calcular-button" id="realizar-calculos-button">
-                                        Realizar cálculos
-                                    </button>
-                                </div>
-                                <div class="float-left">
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-primary nuevo-pliegue-button">
-                                            Nuevo Pliegue Cutáneo
-                                        </button>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 
+                        <div class="row mt-3" id="resultados">
+
+                        </div>
                     </div>
-                </div>
 
-                <div class="row mt-3" id="resultados">
 
-                </div>
 
                 <div class="row mt-3">
                     <div class="col">
@@ -282,8 +441,6 @@
                         @enderror
                     </div>
                 </div>
-
-
 
                 <div class="row mt-3">
                     <div class="col-12 d-flex justify-content-end">
@@ -335,6 +492,25 @@
             margin-left: 5px; /* Ajusta el margen izquierdo del botón de cancelación */
             font-size: 18px;
         }
+
+        /* Estilo para las casillas de verificación */
+            .custom-checkbox-label {
+                font-weight: bold;
+                font-size: 1.2rem;
+                color: #007bff; /* Color azul, puedes personalizarlo */
+            }
+
+            /* Cambiar el color de fondo cuando la casilla está seleccionada */
+            .custom-checkbox-input:checked + .custom-checkbox-label::before {
+                background-color: #007bff; /* Cambia al mismo color azul */
+            }
+
+            /* Cambiar el color del texto de la casilla seleccionada */
+            .custom-checkbox-input:checked + .custom-checkbox-label::after {
+                color: #ffffff; /* Texto en blanco en casilla seleccionada */
+            }
+
+
     </style>
 
 @stop
@@ -349,6 +525,60 @@
     <script>
         $(document).ready(function() {
             $('[data-bs-toggle="popover"]').popover();
+        });
+
+        //Evento para mostrar el contenedor con las mediciones de circunferencias
+        document.addEventListener("DOMContentLoaded", function () {
+            // Selecciona los elementos relevantes
+            const nuevasMedicionesCheckbox = document.querySelector("#nuevas-mediciones-circunferencias");
+            const containerMediciones = document.querySelector("#medidas-circunferencias");
+
+            // Agrega un controlador de eventos para cambiar la visibilidad
+            nuevasMedicionesCheckbox.addEventListener("change", function () {
+                if (nuevasMedicionesCheckbox.checked) {
+                    containerMediciones.style.display = "block";
+                } else {
+                    containerMediciones.style.display = "none";
+                }
+            });
+
+            // Inicialmente, oculta el contenedor de mediciones
+            containerMediciones.style.display = "none";
+        });
+
+        //Evento para mostrar el contenedor con las mediciones de pliegues
+        document.addEventListener("DOMContentLoaded", function () {
+            // Selecciona los elementos relevantes
+            const nuevasMedicionesCheckbox = document.querySelector("#nuevas-mediciones-pliegues");
+            const containerMediciones = document.querySelector("#medidas-masas");
+
+            // Agrega un controlador de eventos para cambiar la visibilidad
+            nuevasMedicionesCheckbox.addEventListener("change", function () {
+                if (nuevasMedicionesCheckbox.checked) {
+                    containerMediciones.style.display = "block";
+                } else {
+                    containerMediciones.style.display = "none";
+                }
+            });
+
+            // Inicialmente, oculta el contenedor de mediciones
+            containerMediciones.style.display = "none";
+        });
+
+        //Evento para que al seleccionar la masa a calcular aparezca los pliegues necesarios
+        document.addEventListener('DOMContentLoaded', function () {
+            const calculos = document.querySelectorAll('input[name="calculo[]"]');
+
+            calculos.forEach(function (calculo) {
+                calculo.addEventListener('click', function () {
+                    const containerMediciones = document.getElementById('container-mediciones');
+                    if (calculo.checked) {
+                        containerMediciones.style.display = 'block';
+                    } else {
+                        containerMediciones.style.display = 'none';
+                    }
+                });
+            });
         });
 
         //SweetAlert2

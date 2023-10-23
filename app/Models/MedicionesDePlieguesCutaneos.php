@@ -12,7 +12,7 @@ class MedicionesDePlieguesCutaneos extends Model
     protected $fillable = [
         'historia_clinica_id',
         'consulta_id',
-        'pliegue_id',
+        'tipos_de_pliegue_cutaneo_id',
         'valor_medicion',
     ];
 

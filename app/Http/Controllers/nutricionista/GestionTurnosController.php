@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\nutricionista;
 
 use App\Http\Controllers\Controller;
+use App\Models\Consulta;
+use App\Models\MedicionesDePlieguesCutaneos;
 use App\Models\Paciente;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\TipoConsulta;
 use App\Models\TiposDePliegueCutaneo;
 use App\Models\Tratamiento;
+use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -131,11 +134,26 @@ class GestionTurnosController extends Controller
         $tratamientos = Tratamiento::all();
         $plieguesCutaneos = TiposDePliegueCutaneo::all();
 
+        $turnosPaciente = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')->get();
+        $tratamientosPaciente = TratamientoPorPaciente::where('paciente_id', $paciente->id)->get();
+
+        $turnoAnteriorPaciente = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')->orderBy('id', 'desc')->first();
+        $consultaAnteriorPaciente = Consulta::where('turno_id', $turnoAnteriorPaciente->id)->first();
+
+        $medidaPliegueTricep = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 1)->orderBy('id', 'desc')->first();
+        $medidaPliegueBicep = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 3)->orderBy('id', 'desc')->first();
+        $medidaPliegueSubescapular = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 4)->orderBy('id', 'desc')->first();
+        $medidaPliegueSuprailiaco = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 5)->orderBy('id', 'desc')->first();
+        $medidaDiametroHumero = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 6)->orderBy('id', 'desc')->first();
+        $medidaDiametroMunieca = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 7)->orderBy('id', 'desc')->first();
+        $medidaDiametroFemur = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 8)->orderBy('id', 'desc')->first();
+        $medidaDiametroTobillo = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 9)->orderBy('id', 'desc')->first();
+
         if(!$historiaClinica){
             return redirect()->back()->with('error', 'No se encontró la historia clínica');
         }
 
-        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'tratamientos', 'plieguesCutaneos'));
+        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo'));
     }
 
     public function confirmarInasistencia($id){
