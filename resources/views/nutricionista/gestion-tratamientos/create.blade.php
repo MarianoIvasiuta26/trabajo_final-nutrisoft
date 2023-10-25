@@ -9,7 +9,7 @@
     <form action="{{ route('gestion-tratamientos.store') }}" method="POST">
         @csrf
 
-        <div class="card card-dark">
+        <div class="card card-dark mt-3">
             <div class="card-header">
                 <h5>Nuevo Tratamiento</h5>
             </div>
@@ -17,7 +17,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <label for="tratamiento">Tratamiento</label>
+                        <label for="tratamiento">Tratamiento <span class="text-muted">(*)</span></label>
                         <input type="text" name="tratamiento" class="form-control" tabindex="1">
 
                         @error('tratamiento')
@@ -27,6 +27,24 @@
                 </div>
 
                 <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label for="tipo_de_dieta">Tipo de dieta <span class="text-muted">(*)</span></label>
+                        <select class="form-select" name="tipo_de_dieta" id="tipo_de_dieta">
+                            <option value="">Seleccione un tipo de dieta para el tratamiento</option>
+                            @foreach ($tiposDeDietas as $dieta)
+                                <option value="{{ $dieta->id }}">{{ $dieta->tipo_de_dieta }}</option>
+                            @endforeach
+                        </select>
+
+                        @error('tipo_de_dieta')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <span class="text-muted">Los datos con la etiqueta (*) significa que son obligatorios</span>
+
                     <div class="col-12">
                         <div class="float-right">
                             <a type="button" href="{{ route('gestion-tratamientos.index') }}" id="cancelar-button" class="btn btn-danger" tabindex="7">Cancelar</a>

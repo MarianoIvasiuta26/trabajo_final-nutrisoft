@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\TiposDeDieta;
 use App\Models\Tratamiento;
 use Illuminate\Http\Request;
 
@@ -11,8 +12,9 @@ class TratramientoController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     *
      */
+    //@return \Illuminate\Http\Response
     public function index()
     {
         $tratamientos = Tratamiento::all();
@@ -23,33 +25,40 @@ class TratramientoController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     *
      */
+    //@return \Illuminate\Http\Response
     public function create()
     {
-        return view('nutricionista.gestion-tratamientos.create');
+        $tiposDeDietas = TiposDeDieta::all();
+        return view('nutricionista.gestion-tratamientos.create', compact('tiposDeDietas'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     *
+     *
      */
+     //@param  \Illuminate\Http\Request  $request
+     //@return \Illuminate\Http\Response
     public function store(Request $request)
     {
         $request->validate([
             'tratamiento' => ['required', 'string', 'max:50'],
+            'tipo_de_dieta' => ['required', 'integer'],
         ]);
 
         $tratamiento = $request->input('tratamiento');
+        $tipoDeDieta = $request->input('tipo_de_dieta');
 
         $tratamientoCreado = Tratamiento::create([
             'tratamiento' => $tratamiento,
+            'tipo_de_dieta_id'=> $tipoDeDieta
         ]);
 
         if($tratamientoCreado){
-            return redirect()->back()->with('success', 'Tratamiento creado correctamente');
+            return redirect()->route('gestion-tratamientos.index')->with('success', 'Tratamiento creado correctamente');
         } else {
             return redirect()->back()->with('error', 'Error al crear el tratamiento');
         }
@@ -58,10 +67,10 @@ class TratramientoController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+     **/
+     //@param  int  $id
+     //@return \Illuminate\Http\Response
+
     public function show($id)
     {
         //
@@ -69,14 +78,15 @@ class TratramientoController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
+     //@param  int  $id
+     //@return \Illuminate\Http\Response
+
     public function edit($id)
     {
         // Buscamos el tratamiento
         $tratamiento = Tratamiento::find($id);
+        $tiposDeDietas = TiposDeDieta::all();
 
         // Si no existe lanzamos error
         if(!$tratamiento){
@@ -84,7 +94,7 @@ class TratramientoController extends Controller
         }
 
         // Si existe retornamos la vista con el tratamiento
-        return view('nutricionista.gestion-tratamientos.edit', compact('tratamiento'));
+        return view('nutricionista.gestion-tratamientos.edit', compact('tratamiento', 'tiposDeDietas'));
     }
 
 
@@ -105,9 +115,11 @@ class TratramientoController extends Controller
 
         $request->validate([
             'tratamiento' => ['required', 'string', 'max:50'],
+            'tipo_de_dieta' => ['required', 'integer'],
         ]);
 
         $tratamiento->tratamiento = $request->input('tratamiento');
+        $tratamiento->tipo_de_dieta_id = $request->input('tipo_de_dieta');
 
         if($tratamiento->save()){
             return redirect()->route('gestion-tratamientos.index')->with('success', 'Tratamiento actualizado correctamente');

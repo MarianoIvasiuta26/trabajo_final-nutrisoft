@@ -16,11 +16,41 @@
                 @method('PUT')
 
                 <div class="mb-3">
-                    <label for="tratamiento" class="form-label">Tratamiento</label>
+                    <label for="tratamiento" class="form-label">Tratamiento <span class="text-muted">(*)</span></label>
                     <input value="{{$tratamiento->tratamiento}}" type="text" name="tratamiento" id="tratamiento" class="form-control" tabindex="2">
+
+                    @error('tratamiento')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                 </div>
 
-                <div>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label for="tipo_de_dieta">Tipo de dieta <span class="text-muted">(*)</span></label>
+                        <select class="form-select" name="tipo_de_dieta" id="tipo_de_dieta">
+                            <option value="">Seleccione un tipo de dieta para el tratamiento</option>
+                            @foreach ($tiposDeDietas as $dieta)
+                                <option value="{{ $dieta->id }}"
+                                    @if ($dieta->id == $tratamiento->tipo_de_dieta_id)
+                                        selected
+                                    @endif
+                                >
+                                    {{ $dieta->tipo_de_dieta }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        @error('tipo_de_dieta')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <span class="text-muted">Los datos con la etiqueta (*) significa que son obligatorios</span>
+                </div>
+
+                <div class="mt-3 float-right">
                     <form action="{{ route('gestion-tratamientos.index') }}">
                         @csrf
 
@@ -82,7 +112,7 @@
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
             const cancelarButtons = document.querySelectorAll('.cancelar-button');
 
-            // Agrega un controlador de clic a cada botón de eliminar
+            
             cancelarButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
                     // Muestra un SweetAlert de confirmación
@@ -96,7 +126,8 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
-                            button.closest('form').submit();
+                            //button.closest('form').submit();
+                            window.location.href = "{{ route('gestion-tratamientos.index') }}";
                         }
                     });
                 });
