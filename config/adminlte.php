@@ -349,7 +349,7 @@ return [
 
         [
             'text' => 'Turnos y Consultas',
-            'icon' => 'fas fa-file-medical fa-fw',
+            'icon' => 'fas fa-clock fa-fw',
             'submenu' => [
                 [
                     'text' => 'Turnos Pendientes',

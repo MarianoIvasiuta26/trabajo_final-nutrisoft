@@ -20,7 +20,7 @@
                     <form id="consulta-form" action="{{route('gestion-consultas.store', $turno->id)}}" method="post">
                         @csrf
 
-                        <input type="hidden" value="{{$paciente->id}}" id="paciente_id">
+                        <input type="hidden" value="{{$paciente->id}}" id="paciente_id" name="paciente_id">
 
                         <div class="row mt-3">
                             <div class="col-md-6">

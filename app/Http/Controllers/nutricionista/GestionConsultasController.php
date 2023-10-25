@@ -146,10 +146,10 @@ class GestionConsultasController extends Controller
             $consulta->save();
         }
 
-        $consulta->masa_grasa_actual = ($masaGrasaActual !== 0) ? $masaGrasaActual : 0.00;
-        $consulta->masa_osea_actual = ($masaOseaActual !== 0) ? $masaOseaActual : 0.00;
-        $consulta->masa_residual_actual = ($masaResidualActual !== 0) ? $masaResidualActual : 0.00;
-        $consulta->masa_muscular_actual = ($masaMuscularActual !== 0) ? $masaMuscularActual : 0.00;
+        $consulta->masa_grasa_actual = (!$masaGrasaActual) ? 0.00 : $masaGrasaActual;
+        $consulta->masa_osea_actual = (!$masaOseaActual) ? 0.00 : $masaOseaActual;
+        $consulta->masa_residual_actual = (!$masaResidualActual) ? 0.00 : $masaResidualActual;
+        $consulta->masa_muscular_actual = (!$masaMuscularActual) ? 0.00 : $masaMuscularActual;
         $consulta->save();
 
 
