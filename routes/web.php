@@ -97,6 +97,7 @@ Route::middleware([
 
     Route::resource('gestion-consultas', GestionConsultasController::class)->names('gestion-consultas');
     Route::post('gestion-consultas.realizarCalculos', [GestionConsultasController::class, 'realizarCalculos'])->name('gestion-consultas.realizarCalculos');
+    Route::post('gestion-consultas.calcularIMC', [GestionConsultasController::class, 'calcularIMC'])->name('gestion-consultas.calcularIMC');
 
     Route::post('gestion-consultas.store/{id}', [GestionConsultasController::class, 'store'])->name('gestion-consultas.store');
 

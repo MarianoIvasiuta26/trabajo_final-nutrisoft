@@ -185,7 +185,7 @@ class GestionConsultasController extends Controller
         //Obtener paciente de la consulta
         $paciente = Paciente::find($turno->paciente_id);
 
-        if( $turno->estado == 'Realizado'){
+        if( $turno->estado == 'Realizado' && $request->has('generar-plan-alimentacion')){
             $planGenerado = $this->generarPlanesAlimentacion($paciente->id, $turno->id);
         }
 
@@ -980,31 +980,18 @@ class GestionConsultasController extends Controller
 
     //Función para realizar los cálculos necesarios que selecciona en la consulta
 
-    public function realizarCalculos(Request $request){
-
-        // Obtenemos los datos del formulario
-        $paciente = Paciente::find($request->input('paciente'));
-
+    public function calcularIMC(Request $request){
         // Recopilamos los datos de la solicitud
         $pesoActual = floatval($request->input('peso'));
         $alturaActual = floatval($request->input('altura'));
-        $calculosSeleccionados = $request->input('calculosSeleccionado');
-        $plieguesSeleccionado = $request->input('plieguesSeleccionado');
-
-
-        // Realiza los cálculos necesarios aquí
 
         $imc = 0;
         $pesoIdeal = 0;
-        $masaGrasa = 0;
-        $masaOsea = 0;
-        $masaResidual = 0;
-        $masaMuscular = 0;
         //Generamos diagnóstico
         $diagnostico = '';
 
-        //Calculamos el IMC
-        if(in_array('imc', $calculosSeleccionados) && $pesoActual && $alturaActual){
+         //Calculamos el IMC
+        if($pesoActual && $alturaActual){
             //Primero pasamos la altura de cm a m
             $alturaMetro = $alturaActual / 100;
             $imc = $pesoActual / ($alturaMetro * $alturaMetro);
@@ -1033,6 +1020,35 @@ class GestionConsultasController extends Controller
                 $pesoIdeal = 40 * ($alturaMetro * $alturaMetro); //Obesidad grado 3 o mórbida
             }
         }
+
+        return [
+            'imc' => $imc,
+            'pesoIdeal' => $pesoIdeal,
+            'diagnostico' => $diagnostico,
+        ];
+
+    }
+
+    public function realizarCalculos(Request $request){
+
+        // Obtenemos los datos del formulario
+        $paciente = Paciente::find($request->input('paciente'));
+
+        // Recopilamos los datos de la solicitud
+        $pesoActual = floatval($request->input('peso'));
+        $alturaActual = floatval($request->input('altura'));
+        $calculosSeleccionados = $request->input('calculosSeleccionado');
+        $plieguesSeleccionado = $request->input('plieguesSeleccionado');
+
+
+        // Realiza los cálculos necesarios aquí
+
+        $masaGrasa = 0;
+        $masaOsea = 0;
+        $masaResidual = 0;
+        $masaMuscular = 0;
+        //Generamos diagnóstico
+        $diagnostico = '';
 
         //Calculamos masa grasa
 
@@ -1249,8 +1265,6 @@ class GestionConsultasController extends Controller
 
         return response()->json([
             'diagnostico' => $diagnostico,
-            'imc' => $imc,
-            'pesoIdeal' => $pesoIdeal,
             'masaGrasa' => $masaGrasa,
             'masaOsea' => $masaOsea,
             'masaResidual' => $masaResidual,

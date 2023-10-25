@@ -6,7 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Consulta;
 use App\Models\MedicionesDePlieguesCutaneos;
 use App\Models\Paciente;
+use App\Models\Paciente\Alergia;
+use App\Models\Paciente\Cirugia;
+use App\Models\Paciente\CirugiasPaciente;
+use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
+use App\Models\Paciente\Intolerancia;
+use App\Models\Paciente\Patologia;
 use App\Models\TipoConsulta;
 use App\Models\TiposDePliegueCutaneo;
 use App\Models\Tratamiento;
@@ -131,6 +137,14 @@ class GestionTurnosController extends Controller
 
         $tipoConsultas = TipoConsulta::all();
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->get();
+        $alergias = Alergia::all();
+        $patologias = Patologia::all();
+        $intolerancias = Intolerancia::all();
+
+        $cirugias = Cirugia::all();
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
+
         $tratamientos = Tratamiento::all();
         $plieguesCutaneos = TiposDePliegueCutaneo::all();
 
@@ -138,22 +152,27 @@ class GestionTurnosController extends Controller
         $tratamientosPaciente = TratamientoPorPaciente::where('paciente_id', $paciente->id)->get();
 
         $turnoAnteriorPaciente = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')->orderBy('id', 'desc')->first();
-        $consultaAnteriorPaciente = Consulta::where('turno_id', $turnoAnteriorPaciente->id)->first();
+        if($turnoAnteriorPaciente){
+            $consultaAnteriorPaciente = Consulta::where('turno_id', $turnoAnteriorPaciente->id)->first();
+            $medidaPliegueTricep = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 1)->orderBy('id', 'desc')->first();
+            $medidaPliegueBicep = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 3)->orderBy('id', 'desc')->first();
+            $medidaPliegueSubescapular = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 4)->orderBy('id', 'desc')->first();
+            $medidaPliegueSuprailiaco = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 5)->orderBy('id', 'desc')->first();
+            $medidaDiametroHumero = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 6)->orderBy('id', 'desc')->first();
+            $medidaDiametroMunieca = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 7)->orderBy('id', 'desc')->first();
+            $medidaDiametroFemur = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 8)->orderBy('id', 'desc')->first();
+            $medidaDiametroTobillo = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 9)->orderBy('id', 'desc')->first();
+            return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo'));
 
-        $medidaPliegueTricep = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 1)->orderBy('id', 'desc')->first();
-        $medidaPliegueBicep = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 3)->orderBy('id', 'desc')->first();
-        $medidaPliegueSubescapular = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 4)->orderBy('id', 'desc')->first();
-        $medidaPliegueSuprailiaco = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 5)->orderBy('id', 'desc')->first();
-        $medidaDiametroHumero = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 6)->orderBy('id', 'desc')->first();
-        $medidaDiametroMunieca = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 7)->orderBy('id', 'desc')->first();
-        $medidaDiametroFemur = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 8)->orderBy('id', 'desc')->first();
-        $medidaDiametroTobillo = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 9)->orderBy('id', 'desc')->first();
+        }
+
+
 
         if(!$historiaClinica){
             return redirect()->back()->with('error', 'No se encontró la historia clínica');
         }
 
-        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo'));
+        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente',   'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente'));
     }
 
     public function confirmarInasistencia($id){
