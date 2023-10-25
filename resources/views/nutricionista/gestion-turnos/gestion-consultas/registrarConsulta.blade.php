@@ -21,6 +21,7 @@
                         @csrf
 
                         <input type="hidden" value="{{$paciente->id}}" id="paciente_id" name="paciente_id">
+                        <span class="text-muted">Los datos con la etiqueta (*) significa que son obligatorios</span>
 
                         <div class="row mt-3">
                             <div class="col-md-6">
@@ -97,7 +98,6 @@
                         <div class="row mt-3">
                             <h5>Datos Físicos del paciente</h5>
                         </div>
-                        <span class="text-muted">Los datos con la etiqueta (*) significa que son obligatorios</span>
 
                         <div class="row mt-3">
                             <div class="col-md-6">
@@ -538,170 +538,174 @@
                       <div id="flush-collapseHistorialTurnos" class="accordion-collapse collapse" aria-labelledby="flush-historial-turnos" data-bs-parent="#accordionFlushExample">
                         <div class="accordion-body">
                             <div class="row">
-
-                                <div class="col-md-12">
-                                    <ul class="list-group list-group">
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                            <div class="ms-2 me-auto ">
-                                              <div class="fw-bold">Último turno - {{\Carbon\Carbon::parse($turnoAnteriorPaciente->fecha)->format('d/m/Y')}}</div>
+                                @if ($turno->tipo_consulta_id == 2)
+                                    <div class="col-md-12">
+                                        <ul class="list-group list-group">
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto ">
+                                                <div class="fw-bold">Último turno - {{\Carbon\Carbon::parse($turnoAnteriorPaciente->fecha)->format('d/m/Y')}}</div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">Tipo de Consulta</div>
+                                                {{ $turnoAnteriorPaciente->tipoConsulta->tipo_consulta }}
                                             </div>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                          <div class="ms-2 me-auto">
-                                            <div class="fw-bold">Tipo de Consulta</div>
-                                            {{ $turnoAnteriorPaciente->tipoConsulta->tipo_consulta }}
-                                          </div>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                          <div class="ms-2 me-auto">
-                                            <div class="fw-bold">Tratamiento</div>
-                                            @foreach ($tratamientos as $tratamiento)
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">Tratamiento</div>
+                                                @foreach ($tratamientos as $tratamiento)
+                                                    @forelse ($tratamientosPaciente as $tratamientoPaciente)
+                                                        @if ($turnoAnteriorPaciente->fecha == $tratamientoPaciente->fecha_alta && $paciente->id == $tratamientoPaciente->paciente_id)
+                                                            @if ($tratamiento->id == $tratamientoPaciente->tratamiento_id)
+                                                                {{ $tratamiento->tratamiento }}
+                                                            @endif
+                                                        @endif
+                                                    @empty
+                                                        <span class="text-danger">No se registró tratamiento</span>
+                                                    @endforelse
+                                                @endforeach
+                                            </div>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">Observaciones</div>
                                                 @forelse ($tratamientosPaciente as $tratamientoPaciente)
                                                     @if ($turnoAnteriorPaciente->fecha == $tratamientoPaciente->fecha_alta && $paciente->id == $tratamientoPaciente->paciente_id)
-                                                        @if ($tratamiento->id == $tratamientoPaciente->tratamiento_id)
-                                                            {{ $tratamiento->tratamiento }}
-                                                        @endif
+                                                        {{ $tratamientoPaciente->observaciones }}
                                                     @endif
                                                 @empty
                                                     <span class="text-danger">No se registró tratamiento</span>
                                                 @endforelse
-                                            @endforeach
-                                          </div>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                          <div class="ms-2 me-auto">
-                                            <div class="fw-bold">Observaciones</div>
-                                            @forelse ($tratamientosPaciente as $tratamientoPaciente)
-                                                @if ($turnoAnteriorPaciente->fecha == $tratamientoPaciente->fecha_alta && $paciente->id == $tratamientoPaciente->paciente_id)
-                                                    {{ $tratamientoPaciente->observaciones }}
-                                                @endif
-                                            @empty
-                                                <span class="text-danger">No se registró tratamiento</span>
-                                            @endforelse
-                                          </div>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                            <div class="ms-2 me-auto">
-                                              <div class="fw-bold">Peso registrado</div>
-                                                @if ($turnoAnteriorPaciente->consulta)
-                                                    {{ $turnoAnteriorPaciente->consulta->peso_actual }} kg
-                                                @else
-                                                    Sin consulta relacionada
-                                                @endif
                                             </div>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                            <div class="ms-2 me-auto">
-                                              <div class="fw-bold">IMC</div>
-                                                @if ($turnoAnteriorPaciente->consulta)
-                                                    {{ $turnoAnteriorPaciente->consulta->imc_actual }}
-                                                @else
-                                                    Sin consulta relacionada
-                                                @endif
-                                            </div>
-                                        </li>
-                                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                                            <div class="ms-2 me-auto">
-                                              <div class="fw-bold">Diagnóstico</div>
-                                                @if ($turnoAnteriorPaciente->consulta)
-                                                    {{ $turnoAnteriorPaciente->consulta->diagnostico }}
-                                                @else
-                                                    Sin consulta relacionada
-                                                @endif
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto">
+                                                <div class="fw-bold">Peso registrado</div>
+                                                    @if ($turnoAnteriorPaciente->consulta)
+                                                        {{ $turnoAnteriorPaciente->consulta->peso_actual }} kg
+                                                    @else
+                                                        Sin consulta relacionada
+                                                    @endif
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto">
+                                                <div class="fw-bold">IMC</div>
+                                                    @if ($turnoAnteriorPaciente->consulta)
+                                                        {{ $turnoAnteriorPaciente->consulta->imc_actual }}
+                                                    @else
+                                                        Sin consulta relacionada
+                                                    @endif
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto">
+                                                <div class="fw-bold">Diagnóstico</div>
+                                                    @if ($turnoAnteriorPaciente->consulta)
+                                                        {{ $turnoAnteriorPaciente->consulta->diagnostico }}
+                                                    @else
+                                                        Sin consulta relacionada
+                                                    @endif
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
 
-                                <div class="col-md-12 mt-2">
-                                    <div class="float-right">
-                                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modal-historial-turnos">
-                                            Historial de Turnos
-                                        </button>
+                                    <div class="col-md-12 mt-2">
+                                        <div class="float-right">
+                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modal-historial-turnos">
+                                                Historial de Turnos
+                                            </button>
 
-                                        <div class="modal fade" id="modal-historial-turnos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="staticBackdropLabel">Historial de Turnos</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                <div class="modal-body">
-                                                    <table class="table table-striped" id="turnos">
-                                                        <thead>
-                                                            <tr>
-                                                                <th scope="col">Fecha</th>
-                                                                <th scope="col">Tipo de consulta</th>
-                                                                <th scope="col">Tratamiento</th>
-                                                                <th scope="col">Observaciones</th>
-                                                                <th scope="col">Peso registrado</th>
-                                                                <th scope="col">IMC</th>
-                                                                <th scope="col">Diagnóstico</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($turnosPaciente as $turno)
+                                            <div class="modal fade" id="modal-historial-turnos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-xl">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="staticBackdropLabel">Historial de Turnos</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                    <div class="modal-body">
+                                                        <table class="table table-striped" id="turnos">
+                                                            <thead>
                                                                 <tr>
-                                                                    <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}</td>
-                                                                    <td>{{ $turno->tipoConsulta->tipo_consulta }}</td>
-                                                                    <td>
-                                                                        @foreach ($tratamientos as $tratamiento)
+                                                                    <th scope="col">Fecha</th>
+                                                                    <th scope="col">Tipo de consulta</th>
+                                                                    <th scope="col">Tratamiento</th>
+                                                                    <th scope="col">Observaciones</th>
+                                                                    <th scope="col">Peso registrado</th>
+                                                                    <th scope="col">IMC</th>
+                                                                    <th scope="col">Diagnóstico</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($turnosPaciente as $turno)
+                                                                    <tr>
+                                                                        <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}</td>
+                                                                        <td>{{ $turno->tipoConsulta->tipo_consulta }}</td>
+                                                                        <td>
+                                                                            @foreach ($tratamientos as $tratamiento)
+                                                                                @forelse ($tratamientosPaciente as $tratamientoPaciente)
+                                                                                    @if ($turno->fecha == $tratamientoPaciente->fecha_alta && $paciente->id == $tratamientoPaciente->paciente_id)
+                                                                                        @if ($tratamiento->id == $tratamientoPaciente->tratamiento_id)
+                                                                                            {{ $tratamiento->tratamiento }}
+                                                                                        @endif
+                                                                                    @endif
+                                                                                @empty
+                                                                                    <span class="text-danger">No se registró tratamiento</span>
+                                                                                @endforelse
+
+                                                                            @endforeach
+                                                                        </td>
+                                                                        <td>
                                                                             @forelse ($tratamientosPaciente as $tratamientoPaciente)
                                                                                 @if ($turno->fecha == $tratamientoPaciente->fecha_alta && $paciente->id == $tratamientoPaciente->paciente_id)
-                                                                                    @if ($tratamiento->id == $tratamientoPaciente->tratamiento_id)
-                                                                                        {{ $tratamiento->tratamiento }}
-                                                                                    @endif
+                                                                                    {{ $tratamientoPaciente->observaciones }}
                                                                                 @endif
                                                                             @empty
                                                                                 <span class="text-danger">No se registró tratamiento</span>
                                                                             @endforelse
-
-                                                                        @endforeach
-                                                                    </td>
-                                                                    <td>
-                                                                        @forelse ($tratamientosPaciente as $tratamientoPaciente)
-                                                                            @if ($turno->fecha == $tratamientoPaciente->fecha_alta && $paciente->id == $tratamientoPaciente->paciente_id)
-                                                                                {{ $tratamientoPaciente->observaciones }}
+                                                                        </td>
+                                                                        <td>
+                                                                            @if ($turno->consulta)
+                                                                                {{ $turno->consulta->peso_actual }} kg
+                                                                            @else
+                                                                                Sin consulta relacionada
                                                                             @endif
-                                                                        @empty
-                                                                            <span class="text-danger">No se registró tratamiento</span>
-                                                                        @endforelse
-                                                                    </td>
-                                                                    <td>
-                                                                        @if ($turno->consulta)
-                                                                            {{ $turno->consulta->peso_actual }} kg
-                                                                        @else
-                                                                            Sin consulta relacionada
-                                                                        @endif
-                                                                    </td>
-                                                                    <td>
-                                                                        @if ($turno->consulta)
-                                                                            {{ $turno->consulta->imc_actual }}
-                                                                        @else
-                                                                            Sin consulta relacionada
-                                                                        @endif
-                                                                    </td>
-                                                                    <td>
-                                                                        @if ($turno->consulta)
-                                                                            {{ $turno->consulta->diagnostico }}
-                                                                        @else
-                                                                            Sin consulta relacionada
-                                                                        @endif
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                                </div>
+                                                                        </td>
+                                                                        <td>
+                                                                            @if ($turno->consulta)
+                                                                                {{ $turno->consulta->imc_actual }}
+                                                                            @else
+                                                                                Sin consulta relacionada
+                                                                            @endif
+                                                                        </td>
+                                                                        <td>
+                                                                            @if ($turno->consulta)
+                                                                                {{ $turno->consulta->diagnostico }}
+                                                                            @else
+                                                                                Sin consulta relacionada
+                                                                            @endif
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
+                                        </div>
                                     </div>
-                                </div>
+                                @else
+                                    <span>Sin turnos previos.</span>
+                                @endif
+
                             </div>
                         </div>
                     </div>

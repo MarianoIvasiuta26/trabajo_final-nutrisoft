@@ -20,33 +20,82 @@
                     <div class="row">
                         <div class="col-md-6">
                             <label for="peso" class="form-label">Peso</label>
-                            <input type="number" class="form-control" id="peso" value="{{$historiaClinica->peso}}">
+                            <div class="input-group">
+                                <input value="{{$historiaClinica->peso}}" class="form-control" name="peso" id="peso" type="text">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
+                            @error('altura')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
                         <div class="col-md-6">
                             <label for="altura" class="form-label">Altura</label>
-                            <input type="number" class="form-control" id="altura" value="{{$historiaClinica->altura}}">
+                            <div class="input-group">
+                                <input value="{{$historiaClinica->altura}}" class="form-control" name="altura" id="altura" type="text">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                            </div>
+                            @error('altura')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
+
                         </div>
                     </div>
 
                     <div class="row mt-3">
                         <div class="col-md-3">
                             <label for="circ_munieca" class="form-label">Circunferencia de Muñeca</label>
-                            <input type="number" class="form-control" id="circ_munieca" value="{{$historiaClinica->circunferencia_munieca}}">
+                            <div class="input-group">
+                                <input value="{{$historiaClinica->circunferencia_munieca}}" class="form-control" name="circ_munieca" id="circ_munieca" type="text">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                            </div>
+                            @error('circ_munieca')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
 
                         <div class="col-md-3">
                             <label for="circ_cintura" class="form-label">Circunferencia de Cintura</label>
-                            <input type="number" class="form-control" id="circ_cintura" value="{{$historiaClinica->circunferencia_cintura}}">
+                            <div class="input-group">
+                                <input value="{{$historiaClinica->circunferencia_cintura}}" class="form-control" name="circ_cintura" id="circ_cintura" type="text">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                            </div>
+                            @error('circ_munieca')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
 
                         <div class="col-md-3">
                             <label for="circ_cadera" class="form-label">Circunferencia de Cadera</label>
-                            <input type="number" class="form-control" id="circ_cadera" value="{{$historiaClinica->circunferencia_cadera}}">
+                            <div class="input-group">
+                                <input value="{{$historiaClinica->circunferencia_cadera}}" class="form-control" name="circ_cadera" id="circ_cadera" type="text">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                            </div>
+                            @error('circ_munieca')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
 
                         <div class="col-md-3">
                             <label for="circ_pecho" class="form-label">Circunferencia de Pecho</label>
-                            <input type="number" class="form-control" id="circ_pecho" value="{{$historiaClinica->circunferencia_pecho}}">
+                            <div class="input-group">
+                                <input value="{{$historiaClinica->circunferencia_pecho}}" class="form-control" name="circ_pecho" id="circ_pecho" type="text">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">cm</span>
+                                </div>
+                            </div>
+                            @error('circ_pecho')
+                                <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
                     </div>
 
