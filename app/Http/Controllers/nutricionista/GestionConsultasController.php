@@ -153,7 +153,7 @@ class GestionConsultasController extends Controller
         $consulta->save();
 
 
-        TratamientoPorPaciente::create([
+        $tratamientoPaciente= TratamientoPorPaciente::create([
             'tratamiento_id' => $tratamientoPaciente,
             'paciente_id' => $turno->paciente_id,
             'fecha_alta' => $turno->fecha,
@@ -186,7 +186,7 @@ class GestionConsultasController extends Controller
         $paciente = Paciente::find($turno->paciente_id);
 
         if( $turno->estado == 'Realizado' && $request->has('generar-plan-alimentacion')){
-            $planGenerado = $this->generarPlanesAlimentacion($paciente->id, $turno->id);
+            $planGenerado = $this->generarPlanesAlimentacion($paciente->id, $turno->id, $tratamientoPaciente->id);
         }
 
         if($planGenerado){
@@ -203,9 +203,12 @@ class GestionConsultasController extends Controller
     }
 
     //Función para el 2do proceso automatizado: Generación automática de Plan de alimentación
-    public function generarPlanesAlimentacion($id, $turnoId){
+    public function generarPlanesAlimentacion($id, $turnoId, $tratamientoPacienteId){
         //Buscamos el paciente
         $paciente = Paciente::find($id);
+
+        //Tratamiento
+        $tratamientoPaciente = TratamientoPorPaciente::find($tratamientoPacienteId);
 
         //Buscamos historia clínica del paciente
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
