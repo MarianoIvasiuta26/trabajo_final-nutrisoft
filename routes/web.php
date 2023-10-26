@@ -16,6 +16,7 @@ use App\Http\Controllers\admin\GrupoAlimentoController;
 use App\Http\Controllers\admin\IntoleranciaController;
 use App\Http\Controllers\admin\NutrienteController;
 use App\Http\Controllers\admin\PatologiaController;
+use App\Http\Controllers\AlimentosPorDietasController;
 use App\Http\Controllers\nutricionista\GestionConsultasController;
 use App\Http\Controllers\nutricionista\GestionPlieguesCutaneosController;
 use App\Http\Controllers\nutricionista\GestionTurnosController;
@@ -104,6 +105,8 @@ Route::middleware([
     Route::resource('gestion-tratamientos', TratramientoController::class)->names('gestion-tratamientos');
 
     Route::resource('gestion-pliegues-cutaneos', GestionPlieguesCutaneosController::class)->names('gestion-pliegues-cutaneos');
+
+    Route::resource('gestion-alimento-por-dietas', AlimentosPorDietasController::class)->names('gestion-alimento-por-dietas');
 
     //Paciente
 

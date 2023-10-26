@@ -63,6 +63,7 @@
                         </div>
                     </div>
                     <button type="button" class="btn btn-primary next-step">Siguiente</button>
+
                 </div>
 
                 <div class="step" id="step2">

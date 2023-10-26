@@ -484,6 +484,11 @@ return [
                     'icon' =>'fas fa-fw fa-plus',
                     'route'  => 'gestion-alimentos.create',
                 ],
+                [
+                    'text' => 'Alimentos por Dietas',
+                    'icon' =>'fas fa-fw fa-plus',
+                    'route'  => 'gestion-alimento-por-dietas.create',
+                ],
             ],
         ],
 
