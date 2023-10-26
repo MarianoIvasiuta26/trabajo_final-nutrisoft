@@ -98,24 +98,69 @@ class AlimentosPorDietasController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
+    //@param  int  $id
+     //@return \Illuminate\Http\Response
+
     public function edit($id)
     {
-        //
+        $alimentoPorDieta = AlimentoPorTipoDeDieta::find($id);
+        $alimentoRecomendadoDieta = AlimentosRecomendadosPorDieta::where('alimento_por_dieta_id', $id)->first();
+        $tiposDietas = TiposDeDieta::all();
+        $comidas = Comida::all();
+        $unidadesMedidas = UnidadesMedidasPorComida::all();
+        $alimentos = Alimento::all();
+
+        if(!$alimentoPorDieta){
+            return redirect()->back()->with('error', 'Error al encontrar el alimento asociado a la dieta.');
+        }
+
+        if(!$alimentoRecomendadoDieta){
+            return redirect()->back()->with('error', 'Error al encontrar el alimento recomendado para la dieta.');
+        }
+
+        return view('nutricionista.gestion-dietas.edit', compact('alimentoPorDieta', 'alimentoRecomendadoDieta', 'tiposDietas', 'comidas', 'unidadesMedidas', 'alimentos'));
+
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
+    //@param  \Illuminate\Http\Request  $request
+    //@param  int  $id
+    //@return \Illuminate\Http\Response
     public function update(Request $request, $id)
     {
-        //
+        $alimentoPorDieta = AlimentoPorTipoDeDieta::find($id);
+        $alimentoRecomendadoDieta = AlimentosRecomendadosPorDieta::where('alimento_por_dieta_id', $id)->first();
+
+        if(!$alimentoPorDieta){
+            return redirect()->back()->with('error', 'Error al encontrar el alimento asociado a la dieta.');
+        }
+
+        if(!$alimentoRecomendadoDieta){
+            return redirect()->back()->with('error', 'Error al encontrar el alimento recomendado para la dieta.');
+        }
+
+        $request->validate([
+            'alimento_id' => ['required', 'integer'],
+            'tipo_de_dieta_id' => ['required', 'integer'],
+            'cantidad' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'unidad_medida_id' => ['required', 'integer'],
+            'comida_id' => ['required', 'integer']
+        ]);
+
+        $alimentoPorDieta->alimento_id = $request->input('alimento_id');
+        $alimentoPorDieta->tipo_de_dieta_id = $request->input('tipo_de_dieta_id');
+        $alimentoPorDieta->save();
+
+        $alimentoRecomendadoDieta->comida_id = $request->input('comida_id');
+        $alimentoRecomendadoDieta->cantidad = $request->input('cantidad');
+        $alimentoRecomendadoDieta->unidad_medida_id = $request->input('unidad_medida_id');
+        $alimentoRecomendadoDieta->save();
+
+        return redirect()->route('gestion-alimento-por-dietas.create')->with('success', '¡Edición de la asociación entre alimento y dieta exitosa!');
     }
 
     /**
@@ -126,6 +171,11 @@ class AlimentosPorDietasController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $alimentoPorDieta = AlimentoPorTipoDeDieta::find($id);
+        $alimentoRecomendadoDieta = AlimentosRecomendadosPorDieta::where('alimento_por_dieta_id', $id)->first();
+        $alimentoRecomendadoDieta->delete();
+        $alimentoPorDieta->delete();
+
+        return redirect()->back()->with('success', '¡Alimento eliminado de la dieta correctamente!');
     }
 }
