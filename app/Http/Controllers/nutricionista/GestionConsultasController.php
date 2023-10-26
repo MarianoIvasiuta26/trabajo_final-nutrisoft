@@ -14,6 +14,7 @@ use App\Models\Paciente\CirugiasPaciente;
 use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\TipoConsulta;
+use App\Models\TiposDeDieta;
 use App\Models\TiposDePliegueCutaneo;
 use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
@@ -24,6 +25,7 @@ use App\Models\Paciente\Cirugia;
 use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
 use App\Models\PlanAlimentaciones;
+use App\Models\Tratamiento;
 use App\Models\ValorNutricional;
 use Illuminate\Http\Request;
 
@@ -209,12 +211,16 @@ class GestionConsultasController extends Controller
 
         //Tratamiento
         $tratamientoPaciente = TratamientoPorPaciente::find($tratamientoPacienteId);
+        if( $tratamientoPaciente ){
+            $tratamiento = Tratamiento::where('id', $tratamientoPaciente->tratamiento_id)->first();
+            $tipoDieta = TiposDeDieta::where('id', $tratamiento->tipo_dieta_id)->first();
+        }
 
         //Buscamos historia clínica del paciente
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
 
         //Obtenemos el tratamiento activo del paciente
-        $tratamientoActivo = TratamientoPorPaciente::where('paciente_id', $paciente->id)->where('estado', 'Activo')->first();
+        //$tratamientoActivo = TratamientoPorPaciente::where('paciente_id', $paciente->id)->where('estado', 'Activo')->first();
 
         //Obtenemos el tipo de consulta
         $tipoConsulta = TipoConsulta::where('tipo_consulta', 'Primera consulta')->first();
@@ -380,7 +386,7 @@ class GestionConsultasController extends Controller
         $porcentajeAzucarDulcesGolosinas = $resultadoEleccionAlimentos['porcentajeAzucarDulcesGolosinas'];
 
         //Selección de alimentos
-        $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas);
+        $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $tipoDieta->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas);
 
         //Obtenemos los alimentos recomendados
         $alimentosRecomendadosFrutas = $alimentosPaciente['alimentosFrutas'];
@@ -465,7 +471,7 @@ class GestionConsultasController extends Controller
         return [
             'paciente' => $paciente,
             'historiaClinica' => $historiaClinica,
-            'tratamientoActivo' => $tratamientoActivo,
+            'tratamientoPaciente' => $tratamiento->tratamiento,
             'tipoConsulta' => $tipoConsulta,
             'nutricionista' => $nutricionista,
             'imc' => $imc,
@@ -508,6 +514,7 @@ class GestionConsultasController extends Controller
             'get' => $gastoEnergeticoTotal
         ];
     }
+
 
     public function determinacionNutrientes($get, $edad){
 
@@ -584,7 +591,7 @@ class GestionConsultasController extends Controller
         ];
     }
 
-    public function eleccionAlimentos($historiaClinicaId, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas,  $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas){
+    public function eleccionAlimentos($historiaClinicaId, $tipoDietaId, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas,  $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas){
 
         //Obtenemos los grupos de alimentos
         //50%
@@ -633,6 +640,10 @@ class GestionConsultasController extends Controller
         //Buscamos la historia Clinica
         $historiaClinica = HistoriaClinica::find($historiaClinicaId);
         $paciente = Paciente::wherE('id', $historiaClinica->paciente_id)->first();
+
+        //Tipo de dieta
+        $tipoDieta = TiposDeDieta::find($tipoDietaId);
+
         //Buscamos datos médicos del paciente
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinicaId)->get();
         //Cirugías del paciente

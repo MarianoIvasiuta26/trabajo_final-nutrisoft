@@ -17,4 +17,8 @@ class TiposDeDieta extends Model
     {
         return $this->hasMany(Tratamiento::class);
     }
+
+    public function alimentoPorTipoDeDieta(){
+        return $this->hasMany(AlimentoPorTipoDeDieta::class);
+    }
 }

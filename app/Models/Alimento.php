@@ -40,4 +40,8 @@ class Alimento extends Model
         return $this->belongsToMany('App\Models\DetallePlanAlimentaciones');
     }
 
+    public function alimentoPorTipoDeDietas(){
+        return $this->hasMany('App\Models\AlimentoPorTipoDeDieta');
+    }
+
 }

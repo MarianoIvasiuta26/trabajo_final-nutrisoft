@@ -393,6 +393,8 @@
         </div>
 
         <div class="col-md-4">
+            <button id="toggleAccordionsButton" class="btn btn-primary">Mostrar Accordions</button>
+
             <div class="accordion accordion-flush-success" id="accordionFlushExample">
                 <div class="accordion-item">
                   <h2 class="accordion-header" id="flush-headingOne">
@@ -716,6 +718,17 @@
                 </div>
             </div>
         </div>
+
+        <div id="sidebar">
+            <!-- Contenido de los accordions -->
+
+            <div class="accordion" id="accordionFlushHistorialTurnos">
+                <!-- Tus accordions para Historial de turnos -->
+            </div>
+        </div>
+
+
+
     </div>
 
 @stop
@@ -771,6 +784,23 @@
                 color: #ffffff; /* Texto en blanco en casilla seleccionada */
             }
 
+            #sidebar {
+                position: fixed;
+                top: 0;
+                right: -300px; /* Inicialmente, el sidebar está fuera de la pantalla */
+                width: 300px; /* Ancho del sidebar */
+                height: 100%;
+                background-color: #f8f9fa; /* Color de fondo del sidebar */
+                box-shadow: -5px 0px 5px rgba(0, 0, 0, 0.1); /* Sombra a la izquierda para resaltar el sidebar */
+                z-index: 1000; /* Para estar por encima del contenido */
+                overflow-y: auto; /* Agrega desplazamiento vertical si el contenido es largo */
+                transition: right 0.3s; /* Animación de transición */
+            }
+
+            #sidebar.open {
+                right: 0; /* Cuando se abre, se desplaza hacia la izquierda y se muestra completamente */
+            }
+
     </style>
 
 @stop
@@ -785,6 +815,15 @@
     <script>
         $(document).ready(function() {
             $('[data-bs-toggle="popover"]').popover();
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.getElementById("sidebar");
+            const toggleButton = document.getElementById("toggleAccordionsButton");
+
+            toggleButton.addEventListener("click", function () {
+                sidebar.classList.toggle("open");
+            });
         });
 
         //Evento para mostrar el contenedor con las mediciones de circunferencias
