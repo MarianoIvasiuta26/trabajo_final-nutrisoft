@@ -4,6 +4,9 @@ namespace App\Http\Controllers\nutricionista;
 
 use App\Http\Controllers\Controller;
 use App\Models\Alimento;
+use App\Models\AlimentoPorTipoDeDieta;
+use App\Models\AlimentosRecomendadosPorDieta;
+use App\Models\Comida;
 use App\Models\Consulta;
 use App\Models\DetallePlanAlimentaciones;
 use App\Models\MedicionesDePlieguesCutaneos;
@@ -26,6 +29,7 @@ use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
 use App\Models\PlanAlimentaciones;
 use App\Models\Tratamiento;
+use App\Models\UnidadesMedidasPorComida;
 use App\Models\ValorNutricional;
 use Illuminate\Http\Request;
 
@@ -211,13 +215,17 @@ class GestionConsultasController extends Controller
 
         //Tratamiento
         $tratamientoPaciente = TratamientoPorPaciente::find($tratamientoPacienteId);
+
+        //dd($tratamientoPaciente);
+
         if( $tratamientoPaciente ){
             $tratamiento = Tratamiento::where('id', $tratamientoPaciente->tratamiento_id)->first();
-            $tipoDieta = TiposDeDieta::where('id', $tratamiento->tipo_dieta_id)->first();
+            $tipoDieta = TiposDeDieta::where('id', $tratamiento->tipo_de_dieta_id)->first();
         }
 
         //Buscamos historia clínica del paciente
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+        //dd($paciente, $historiaClinica, $tratamiento, $tipoDieta);
 
         //Obtenemos el tratamiento activo del paciente
         //$tratamientoActivo = TratamientoPorPaciente::where('paciente_id', $paciente->id)->where('estado', 'Activo')->first();
@@ -389,19 +397,8 @@ class GestionConsultasController extends Controller
         $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $tipoDieta->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas);
 
         //Obtenemos los alimentos recomendados
-        $alimentosRecomendadosFrutas = $alimentosPaciente['alimentosFrutas'];
-        $alimentosRecomendadosVerduras = $alimentosPaciente['alimentosVerduras'];
-        $alimentosRecomendadosLegumbres = $alimentosPaciente['alimentosLegumbres'];
-        $alimentosRecomendadosLeche = $alimentosPaciente['alimentosLeche'];
-        $alimentosRecomendadosYogur = $alimentosPaciente['alimentosYogur'];
-        $alimentosRecomendadosQueso = $alimentosPaciente['alimentosQueso'];
-        $alimentosRecomendadosCarnes = $alimentosPaciente['alimentosCarnes'];
-        $alimentosRecomendadosHuevos = $alimentosPaciente['alimentosHuevos'];
-        $alimentosRecomendadosPescados = $alimentosPaciente['alimentosPescados'];
-        $alimentosRecomendadosAceites = $alimentosPaciente['alimentosAceites'];
-        $alimentosRecomendadosFrutasSecas = $alimentosPaciente['alimentosFrutasSecas'];
-        $alimentosRecomendadosAzucar = $alimentosPaciente['alimentosAzucar'];
-        $alimentosRecomendadosGolosinas = $alimentosPaciente['alimentosGolosinas'];
+        $alimentosRecomendadosFrutas = $alimentosPaciente['frutasRecomendadas'];
+        $alimentosRecomendadosVerduras = $alimentosPaciente['verdurasRecomendadas'];
 
         //dd($alimentosRecomendadosFrutas, $alimentosRecomendadosVerduras, $alimentosRecomendadosLegumbres, $alimentosRecomendadosLeche, $alimentosRecomendadosYogur, $alimentosRecomendadosQueso, $alimentosRecomendadosCarnes, $alimentosRecomendadosHuevos, $alimentosRecomendadosPescados, $alimentosRecomendadosAceites, $alimentosRecomendadosFrutasSecas, $alimentosRecomendadosAzucar, $alimentosRecomendadosGolosinas);
 
@@ -409,17 +406,6 @@ class GestionConsultasController extends Controller
         $alimentosRecomendados = array_merge(
             $alimentosRecomendadosFrutas,
             $alimentosRecomendadosVerduras,
-            $alimentosRecomendadosLegumbres,
-            $alimentosRecomendadosLeche,
-            $alimentosRecomendadosYogur,
-            $alimentosRecomendadosQueso,
-            $alimentosRecomendadosCarnes,
-            $alimentosRecomendadosHuevos,
-            $alimentosRecomendadosPescados,
-            $alimentosRecomendadosAceites,
-            $alimentosRecomendadosFrutasSecas,
-            $alimentosRecomendadosAzucar,
-            $alimentosRecomendadosGolosinas
         );
 
         //dd($imc, $consulta->peso_actual, $consulta->altura_actual, $paciente->edad, $gastoEnergeticoTotal, $gastoEnergeticoBasal, $alimentosRecomendados, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas,  $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas);
@@ -482,17 +468,6 @@ class GestionConsultasController extends Controller
             'carbohidratosRecomendados' => $carbohidratosRecomendados,
             'alimentosRecomendadosFrutas' => $alimentosRecomendadosFrutas,
             'alimentosRecomendadosVerduras' => $alimentosRecomendadosVerduras,
-            'alimentosRecomendadosLegumbres' => $alimentosRecomendadosLegumbres,
-            'alimentosRecomendadosLeche' => $alimentosRecomendadosLeche,
-            'alimentosRecomendadosYogur' => $alimentosRecomendadosYogur,
-            'alimentosRecomendadosQueso' => $alimentosRecomendadosQueso,
-            'alimentosRecomendadosCarnes' => $alimentosRecomendadosCarnes,
-            'alimentosRecomendadosHuevos' => $alimentosRecomendadosHuevos,
-            'alimentosRecomendadosPescados' => $alimentosRecomendadosPescados,
-            'alimentosRecomendadosAceites' => $alimentosRecomendadosAceites,
-            'alimentosRecomendadosFrutasSecas' => $alimentosRecomendadosFrutasSecas,
-            'alimentosRecomendadosAzucar' => $alimentosRecomendadosAzucar,
-            'alimentosRecomendadosGolosinas' => $alimentosRecomendadosGolosinas,
         ];
 
     }
@@ -639,10 +614,17 @@ class GestionConsultasController extends Controller
 
         //Buscamos la historia Clinica
         $historiaClinica = HistoriaClinica::find($historiaClinicaId);
-        $paciente = Paciente::wherE('id', $historiaClinica->paciente_id)->first();
+        $paciente = Paciente::where('id', $historiaClinica->paciente_id)->first();
 
         //Tipo de dieta
         $tipoDieta = TiposDeDieta::find($tipoDietaId);
+
+        //Alimentos por dieta
+        $alimentosPorDieta = AlimentoPorTipoDeDieta::where('tipo_de_dieta_id', $tipoDieta->id)->get();
+        //$alimentosrecomendadosPorDieta = AlimentosRecomendadosPorDieta::all();
+
+        //$comidas = Comida::all();
+        $unidadesMedidas = UnidadesMedidasPorComida::all();
 
         //Buscamos datos médicos del paciente
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinicaId)->get();
@@ -682,19 +664,22 @@ class GestionConsultasController extends Controller
         $carbohidratosDesayuno = $carbohidratosRecomendados * $porcentajeDesayuno; //Total de gramos de carbohidratos para el desayuno
         $lipidosDesayuno = $lipidosRecomendados * $porcentajeDesayuno; //Total de gramos de lípidos para el desayuno
         $proteinasDesayuno = $proteinasRecomendadas * $porcentajeDesayuno;  //Total de gramos de proteínas para el desayuno
+
         $carbohidratosMediaManiana = $carbohidratosRecomendados * $porcentajeMediaManiana; //Total de gramos de carbohidratos para la media mañana
         $lipidosMediaManiana = $lipidosRecomendados * $porcentajeMediaManiana; //Total de gramos de lípidos para la media mañana
         $proteinasMediaManiana = $proteinasRecomendadas * $porcentajeMediaManiana; //Total de gramos de proteínas para la media mañana
+
         $carbohidratosAlmuerzo = $carbohidratosRecomendados * $porcentajeAlmuerzo; //Total de gramos de carbohidratos para el almuerzo
         $lipidosAlmuerzo = $lipidosRecomendados * $porcentajeAlmuerzo; //Total de gramos de lípidos para el almuerzo
         $proteinasAlmuerzo = $proteinasRecomendadas * $porcentajeAlmuerzo; //Total de gramos de proteinas para el almuerzo
+
         $carbohidratosMediaTarde = $carbohidratosRecomendados * $porcentajeMediaTarde; //Total de gramos de carbohidratos para la media tarde
         $lipidosMediaTarde = $lipidosRecomendados * $porcentajeMediaTarde; //Total de gramos de lípidos para la media tarde
         $proteinasMediaTarde = $proteinasRecomendadas * $porcentajeMediaTarde; //Total de gramos de proteínas para la media tarde
+
         $carbohidratosCena = $carbohidratosRecomendados * $porcentajeCena; //Total de gramos de carbohidratos para la cena
         $lipidosCena = $lipidosRecomendados * $porcentajeCena; //Total de gramos de lípidos para la cena
         $proteinasCena = $proteinasRecomendadas * $porcentajeCena;  //Total de gramos de proteínas para la cena
-
 
         //Frutas por comida y por macronutriente
         $carbohidratoFrutasDesayuno = (($carbohidratosDesayuno * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en desayuno
@@ -705,9 +690,255 @@ class GestionConsultasController extends Controller
         $lipidoFrutasMediaManiana = (($lipidosMediaManiana * 9) * ($caloriasTotalesFrutas/3))/9; //Gramos totales de frutas en media mañana
         $proteinaFrutasMediaManiana = (($proteinasMediaManiana * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en media mañana
 
-        $carbohidratoFrutasMediaTarde = (($carbohidratosMediaTarde * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en media tarde
-        $lipidoFrutasMediaTarde = (($lipidosMediaTarde * 9) * ($caloriasTotalesFrutas/3))/9; //Gramos totales de frutas en media tarde
-        $proteinaFrutasMediaTarde = (($proteinasMediaTarde * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en media tarde
+        $carbohidratoFrutasMerienda = (($carbohidratosMediaTarde * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en merienda
+        $lipidoFrutasMerienda = (($lipidosMediaTarde * 9) * ($caloriasTotalesFrutas/3))/9; //Gramos totales de frutas en media tarde
+        $proteinaFrutasMerienda = (($proteinasMediaTarde * 4) * ($caloriasTotalesFrutas/3))/4; //Gramos totales de frutas en media tarde
+
+        //Frutas
+        //Búsqueda para desayuno
+        $alimentosRecomendadosFrutasDesayuno = [];
+
+        //Obtenemos los alimentos recomendados para esta dieta y para desayuno
+        $comidaDesayuno = Comida::where('nombre_comida', 'Desayuno')->first();
+        $alimentosDesayunoRecomendados = AlimentosRecomendadosPorDieta::where('comida_id', $comidaDesayuno->id)->get();
+
+        //Comprobamos los macronutrientes
+        foreach($alimentosDesayunoRecomendados as $desayunoRecomendado){
+            foreach($alimentosPorDieta as $alimentoDieta){
+                if($alimentoDieta->id == $desayunoRecomendado->alimento_por_dieta_id){ //Obtenemos solo los alimetno spara la dieta que son para el desayuno
+                    foreach($alimentosFruta as $fruta){
+                        if($fruta->id == $alimentoDieta->alimento_id){ //Verificamos que el alimento es una fruta
+                            foreach($ValoresNutricionales as $valorN){
+                                foreach($nutrientes as $nutriente){
+                                    //Primero obtenemos la cantidad total de macros recomendados para este alimento
+                                    foreach($unidadesMedidas as $unidad){
+                                        if($desayunoRecomendado->unidad_medida_id == $unidad->id){
+                                            if($unidad->nombre_unidad_medida == 'Gramos'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = ($valorN->valor * $desayunoRecomendado->cantidad)/100; //Carbohidratos totales en Gramos del alimento
+                                                    if($carbohidratosTotal < $carbohidratoFrutasDesayuno){
+                                                        if($carbohidratoFrutasDesayuno > 0){
+                                                            $alimentosRecomendadosFrutasDesayuno[] = $alimentoDieta->id;
+                                                            $carbohidratoFrutasDesayuno -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * $desayunoRecomendado->cantidad)/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoFrutasDesayuno){
+                                                        if($lipidoFrutasDesayuno > 0){
+                                                            $alimentosRecomendadosFrutasDesayuno[] = $alimentoDieta->id;
+                                                            $lipidoFrutasDesayuno -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * $desayunoRecomendado->cantidad)/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaFrutasDesayuno){
+                                                        if($proteinaFrutasDesayuno > 0){
+                                                            $alimentosRecomendadosFrutasDesayuno[] = $alimentoDieta->id;
+                                                            $proteinaFrutasDesayuno -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }else if($unidad->nombre_unidad_medida == 'Kcal'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = (($desayunoRecomendado->cantidad/4) * $valorN->valor)/100;
+                                                    if($carbohidratosTotal < $carbohidratoFrutasDesayuno){
+                                                        if($carbohidratoFrutasDesayuno > 0){
+                                                            $alimentosRecomendadosFrutasDesayuno[] = $alimentoDieta->id;
+                                                            $carbohidratoFrutasDesayuno -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * ($desayunoRecomendado->cantidad/9))/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoFrutasDesayuno){
+                                                        if($lipidoFrutasDesayuno > 0){
+                                                            $alimentosRecomendadosFrutasDesayuno[] = $alimentoDieta->id;
+                                                            $lipidoFrutasDesayuno -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * ($desayunoRecomendado->cantidad/4))/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaFrutasDesayuno){
+                                                        if($proteinaFrutasDesayuno > 0){
+                                                            $alimentosRecomendadosFrutasDesayuno[] = $alimentoDieta->id;
+                                                            $proteinaFrutasDesayuno -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //Búsqueda para media maniana
+        $FrutasMediaManiana = [];
+        $comidaMediaManiana = Comida::where('nombre_comida', 'Media maniana')->first();
+        $alimentosMediaManianaRecomendados = AlimentosRecomendadosPorDieta::where('comida_id', $comidaMediaManiana->id)->get();
+
+        //Comprobamos los macronutrientes
+        foreach($alimentosMediaManianaRecomendados as $mediaManianaRecomendado){
+            foreach($alimentosPorDieta as $alimentoDieta){
+                if($alimentoDieta->id == $mediaManianaRecomendado->alimento_por_dieta_id){ //Obtenemos solo los alimetno spara la dieta que son para el desayuno
+                    foreach($alimentosFruta as $fruta){
+                        if($fruta->id == $alimentoDieta->alimento_id){ //Verificamos que el alimento es una fruta
+                            foreach($ValoresNutricionales as $valorN){
+                                foreach($nutrientes as $nutriente){
+                                    //Primero obtenemos la cantidad total de macros recomendados para este alimento
+                                    foreach($unidadesMedidas as $unidad){
+                                        if($mediaManianaRecomendado->unidad_medida_id == $unidad->id){
+                                            if($unidad->nombre_unidad_medida == 'Gramos'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = ($valorN->valor * $mediaManianaRecomendado->cantidad)/100; //Carbohidratos totales en Gramos del alimento
+                                                    if($carbohidratosTotal < $carbohidratoFrutasMediaManiana){
+                                                        if($carbohidratoFrutasMediaManiana > 0){
+                                                            $FrutasMediaManiana[] = $alimentoDieta->id;
+                                                            $carbohidratoFrutasMediaManiana -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * $mediaManianaRecomendado->cantidad)/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoFrutasMediaManiana){
+                                                        if($lipidoFrutasMediaManiana > 0){
+                                                            $FrutasMediaManiana[] = $alimentoDieta->id;
+                                                            $lipidoFrutasMediaManiana -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * $mediaManianaRecomendado->cantidad)/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaFrutasMediaManiana){
+                                                        if($proteinaFrutasMediaManiana > 0){
+                                                            $FrutasMediaManiana[] = $alimentoDieta->id;
+                                                            $proteinaFrutasMediaManiana -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }else if($unidad->nombre_unidad_medida == 'Kcal'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = (($mediaManianaRecomendado->cantidad/4) * $valorN->valor)/100;
+                                                    if($carbohidratosTotal < $carbohidratoFrutasMediaManiana){
+                                                        if($carbohidratoFrutasMediaManiana > 0){
+                                                            $FrutasMediaManiana[] = $alimentoDieta->id;
+                                                            $carbohidratoFrutasMediaManiana -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * ($mediaManianaRecomendado->cantidad/9))/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoFrutasMediaManiana){
+                                                        if($lipidoFrutasMediaManiana > 0){
+                                                            $FrutasMediaManiana[] = $alimentoDieta->id;
+                                                            $lipidoFrutasMediaManiana -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * ($mediaManianaRecomendado->cantidad/4))/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaFrutasMediaManiana){
+                                                        if($proteinaFrutasMediaManiana > 0){
+                                                            $FrutasMediaManiana[] = $alimentoDieta->id;
+                                                            $proteinaFrutasMediaManiana -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //Búsqueda para merienda
+        $FrutasMerienda= [];
+        $comidaMerienda = Comida::where('nombre_comida', 'Media maniana')->first();
+        $alimentosMeriendaRecomendados = AlimentosRecomendadosPorDieta::where('comida_id', $comidaMerienda->id)->get();
+
+        //Comprobamos los macronutrientes
+        foreach($alimentosMeriendaRecomendados as $meriendaRecomendada){
+            foreach($alimentosPorDieta as $alimentoDieta){
+                if($alimentoDieta->id == $meriendaRecomendada->alimento_por_dieta_id){ //Obtenemos solo los alimetno spara la dieta que son para el desayuno
+                    foreach($alimentosFruta as $fruta){
+                        if($fruta->id == $alimentoDieta->alimento_id){ //Verificamos que el alimento es una fruta
+                            foreach($ValoresNutricionales as $valorN){
+                                foreach($nutrientes as $nutriente){
+                                    //Primero obtenemos la cantidad total de macros recomendados para este alimento
+                                    foreach($unidadesMedidas as $unidad){
+                                        if($meriendaRecomendada->unidad_medida_id == $unidad->id){
+                                            if($unidad->nombre_unidad_medida == 'Gramos'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = ($valorN->valor * $meriendaRecomendada->cantidad)/100; //Carbohidratos totales en Gramos del alimento
+                                                    if($carbohidratosTotal < $carbohidratoFrutasMerienda){
+                                                        if($carbohidratoFrutasMerienda > 0){
+                                                            $FrutasMerienda[] = $alimentoDieta->id;
+                                                            $carbohidratoFrutasMerienda -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * $meriendaRecomendada->cantidad)/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoFrutasMerienda){
+                                                        if($lipidoFrutasMerienda > 0){
+                                                            $FrutasMerienda[] = $alimentoDieta->id;
+                                                            $lipidoFrutasMerienda -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * $meriendaRecomendada->cantidad)/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaFrutasMerienda){
+                                                        if($proteinaFrutasMerienda > 0){
+                                                            $FrutasMerienda[] = $alimentoDieta->id;
+                                                            $proteinaFrutasMerienda -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }else if($unidad->nombre_unidad_medida == 'Kcal'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = (($meriendaRecomendada->cantidad/4) * $valorN->valor)/100;
+                                                    if($carbohidratosTotal < $carbohidratoFrutasMerienda){
+                                                        if($carbohidratoFrutasMerienda > 0){
+                                                            $FrutasMerienda[] = $alimentoDieta->id;
+                                                            $carbohidratoFrutasMerienda -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * ($meriendaRecomendada->cantidad/9))/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoFrutasMerienda){
+                                                        if($lipidoFrutasMerienda > 0){
+                                                            $FrutasMerienda[] = $alimentoDieta->id;
+                                                            $lipidoFrutasMerienda -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * ($meriendaRecomendada->cantidad/4))/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaFrutasMerienda){
+                                                        if($proteinaFrutasMerienda > 0){
+                                                            $FrutasMerienda[] = $alimentoDieta->id;
+                                                            $proteinaFrutasMerienda -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $frutasRecomendadas = array_merge(
+            $alimentosRecomendadosFrutasDesayuno,
+            $FrutasMediaManiana,
+            $FrutasMerienda,
+        );
 
         //Verduras por comida y por macronutriente
         $carbohidratoVerdurasAlmuerzo = (($carbohidratosAlmuerzo * 4) * ($caloriasTotalesVerduras/2))/4; //Gramos totales de verduras en almuerzo
@@ -718,6 +949,176 @@ class GestionConsultasController extends Controller
         $lipidoVerdurasCena = (($lipidosCena * 9) * ($caloriasTotalesVerduras/2))/9; //Gramos totales de verduras en cena
         $proteinaVerdurasCena = (($proteinasCena * 4) * ($caloriasTotalesVerduras/2))/4; //Gramos totales de verduras en cena
 
+        //Búsqueda para almuerzo
+        $verdurasAlmuerzo = [];
+        $comidaAlmuerzoVerdura = Comida::where('nombre_comida', 'Almuerzo')->first();
+        $alimentosAlmuerzoRecomendados = AlimentosRecomendadosPorDieta::where('comida_id', $comidaAlmuerzoVerdura->id)->get();
+
+        //Comprobamos los macronutrientes
+        foreach($alimentosAlmuerzoRecomendados as $almuerzoRecomendado){
+            foreach($alimentosPorDieta as $alimentoDieta){
+                if($alimentoDieta->id == $almuerzoRecomendado->alimento_por_dieta_id){ //Obtenemos solo los alimetno spara la dieta que son para el almuer<o
+                    foreach($alimentosFruta as $fruta){
+                        if($fruta->id == $alimentoDieta->alimento_id){ //Verificamos que el alimento es una fruta
+                            foreach($ValoresNutricionales as $valorN){
+                                foreach($nutrientes as $nutriente){
+                                    //Primero obtenemos la cantidad total de macros recomendados para este alimento
+                                    foreach($unidadesMedidas as $unidad){
+                                        if($almuerzoRecomendado->unidad_medida_id == $unidad->id){
+                                            if($unidad->nombre_unidad_medida == 'Gramos'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = ($valorN->valor * $almuerzoRecomendado->cantidad)/100; //Carbohidratos totales en Gramos del alimento
+                                                    if($carbohidratosTotal < $carbohidratoVerdurasAlmuerzo){
+                                                        if($carbohidratoVerdurasAlmuerzo > 0){
+                                                            $verdurasAlmuerzo[] = $alimentoDieta->id;
+                                                            $carbohidratoVerdurasAlmuerzo -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * $almuerzoRecomendado->cantidad)/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoVerdurasAlmuerzo){
+                                                        if($lipidoVerdurasAlmuerzo > 0){
+                                                            $verdurasAlmuerzo[] = $alimentoDieta->id;
+                                                            $lipidoVerdurasAlmuerzo -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * $almuerzoRecomendado->cantidad)/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaVerdurasAlmuerzo){
+                                                        if($proteinaVerdurasAlmuerzo > 0){
+                                                            $verdurasAlmuerzo[] = $alimentoDieta->id;
+                                                            $proteinaVerdurasAlmuerzo -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }else if($unidad->nombre_unidad_medida == 'Kcal'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = (($almuerzoRecomendado->cantidad/4) * $valorN->valor)/100;
+                                                    if($carbohidratosTotal < $carbohidratoVerdurasAlmuerzo){
+                                                        if($carbohidratoVerdurasAlmuerzo > 0){
+                                                            $verdurasAlmuerzo[] = $alimentoDieta->id;
+                                                            $carbohidratoVerdurasAlmuerzo -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * ($almuerzoRecomendado->cantidad/9))/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoVerdurasAlmuerzo){
+                                                        if($lipidoVerdurasAlmuerzo > 0){
+                                                            $verdurasAlmuerzo[] = $alimentoDieta->id;
+                                                            $lipidoVerdurasAlmuerzo -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * ($almuerzoRecomendado->cantidad/4))/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaVerdurasAlmuerzo){
+                                                        if($proteinaVerdurasAlmuerzo > 0){
+                                                            $verdurasAlmuerzo[] = $alimentoDieta->id;
+                                                            $proteinaVerdurasAlmuerzo -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        //Búsqueda para cena
+        $verdurasCena = [];
+        $comidaCenaVerdura = Comida::where('nombre_comida', 'Cena')->first();
+        $alimentosCenaRecomendados = AlimentosRecomendadosPorDieta::where('comida_id', $comidaCenaVerdura->id)->get();
+
+        //Comprobamos los macronutrientes
+        foreach($alimentosCenaRecomendados as $cenaRecomendada){
+            foreach($alimentosPorDieta as $alimentoDieta){
+                if($alimentoDieta->id == $cenaRecomendada->alimento_por_dieta_id){ //Obtenemos solo los alimetno spara la dieta que son para el almuer<o
+                    foreach($alimentosFruta as $fruta){
+                        if($fruta->id == $alimentoDieta->alimento_id){ //Verificamos que el alimento es una fruta
+                            foreach($ValoresNutricionales as $valorN){
+                                foreach($nutrientes as $nutriente){
+                                    //Primero obtenemos la cantidad total de macros recomendados para este alimento
+                                    foreach($unidadesMedidas as $unidad){
+                                        if($cenaRecomendada->unidad_medida_id == $unidad->id){
+                                            if($unidad->nombre_unidad_medida == 'Gramos'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = ($valorN->valor * $cenaRecomendada->cantidad)/100; //Carbohidratos totales en Gramos del alimento
+                                                    if($carbohidratosTotal < $carbohidratoVerdurasCena){
+                                                        if($carbohidratoVerdurasCena > 0){
+                                                            $verdurasCena[] = $alimentoDieta->id;
+                                                            $carbohidratoVerdurasCena -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * $cenaRecomendada->cantidad)/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoVerdurasCena){
+                                                        if($lipidoVerdurasCena > 0){
+                                                            $verdurasCena[] = $alimentoDieta->id;
+                                                            $lipidoVerdurasCena -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * $cenaRecomendada->cantidad)/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaVerdurasCena){
+                                                        if($proteinaVerdurasCena > 0){
+                                                            $verdurasCena[] = $alimentoDieta->id;
+                                                            $proteinaVerdurasCena -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }else if($unidad->nombre_unidad_medida == 'Kcal'){
+                                                if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $carbohidratosTotal = (($cenaRecomendada->cantidad/4) * $valorN->valor)/100;
+                                                    if($carbohidratosTotal < $carbohidratoVerdurasCena){
+                                                        if($carbohidratoVerdurasCena > 0){
+                                                            $verdurasCena[] = $alimentoDieta->id;
+                                                            $carbohidratoVerdurasCena -= $carbohidratosTotal;
+                                                        }
+                                                    }
+                                                } else if($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                    $lipidosTotal = ($valorN->valor * ($cenaRecomendada->cantidad/9))/100; //Lípidos totales en Gramos del alimento
+                                                    if($lipidosTotal < $lipidoVerdurasCena){
+                                                        if($lipidoVerdurasCena > 0){
+                                                            $verdurasCena[] = $alimentoDieta->id;
+                                                            $lipidoVerdurasCena -= $lipidosTotal;
+                                                        }
+                                                    }
+                                                }else if($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                    $proteinasTotal = ($valorN->valor * ($cenaRecomendada->cantidad/4))/100; //Proteínas totales en Gramos del alimento
+                                                    if($proteinasTotal < $proteinaVerdurasCena){
+                                                        if($proteinaVerdurasCena > 0){
+                                                            $verdurasCena[] = $alimentoDieta->id;
+                                                            $proteinaVerdurasCena -= $proteinasTotal;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $verdurasRecomendadas = array_merge(
+            $verdurasAlmuerzo,
+            $verdurasCena,
+        );
+
+
+        return [
+            'frutasRecomendadas' => $frutasRecomendadas,
+            'verdurasRecomendadas' => $verdurasRecomendadas,
+        ];
+
+/*
         $desayuno = [];
 
         foreach($alimentosFruta as $fruta){
@@ -917,7 +1318,7 @@ class GestionConsultasController extends Controller
                 }
             }
         }
-/*
+
         //Obtenemos los alimentos que no le gustan al paciente
         $alimentosNoGustan = [];
         foreach($anamnesisPaciente as $anamnesis){
@@ -927,6 +1328,7 @@ class GestionConsultasController extends Controller
         }
 */
 
+/*
         return [
             'alimentosFrutas' => $alimentosRecomendadosFrutas,
             'alimentosVerduras' => $alimentosRecomendadosVerduras,
@@ -942,7 +1344,7 @@ class GestionConsultasController extends Controller
             'alimentosAzucar' => $alimentosRecomendadosAzucar,
             'alimentosGolosinas' => $alimentosRecomendadosGolosinas,
         ];
-
+*/
 
 
     }

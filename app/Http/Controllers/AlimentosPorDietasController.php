@@ -59,6 +59,19 @@ class AlimentosPorDietasController extends Controller
             'comida_id' => ['required', 'integer']
         ]);
 
+        //Validamos que ya no exista registro del alimento seleccioando en la dieta
+        $alimentoPorDieta = AlimentoPorTipoDeDieta::where('alimento_id', $request->input('alimento_id'))
+            ->where('tipo_de_dieta_id', $request->input('tipo_de_dieta_id'))
+            ->first();
+
+        $alimentoRecomendadoDieta = AlimentosRecomendadosPorDieta::where('alimento_por_dieta_id', $alimentoPorDieta->id)
+        ->where('comida_id', $request->input('comida_id'))
+        ->first();
+
+        if($alimentoPorDieta && $alimentoRecomendadoDieta){
+            return redirect()->back()->with('error', 'Error al crear la asociación del alimento con la dieta. Ya existe un registro de este alimento en la dieta.');
+        }
+
         $alimentoPorDieta = AlimentoPorTipoDeDieta::create([
             'alimento_id' => $request->input('alimento_id'),
             'tipo_de_dieta_id'=> $request->input('tipo_de_dieta_id'),

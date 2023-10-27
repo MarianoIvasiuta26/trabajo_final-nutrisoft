@@ -243,9 +243,6 @@
             })
         @endif
 
-
-
-
         //SweetAlert
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
@@ -268,6 +265,31 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, asociar alimento con la dieta.',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            button.closest('form').submit();
+                        }
+                    });
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const deleteButtons = document.querySelectorAll('.delete-button');
+
+            // Agrega un controlador de clic a cada botón de eliminar
+            deleteButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Estás seguro?',
+                        text: 'Esta acción eliminará el alimento recomendado a la dieta.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
