@@ -665,13 +665,13 @@
                                         <div id="historial-turnos" class="tab-pane">
                                             <table id="tabla-mis-turnos" class="table table-striped" id="turnos">
                                                 <thead>
-                                                <tr>
-                                                    <th scope="col">Fecha</th>
-                                                    <th scope="col">Hora</th>
-                                                    <th scope="col">Tipo de consulta</th>
-                                                    <th scope="col">Estado</th>
-                                                    <th scope="col">Acciones</th>
-                                                </tr>
+                                                    <tr>
+                                                        <th scope="col">Fecha</th>
+                                                        <th scope="col">Hora</th>
+                                                        <th scope="col">Tipo de consulta</th>
+                                                        <th scope="col">Estado</th>
+                                                        <th scope="col">Acciones</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
 
@@ -705,48 +705,48 @@
                                                         </tr>
                                                         <tr class="detalles-turno" style="display: none;">
                                                             <td colspan="5">
-                                                                <table class="table" id="turnos">
+                                                                <table class="table">
                                                                     <tbody>
 
-                                                                            <tr>
-                                                                                <th scope="col">Paciente</th>
-                                                                                <td>{{ $paciente->user->name }} {{$paciente->user->apellido}}</td>
-                                                                            </tr>
+                                                                        <tr>
+                                                                            <th scope="col">Paciente</th>
+                                                                            <td>{{ $paciente->user->name }} {{$paciente->user->apellido}}</td>
+                                                                        </tr>
 
-                                                                            <tr>
-                                                                                <th scope="col">Objetivo de salud</th>
-                                                                                <td>{{ $historiaClinica->objetivo_salud }}</td>
-                                                                            </tr>
+                                                                        <tr>
+                                                                            <th scope="col">Objetivo de salud</th>
+                                                                            <td>{{ $historiaClinica->objetivo_salud }}</td>
+                                                                        </tr>
 
-                                                                            <tr>
-                                                                                <th scope="col">Estilo de vida</th>
-                                                                                <td>{{ $historiaClinica->estilo_vida }}</td>
-                                                                            </tr>
+                                                                        <tr>
+                                                                            <th scope="col">Estilo de vida</th>
+                                                                            <td>{{ $historiaClinica->estilo_vida }}</td>
+                                                                        </tr>
 
-                                                                            <tr>
-                                                                                <th scope="col">Profesional</th>
-                                                                                <td>
-                                                                                    @foreach ($profesionales as $profesional)
-                                                                                        @foreach ($horarios as $horario)
-                                                                                            @if ($horario->id == $turno->horario_id)
-                                                                                                @if ($horario->nutricionista_id == $profesional->id)
-                                                                                                    {{ $profesional->user->name}} {{ $profesional->user->apellido}}
-                                                                                                @endif
+                                                                        <tr>
+                                                                            <th scope="col">Profesional</th>
+                                                                            <td>
+                                                                                @foreach ($profesionales as $profesional)
+                                                                                    @foreach ($horarios as $horario)
+                                                                                        @if ($horario->id == $turno->horario_id)
+                                                                                            @if ($horario->nutricionista_id == $profesional->id)
+                                                                                                {{ $profesional->user->name}} {{ $profesional->user->apellido}}
                                                                                             @endif
-                                                                                        @endforeach
+                                                                                        @endif
                                                                                     @endforeach
-                                                                                </td>
-                                                                            </tr>
+                                                                                @endforeach
+                                                                            </td>
+                                                                        </tr>
 
-                                                                            <tr>
-                                                                                @if ($turno->estado == 'Cancelado' || $turno->estado == 'Inasistencia')
-                                                                                    <th>Detalles de la consulta</th>
-                                                                                    <td>Sin consulta.</td>
-                                                                                @else
-                                                                                    <th scope="col">Detalles de la consulta</th>
-                                                                                    <td><a href="{{route('turnos.show-detalles-consulta', $turno->id)}}">Ver detalles</a></td>
-                                                                                @endif
-                                                                            </tr>
+                                                                        <tr>
+                                                                            @if ($turno->estado == 'Cancelado' || $turno->estado == 'Inasistencia')
+                                                                                <th>Detalles de la consulta</th>
+                                                                                <td>Sin consulta.</td>
+                                                                            @else
+                                                                                <th scope="col">Detalles de la consulta</th>
+                                                                                <td><a href="{{route('turnos.show-detalles-consulta', $turno->id)}}">Ver detalles</a></td>
+                                                                            @endif
+                                                                        </tr>
                                                                     </tbody>
                                                                 </table>
                                                             </td>
