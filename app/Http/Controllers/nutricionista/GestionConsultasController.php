@@ -446,6 +446,14 @@ class GestionConsultasController extends Controller
 
         $alimentos = Alimento::All();
 
+        //Obtenemos el plan generado en consultas anteriores para el paciente y lo volvemos inactivo.
+        $ultimoPlanAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 1)->orderBy('id', 'desc')->first();
+
+        if($ultimoPlanAlimentacionPaciente){
+            $ultimoPlanAlimentacionPaciente->estado = 0;
+            $ultimoPlanAlimentacionPaciente->save();
+        }
+
         // Crea un nuevo plan de alimentación
         $planAlimentacion = PlanAlimentaciones::create([
             'consulta_id' => $consulta->id, // Asocia el plan a la consulta

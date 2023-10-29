@@ -13,6 +13,7 @@ class Turno extends Model
         'paciente_id',
         'horario_id',
         'tipo_consulta_id',
+        'motivo_consulta',
         'estado',
         'fecha',
         'hora',
