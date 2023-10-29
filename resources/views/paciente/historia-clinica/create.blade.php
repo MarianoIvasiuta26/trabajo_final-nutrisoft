@@ -463,9 +463,10 @@
                                     <select id="estilo_vida" class="form-select @error('estilo_vida') is-invalid @enderror" name="estilo_vida">
                                         <option value="">Elija una opción...</option>
                                         <option value="Sedentario" {{ old('estilo_vida') == 'Sedentario' ? 'selected' : '' }}>Sedentario</option>
-                                        <option value="Actividad Fisica regular" {{ old('estilo_vida') == 'Actividad Fisica regular' ? 'selected' : '' }}>Actividad Física regular</option>
-                                        <option value="Actividad Fisica intensa" {{ old('estilo_vida') == 'Actividad Fisica intensa' ? 'selected' : '' }}>Actividad Física intensa</option>
-                                        <option value="Poca actividad física" {{ old('estilo_vida') == 'Poca actividad física' ? 'selected' : '' }}>Poca actividad física</option>
+                                        <option value="Ligeramente activo" {{ old('estilo_vida') == 'Ligeramente activo' ? 'selected' : '' }}>Ligeramente activo</option>
+                                        <option value="Moderadamente activo" {{ old('estilo_vida') == 'Moderadamente activo' ? 'selected' : '' }}>Moderadamente activo</option>
+                                        <option value="Muy activo" {{ old('estilo_vida') == 'Muy activo' ? 'selected' : '' }}>Muy activo</option>
+                                        <option value="Extra activo" {{ old('estilo_vida') == 'Extra activo' ? 'selected' : '' }}>Extra activo</option>
                                     </select>
 
                                     @error('estilo_vida')

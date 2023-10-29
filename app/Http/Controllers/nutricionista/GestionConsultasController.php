@@ -9,6 +9,7 @@ use App\Models\AlimentosRecomendadosPorDieta;
 use App\Models\Comida;
 use App\Models\Consulta;
 use App\Models\DetallePlanAlimentaciones;
+use App\Models\Diagnostico;
 use App\Models\MedicionesDePlieguesCutaneos;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
@@ -28,6 +29,7 @@ use App\Models\Paciente\Cirugia;
 use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
 use App\Models\PlanAlimentaciones;
+use App\Models\TagsDiagnostico;
 use App\Models\Tratamiento;
 use App\Models\UnidadesMedidasPorComida;
 use App\Models\ValorNutricional;
@@ -74,10 +76,6 @@ class GestionConsultasController extends Controller
             'observacion' => ['required', 'string', 'max:255'],
             'peso_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'altura_actual' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'circ_munieca_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'circ_cintura_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'circ_cadera_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'circ_pecho_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'diagnostico' => ['required', 'string', 'max:255'],
             'imc_actual' => ['required', 'numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'],
             'masa_grasa_actual' => ['numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'] ,
@@ -86,16 +84,37 @@ class GestionConsultasController extends Controller
             'masa_muscular_actual' => ['numeric', 'regex:/^\d{1,3}(\.\d{1,2})?$/'],
         ]);
 
+        if($request->has('nuevas_mediciones-circunferencias')){
+            $request->validate([
+                'circ_munieca_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+                'circ_cintura_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+                'circ_cadera_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+                'circ_pecho_actual' => ['sometimes', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            ]);
+            $circMuniecaActual = $request->input('circ_munieca_actual');
+            $circCinturaActual = $request->input('circ_cintura_actual');
+            $circCaderaActual = $request->input('circ_cadera_actual');
+            $circPechoActual = $request->input('circ_pecho_actual');
+        }else{
+            $circMuniecaActual = 0.00;
+            $circCinturaActual = 0.00;
+            $circCaderaActual = 0.00;
+            $circPechoActual = 0.00;
+        }
+
         //Obtenemos los datos del formulario
         $tratamientoPaciente = $request->input('tratamiento_paciente');
         $observacion = $request->input('observacion');
         $pesoActual = $request->input('peso_actual');
         $alturaActual = $request->input('altura_actual');
-        $circMuniecaActual = $request->input('circ_munieca_actual');
-        $circCinturaActual = $request->input('circ_cintura_actual');
-        $circCaderaActual = $request->input('circ_cadera_actual');
-        $circPechoActual = $request->input('circ_pecho_actual');
-        $diagnostico = $request->input('diagnostico');
+
+        $descripcionDiagnostico = $request->input('diagnostico');
+
+        //dd($descripcionDiagnostico);
+
+        $tagsSeleccionadas = $request->input('tags_diagnostico');
+
+        //dd($descripcionDiagnostico, $tagsSeleccionadas);
 
         $imcActual = $request->input('imc_actual');
         $masaGrasaActual = $request->input('masa_grasa_actual');
@@ -130,8 +149,23 @@ class GestionConsultasController extends Controller
             'circunferencia_cintura_actual' => $circCinturaActual,
             'circunferencia_cadera_actual' => $circCaderaActual,
             'circunferencia_pecho_actual' => $circPechoActual,
-            'diagnostico' => $diagnostico,
         ]);
+
+        $diagnostico = Diagnostico::create([
+            'consulta_id' => $consulta->id,
+            'descripcion_diagnostico' => $descripcionDiagnostico
+        ]);
+
+        if($diagnostico){
+            if(!empty($tagsSeleccionadas)){
+                foreach($tagsSeleccionadas as $tagId){
+                    TagsDiagnostico::create([
+                        'diagnostico_id' => $diagnostico->id,
+                        'tag_id' => $tagId
+                    ]);
+                }
+            }
+        }
 
         if($imcActual != 0){
             $consulta->imc_Actual = $imcActual;
@@ -157,7 +191,6 @@ class GestionConsultasController extends Controller
         $consulta->masa_residual_actual = (!$masaResidualActual) ? 0.00 : $masaResidualActual;
         $consulta->masa_muscular_actual = (!$masaMuscularActual) ? 0.00 : $masaMuscularActual;
         $consulta->save();
-
 
         $tratamientoPaciente= TratamientoPorPaciente::create([
             'tratamiento_id' => $tratamientoPaciente,
@@ -207,6 +240,7 @@ class GestionConsultasController extends Controller
         }
 
     }
+
 
     //Función para el 2do proceso automatizado: Generación automática de Plan de alimentación
     public function generarPlanesAlimentacion($id, $turnoId, $tratamientoPacienteId){
@@ -2052,15 +2086,15 @@ class GestionConsultasController extends Controller
             } elseif ($masaGrasa >= 10 && $masaGrasa <= 20) {
                 $diagnostico .= 'Porcentaje de grasa bajo (Saludable). ';
             } elseif ($masaGrasa > 20 && $masaGrasa <= 30) {
-                $diagnostico .= 'Porcentaje de grasa moderado, se recomienda un seguimiento. ';
+                $diagnostico .= 'Porcentaje de grasa moderado (requiere seguimiento). ';
             } elseif ($masaGrasa > 30) {
-                $diagnostico .= 'Porcentaje de grasa elevado (podría requerir atención). ';
+                $diagnostico .= 'Porcentaje de grasa elevado (requiere atención). ';
             }
         }
 
         if (in_array('masa_osea', $calculosSeleccionados)) {
             if ($masaOsea < 2) {
-                $diagnostico .= 'Masa ósea baja (riesgo de osteoporosis). ';
+                $diagnostico .= 'Masa ósea baja (riesgo osteoporosis). ';
             } elseif ($masaOsea >= 2 && $masaOsea <= 2.5) {
                 $diagnostico .= 'Masa ósea normal. ';
             } elseif ($masaOsea > 2.5) {
@@ -2070,11 +2104,11 @@ class GestionConsultasController extends Controller
 
         if (in_array('masa_residual', $calculosSeleccionados)) {
             if ($masaResidual < 5) {
-                $diagnostico .= 'Masa residual baja (investigar posible causa). ';
+                $diagnostico .= 'Masa residual baja (ver posible causa). ';
             } elseif ($masaResidual >= 5 && $masaResidual <= 10) {
                 $diagnostico .= 'Masa residual normal. ';
             } elseif ($masaResidual > 10) {
-                $diagnostico .= 'Masa residual alta (retención de líquidos u otros problemas). ';
+                $diagnostico .= 'Masa residual alta (posible retención de líquidos). ';
             }
         }
 

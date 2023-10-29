@@ -105,9 +105,10 @@
                             <select id="estilo_vida" class="form-select @error('estilo_vida') is-invalid @enderror" name="estilo_vida">
                                 <option value="">Elija una opción...</option>
                                 <option value="Sedentario" @if ($historiaClinica->estilo_vida == 'Sedentario') selected @endif>Sedentario</option>
-                                <option value="Actividad Fisica regular" @if ($historiaClinica->estilo_vida == 'Actividad Fisica regular') selected @endif>Actividad Física regular</option>
-                                <option value="Actividad Fisica intensa" @if ($historiaClinica->estilo_vida == 'Actividad Fisica intensa') selected @endif>Actividad Física intensa</option>
-                                <option value="Poca actividad física" @if ($historiaClinica->estilo_vida == 'Poca actividad física') selected @endif>Poca actividad física</option>
+                                <option value="Ligeramente activo" @if ($historiaClinica->estilo_vida == 'Ligeramente activo') selected @endif>Ligeramente activo</option>
+                                <option value="Moderadamente activo" @if ($historiaClinica->estilo_vida == 'Moderadamente activo') selected @endif>Moderadamente activo</option>
+                                <option value="Muy activo" @if ($historiaClinica->estilo_vida == 'Muy activo') selected @endif>Muy activo</option>
+                                <option value="Extra activo" @if ($historiaClinica->estilo_vida == 'Extra activo') selected @endif>Extra activo</option>
                             </select>
 
                             @error('estilo_vida')

@@ -13,6 +13,7 @@ use App\Models\Paciente\DatosMedicos;
 use App\Models\Paciente\HistoriaClinica;
 use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
+use App\Models\Tag;
 use App\Models\TipoConsulta;
 use App\Models\TiposDePliegueCutaneo;
 use App\Models\Tratamiento;
@@ -151,6 +152,8 @@ class GestionTurnosController extends Controller
         $turnosPaciente = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')->get();
         $tratamientosPaciente = TratamientoPorPaciente::where('paciente_id', $paciente->id)->get();
 
+        $tags = Tag::all();
+
         $turnoAnteriorPaciente = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')->orderBy('id', 'desc')->first();
         if($turnoAnteriorPaciente){
             $consultaAnteriorPaciente = Consulta::where('turno_id', $turnoAnteriorPaciente->id)->first();
@@ -162,7 +165,7 @@ class GestionTurnosController extends Controller
             $medidaDiametroMunieca = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 7)->orderBy('id', 'desc')->first();
             $medidaDiametroFemur = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 8)->orderBy('id', 'desc')->first();
             $medidaDiametroTobillo = MedicionesDePlieguesCutaneos::where('consulta_id', $consultaAnteriorPaciente->id)->where('tipos_de_pliegue_cutaneo_id', 9)->orderBy('id', 'desc')->first();
-            return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo'));
+            return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo', 'tags'));
 
         }
 
@@ -172,7 +175,7 @@ class GestionTurnosController extends Controller
             return redirect()->back()->with('error', 'No se encontró la historia clínica');
         }
 
-        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente',   'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente'));
+        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente',   'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'tags'));
     }
 
     public function confirmarInasistencia($id){

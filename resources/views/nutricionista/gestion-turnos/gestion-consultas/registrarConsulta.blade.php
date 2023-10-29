@@ -377,6 +377,35 @@
                         </div>
 
                         <div class="row mt-3">
+                            <div class="col">
+                                <label for="tags_diagnostico">Etiquetas del diagnóstico <span class="text-muted">(*)</span></label>
+                                <div class="accordion accordion-flush-success" id="accordionFlushTags">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="flush-tags-heading">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-tags-content" aria-expanded="false" aria-controls="flush-tags-content">
+                                                Etiquetas del diagnóstico
+                                            </button>
+                                        </h2>
+                                        <div id="flush-tags-content" class="accordion-collapse collapse" aria-labelledby="flush-tags-heading" data-bs-parent="#accordionFlushTags">
+                                            <div class="accordion-body">
+                                                @foreach ($tags as $tag)
+                                                    <div class="d-inline-block">
+                                                        <input class="btn-check" type="checkbox" name="tags_diagnostico[]" value="{{ $tag->id }}" id="tag_{{ $tag->id }}" autocomplete="off">
+                                                        <label class="btn btn-outline-primary w-auto" for="tag_{{ $tag->id }}">{{ $tag->name }}</label>
+                                                    </div>
+                                                    @error('tags_diagnostico')
+                                                        <span class="text-danger">{{$message}}</span>
+                                                    @enderror
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row mt-3">
                             <div class="col-12 d-flex justify-content-end">
                                 <button type="button" class="btn btn-success guardar-button">Guardar</button>
                                 <form action="{{ route('gestion-turnos-nutricionista.index') }}" method="GET">
@@ -921,8 +950,7 @@
                     success: function (data) {
                         // Actualizar el campo de IMC con el resultado
                         $('#imc_actual').val(data.imc);
-                        document.getElementById('diagnostico').value += data.diagnostico;
-                            
+                        document.getElementById('diagnostico').value = data.diagnosticoIMC;
                     },
                     error: function () {
                         $('#imc-result').html('Ocurrió un error al calcular el IMC.');
