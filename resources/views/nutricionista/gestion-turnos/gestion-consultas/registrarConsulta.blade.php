@@ -592,7 +592,7 @@
                                                     <div class="fw-bold">Motivo de Consulta</div>
                                                     {{ $turnoAnteriorPaciente->motivo_consulta }}
                                                 </div>
-                                                </li>
+                                            </li>
                                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                             <div class="ms-2 me-auto">
                                                 <div class="fw-bold">Tratamiento</div>
@@ -644,8 +644,8 @@
                                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                                 <div class="ms-2 me-auto">
                                                 <div class="fw-bold">Diagnóstico</div>
-                                                    @if ($turnoAnteriorPaciente->consulta)
-                                                        {{ $turnoAnteriorPaciente->consulta->diagnostico }}
+                                                    @if ($diagnosticoAnteriorPaciente)
+                                                        {{ $diagnosticoAnteriorPaciente->descripcion_diagnostico }}
                                                     @else
                                                         Sin consulta relacionada
                                                     @endif
@@ -728,7 +728,7 @@
                                                                         </td>
                                                                         <td>
                                                                             @if ($turno->consulta)
-                                                                                {{ $turno->consulta->diagnostico }}
+                                                                                {{ $turno->consulta->diagnostico->descripcion_diagnostico }}
                                                                             @else
                                                                                 Sin consulta relacionada
                                                                             @endif
@@ -758,6 +758,362 @@
 
 
 
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="accordion accordion-flush-success" id="accordionFlushPlanesAlimentacion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-planes-alimentacion">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapsePlanesAlimentacion" aria-expanded="false" aria-controls="flush-collapsePlanesAlimentacion">
+                                Planes de Alimentación
+                            </button>
+                        </h2>
+                        <div id="flush-collapsePlanesAlimentacion" class="accordion-collapse collapse" aria-labelledby="flush-planes-alimentacion" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    @if ($turno->tipo_consulta_id == 2)
+                                        <div class="col-md-12">
+                                            <ul class="list-group list-group">
+                                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto ">
+                                                        <div class="fw-bold">Último Plan de Alimentación</div>
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">
+                                                        <div class="fw-bold">Fecha generación</div>
+                                                        {{ \Carbon\Carbon::parse($ultimoPlanAlimentacionPaciente->consulta->turno->fecha)->format('d/m/Y') }}
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">
+                                                        <div class="fw-bold">Estado
+                                                            @if ($ultimoPlanAlimentacionPaciente->estado == 1)
+                                                                <span class="badge bg-success rounded-pill">Activo</span>
+                                                            @else
+                                                                <span class="badge bg-danger rounded-pill">Inactivo</span>
+                                                            @endif
+                                                        </div>
+
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">
+                                                        <div class="fw-bold">Alimentos recomendados</div>
+                                                        @forelse ($detallesPlanesPlanes as $detallePlan)
+                                                            @foreach ($alimentos as $alimento)
+                                                                @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                                        {{ $alimento->alimento }}.
+                                                                    @endif
+                                                                @endif
+                                                            @endforeach
+                                                        @empty
+                                                            <span class="text-danger">No se registraron alimentos</span>
+                                                        @endforelse
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-12 mt-2">
+                                            <div class="float-right">
+                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modal-planes-alimentacion">
+                                                    Otros planes
+                                                </button>
+
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detalles-plan-alimentacion">
+                                                    Detalles del plan
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal fade" id="modal-detalles-plan-alimentacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="staticBackdropLabel">Detalles del Plan</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                <div class="modal-body">
+                                                    <table class="table table-stripped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Fecha Generación</th>
+                                                                <th scope="col">Estado</th>
+                                                                <th scope="col">Descripción del plan</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>{{ \Carbon\Carbon::parse($ultimoPlanAlimentacionPaciente->consulta->turno->fecha)->format('d/m/Y') }}</td>
+                                                                <td>
+                                                                    @if ($ultimoPlanAlimentacionPaciente->estado == 1)
+                                                                        Activo
+                                                                    @else
+                                                                        Inactivo
+                                                                    @endif
+                                                                </td>
+                                                                <td>
+                                                                    {{$ultimoPlanAlimentacionPaciente->descripcion}}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                    <table class="table table-striped" id="turnos">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Alimento</th>
+                                                                <th scope="col">Comida</th>
+                                                                <th scope="col">Cantidad</th>
+                                                                <th scope="col">Unidad de medida</th>
+                                                                <th scope="col">Observación</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($detallesPlanesPlanes as $detallePlan)
+                                                                <tr>
+                                                                    <td>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                    {{ $alimento->alimento }}
+                                                                                @endif
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </td>
+                                                                    <td>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                    {{ $detallePlan->horario_consumicion }}
+                                                                                @endif
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </td>
+                                                                    <td>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                    {{ $detallePlan->cantidad }}
+                                                                                @endif
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </td>
+                                                                    <td>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                    {{ $detallePlan->unidad_medida }}
+                                                                                @endif
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </td>
+                                                                    <td>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                    {{ $detallePlan->observacion }}
+                                                                                @endif
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="modal fade" id="modal-planes-alimentacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="staticBackdropLabel">Detalles del Plan</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                <div class="modal-body">
+                                                    <table class="table table-stripped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Fecha Generación</th>
+                                                                <th scope="col">Estado</th>
+                                                                <th scope="col">Descripción del plan</th>
+                                                                <th scope="col">Acciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @forelse ($planesAlimentacionPaciente as $plan)
+                                                                <tr>
+                                                                    <td>{{ \Carbon\Carbon::parse($plan->consulta->turno->fecha)->format('d/m/Y') }}</td>
+                                                                    <td>
+                                                                        @if ($plan->estado == 1)
+                                                                            Activo
+                                                                        @else
+                                                                            Inactivo
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        {{$plan->descripcion}}
+                                                                    </td>
+                                                                    <td>
+                                                                        <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#collapseExample-{{$plan->id}}" aria-expanded="false" aria-controls="collapseExample">
+                                                                            Ver detalles
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+
+                                                            @endforelse
+
+                                                        </tbody>
+                                                    </table>
+
+                                                    @foreach ($planesAlimentacionPaciente as $plan)
+                                                        <div class="collapse mt-2" id="collapseExample-{{$plan->id}}">
+                                                            <div class="card card-body">
+                                                                <table class="table table-striped" id="turnos">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">Alimento</th>
+                                                                            <th scope="col">Comida</th>
+                                                                            <th scope="col">Cantidad</th>
+                                                                            <th scope="col">Unidad de medida</th>
+                                                                            <th scope="col">Observación</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach ($detallesPlanesPlanes as $detallePlan)
+                                                                            <tr>
+                                                                                <td>
+                                                                                    @foreach ($alimentos as $alimento)
+                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                                {{ $alimento->alimento }}
+                                                                                            @endif
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                </td>
+                                                                                <td>
+                                                                                    @foreach ($alimentos as $alimento)
+                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                                {{ $detallePlan->horario_consumicion }}
+                                                                                            @endif
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                </td>
+                                                                                <td>
+                                                                                    @foreach ($alimentos as $alimento)
+                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                                {{ $detallePlan->cantidad }}
+                                                                                            @endif
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                </td>
+                                                                                <td>
+                                                                                    @foreach ($alimentos as $alimento)
+                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                                {{ $detallePlan->unidad_medida }}
+                                                                                            @endif
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                </td>
+                                                                                <td>
+                                                                                    @foreach ($alimentos as $alimento)
+                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                                {{ $detallePlan->observacion }}
+                                                                                            @endif
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    @else
+                                        <span>Sin planes asociados.</span>
+                                    @endif
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="accordion accordion-flush-success" id="accordionFlushGustosAlimenticios">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-gustos-alimenticios">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseGustosAlimenticios" aria-expanded="false" aria-controls="flush-collapseGustosAlimenticios">
+                                Gustos alimenticios
+                            </button>
+                        </h2>
+                        <div id="flush-collapseGustosAlimenticios" class="accordion-collapse collapse" aria-labelledby="flush-gustos-alimenticios" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    @if ($turno->tipo_consulta_id == 2)
+                                        <div class="col-md-12">
+                                            <ul class="list-group list-group">
+                                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">
+                                                        <div class="fw-bold">Gustos</div>
+                                                        @forelse ($anamnesisPaciente as $anamnesis)
+                                                            @foreach ($alimentos as $alimento)
+                                                                @if ($anamnesis->alimento_id == $alimento->id && $anamnesis->gusta == 1)
+                                                                    {{ $alimento->alimento }}.
+                                                                @endif
+                                                            @endforeach
+                                                        @empty
+                                                            <span class="text-danger">No se registraron gustos</span>
+                                                        @endforelse
+                                                    </div>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                    <div class="ms-2 me-auto">
+                                                        <div class="fw-bold">Alimentos que no le gusta</div>
+                                                        @forelse ($anamnesisPaciente as $anamnesis)
+                                                            @foreach ($alimentos as $alimento)
+                                                                @if ($anamnesis->alimento_id == $alimento->id && $anamnesis->gusta == 0)
+                                                                    {{ $alimento->alimento }}.
+                                                                @endif
+                                                            @endforeach
+                                                        @empty
+                                                            <span class="text-danger">No se registraron gustos</span>
+                                                        @endforelse
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    @else
+                                        <span>Sin planes asociados.</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
