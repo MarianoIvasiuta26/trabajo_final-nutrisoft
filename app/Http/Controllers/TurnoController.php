@@ -54,7 +54,9 @@ class TurnoController extends Controller
         $dias = DiasAtencion::all();
         $paciente = Paciente::where('user_id', auth()->user()->id)->first();
 
+
         return view ('paciente.turnos-paciente.create', compact('horarios', 'tipo_consultas', 'turnos', 'pacientes', 'profesionales', 'historias_clinicas', 'horas', 'dias', 'paciente'));
+
     }
 
     /**
@@ -69,6 +71,7 @@ class TurnoController extends Controller
         $request->validate([
             'profesional' => ['required', 'integer'],
             'tipo_consulta' => ['required', 'integer'],
+            'motivo_de_consulta' => ['required', 'string:50'],
             'fecha' => ['required', 'date'],
             'hora' => ['required', 'date_format:H:i'],
         ]);
@@ -77,8 +80,42 @@ class TurnoController extends Controller
         $profesional = $request->input('profesional');
         $paciente = Paciente::where('user_id', auth()->user()->id)->first();
         $tipo_consulta = $request->input('tipo_consulta');
+        $motivoConsulta = $request->input('motivo_de_consulta');
         $fecha = $request->input('fecha');
         $hora = $request->input('hora');
+
+        $turnoAnteriorPaciente = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')
+            ->orderBy('id', 'desc')
+            ->first();
+        if ($turnoAnteriorPaciente) {
+            $ultimaConsulta = Consulta::where('turno_id', $turnoAnteriorPaciente->id)->first();
+        }
+
+        $tiposConsultas = TipoConsulta::all();
+
+        foreach($tiposConsultas as $consulta){
+            if($tipo_consulta == $consulta->id && $consulta->tipo_consulta == 'Primera consulta'){
+                if($turnoAnteriorPaciente && $turnoAnteriorPaciente->motivo_consulta == $motivoConsulta && $ultimaConsulta && $ultimaConsulta->nutricionista_id == $profesional){
+                    return redirect()->back()->with('error', 'Ya tuvo una primera consulta con el profesional seleccionado con el mismo motivo de consulta. Debe seleccionar una Consulta de Seguimiento');
+                }
+            }
+
+            if($tipo_consulta == $consulta->id && $consulta->tipo_consulta == 'Seguimiento'){
+                if($turnoAnteriorPaciente && $turnoAnteriorPaciente->motivo_consulta == $motivoConsulta && $ultimaConsulta && $ultimaConsulta->nutricionista_id == $profesional){
+                    $fechaTurnoAnterior = Carbon::parse($turnoAnteriorPaciente->fecha);
+                    $fechaActual = Carbon::now();
+                    $diferenciaDias = $fechaTurnoAnterior->diffInDays($fechaActual);
+                    if($diferenciaDias < 20){
+                        return redirect()->back()->with('error', 'Debes esperar al menos 20 días para solicitar una nueva consulta.');
+                    }
+                }
+            }
+
+            if(!$turnoAnteriorPaciente && $tipo_consulta == $consulta->id && $consulta->tipo_consulta == 'Seguimiento'){
+                return redirect()->back()->with('error', 'No puede seleccionar el tipo de consulta Seguimiento sin antes haber recibido una primera consulta. Seleccione el Tipo de ocnsulta correspondiente a una primera consulta por favor.');
+            }
+        }
+
 
         //Validamos que no posea un turno pendiente
         $turnoPendiente = Turno::where('paciente_id', $paciente->id)->where('estado', 'Pendiente')->first();
@@ -214,6 +251,7 @@ class TurnoController extends Controller
             'paciente_id' => $pacienteExistente->id,
             'horario_id' => $horarioId,
             'tipo_consulta_id' => $tipo_consulta,
+            'motivo_consulta' => $motivoConsulta,
             'fecha' => $fecha,
             'hora' => $hora,
             'estado' => 'Pendiente',

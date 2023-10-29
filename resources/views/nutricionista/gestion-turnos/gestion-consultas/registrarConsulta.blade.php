@@ -393,8 +393,6 @@
         </div>
 
         <div class="col-md-4">
-            <button id="toggleAccordionsButton" class="btn btn-primary">Mostrar Accordions</button>
-
             <div class="accordion accordion-flush-success" id="accordionFlushExample">
                 <div class="accordion-item">
                   <h2 class="accordion-header" id="flush-headingOne">
@@ -454,7 +452,7 @@
                                     </button>
 
                                     <div class="modal fade" id="modal-historia-clinica" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg">
+                                        <div class="modal-dialog modal-xl">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" id="staticBackdropLabel">Historia Clínica</h5>
@@ -462,45 +460,51 @@
                                                 </div>
                                             <div class="modal-body">
                                                 <table class="table table-stripped">
+                                                    <thead>
+                                                        <th scope="row">Alergias</th>
+                                                        <th scope="row">Patologías</th>
+                                                        <th scope="row">Intolerancias</th>
+                                                        <th scope="row">Cirugías</th>
+                                                    </thead>
                                                     <tbody>
                                                         @forelse ($datosMedicos as $datoMedico)
+                                                            <tr>
+                                                                <td>
+                                                                    @foreach ($alergias as $alergia)
+                                                                        @if ($alergia->id == $datoMedico->alergia_id)
+                                                                            {{ $alergia->alergia }}
+                                                                        @endif
+                                                                    @endforeach
+                                                                </td>
 
-                                                            @foreach ($alergias as $alergia)
-                                                                @if ($alergia->id == $datoMedico->alergia_id)
-                                                                    <tr>
-                                                                        <th scope="row">Alergias</th>
-                                                                        <td>{{ $alergia->alergia }}</td>
-                                                                    </tr>
-                                                                @endif
-                                                            @endforeach
+                                                                <td>
+                                                                    @foreach ($patologias as $patologia)
+                                                                        @if ($patologia->id == $datoMedico->patologia_id)
+                                                                            {{ $patologia->patologia}}
+                                                                        @endif
+                                                                    @endforeach
+                                                                </td>
 
-                                                            @foreach ($patologias as $patologia)
-                                                                    @if ($patologia->id == $datoMedico->patologia_id)
-                                                                        <tr>
-                                                                            <th scope="row">Patologías</th>
-                                                                            <td>{{ $patologia->patologia}}</td>
-                                                                        </tr>
-                                                                    @endif
-                                                            @endforeach
-                                                            @foreach ($intolerancias as $intolerancia)
-                                                                @if ($intolerancia->id == $datoMedico->intolerancia_id)
-                                                                    <tr>
-                                                                        <th scope="row">Intolerancias</th>
-                                                                        <td>{{ $intolerancia->intolerancia}}</td>
-                                                                    </tr>
-                                                                @endif
-                                                            @endforeach
-                                                            @foreach ($cirugias as $cirugia)
-                                                                @forelse ($cirugiasPaciente as $cirugiaPaciente)
-                                                                    @if ($cirugia->id == $cirugiaPaciente->cirugia_id)
-                                                                        <tr>
-                                                                            <th scope="row">Cirugías</th>
-                                                                            <td>{{$cirugia->cirugia}}</td>
-                                                                        </tr>
-                                                                    @endif
-                                                                @empty
-                                                                @endforelse
-                                                            @endforeach
+                                                                <td>
+                                                                    @foreach ($intolerancias as $intolerancia)
+                                                                        @if ($intolerancia->id == $datoMedico->intolerancia_id)
+                                                                            {{ $intolerancia->intolerancia}}
+                                                                        @endif
+                                                                    @endforeach
+                                                                </td>
+
+                                                                <td>
+                                                                    @foreach ($cirugias as $cirugia)
+                                                                        @forelse ($cirugiasPaciente as $cirugiaPaciente)
+                                                                            @if ($cirugia->id == $cirugiaPaciente->cirugia_id)
+                                                                                {{$cirugia->cirugia}}
+                                                                            @endif
+                                                                        @empty
+                                                                            <span class="text-danger">No se registraron cirugías</span>
+                                                                        @endforelse
+                                                                    @endforeach
+                                                                </td>
+                                                            </tr>
                                                         @empty
                                                             <tr>
                                                                 <td>
@@ -554,6 +558,12 @@
                                                 {{ $turnoAnteriorPaciente->tipoConsulta->tipo_consulta }}
                                             </div>
                                             </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                                <div class="ms-2 me-auto">
+                                                    <div class="fw-bold">Motivo de Consulta</div>
+                                                    {{ $turnoAnteriorPaciente->motivo_consulta }}
+                                                </div>
+                                                </li>
                                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                             <div class="ms-2 me-auto">
                                                 <div class="fw-bold">Tratamiento</div>
@@ -634,6 +644,7 @@
                                                                 <tr>
                                                                     <th scope="col">Fecha</th>
                                                                     <th scope="col">Tipo de consulta</th>
+                                                                    <th scope="col">Motivo de consulta</th>
                                                                     <th scope="col">Tratamiento</th>
                                                                     <th scope="col">Observaciones</th>
                                                                     <th scope="col">Peso registrado</th>
@@ -646,6 +657,9 @@
                                                                     <tr>
                                                                         <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}</td>
                                                                         <td>{{ $turno->tipoConsulta->tipo_consulta }}</td>
+                                                                        <td>
+                                                                            {{ $turnoAnteriorPaciente->motivo_consulta }}
+                                                                        </td>
                                                                         <td>
                                                                             @foreach ($tratamientos as $tratamiento)
                                                                                 @forelse ($tratamientosPaciente as $tratamientoPaciente)
@@ -718,17 +732,6 @@
                 </div>
             </div>
         </div>
-
-        <div id="sidebar">
-            <!-- Contenido de los accordions -->
-
-            <div class="accordion" id="accordionFlushHistorialTurnos">
-                <!-- Tus accordions para Historial de turnos -->
-            </div>
-        </div>
-
-
-
     </div>
 
 @stop
@@ -919,6 +922,7 @@
                         // Actualizar el campo de IMC con el resultado
                         $('#imc_actual').val(data.imc);
                         document.getElementById('diagnostico').value += data.diagnostico;
+                            
                     },
                     error: function () {
                         $('#imc-result').html('Ocurrió un error al calcular el IMC.');

@@ -476,7 +476,7 @@
                                 <div class="col-md-6">
                                     <label for="objetivo_salud" class="form-label">Objetivo de salud(*)</label>
                                     <select name="objetivo_salud" id="objetivo_salud" class="form-select @error('objetivo_salud') is-invalid @enderror">
-                                        <option value="">Elija una opción...</option>
+                                        <option value="" disabled>Elija una opción...</option>
                                         <option value="Adelgazar" {{ old('objetivo_salud') == 'Adelgazar' ? 'selected' : '' }}>Adelgazar</option>
                                         <option value="Ganar masa muscular" {{ old('objetivo_salud') == 'Ganar masa muscular' ? 'selected' : '' }}>Ganar masa muscular</option>
                                         <option value="Nutrición deportiva" {{ old('objetivo_salud') == 'Nutrición deportiva' ? 'selected' : '' }}>Nutrición deportiva</option>

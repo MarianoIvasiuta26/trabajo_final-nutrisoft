@@ -62,16 +62,16 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label" for="paciente">Paciente</label>
-                                    <input
-                                        @foreach ($pacientes as $paciente)
-                                            @if ($paciente->user_id == auth()->user()->id)
-                                            value="{{$paciente->user->name}} {{$paciente->user->apellido}}"
-                                            @endif
-                                        @endforeach
-                                    class="form-control" name="paciente" id="paciente" type="text" disabled>
+                                    <label class="form-label" for="paciente">Motivo de consulta</label>
+                                    <select name="motivo_de_consulta" id="motivo_de_consulta" class="form-select">
+                                        <option value="" disabled selected>Seleccione un motivo de consulta</option>
+                                        <option value="Perder peso" {{ old('motivo_de_consulta') == 'Perder peso' ? 'selected' : '' }}>Perder peso</option>
+                                        <option value="Ganar peso" {{ old('motivo_de_consulta') == 'Ganar peso' ? 'selected' : '' }}>Ganar peso</option>
+                                        <option value="Mejorar rendimiento deportivo" {{ old('motivo_de_consulta') == 'Mejorar rendimiento deportivo' ? 'selected' : '' }}>Mejorar rendimiento deportivo</option>
+                                        <option value="Control de condiciones médicas" {{ old('motivo_de_consulta') == 'Control de condiciones médicas' ? 'selected' : '' }}>Control de condiciones médicas</option>
+                                    </select>
 
-                                    @error('paciente')
+                                    @error('motivo_de_consulta')
                                         <small class="text-danger">{{$message}}</small>
                                     @enderror
                                 </div>
@@ -96,7 +96,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label" for="objetivo_salud">
                                         Objetivo de salud
-                                        <button type="button" style="margin-left: -5px;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Para seleccionar otro Objetivo de salud, debe modificar su historia clínica.">
+                                        <button type="button" style="margin-left: 5px; padding: 0;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Para seleccionar otro Objetivo de salud, debe modificar su historia clínica.">
                                             <i class="bi bi-question-circle"></i>
                                         </button>
                                     </label>
