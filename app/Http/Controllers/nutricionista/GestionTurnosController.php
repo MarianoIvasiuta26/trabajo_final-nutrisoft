@@ -164,6 +164,9 @@ class GestionTurnosController extends Controller
         $tagsDiagnosticos = TagsDiagnostico::all();
 
         $planesAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', $paciente->id)->get();
+        $planesAlimentacionPaciente = $planesAlimentacionPaciente->sortByDesc(function ($plan) {
+            return Carbon::parse($plan->consulta->turno->fecha);
+        });
         $detallesPlanesPlanes = DetallePlanAlimentaciones::all();
         $alimentos = Alimento::all();
 

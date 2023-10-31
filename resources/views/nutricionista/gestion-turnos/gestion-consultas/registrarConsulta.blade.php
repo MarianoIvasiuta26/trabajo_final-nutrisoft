@@ -873,53 +873,46 @@
                                                         </thead>
                                                         <tbody>
                                                             @foreach ($detallesPlanesPlanes as $detallePlan)
-                                                                <tr>
-                                                                    <td>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+
+                                                                    <tr>
+                                                                        <td>
+                                                                            @foreach ($alimentos as $alimento)
                                                                                 @if ($detallePlan->alimento_id == $alimento->id)
                                                                                     {{ $alimento->alimento }}
                                                                                 @endif
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </td>
-                                                                    <td>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                            @endforeach
+                                                                        </td>
+                                                                        <td>
+                                                                            @foreach ($alimentos as $alimento)
                                                                                 @if ($detallePlan->alimento_id == $alimento->id)
                                                                                     {{ $detallePlan->horario_consumicion }}
                                                                                 @endif
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </td>
-                                                                    <td>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                            @endforeach
+                                                                        </td>
+                                                                        <td>
+                                                                            @foreach ($alimentos as $alimento)
                                                                                 @if ($detallePlan->alimento_id == $alimento->id)
                                                                                     {{ $detallePlan->cantidad }}
                                                                                 @endif
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </td>
-                                                                    <td>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                            @endforeach
+                                                                        </td>
+                                                                        <td>
+                                                                            @foreach ($alimentos as $alimento)
                                                                                 @if ($detallePlan->alimento_id == $alimento->id)
                                                                                     {{ $detallePlan->unidad_medida }}
                                                                                 @endif
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </td>
-                                                                    <td>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                            @endforeach
+                                                                        </td>
+                                                                        <td>
+                                                                            @foreach ($alimentos as $alimento)
                                                                                 @if ($detallePlan->alimento_id == $alimento->id)
                                                                                     {{ $detallePlan->observacion }}
                                                                                 @endif
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </td>
-                                                                </tr>
+                                                                            @endforeach
+                                                                        </td>
+                                                                    </tr>
+                                                                @endif
                                                             @endforeach
                                                         </tbody>
                                                     </table>
@@ -989,55 +982,53 @@
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                        @foreach ($detallesPlanesPlanes as $detallePlan)
-                                                                            <tr>
-                                                                                <td>
-                                                                                    @foreach ($alimentos as $alimento)
-                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                        @forelse ($detallesPlanesPlanes as $detallePlan)
+                                                                            @if ($detallePlan->plan_alimentacion_id == $plan->id)
+                                                                                <tr>
+                                                                                    <td>
+                                                                                        @foreach ($alimentos as $alimento)
                                                                                             @if ($detallePlan->alimento_id == $alimento->id)
                                                                                                 {{ $alimento->alimento }}
                                                                                             @endif
-                                                                                        @endif
-                                                                                    @endforeach
-                                                                                </td>
-                                                                                <td>
-                                                                                    @foreach ($alimentos as $alimento)
-                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                        @endforeach
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @foreach ($alimentos as $alimento)
                                                                                             @if ($detallePlan->alimento_id == $alimento->id)
                                                                                                 {{ $detallePlan->horario_consumicion }}
                                                                                             @endif
-                                                                                        @endif
-                                                                                    @endforeach
-                                                                                </td>
-                                                                                <td>
-                                                                                    @foreach ($alimentos as $alimento)
-                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                        @endforeach
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @foreach ($alimentos as $alimento)
                                                                                             @if ($detallePlan->alimento_id == $alimento->id)
                                                                                                 {{ $detallePlan->cantidad }}
                                                                                             @endif
-                                                                                        @endif
-                                                                                    @endforeach
-                                                                                </td>
-                                                                                <td>
-                                                                                    @foreach ($alimentos as $alimento)
-                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                        @endforeach
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @foreach ($alimentos as $alimento)
                                                                                             @if ($detallePlan->alimento_id == $alimento->id)
                                                                                                 {{ $detallePlan->unidad_medida }}
                                                                                             @endif
-                                                                                        @endif
-                                                                                    @endforeach
-                                                                                </td>
-                                                                                <td>
-                                                                                    @foreach ($alimentos as $alimento)
-                                                                                        @if ($detallePlan->plan_alimentacion_id == $ultimoPlanAlimentacionPaciente->id)
+                                                                                        @endforeach
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        @foreach ($alimentos as $alimento)
                                                                                             @if ($detallePlan->alimento_id == $alimento->id)
                                                                                                 {{ $detallePlan->observacion }}
                                                                                             @endif
-                                                                                        @endif
-                                                                                    @endforeach
+                                                                                        @endforeach
+                                                                                    </td>
+                                                                                </tr>
+                                                                            @endif
+                                                                        @empty
+                                                                            <tr>
+                                                                                <td>
+                                                                                    <span class="text-danger">No se registraron alimentos</span>
                                                                                 </td>
                                                                             </tr>
-                                                                        @endforeach
+                                                                        @endforelse
                                                                     </tbody>
                                                                 </table>
                                                             </div>
