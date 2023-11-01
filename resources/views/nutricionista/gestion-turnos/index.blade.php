@@ -8,16 +8,16 @@
 
 @section('content')
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
+    @if (session('successConPlanGenerado'))
+
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            {{ session('successConPlanGenerado') }}
             <form action="{{ route('plan-alimentacion.consultarPlanGenerado', ['pacienteId' => session('pacienteId'), 'turnoId' => session('turnoId'), 'nutricionistaId' => session('nutricionistaId')]) }}" method="get">
                 @csrf
                 <button type="submit" class="btn btn-primary">Consultar Plan</button>
             </form>
         </div>
     @endif
-
 
     <div class="card card-dark">
         <div class="card-header">
@@ -153,7 +153,56 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
+        //Respuestas Flash del controlador con SweetAlert
+        @if (session('successConPlanGenerado'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successConPlanGenerado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
 
+        @if (session('successSinPlanGenerado'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successSinPlanGenerado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('successPlanConfirmado'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successPlanConfirmado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('errorPlanNoEncontrado'))
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                text: "{{session('errorPlanNoEncontrado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('errorPlanNoGenerado'))
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                text: "{{session('errorPlanNoGenerado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
 
         $(document).ready(function(){
             $('#turnos-dia').DataTable({

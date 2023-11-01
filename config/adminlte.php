@@ -365,6 +365,23 @@ return [
         ],
 
         [
+            'text' => 'Planes a confirmar',
+            'icon' => 'fas fa-clipboard-check fa-fw',
+            'submenu' => [
+                [
+                    'text' => 'Planes de Alimentación',
+                    'icon' =>'fas fa-fw fa-utensils',
+                    'route'  => 'gestion-turnos-nutricionista.index',
+                ],
+                [
+                    'text' => 'Planes de Seguimiento',
+                    'icon' =>'fas fa-fw fa-receipt',
+                    'route'  => 'gestion-turnos-nutricionista.showHistorialTurnos',
+                ],
+            ],
+        ],
+
+        [
             'text' => 'Gestión Tratamientos',
             'route' => 'gestion-tratamientos.index',
             'icon' => 'fas fa-comment-medical fa-fw',

@@ -230,13 +230,17 @@ class GestionConsultasController extends Controller
 
         if($planGenerado){
             return redirect()->route('gestion-turnos-nutricionista.index')
-            ->with('success', 'Consulta realizada con éxito. Se generó el plan de alimentación')
+            ->with('successConPlanGenerado', 'Consulta realizada con éxito. Se generó el plan de alimentación')
             ->with('pacienteId', $pacienteId)
             ->with('turnoId', $turno->id)
             ->with('nutricionistaId', $nutricionista->id);
 
         }else{
-            return back()->with('error', 'No se pudo generar el plan');
+            return redirect()->back()->with('errorPlanNoGenerado', 'No se pudo generar el plan');
+        }
+
+        if(!$planGenerado){
+            return redirect()->route('gestion-turnos-nutricionista.index')->with('successSinPlanGenerado', 'Consulta realizada con éxito.');
         }
 
     }
@@ -458,8 +462,8 @@ class GestionConsultasController extends Controller
         $planAlimentacion = PlanAlimentaciones::create([
             'consulta_id' => $consulta->id, // Asocia el plan a la consulta
             'paciente_id' => $paciente->id, // Asocia el plan al paciente
-            'descripcion' => 'Descripción del plan', // Añade una descripción
-            'estado' => 1, // Establece el estado según tus necesidades
+            'descripcion' => 'Descripción del plan',
+            'estado' => 2, //Estado esperando confirmación del profesional
         ]);
 
         $planAlimentacion->save(); // Guarda el nuevo plan de alimentación
@@ -492,19 +496,6 @@ class GestionConsultasController extends Controller
 
         //dd($alimentosRecomendadosVerduras, $planAlimentacion, $alimentosRecomendados);
 
-/*
-        return view('plan-alimentacion.index',
-        compact(
-            'paciente', 'historiaClinica', 'datosMedicos', 'cirugiasPaciente', 'anamnesisPaciente',
-            'tratamientoActivo', 'tipoConsulta', 'nutricionista', 'turno', 'consulta', 'imc',
-            'gastoEnergeticoBasal', 'gastoEnergeticoTotal', 'proteinasRecomendadas', 'lipidosRecomendados',
-            'carbohidratosRecomendados', 'alimentosRecomendadosFrutas', 'alimentosRecomendadosVerduras',
-            'alimentosRecomendadosLegumbres', 'alimentosRecomendadosLeche', 'alimentosRecomendadosYogur',
-            'alimentosRecomendadosQueso', 'alimentosRecomendadosCarnes', 'alimentosRecomendadosHuevos',
-            'alimentosRecomendadosPescados', 'alimentosRecomendadosAceites', 'alimentosRecomendadosFrutasSecas',
-            'alimentosRecomendadosAzucar', 'alimentosRecomendadosGolosinas'
-        ));
-*/
         return [
             'paciente' => $paciente,
             'historiaClinica' => $historiaClinica,

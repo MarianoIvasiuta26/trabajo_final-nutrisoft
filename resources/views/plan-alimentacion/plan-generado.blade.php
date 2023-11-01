@@ -14,8 +14,9 @@
         </div>
 
         <div class="card-body">
-            <div class="row mt-3">
 
+            <!-- Tabla con información del Plan -->
+            <div class="row mt-3">
                 <div class="col-md-12">
                     <table class="table table-striped">
                         <thead>
@@ -38,35 +39,161 @@
                     </table>
                 </div>
 
-
-
-            <div class="row mt-3">
-
-                <table class="table table-striped">
-                    <thead>
-                        <tr style="text-align: center;">
-                            <th>Paciente</th>
-                            <th>IMC</th>
-                            <th>Peso actual</th>
-                            <th>Altura actual</th>
-                            <th>Objetivo de salud</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr style="text-align: center;">
-                            <td>{{$paciente->user->apellido}}, {{$paciente->user->name}}</td>
-                            <td>{{$turno->consulta->imc_actual}}</td>
-                            <td>{{$turno->consulta->peso_actual}} kg</td>
-                            <td>{{$turno->consulta->altura_actual}} cm</td>
-                            <td>{{$paciente->historiaClinica->objetivo_salud}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-
             </div>
-        </div>
+
+            <!-- Tabla con información del Paciente -->
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr style="text-align: center;">
+                                <th>Paciente</th>
+                                <th>IMC</th>
+                                <th>Peso actual</th>
+                                <th>Altura actual</th>
+                                <th>Objetivo de salud</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr style="text-align: center;">
+                                <td>{{$paciente->user->apellido}}, {{$paciente->user->name}}</td>
+                                <td>{{$turno->consulta->imc_actual}}</td>
+                                <td>{{$turno->consulta->peso_actual}} kg</td>
+                                <td>{{$turno->consulta->altura_actual}} cm</td>
+                                <td>{{$paciente->historiaClinica->objetivo_salud}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabla con más información del Paciente -->
+            <div class="row mt-3">
+                <div class="accordion accordion-flush-success" id="accordionFlushExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                <strong>Más Datos del Paciente</strong>
+                            </button>
+                        </h2>
+                        <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body">
+                                <!-- Tabla de historia clínica -->
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr style="text-align: center;">
+                                            <th colspan="4"><h5>Historia Clínica</h5></th>
+                                        </tr>
+                                        <tr style="text-align: center;">
+                                            <th>Alergias</th>
+                                            <th>Patologías</th>
+                                            <th>Cirugías</th>
+                                            <th>Intolerancias</th>
+                                        </tr>
+
+                                    </thead>
+
+                                    <tbody>
+                                        @forelse ($datosMedicos as $datoMedico)
+                                            <tr style="text-align: center;">
+                                                <td>
+                                                    @foreach ($alergias as $alergia)
+                                                        @if ($alergia->id == $datoMedico->alergia_id)
+                                                            {{ $alergia->alergia }}
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+
+                                                <td>
+                                                    @foreach ($patologias as $patologia)
+                                                        @if ($patologia->id == $datoMedico->patologia_id)
+                                                            {{ $patologia->patologia}}
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+
+                                                <td>
+                                                    @foreach ($intolerancias as $intolerancia)
+                                                        @if ($intolerancia->id == $datoMedico->intolerancia_id)
+                                                            {{ $intolerancia->intolerancia}}
+                                                        @endif
+                                                    @endforeach
+                                                </td>
+
+                                                <td>
+                                                    @foreach ($cirugias as $cirugia)
+                                                        @forelse ($cirugiasPaciente as $cirugiaPaciente)
+                                                            @if ($cirugia->id == $cirugiaPaciente->cirugia_id)
+                                                                {{$cirugia->cirugia}}
+                                                            @endif
+                                                        @empty
+                                                            <span class="text-danger">No se registraron cirugías</span>
+                                                        @endforelse
+                                                    @endforeach
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td>
+                                                    <span class="text-danger">No se registraron datos médicos</span>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+
+                                    </tbody>
+                                </table>
+
+                                <!-- Tabla de anamnesis -->
+                                <table class="table table-striped mt-3">
+                                    <thead>
+                                        <tr style="text-align: center;">
+                                            <th colspan="4"><h5>Gustos Alimenticios</h5></th>
+                                        </tr>
+                                        <tr style="text-align: center;">
+                                            <th>Gustos</th>
+                                            <th></th>
+                                            <th>Disgustos</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="text-align: center;">
+                                            <td>
+                                                @forelse ($anamnesisPaciente as $anamnesis)
+                                                    @if ($anamnesis->gusta == 1)
+                                                        @foreach ($alimentos as $alimento)
+                                                            @if ($anamnesis->alimento_id == $alimento->id)
+                                                                {{ $alimento->alimento }} <br>
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                @empty
+                                                    <span class="text-danger">No se registraron gustos</span>
+                                                @endforelse
+                                            </td>
+                                            <td></td>
+                                            <td>
+                                                @forelse ($anamnesisPaciente as $anamnesis)
+                                                    @if ($anamnesis->gusta == 0)
+                                                        @foreach ($alimentos as $alimento)
+                                                            @if ($anamnesis->alimento_id == $alimento->id)
+                                                                {{ $alimento->alimento }} <br>
+                                                            @endif
+                                                        @endforeach
+                                                    @endif
+                                                @empty
+                                                    <span class="text-danger">No se registraron disgustos</span>
+                                                @endforelse
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -76,13 +203,23 @@
         </div>
 
         <div class="card-body">
+
+            <!-- Tabla de Desayuno -->
             <div class="row mt-3">
                 <div class="col-md-12">
                     <table class="table table-striped">
                         <thead>
-                            <tr style="text-align: center;">
-                                <th colspan="5"><h5>Desayuno</h5></th>
+                            <tr>
+                                <th colspan="5">
+                                    <h5>
+                                        Desayuno
+                                        <a href="#" class="btn btn-success btn-sm">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </a>
+                                    </h5>
+                                </th>
                             </tr>
+
                             <tr>
                                 <th>Alimento</th>
                                 <th>Cantidad</th>
@@ -102,13 +239,88 @@
                                             <td>{{$detallePlan->unidad_medida}}</td>
                                             <td>{{$detallePlan->observaciones}}</td>
                                             <td>
-                                                <form action="#" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                </form>
+                                                <div>
+                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editDesayuno_{{$detallePlan->id}}">
+                                                        <span class="far fa-edit"></span>
+                                                    </button>
+                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-danger delete-button">
+                                                            <span class="far fa-trash-alt"></span>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
+                                        <!-- Modal Media mañana-->
+                                        <div class="modal fade" id="editDesayuno_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby=DesayunonianaLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editDesayunoLabel">Editar Desayuno</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <label for="alimento">Alimento</label>
+                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
+                                                                        <option value="" disabled>Seleccione un alimento</option>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @foreach ($detallesPlan as $detalle)
+                                                                                @if ($detalle->id == $detallePlan->id)
+                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
+                                                                                    @else
+                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                                                    @endif
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="cantidad">Cantidad</label>
+                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="unidad_medida">Unidad de medida</label>
+                                                                    <select class="form-select" name="unidad_medida" id="">
+                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
+                                                                        @foreach ($unidadesMedidas as $unidad)
+                                                                            @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
+                                                                                <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
+                                                                            @else
+                                                                                <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="observaciones">Observaciones</label>
+                                                                    <input type="text" id="observacionesInput" class="form-control" name="observaciones" value="{{$detallePlan->observacion}}">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-3 float-right">
+                                                                <div class="col">
+                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                                                </div>
+                                                            </div>
+
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
                                 @endforeach
                             @empty
@@ -120,12 +332,21 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Media mañana -->
             <div class="row mt-3">
                 <div class="col-md-12">
                     <table class="table table-striped">
                         <thead>
-                            <tr style="text-align: center;">
-                                <th colspan="5"><h5>Media mañana</h5></th>
+                            <tr>
+                                <th colspan="4">
+                                    <h5>
+                                        Media mañana
+                                        <a href="#" class="btn btn-success btn-sm">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </a>
+                                    </h5>
+                                </th>
                             </tr>
                             <tr>
                                 <th>Alimento</th>
@@ -146,13 +367,88 @@
                                             <td>{{$detallePlan->unidad_medida}}</td>
                                             <td>{{$detallePlan->observaciones}}</td>
                                             <td>
-                                                <form action="#" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                </form>
+                                                <div>
+                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMediaManiana_{{$detallePlan->id}}">
+                                                        <span class="far fa-edit"></span>
+                                                    </button>
+                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-danger delete-button">
+                                                            <span class="far fa-trash-alt"></span>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
+                                        <!-- Modal Media mañana-->
+                                        <div class="modal fade" id="editMediaManiana_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editMediaManianaLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editMediaManianaLabel">Editar Media mañana</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <label for="alimento">Alimento</label>
+                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
+                                                                        <option value="" disabled>Seleccione un alimento</option>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @foreach ($detallesPlan as $detalle)
+                                                                                @if ($detalle->id == $detallePlan->id)
+                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
+                                                                                    @else
+                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                                                    @endif
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="cantidad">Cantidad</label>
+                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="unidad_medida">Unidad de medida</label>
+                                                                    <select class="form-select" name="unidad_medida" id="">
+                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
+                                                                        @foreach ($unidadesMedidas as $unidad)
+                                                                            @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
+                                                                                <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
+                                                                            @else
+                                                                                <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="observaciones">Observaciones</label>
+                                                                    <input type="text" id="observacionesInput" class="form-control" name="observaciones" value="{{$detallePlan->observacion}}">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-3 float-right">
+                                                                <div class="col">
+                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                                                </div>
+                                                            </div>
+
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
                                 @endforeach
                             @empty
@@ -165,13 +461,21 @@
                 </div>
             </div>
 
+            <!-- Almuerzo -->
             <div class="row mt-3">
                 <div class="col-md-12">
-
                     <table class="table table-striped">
                         <thead>
-                            <tr style="text-align: center;">
-                                <th colspan="5"><h5>Almuerzo</h5></th>
+                            <tr>
+                                <th colspan="5">
+                                    <h5>
+                                        Almuerzo
+                                        <a href="#" class="btn btn-success btn-sm">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </a>
+                                    </h5>
+
+                                </th>
                             </tr>
                             <tr>
                                 <th>Alimento</th>
@@ -192,13 +496,90 @@
                                             <td>{{$detallePlan->unidad_medida}}</td>
                                             <td>{{$detallePlan->observaciones}}</td>
                                             <td>
-                                                <form action="#" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                </form>
+                                                <div>
+                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editAlmuerzo_{{$detallePlan->id}}">
+                                                        <span class="far fa-edit"></span>
+                                                    </button>
+                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-danger delete-button">
+                                                            <span class="far fa-trash-alt"></span>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
+
+                                        <!-- Modal Almuerzo-->
+                                        <div class="modal fade" id="editAlmuerzo_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editAlmuerzoLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editAlmuerzoLabel">Editar Almuerzo</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <label for="alimento">Alimento</label>
+                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
+                                                                        <option value="" disabled>Seleccione un alimento</option>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @foreach ($detallesPlan as $detalle)
+                                                                                @if ($detalle->id == $detallePlan->id)
+                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
+                                                                                    @else
+                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                                                    @endif
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="cantidad">Cantidad</label>
+                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="unidad_medida">Unidad de medida</label>
+                                                                    <select class="form-select" name="unidad_medida" id="">
+                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
+                                                                        @foreach ($unidadesMedidas as $unidad)
+                                                                            @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
+                                                                                <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
+                                                                            @else
+                                                                                <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="observaciones">Observaciones</label>
+                                                                    <input type="text" id="observacionesInput" class="form-control" name="observaciones" value="{{$detallePlan->observacion}}">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-3 float-right">
+                                                                <div class="col">
+                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                                                </div>
+                                                            </div>
+
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     @endif
                                 @endforeach
                             @empty
@@ -208,16 +589,23 @@
                             @endforelse
                         </tbody>
                     </table>
-
                 </div>
             </div>
 
+            <!-- Merienda -->
             <div class="row mt-3">
                 <div class="col-md-12">
                     <table class="table table-striped">
                         <thead>
-                            <tr style="text-align: center;">
-                                <th colspan="5"><h5>Merienda</h5></th>
+                            <tr>
+                                <th colspan="5">
+                                    <h5>
+                                        Merienda
+                                        <a href="#" class="btn btn-success btn-sm">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </a>
+                                    </h5>
+                                </th>
                             </tr>
                             <tr>
                                 <th>Alimento</th>
@@ -238,13 +626,93 @@
                                             <td>{{$detallePlan->unidad_medida}}</td>
                                             <td>{{$detallePlan->observaciones}}</td>
                                             <td>
-                                                <form action="#" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                </form>
+                                                <div>
+                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMerienda_{{$detallePlan->id}}">
+                                                        <span class="far fa-edit"></span>
+                                                    </button>
+                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button type="button" class="btn btn-danger delete-button">
+                                                            <span class="far fa-trash-alt"></span>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
+                                        <!-- Modal Merienda-->
+                                        <div class="modal fade" id="editMerienda_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editMeriendaLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editMeriendaLabel">Editar Merienda</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <label for="alimento">Alimento</label>
+                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
+                                                                        <option value="" disabled>Seleccione un alimento</option>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @foreach ($detallesPlan as $detalle)
+                                                                                @if ($detalle->id == $detallePlan->id)
+                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
+                                                                                    @else
+                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                                                    @endif
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="cantidad">Cantidad</label>
+                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="unidad_medida">Unidad de medida</label>
+                                                                    <select class="form-select" name="unidad_medida" id="">
+                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
+                                                                        @foreach ($unidadesMedidas as $unidad)
+                                                                            @foreach ($detallesPlan as $detalle)
+                                                                                @if ($detalle->id == $detallePlan->id)
+                                                                                    @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
+                                                                                        <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
+                                                                                    @else
+                                                                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
+                                                                                    @endif
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="observaciones">Observaciones</label>
+                                                                    <input type="text" id="observacionesInput" class="form-control" name="observaciones" value="{{$detallePlan->observacion}}">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-3 float-right">
+                                                                <div class="col">
+                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                                                </div>
+                                                            </div>
+
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
                                 @endforeach
                             @empty
@@ -257,13 +725,20 @@
                 </div>
             </div>
 
+            <!-- Cena -->
             <div class="row mt-3">
                 <div class="col-md-12">
-
                     <table class="table table-striped">
                         <thead>
-                            <tr style="text-align: center;">
-                                <th colspan="5"><h5>Cena</h5></th>
+                            <tr>
+                                <th colspan="5">
+                                    <h5>
+                                        Cena
+                                        <a href="#" class="btn btn-success btn-sm">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </a>
+                                    </h5>
+                                </th>
                             </tr>
                             <tr>
                                 <th>Alimento</th>
@@ -284,27 +759,113 @@
                                             <td>{{$detallePlan->unidad_medida}}</td>
                                             <td>{{$detallePlan->observaciones}}</td>
                                             <td>
-                                                <form action="#" method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                                                </form>
+                                                <div>
+                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editCena_{{$detallePlan->id}}">
+                                                        <span class="far fa-edit"></span>
+                                                    </button>
+                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn btn-danger delete-button">
+                                                            <span class="far fa-trash-alt"></span>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
+
+                                        <!-- Modal Cena-->
+                                        <div class="modal fade" id="editCena_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editCenaLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-xl">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="editCenaLabel">Editar Cena</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <label for="alimento">Alimento</label>
+                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
+                                                                        <option value="" disabled>Seleccione un alimento</option>
+                                                                        @foreach ($alimentos as $alimento)
+                                                                            @foreach ($detallesPlan as $detalle)
+                                                                                @if ($detalle->id == $detallePlan->id)
+                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
+                                                                                    @else
+                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                                                    @endif
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="cantidad">Cantidad</label>
+                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="unidad_medida">Unidad de medida</label>
+                                                                    <select class="form-select" name="unidad_medida" id="">
+                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
+                                                                        @foreach ($unidadesMedidas as $unidad)
+                                                                            @foreach ($detallesPlan as $detalle)
+                                                                                @if ($detalle->id == $detallePlan->id)
+                                                                                    @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
+                                                                                        <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
+                                                                                    @else
+                                                                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
+                                                                                    @endif
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endforeach
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-md-3">
+                                                                    <label for="observaciones">Observaciones</label>
+                                                                    <input type="text" id="observacionesInput" class="form-control" name="observaciones" value="{{$detallePlan->observacion}}">
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row mt-3 float-right">
+                                                                <div class="col">
+                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                                                </div>
+                                                            </div>
+
+                                                        </form>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     @endif
                                 @endforeach
                             @empty
-                                <p>No hay alimentos asignados para este horario</p>
+                                <tr>
+                                    <td colspan="5">
+                                        <p>No hay alimentos asignados para este horario</p>
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
+
                 </div>
             </div>
 
             <div class="float-right">
                 <div class="row">
                     <div class="col-md-12">
-                        <form id="confirmar-form" action="" method="POST" class="d-inline-block">
+                        <form id="confirmar-form" action="{{route('plan-alimentacion.confirmarPlan', $planGenerado->id)}}" method="POST" class="d-inline-block">
                             @csrf
                             <button class="btn btn-success confirmar-button" type="button">Confirmar Plan</button>
                         </form>
@@ -324,6 +885,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
     <style>
         .seccion {
             border: 1px solid #ccc;
@@ -367,63 +930,81 @@
 
     <script>
 
-//Respuestas Flash del controlador con SweetAlert
-        @if (session('success'))
+        //Respuestas Flash del controlador con SweetAlert
+        @if (session('successAlimentoEliminado'))
             Swal.fire({
                 icon: 'success',
                 title: '¡Éxito!',
-                text: "{{session('success')}}",
+                text: "{{session('successAlimentoEliminado')}}",
                 showConfirmButton: false,
                 timer: 3000
             })
         @endif
 
-        @if (session('error'))
+        @if (session('successAlimentoActualizado'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successAlimentoActualizado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('successAlimentoEliminado'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successAlimentoEliminado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('errorAlimentoNoEncontrado'))
             Swal.fire({
                 icon: 'error',
                 title: '¡Error!',
-                text: "{{session('error')}}",
+                text: "{{session('errorAlimentoNoEncontrado')}}",
                 showConfirmButton: false,
                 timer: 3000
             })
         @endif
 
-        @if(session('info'))
-            Swal.fire({
-                icon: 'info',
-                title: '¡Información!',
-                text: "{{session('info')}}",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        @endif
+        //SweetAlert Eliminar alimento
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+        })
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const deleteButtons = document.querySelectorAll('.delete-button');
 
-        $(document).ready(function() {
-            $('[data-bs-toggle="popover"]').popover();
-        });
-
-        $(document).ready(function(){
-            var table = $('#tabla-mis-turnos').DataTable({
-                responsive: true,
-                autoWidth: false,
-                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
-                "language": {
-                    "lengthMenu": "Mostrar _MENU_ turnos por página",
-                    "zeroRecords": "No se encontró ningún turno",
-                    "info": "Mostrando la página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay registros de turnos",
-                    "infoFiltered": "(filtrado de _MAX_ turnos totales)",
-                    "search": "Buscar:",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    },
-                }
+            // Agrega un controlador de clic a cada botón de eliminar
+            deleteButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Estás seguro de eliminar el alimento del plan?',
+                        text: 'Esta acción eliminará el alimento del plan de alimentación.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            button.closest('form').submit();
+                        }
+                    });
+                });
             });
         });
 
+        //SweetAlert Confirmar plan
         document.addEventListener('DOMContentLoaded', function () {
             const confirmarPlan = document.querySelectorAll('.confirmar-button');
 
