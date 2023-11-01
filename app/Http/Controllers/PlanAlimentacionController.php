@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Alimento;
+use App\Models\Comida;
 use App\Models\DetallePlanAlimentaciones;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
@@ -52,7 +53,47 @@ class PlanAlimentacionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $planGenerado = PlanAlimentaciones::find($request->input('plan_id'));
+
+        if(!$planGenerado){
+            return redirect()->back()->with('errorPlanNoEncontrado','Error, no se puedo encontrar el plan generado. Inténtelo de nuevo por favor.');
+        }
+
+        $request->validate([
+            'alimento' => ['required', 'integer'],
+            'cantidad'=> ['required','integer'],
+            'unidad_medida'=> ['required','string'],
+            'observaciones'=> ['required','string'],
+        ]);
+
+        $alimentoNuevo = $request->input('alimento');
+        $comida = $request->input('comida');
+
+        $detallesExistentes = DetallePlanAlimentaciones::where('plan_alimentacion_id', $planGenerado->id)->get();
+
+        foreach($detallesExistentes as $detalle){
+            if($detalle->alimento_id ==  $alimentoNuevo && $detalle->horario_consumicion == $comida){
+                return redirect()->back()->with('errorAlimentoYaAgregado', 'El alimento ya se encuentra agregado al plan de alimentación. Elimine el anterior registro o modifíquelo por favor.');
+            }
+        }
+
+        $detalleNuevoPlan = DetallePlanAlimentaciones::create([
+            'plan_alimentacion_id' => $planGenerado->id,
+            'alimento_id' => $request->input('alimento'),
+            'horario_consumicion' => $request->input('comida'),
+            'cantidad' => $request->input('cantidad'),
+            'unidad_medida' => $request->input('unidad_medida'),
+            'observacion' => $request->input('observaciones'),
+        ]);
+
+        if($detalleNuevoPlan){
+            return redirect()->back()->with('successAlimentoAgregado', 'Alimento agregado al plan de alimentación.');
+        }else{
+            return redirect()->back()->with('errorAlimentoNoAgregado','Error al intentar registrar el nuevo alimento al plan. Inténtelo de nuevo.');
+        }
+
+
     }
 
     /**
@@ -91,6 +132,13 @@ class PlanAlimentacionController extends Controller
         if(!$detallePlan){
             return redirect()->back()->with('errorAlimentoNoEncontrado', 'No se encontró el alimento a eliminar del plan de alimentación.');
         }
+
+        $request->validate([
+            'alimento' => ['required', 'integer'],
+            'cantidad'=> ['required','integer'],
+            'unidad_medida'=> ['required','string'],
+            'observaciones'=> ['required','string'],
+        ]);
 
         $detallePlan->alimento_id = $request->input('alimento');
         $detallePlan->cantidad = $request->input('cantidad');
@@ -131,6 +179,7 @@ class PlanAlimentacionController extends Controller
         $unidadesMedidas = UnidadesMedidasPorComida::all();
 
         $alimentos = Alimento::all();
+        $comidas = Comida::all();
 
         //Datos clínicos dell paciente
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
@@ -146,7 +195,7 @@ class PlanAlimentacionController extends Controller
         $tratamientosPaciente = TratamientoPorPaciente::where('paciente_id', $paciente->id)->get();
         $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->get();
 
-        return view('plan-alimentacion.plan-generado', compact('paciente', 'turno', 'nutricionista' , 'planGenerado', 'detallesPlan', 'alimentos', 'historiaClinica', 'datosMedicos', 'alergias', 'patologias', 'intolerancias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'tratamientosPaciente', 'anamnesisPaciente', 'unidadesMedidas'));
+        return view('plan-alimentacion.plan-generado', compact('paciente', 'turno', 'nutricionista' , 'planGenerado', 'detallesPlan', 'alimentos', 'historiaClinica', 'datosMedicos', 'alergias', 'patologias', 'intolerancias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'tratamientosPaciente', 'anamnesisPaciente', 'unidadesMedidas', 'comidas'));
 
     }
 
