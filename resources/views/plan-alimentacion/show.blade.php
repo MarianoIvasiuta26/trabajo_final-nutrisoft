@@ -7,90 +7,119 @@
 
 @section('content')
 
-
     <div class="card card-dark mt-3">
-        <div class="card-header">
-            <h5>Planes de alimentación por confirmar</h5>
+        <div class="card-header" style="text-align: center;">
+            <h3>Información del Plan</h3>
         </div>
 
         <div class="card-body">
-            <table id="planes-confirmacion" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Fecha de Generación</th>
-                        <th>Paciente correspondiente</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($planesAConfirmar as $plan)
-                        <tr>
-                            <td>{{ \Carbon\Carbon::parse($plan->consulta->turno->fecha)->format('d/m/Y')}}</td>
-                            <td>{{ $plan->paciente->user->apellido }}, {{ $plan->paciente->user->name }}</td>
-                            <td>
-                                <form action="{{ route('plan-alimentacion.consultarPlanGenerado', ['pacienteId'=>$plan->paciente_id, 'turnoId' => $plan->consulta->turno->id, 'nutricionistaId' => $plan->consulta->nutricionista_id]) }}" method="GET" style="display: inline-block;">
-                                    @csrf
 
-                                    <button class="btn btn-primary btn-sm" type="submit">Ver</button>
-                                </form>
+            <!-- Tabla con información del Plan -->
+            <div class="row mt-3">
+                <div class="col-md-12 table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr style="text-align: center;">
+                                <th>Fecha generación</th>
+                                <th>Profesional</th>
+                                <th>Descripción del Plan</th>
+                            </tr>
+                        </thead>
 
-                                <form id="confirmar-form" action="{{route('plan-alimentacion.confirmarPlan', $plan->id)}}" method="POST" class="d-inline-block">
-                                    @csrf
+                        <tbody>
+                            <tr style="text-align: center;">
+                                <td>{{ \Carbon\Carbon::parse($plan->consulta->turno->fecha)->format('d/m/Y')}}</td>
+                                <td>{{$plan->consulta->nutricionista->user->apellido}}, {{$plan->consulta->nutricionista->user->name}}</td>
+                                <td>{{$plan->descripcion}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                                    <button type="button" class="btn btn-success btn-sm confirmar-button">Confirmar</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            </div>
+
+            <!-- Tabla con información del Paciente -->
+            <div class="row mt-3">
+                <div class="col-md-12 table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr style="text-align: center;">
+                                <th>Paciente</th>
+                                <th>IMC</th>
+                                <th>Peso actual</th>
+                                <th>Altura actual</th>
+                                <th>Objetivo de salud</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr style="text-align: center;">
+                                <td>{{$plan->paciente->user->apellido}}, {{$plan->paciente->user->name}}</td>
+                                <td>{{$plan->consulta->imc_actual}}</td>
+                                <td>{{$plan->consulta->peso_actual}} kg</td>
+                                <td>{{$plan->consulta->altura_actual}} cm</td>
+                                <td>{{$plan->paciente->historiaClinica->objetivo_salud}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card card-dark mt-3">
-        <div class="card-header">
-            <h5>Historial de Planes de alimentación generados</h5>
+    <div class="card card-dark">
+        <div class="card-header" style="text-align: center;">
+            <h3>Plan de Alimentación</h3>
         </div>
 
         <div class="card-body">
-            <table id="historial-planes" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Fecha de Generación</th>
-                        <th>Paciente correspondiente</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($planesGenerados as $plan)
-                        @if ($plan->estado != 2)
-                            <tr>
-                                <td>{{ \Carbon\Carbon::parse($plan->consulta->turno->fecha)->format('d/m/Y')}}</td>
-                                <td>{{ $plan->paciente->user->apellido }}, {{ $plan->paciente->user->name }}</td>
-                                <td>
-                                    @if ($plan->estado == 0)
-                                        <span class="badge bg-warning">Inactivo</span>
-                                    @endif
 
-                                    @if ($plan->estado == 1)
-                                        <span class="badge bg-success">Activo</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <form action="{{ route('plan-alimentacion.show', $plan->id) }}" method="GET" style="display: inline-block;">
-                                        @csrf
+            @foreach($comidas as $comida)
+                @if ($comida->nombre_comida != 'Sin comida')
+                    <div class="row mt-3">
+                        <div class="col-md-12 table-responsive">
+                            <h5>
+                                @if ($comida->nombre_comida == 'Media maniana')
+                                    Media mañana
+                                @else
+                                    {{ $comida->nombre_comida }}
+                                @endif
+                            </h5>
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Alimento</th>
+                                        <th>Cantidad</th>
+                                        <th>Unidad de medida</th>
+                                        <th>Observaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($detallesPlan as $detallePlan)
+                                        @foreach ($alimentos as $alimento)
+                                            @if ($detallePlan->horario_consumicion == $comida->nombre_comida && $detallePlan->alimento_id == $alimento->id)
+                                                <tr>
+                                                    <td>{{ $alimento->alimento }}</td>
+                                                    <td>{{ $detallePlan->cantidad }}</td>
+                                                    <td>{{ $detallePlan->unidad_medida }}</td>
+                                                    <td>{{ $detallePlan->observacion }}</td>
+                                                </tr>
+                                            @endif
+                                        @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="4"><p>No hay alimentos asignados para este horario</p></td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+            @endforeach
 
-                                        <button class="btn btn-primary btn-sm" type="submit">Ver</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @endif
-
-                    @endforeach
-                </tbody>
-            </table>
         </div>
+
     </div>
 
 @stop

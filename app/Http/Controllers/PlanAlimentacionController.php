@@ -32,7 +32,9 @@ class PlanAlimentacionController extends Controller
      */
     public function index()
     {
-        //
+        $planesPaciente = PlanAlimentaciones::where('paciente_id', auth()->user()->paciente->id)->get();
+        return view('plan-alimentacion.index', compact('planesPaciente'));
+
     }
 
     /**
@@ -104,7 +106,17 @@ class PlanAlimentacionController extends Controller
      */
     public function show($id)
     {
-        //
+        $plan = PlanAlimentaciones::find($id);
+        $detallesPlan = DetallePlanAlimentaciones::where('plan_alimentacion_id', $plan->id)->get();
+        $alimentos = Alimento::all();
+        $comidas = Comida::all();
+
+        if(!$plan){
+            return redirect()->back()->with('errorPlanNoEncontrado', 'No se encontró el plan de alimentación a consultar.');
+        }
+
+        return view('plan-alimentacion.show', compact('plan','detallesPlan','alimentos', 'comidas'));
+
     }
 
     /**

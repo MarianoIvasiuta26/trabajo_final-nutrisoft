@@ -19,10 +19,9 @@
             <div class="row mt-3">
                 <div class="col-md-12">
                     <table class="table table-striped">
-                        <thead>
+                        <thead class="table-dark">
                             <tr style="text-align: center;">
                                 <th>Fecha generación</th>
-                                <th>Hora de Consulta</th>
                                 <th>Profesional</th>
                                 <th>Descripción del Plan</th>
                             </tr>
@@ -31,7 +30,6 @@
                         <tbody>
                             <tr style="text-align: center;">
                                 <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y')}}</td>
-                                <td>{{ \Carbon\Carbon::parse($turno->hora)->format('H:i')}}</td>
                                 <td>{{$nutricionista->user->apellido}}, {{$nutricionista->user->name}}</td>
                                 <td>{{$planGenerado->descripcion}}</td>
                             </tr>
@@ -45,7 +43,7 @@
             <div class="row mt-3">
                 <div class="col-md-12">
                     <table class="table table-striped">
-                        <thead>
+                        <thead class="table-dark">
                             <tr style="text-align: center;">
                                 <th>Paciente</th>
                                 <th>IMC</th>
@@ -81,11 +79,11 @@
                             <div class="accordion-body">
                                 <!-- Tabla de historia clínica -->
                                 <table class="table table-striped">
-                                    <thead>
+                                    <thead class="table-dark">
                                         <tr style="text-align: center;">
                                             <th colspan="4"><h5>Historia Clínica</h5></th>
                                         </tr>
-                                        <tr style="text-align: center;">
+                                        <tr style="text-align: center;" class="table-info table-active">
                                             <th>Alergias</th>
                                             <th>Patologías</th>
                                             <th>Cirugías</th>
@@ -146,11 +144,11 @@
 
                                 <!-- Tabla de anamnesis -->
                                 <table class="table table-striped mt-3">
-                                    <thead>
+                                    <thead class="table-dark table-striped">
                                         <tr style="text-align: center;">
                                             <th colspan="4"><h5>Gustos Alimenticios</h5></th>
                                         </tr>
-                                        <tr style="text-align: center;">
+                                        <tr style="text-align: center;" class="table-info  table-active">
                                             <th>Gustos</th>
                                             <th></th>
                                             <th>Disgustos</th>
@@ -204,718 +202,169 @@
 
         <div class="card-body">
 
-            <!-- Tabla de Desayuno -->
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <h5>
-                        Desayuno
-                        <button type="button" class="btn btn-success btn-sm add-button" data-bs-toggle="modal" data-bs-target="#addDesayuno">
-                            <i class="bi bi-plus-circle"></i> Agregar
-                        </button>
-                    </h5>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Alimento</th>
-                                <th>Cantidad</th>
-                                <th>Unidad de medida</th>
-                                <th>Observaciones</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
+            @foreach($comidas as $comida)
+                @if ($comida->nombre_comida != 'Sin comida')
+                    <div class="row mt-3">
+                        <div class="col-md-12 table-responsive">
+                            <h5>
+                                @if ($comida->nombre_comida == 'Media maniana')
+                                    Media mañana
+                                    <button type="button" class="btn btn-success btn-sm add-button" data-bs-toggle="modal" data-bs-target="#add{{$comida->id}}">
+                                        <i class="bi bi-plus-circle"></i> Agregar
+                                    </button>
+                                @else
+                                    {{ $comida->nombre_comida }}
+                                    <button type="button" class="btn btn-success btn-sm add-button" data-bs-toggle="modal" data-bs-target="#add{{$comida->id}}">
+                                        <i class="bi bi-plus-circle"></i> Agregar
+                                    </button>
+                                @endif
+                            </h5>
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Alimento</th>
+                                        <th>Cantidad</th>
+                                        <th>Unidad de medida</th>
+                                        <th>Observaciones</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
 
-                        <tbody>
-                            @forelse ($detallesPlan as $detallePlan)
-                                @foreach ($alimentos as $alimento)
-                                    @if ($detallePlan->horario_consumicion == 'Desayuno' && $detallePlan->alimento_id == $alimento->id)
-                                        <tr>
-                                            <td>{{$alimento->alimento}}</td>
-                                            <td>{{$detallePlan->cantidad}}</td>
-                                            <td>{{$detallePlan->unidad_medida}}</td>
-                                            <td>{{$detallePlan->observacion}}</td>
-                                            <td>
-                                                <div>
-                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editDesayuno_{{$detallePlan->id}}">
-                                                        <span class="far fa-edit"></span>
-                                                    </button>
-                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger delete-button">
-                                                            <span class="far fa-trash-alt"></span>
-                                                        </button>
-                                                    </form>
+                                <tbody>
+                                    @forelse ($detallesPlan as $detallePlan)
+                                        @foreach ($alimentos as $alimento)
+                                            @if ($detallePlan->horario_consumicion == $comida->nombre_comida && $detallePlan->alimento_id == $alimento->id)
+                                                <tr>
+                                                    <td>{{$alimento->alimento}}</td>
+                                                    <td>{{$detallePlan->cantidad}}</td>
+                                                    <td>{{$detallePlan->unidad_medida}}</td>
+                                                    <td>{{$detallePlan->observacion}}</td>
+                                                    <td>
+                                                        <div>
+                                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit_{{$detallePlan->id}}">
+                                                                <span class="far fa-edit"></span>
+                                                            </button>
+                                                            <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="button" class="btn btn-danger delete-button">
+                                                                    <span class="far fa-trash-alt"></span>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                                <!-- Modal Edit-->
+                                                <div class="modal fade" id="edit_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="edit{{$comida->id}}Label" aria-hidden="true">
+                                                    <div class="modal-dialog modal-xl">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="edit{{$comida->id}}Label">
+                                                                    @if ($comida->nombre_comida == 'Media maniana')
+                                                                        Editar Media mañana
+                                                                    @else
+                                                                        Editar {{$comida->nombre_comida}}
+                                                                    @endif
+                                                                </h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+
+                                                                    <div class="row">
+                                                                        <div class="col-md-4">
+                                                                            <label for="alimento">Alimento</label>
+                                                                            <select id="alimentoSelect" class="form-select" name="alimento">
+                                                                                <option value="" disabled>Seleccione un alimento</option>
+                                                                                @foreach ($alimentos as $alimento)
+                                                                                    @foreach ($detallesPlan as $detalle)
+                                                                                        @if ($detalle->id == $detallePlan->id)
+                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
+                                                                                                <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
+                                                                                            @else
+                                                                                                <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                                                            @endif
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                @endforeach
+                                                                            </select>
+                                                                            @error('alimento')
+                                                                                <small class="text-danger">{{$message}}</small>
+                                                                            @enderror
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <label for="cantidad">Cantidad</label>
+                                                                            <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
+                                                                            @error('cantidad')
+                                                                                <small class="text-danger">{{$message}}</small>
+                                                                            @enderror
+                                                                        </div>
+                                                                        <div class="col-md-4">
+                                                                            <label for="unidad_medida">Unidad de medida</label>
+                                                                            <select class="form-select" name="unidad_medida" id="">
+                                                                                <option value="" disabled>Seleccione la unidad de medida</option>
+                                                                                @foreach ($unidadesMedidas as $unidad)
+                                                                                    @foreach ($detallesPlan as $detalle)
+                                                                                        @if ($detalle->id == $detallePlan->id)
+                                                                                            @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
+                                                                                                <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
+                                                                                            @else
+                                                                                                <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
+                                                                                            @endif
+                                                                                        @endif
+                                                                                    @endforeach
+                                                                                @endforeach
+                                                                            </select>
+
+                                                                            @error('unidad_medida')
+                                                                                <small class="text-danger">{{$message}}</small>
+                                                                            @enderror
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row mt-3">
+                                                                        <div class="col-md-12">
+                                                                            <label for="observaciones">Observaciones</label>
+                                                                            <textarea class="form-control" name="observaciones" id="" cols="10" rows="5">{{$detallePlan->observacion}}</textarea>
+                                                                            @error('observaciones')
+                                                                                <small class="text-danger">{{$message}}</small>
+                                                                            @enderror
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row mt-3 float-right">
+                                                                        <div class="col">
+                                                                            <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </form>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
+
+                                            @endif
+                                        @endforeach
+                                    @empty
+                                        <tr>
+                                            <td colspan="5">
+                                                <p>No hay alimentos asignados para este horario</p>
                                             </td>
                                         </tr>
-                                        <!-- Modal Edit Media mañana-->
-                                        <div class="modal fade" id="editDesayuno_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby=DesayunonianaLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="editDesayunoLabel">Editar Desayuno</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-
-                                                            <div class="row">
-                                                                <div class="col-md-4">
-                                                                    <label for="alimento">Alimento</label>
-                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
-                                                                        <option value="" disabled>Seleccione un alimento</option>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @foreach ($detallesPlan as $detalle)
-                                                                                @if ($detalle->id == $detallePlan->id)
-                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
-                                                                                    @else
-                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                                                                    @endif
-                                                                                @endif
-                                                                            @endforeach
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('alimento')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="cantidad">Cantidad</label>
-                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
-                                                                    @error('cantidad')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-
-                                                                <div class="col-md-4">
-                                                                    <label for="unidad_medida">Unidad de medida</label>
-                                                                    <select class="form-select" name="unidad_medida" id="">
-                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
-                                                                        @foreach ($unidadesMedidas as $unidad)
-                                                                            @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
-                                                                                <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
-                                                                            @else
-                                                                                <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('unidad_medida')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-
-                                                            </div>
-
-                                                            <div class="row mt-3">
-                                                                <div class="col-md-12">
-                                                                    <label for="observaciones">Observaciones</label>
-                                                                    <textarea class="form-control" name="observaciones" id="" cols="10" rows="5">{{$detallePlan->observacion}}</textarea>
-                                                                    @error('observaciones')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3 float-right">
-                                                                <div class="col">
-                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
-                                                                </div>
-                                                            </div>
-
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            @empty
-                                <tr>
-                                    <td colspan="4"><p>No hay alimentos asignados para este horario</p></td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Media mañana -->
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <h5>
-                        Media mañana
-                        <button type="button" class="btn btn-success btn-sm add-button" data-bs-toggle="modal" data-bs-target="#addMediaManiana">
-                            <i class="bi bi-plus-circle"></i> Agregar
-                        </button>
-                    </h5>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Alimento</th>
-                                <th>Cantidad</th>
-                                <th>Unidad de medida</th>
-                                <th>Observaciones</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @forelse ($detallesPlan as $detallePlan)
-                                @foreach ($alimentos as $alimento)
-                                    @if ($detallePlan->horario_consumicion == 'Media mañana' && $detallePlan->alimento_id == $alimento->id)
-                                        <tr>
-                                            <td>{{$alimento->alimento}}</td>
-                                            <td>{{$detallePlan->cantidad}}</td>
-                                            <td>{{$detallePlan->unidad_medida}}</td>
-                                            <td>{{$detallePlan->observacion}}</td>
-                                            <td>
-                                                <div>
-                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMediaManiana_{{$detallePlan->id}}">
-                                                        <span class="far fa-edit"></span>
-                                                    </button>
-                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger delete-button">
-                                                            <span class="far fa-trash-alt"></span>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!-- Modal Media mañana-->
-                                        <div class="modal fade" id="editMediaManiana_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editMediaManianaLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="editMediaManianaLabel">Editar Media mañana</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-
-                                                            <div class="row">
-                                                                <div class="col-md-4">
-                                                                    <label for="alimento">Alimento</label>
-                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
-                                                                        <option value="" disabled>Seleccione un alimento</option>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @foreach ($detallesPlan as $detalle)
-                                                                                @if ($detalle->id == $detallePlan->id)
-                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
-                                                                                    @else
-                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                                                                    @endif
-                                                                                @endif
-                                                                            @endforeach
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('alimento')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="cantidad">Cantidad</label>
-                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
-                                                                    @error('cantidad')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="unidad_medida">Unidad de medida</label>
-                                                                    <select class="form-select" name="unidad_medida" id="">
-                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
-                                                                        @foreach ($unidadesMedidas as $unidad)
-                                                                            @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
-                                                                                <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
-                                                                            @else
-                                                                                <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('unidad_medida')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3">
-                                                                <div class="col-md-12">
-                                                                    <label for="observaciones">Observaciones</label>
-                                                                    <textarea class="form-control" name="observaciones" id="" cols="10" rows="5">{{$detallePlan->observacion}}</textarea>
-                                                                    @error('observaciones')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3 float-right">
-                                                                <div class="col">
-                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
-                                                                </div>
-                                                            </div>
-
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            @empty
-                                <tr>
-                                    <td colspan="4"><p>No hay alimentos asignados para este horario</p></td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Almuerzo -->
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <h5>
-                        Almuerzo
-                        <button type="button" class="btn btn-success btn-sm add-button" data-bs-toggle="modal" data-bs-target="#addAlmuerzo">
-                            <i class="bi bi-plus-circle"></i> Agregar
-                        </button>
-                    </h5>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Alimento</th>
-                                <th>Cantidad</th>
-                                <th>Unidad de medida</th>
-                                <th>Observaciones</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @forelse ($detallesPlan as $detallePlan)
-                                @foreach ($alimentos as $alimento)
-                                    @if ($detallePlan->horario_consumicion == 'Almuerzo' && $detallePlan->alimento_id == $alimento->id)
-                                        <tr>
-                                            <td>{{$alimento->alimento}}</td>
-                                            <td>{{$detallePlan->cantidad}}</td>
-                                            <td>{{$detallePlan->unidad_medida}}</td>
-                                            <td>{{$detallePlan->observacion}}</td>
-                                            <td>
-                                                <div>
-                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editAlmuerzo_{{$detallePlan->id}}">
-                                                        <span class="far fa-edit"></span>
-                                                    </button>
-                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger delete-button">
-                                                            <span class="far fa-trash-alt"></span>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <!-- Modal Almuerzo-->
-                                        <div class="modal fade" id="editAlmuerzo_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editAlmuerzoLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="editAlmuerzoLabel">Editar Almuerzo</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-
-                                                            <div class="row">
-                                                                <div class="col-md-4">
-                                                                    <label for="alimento">Alimento</label>
-                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
-                                                                        <option value="" disabled>Seleccione un alimento</option>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @foreach ($detallesPlan as $detalle)
-                                                                                @if ($detalle->id == $detallePlan->id)
-                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
-                                                                                    @else
-                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                                                                    @endif
-                                                                                @endif
-                                                                            @endforeach
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('alimento')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="cantidad">Cantidad</label>
-                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
-                                                                    @error('cantidad')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="unidad_medida">Unidad de medida</label>
-                                                                    <select class="form-select" name="unidad_medida" id="">
-                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
-                                                                        @foreach ($unidadesMedidas as $unidad)
-                                                                            @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
-                                                                                <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
-                                                                            @else
-                                                                                <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('unidad_medida')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3">
-                                                                <div class="col-md-12">
-                                                                    <label for="observaciones">Observaciones</label>
-                                                                    <textarea class="form-control" name="observaciones" id="" cols="10" rows="5">{{$detallePlan->observacion}}</textarea>
-                                                                    @error('observaciones')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3 float-right">
-                                                                <div class="col">
-                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
-                                                                </div>
-                                                            </div>
-
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    @endif
-                                @endforeach
-                            @empty
-                                <tr>
-                                    <td colspan="4"><p>No hay alimentos asignados para este horario</p></td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Merienda -->
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <h5>
-                        Merienda
-                        <button type="button" class="btn btn-success btn-sm add-button" data-bs-toggle="modal" data-bs-target="#addMerienda">
-                            <i class="bi bi-plus-circle"></i> Agregar
-                        </button>
-                    </h5>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Alimento</th>
-                                <th>Cantidad</th>
-                                <th>Unidad de medida</th>
-                                <th>Observaciones</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @forelse ($detallesPlan as $detallePlan)
-                                @foreach ($alimentos as $alimento)
-                                    @if ($detallePlan->horario_consumicion == 'Merienda' && $detallePlan->alimento_id == $alimento->id)
-                                        <tr>
-                                            <td>{{$alimento->alimento}}</td>
-                                            <td>{{$detallePlan->cantidad}}</td>
-                                            <td>{{$detallePlan->unidad_medida}}</td>
-                                            <td>{{$detallePlan->observacion}}</td>
-                                            <td>
-                                                <div>
-                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editMerienda_{{$detallePlan->id}}">
-                                                        <span class="far fa-edit"></span>
-                                                    </button>
-                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-
-                                                        <button type="button" class="btn btn-danger delete-button">
-                                                            <span class="far fa-trash-alt"></span>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <!-- Modal Merienda-->
-                                        <div class="modal fade" id="editMerienda_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editMeriendaLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="editMeriendaLabel">Editar Merienda</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-
-                                                            <div class="row">
-                                                                <div class="col-md-4">
-                                                                    <label for="alimento">Alimento</label>
-                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
-                                                                        <option value="" disabled>Seleccione un alimento</option>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @foreach ($detallesPlan as $detalle)
-                                                                                @if ($detalle->id == $detallePlan->id)
-                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
-                                                                                    @else
-                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                                                                    @endif
-                                                                                @endif
-                                                                            @endforeach
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('alimento')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="cantidad">Cantidad</label>
-                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
-                                                                    @error('cantidad')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="unidad_medida">Unidad de medida</label>
-                                                                    <select class="form-select" name="unidad_medida" id="">
-                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
-                                                                        @foreach ($unidadesMedidas as $unidad)
-                                                                            @foreach ($detallesPlan as $detalle)
-                                                                                @if ($detalle->id == $detallePlan->id)
-                                                                                    @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
-                                                                                        <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
-                                                                                    @else
-                                                                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                                                                    @endif
-                                                                                @endif
-                                                                            @endforeach
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('unidad_medida')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3">
-                                                                <div class="col-md-12">
-                                                                    <label for="observaciones">Observaciones</label>
-                                                                    <textarea class="form-control" name="observaciones" id="" cols="10" rows="5">{{$detallePlan->observacion}}</textarea>
-                                                                    @error('observaciones')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3 float-right">
-                                                                <div class="col">
-                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
-                                                                </div>
-                                                            </div>
-
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
-                                @endforeach
-                            @empty
-                                <tr>
-                                    <td colspan="4"><p>No hay alimentos asignados para este horario</p></td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Cena -->
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <h5>
-                        Cena
-                        <button type="button" class="btn btn-success btn-sm add-button" data-bs-toggle="modal" data-bs-target="#addCena">
-                            <i class="bi bi-plus-circle"></i> Agregar
-                        </button>
-                    </h5>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Alimento</th>
-                                <th>Cantidad</th>
-                                <th>Unidad de medida</th>
-                                <th>Observaciones</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @forelse ($detallesPlan as $detallePlan)
-                                @foreach ($alimentos as $alimento)
-                                    @if ($detallePlan->horario_consumicion == 'Cena' && $detallePlan->alimento_id == $alimento->id)
-                                        <tr>
-                                            <td>{{$alimento->alimento}}</td>
-                                            <td>{{$detallePlan->cantidad}}</td>
-                                            <td>{{$detallePlan->unidad_medida}}</td>
-                                            <td>{{$detallePlan->observacion}}</td>
-                                            <td>
-                                                <div>
-                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editCena_{{$detallePlan->id}}">
-                                                        <span class="far fa-edit"></span>
-                                                    </button>
-                                                    <form action="{{route('plan-alimentacion.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" class="btn btn-danger delete-button">
-                                                            <span class="far fa-trash-alt"></span>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <!-- Modal Cena-->
-                                        <div class="modal fade" id="editCena_{{$detallePlan->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editCenaLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-xl">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="editCenaLabel">Editar Cena</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <form id="editForm" action="{{route('plan-alimentacion.update', $detallePlan->id)}}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-
-                                                            <div class="row">
-                                                                <div class="col-md-4">
-                                                                    <label for="alimento">Alimento</label>
-                                                                    <select id="alimentoSelect" class="form-select" name="alimento">
-                                                                        <option value="" disabled>Seleccione un alimento</option>
-                                                                        @foreach ($alimentos as $alimento)
-                                                                            @foreach ($detallesPlan as $detalle)
-                                                                                @if ($detalle->id == $detallePlan->id)
-                                                                                    @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                        <option value="{{$alimento->id}}" selected>{{$alimento->alimento}}</option>
-                                                                                    @else
-                                                                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                                                                    @endif
-                                                                                @endif
-                                                                            @endforeach
-                                                                        @endforeach
-                                                                    </select>
-                                                                    @error('alimento')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="cantidad">Cantidad</label>
-                                                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{$detallePlan->cantidad}}">
-                                                                    @error('cantidad')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                                <div class="col-md-4">
-                                                                    <label for="unidad_medida">Unidad de medida</label>
-                                                                    <select class="form-select" name="unidad_medida" id="">
-                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
-                                                                        @foreach ($unidadesMedidas as $unidad)
-                                                                            @foreach ($detallesPlan as $detalle)
-                                                                                @if ($detalle->id == $detallePlan->id)
-                                                                                    @if ($detallePlan->unidad_medida == $unidad->nombre_unidad_medida)
-                                                                                        <option value="{{$unidad->nombre_unidad_medida}}" selected>{{$unidad->nombre_unidad_medida}}</option>
-                                                                                    @else
-                                                                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                                                                    @endif
-                                                                                @endif
-                                                                            @endforeach
-                                                                        @endforeach
-                                                                    </select>
-
-                                                                    @error('unidad_medida')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3">
-                                                                <div class="col-md-12">
-                                                                    <label for="observaciones">Observaciones</label>
-                                                                    <textarea class="form-control" name="observaciones" id="" cols="10" rows="5">{{$detallePlan->observacion}}</textarea>
-                                                                    @error('observaciones')
-                                                                        <small class="text-danger">{{$message}}</small>
-                                                                    @enderror
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row mt-3 float-right">
-                                                                <div class="col">
-                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
-                                                                </div>
-                                                            </div>
-
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    @endif
-                                @endforeach
-                            @empty
-                                <tr>
-                                    <td colspan="5">
-                                        <p>No hay alimentos asignados para este horario</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+            @endforeach
 
             <div class="float-right">
                 <div class="row">
@@ -927,411 +376,96 @@
                     </div>
                 </div>
             </div>
-
         </div>
-
     </div>
 
+    @foreach ($comidas as $comida)
+        <!-- Modal Add-->
+        <div class="modal fade" id="add{{$comida->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="add{{$comida->id}}Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="add{{$comida->id}}Label">
+                            @if ($comida->nombre_comida == 'Media maniana')
+                                Agregar alimento a Media mañana
+                            @endif
+                            Agregar alimento a {{$comida->nombre_comida}}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addForm" action="{{route('plan-alimentacion.store')}}" method="POST">
+                            @csrf
 
-    <!-- Modal Add Cena-->
-    <div class="modal fade" id="addCena" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addCenaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCenaLabel">Agregar alimento a Cena</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addForm" action="{{route('plan-alimentacion.store')}}" method="POST">
-                        @csrf
+                            <input type="hidden" name="plan_id" value="{{$planGenerado->id}}">
+                            <input type="hidden" name="comida" value="{{$comida->nombre_comida}}">
 
-                        <input type="hidden" name="plan_id" value="{{$planGenerado->id}}">
-                        <input type="hidden" name="comida" value="Cena">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="alimento">Alimento</label>
+                                    <select id="alimentoSelect" class="form-select" name="alimento">
+                                        <option value="" disabled>Seleccione un alimento</option>
+                                        @foreach ($alimentos as $alimento)
+                                            <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                        @endforeach
+                                    </select>
 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="alimento">Alimento</label>
-                                <select id="alimentoSelect" class="form-select" name="alimento">
-                                    <option value="" disabled>Seleccione un alimento</option>
-                                    @foreach ($alimentos as $alimento)
-                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                    @endforeach
-                                </select>
+                                    @error('alimento')
+                                        <small class="text-danger">{{$message}}</small>
+                                    @enderror
+                                </div>
 
-                                @error('alimento')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
+                                <div class="col-md-4">
+                                    <label for="cantidad">Cantidad</label>
+                                    <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{old('cantidad')}}">
+
+                                    @error('cantidad')
+                                        <small class="text-danger">{{$message}}</small>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="unidad_medida">Unidad de medida</label>
+                                    <select class="form-select" name="unidad_medida" id="">
+                                        <option value="" disabled>Seleccione la unidad de medida</option>
+                                        @foreach ($unidadesMedidas as $unidad)
+                                            <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
+                                        @endforeach
+                                    </select>
+
+                                    @error('unidad_medida')
+                                        <small class="text-danger">{{$message}}</small>
+                                    @enderror
+                                </div>
+
                             </div>
 
-                            <div class="col-md-4">
-                                <label for="cantidad">Cantidad</label>
-                                <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{old('cantidad')}}">
-
-                                @error('cantidad')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <label for="observaciones">Observaciones</label>
+                                    <textarea class="form-control" name="observaciones" id="" cols="10" rows="3">{{old('observaciones')}}</textarea>
+                                    @error('observaciones')
+                                        <small class="text-danger">{{$message}}</small>
+                                    @enderror
+                                </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <label for="unidad_medida">Unidad de medida</label>
-                                <select class="form-select" name="unidad_medida" id="">
-                                    <option value="" disabled>Seleccione la unidad de medida</option>
-                                    @foreach ($unidadesMedidas as $unidad)
-                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('unidad_medida')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
+                            <div class="row mt-3 float-right">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                </div>
                             </div>
 
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <label for="observaciones">Observaciones</label>
-                                <textarea class="form-control" name="observaciones" id="" cols="10" rows="3">{{old('observaciones')}}</textarea>
-                                @error('observaciones')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mt-3 float-right">
-                            <div class="col">
-                                <button type="submit" class="btn btn-success">Guardar cambios</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endforeach
 
-    <!-- Modal Add Merienda-->
-    <div class="modal fade" id="addMerienda" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addMeriendaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addMeriendaLabel">Agregar alimento a Merienda</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addForm" action="{{route('plan-alimentacion.store')}}" method="POST">
-                        @csrf
-
-                        <input type="hidden" name="plan_id" value="{{$planGenerado->id}}">
-                        <input type="hidden" name="comida" value="Merienda">
-
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="alimento">Alimento</label>
-                                <select id="alimentoSelect" class="form-select" name="alimento">
-                                    <option value="" disabled>Seleccione un alimento</option>
-                                    @foreach ($alimentos as $alimento)
-                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('alimento')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="cantidad">Cantidad</label>
-                                <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{old('cantidad')}}">
-
-                                @error('cantidad')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="unidad_medida">Unidad de medida</label>
-                                <select class="form-select" name="unidad_medida" id="">
-                                    <option value="" disabled>Seleccione la unidad de medida</option>
-                                    @foreach ($unidadesMedidas as $unidad)
-                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('unidad_medida')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <label for="observaciones">Observaciones</label>
-                                <textarea class="form-control" name="observaciones" id="" cols="10" rows="3">{{old('observaciones')}}</textarea>
-                                @error('observaciones')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mt-3 float-right">
-                            <div class="col">
-                                <button type="submit" class="btn btn-success">Guardar cambios</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Add Almuerzo-->
-    <div class="modal fade" id="addAlmuerzo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addAlmuerzoLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addAlmuerzoLabel">Agregar alimento a Almuerzo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addForm" action="{{route('plan-alimentacion.store')}}" method="POST">
-                        @csrf
-
-                        <input type="hidden" name="plan_id" value="{{$planGenerado->id}}">
-                        <input type="hidden" name="comida" value="Almuerzo">
-
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="alimento">Alimento</label>
-                                <select id="alimentoSelect" class="form-select" name="alimento">
-                                    <option value="" disabled>Seleccione un alimento</option>
-                                    @foreach ($alimentos as $alimento)
-                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('alimento')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="cantidad">Cantidad</label>
-                                <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{old('cantidad')}}">
-
-                                @error('cantidad')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="unidad_medida">Unidad de medida</label>
-                                <select class="form-select" name="unidad_medida" id="">
-                                    <option value="" disabled>Seleccione la unidad de medida</option>
-                                    @foreach ($unidadesMedidas as $unidad)
-                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('unidad_medida')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <label for="observaciones">Observaciones</label>
-                                <textarea class="form-control" name="observaciones" id="" cols="10" rows="3">{{old('observaciones')}}</textarea>
-                                @error('observaciones')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mt-3 float-right">
-                            <div class="col">
-                                <button type="submit" class="btn btn-success">Guardar cambios</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Add Media Mañana-->
-    <div class="modal fade" id="addMediaManiana" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addMediaManianaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addMediaManianaLabel">Agregar alimento a Almuerzo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addForm" action="{{route('plan-alimentacion.store')}}" method="POST">
-                        @csrf
-
-                        <input type="hidden" name="plan_id" value="{{$planGenerado->id}}">
-                        <input type="hidden" name="comida" value="Media maniana">
-
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="alimento">Alimento</label>
-                                <select id="alimentoSelect" class="form-select" name="alimento">
-                                    <option value="" disabled>Seleccione un alimento</option>
-                                    @foreach ($alimentos as $alimento)
-                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('alimento')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="cantidad">Cantidad</label>
-                                <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{old('cantidad')}}">
-
-                                @error('cantidad')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="unidad_medida">Unidad de medida</label>
-                                <select class="form-select" name="unidad_medida" id="">
-                                    <option value="" disabled>Seleccione la unidad de medida</option>
-                                    @foreach ($unidadesMedidas as $unidad)
-                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('unidad_medida')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <label for="observaciones">Observaciones</label>
-                                <textarea class="form-control" name="observaciones" id="" cols="10" rows="3">{{old('observaciones')}}</textarea>
-                                @error('observaciones')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mt-3 float-right">
-                            <div class="col">
-                                <button type="submit" class="btn btn-success">Guardar cambios</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Add Desayuno-->
-    <div class="modal fade" id="addDesayuno" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addDesayunoLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addDesayunoLabel">Agregar alimento a Desayuno</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addForm" action="{{route('plan-alimentacion.store')}}" method="POST">
-                        @csrf
-
-                        <input type="hidden" name="plan_id" value="{{$planGenerado->id}}">
-                        <input type="hidden" name="comida" value="Desayuno">
-
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="alimento">Alimento</label>
-                                <select id="alimentoSelect" class="form-select" name="alimento">
-                                    <option value="" disabled>Seleccione un alimento</option>
-                                    @foreach ($alimentos as $alimento)
-                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('alimento')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="cantidad">Cantidad</label>
-                                <input type="text" id="cantidadInput" class="form-control" name="cantidad" value="{{old('cantidad')}}">
-
-                                @error('cantidad')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="unidad_medida">Unidad de medida</label>
-                                <select class="form-select" name="unidad_medida" id="">
-                                    <option value="" disabled>Seleccione la unidad de medida</option>
-                                    @foreach ($unidadesMedidas as $unidad)
-                                        <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
-                                    @endforeach
-                                </select>
-
-                                @error('unidad_medida')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-md-12">
-                                <label for="observaciones">Observaciones</label>
-                                <textarea class="form-control" name="observaciones" id="" cols="10" rows="3">{{old('observaciones')}} </textarea>
-                                @error('observaciones')
-                                    <small class="text-danger">{{$message}}</small>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row mt-3 float-right">
-                            <div class="col">
-                                <button type="submit" class="btn btn-success">Guardar cambios</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 @stop
 
@@ -1387,6 +521,16 @@
     <script>
 
         //Respuestas Flash del controlador con SweetAlert
+        @if (session('successPlanConfirmado'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successPlanConfirmado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
         @if (session('successAlimentoEliminado'))
             Swal.fire({
                 icon: 'success',
@@ -1402,16 +546,6 @@
                 icon: 'success',
                 title: '¡Éxito!',
                 text: "{{session('successAlimentoActualizado')}}",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        @endif
-
-        @if (session('successAlimentoEliminado'))
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: "{{session('successAlimentoEliminado')}}",
                 showConfirmButton: false,
                 timer: 3000
             })
