@@ -214,6 +214,14 @@ class PlanAlimentacionController extends Controller
 
     }
 
+    public function planesAlimentacionAConfirmar(){
+        $planesAConfirmar = PlanAlimentaciones::where('estado', 2)->get();
+        $planesGenerados =  PlanAlimentaciones::all();
+
+        return view('nutricionista.planes-a-confirmar.plan-alimentacion.index', compact('planesAConfirmar', 'planesGenerados'));
+
+    }
+
 
 
 }

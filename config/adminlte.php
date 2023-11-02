@@ -371,7 +371,7 @@ return [
                 [
                     'text' => 'Planes de Alimentación',
                     'icon' =>'fas fa-fw fa-utensils',
-                    'route'  => 'gestion-turnos-nutricionista.index',
+                    'route'  => 'plan-alimentacion.planesAlimentacionAConfirmar',
                 ],
                 [
                     'text' => 'Planes de Seguimiento',
