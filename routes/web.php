@@ -112,6 +112,7 @@ Route::middleware([
     Route::get('plan-alimentacion.consultarPlanGenerado/{pacienteId}/{turnoId}/{nutricionistaId}', [PlanAlimentacionController::class, 'consultarPlanGenerado'])->name('plan-alimentacion.consultarPlanGenerado');
     Route::post('plan-alimentacion.confirmarPlan/{planId}', [PlanAlimentacionController::class, 'confirmarPlan'])->name('plan-alimentacion.confirmarPlan');
     Route::get('plan-alimentacion.planesAlimentacionAConfirmar', [PlanAlimentacionController::class, 'planesAlimentacionAConfirmar'])->name('plan-alimentacion.planesAlimentacionAConfirmar');
+    Route::get('plan-alimentacion.pdf/{planId}', [PlanAlimentacionController::class, 'pdf'])->name('plan-alimentacion.pdf');
 
 
 

@@ -22,6 +22,7 @@ use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
 use App\Models\UnidadesMedidasPorComida;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PlanAlimentacionController extends Controller
 {
@@ -234,6 +235,14 @@ class PlanAlimentacionController extends Controller
 
     }
 
+    public function pdf($id){
 
+        $plan = PlanAlimentaciones::find($id);
+        $detallesPlan = DetallePlanAlimentaciones::where('plan_alimentacion_id', $plan->id)->get();
+        $alimentos = Alimento::all();
+        $comidas = Comida::all();
+        $pdf = Pdf::loadView('plan-alimentacion.pdf', compact('plan','detallesPlan','alimentos','comidas'));
+        return $pdf->stream();
+    }
 
 }

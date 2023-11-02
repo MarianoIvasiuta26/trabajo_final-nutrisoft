@@ -376,6 +376,17 @@
                     </div>
                 </div>
             </div>
+            <div class="float-left">
+                <div class="row">
+                    <div class="col">
+                        <a href="{{ route('plan-alimentacion.pdf', $planGenerado->id) }}" target="_blank" class="btn btn-secondary">
+                            <i class="bi bi-printer"></i>
+                            Imprimir
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 

@@ -42,8 +42,16 @@
                                     <form action="{{ route('plan-alimentacion.show', $plan->id) }}" method="GET" style="display: inline-block;">
                                         @csrf
 
-                                        <button class="btn btn-primary btn-sm" type="submit">Ver</button>
+                                        <button class="btn btn-primary btn-sm" type="submit">
+                                            <i class="bi bi-eye"></i>
+                                            Ver
+                                        </button>
                                     </form>
+
+                                    <a href="{{ route('plan-alimentacion.pdf', $plan->id) }}" target="_blank" class="btn btn-secondary btn-sm">
+                                        <i class="bi bi-printer"></i>
+                                        Imprimir
+                                    </a>
                                 </td>
                             </tr>
                         @endif
@@ -61,7 +69,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 @stop
 
