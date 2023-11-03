@@ -44,4 +44,16 @@ class Alimento extends Model
         return $this->hasMany('App\Models\AlimentoPorTipoDeDieta');
     }
 
+    public function alimentosProhibidosAlergias(){
+        return $this->hasMany('App\Models\AlimentosProhibidosAlergia');
+    }
+
+    public function alimentosProhibidosIntolerancias(){
+        return $this->hasMany('App\Models\AlimentosProhibidosIntolerancia');
+    }
+
+    public function alimentosProhibidosPatologias(){
+        return $this->hasMany('App\Models\AlimentosProhibidosPatologia');
+    }
+
 }
