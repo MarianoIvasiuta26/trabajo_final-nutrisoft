@@ -434,6 +434,11 @@ return [
                             'icon' =>'fas fa-fw fa-file-medical',
                             'route'  => 'gestion-patologias.create',
                         ],
+                        [
+                            'text' => 'Alimentos prohibidos',
+                            'icon' =>'fas fa-fw fa-ban',
+                            'route'  => 'prohibiciones-patologias.create',
+                        ],
                     ],
                 ],
                 [
@@ -449,6 +454,11 @@ return [
                             'text' => 'Nueva Alergia',
                             'icon' =>'fas fa-fw fa-file-medical',
                             'route'  => 'gestion-alergias.create',
+                        ],
+                        [
+                            'text' => 'Alimentos prohibidos',
+                            'icon' =>'fas fa-fw fa-ban',
+                            'route'  => 'prohibiciones-alergias.create',
                         ],
                     ],
                 ],
@@ -482,6 +492,11 @@ return [
                             'icon' =>'fas fa-fw fa-file-medical',
                             'route'  => 'gestion-intolerancias.create',
                         ],
+                        [
+                            'text' => 'Alimentos prohibidos',
+                            'icon' =>'fas fa-fw fa-ban',
+                            'route'  => 'prohibiciones-intolerancias.store',
+                        ],
                     ],
                 ],
                 [
@@ -500,6 +515,7 @@ return [
                         ],
                     ],
                 ],
+
             ],
 
         ],

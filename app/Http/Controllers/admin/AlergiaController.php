@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Alimento;
+use App\Models\AlimentosProhibidosAlergia;
 use App\Models\Paciente\Alergia;
 use App\Models\Prohibiciones;
 use Illuminate\Http\Request;
