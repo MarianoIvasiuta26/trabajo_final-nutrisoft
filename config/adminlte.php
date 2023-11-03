@@ -495,7 +495,7 @@ return [
                         [
                             'text' => 'Alimentos prohibidos',
                             'icon' =>'fas fa-fw fa-ban',
-                            'route'  => 'prohibiciones-intolerancias.store',
+                            'route'  => 'prohibiciones-intolerancias.create',
                         ],
                     ],
                 ],

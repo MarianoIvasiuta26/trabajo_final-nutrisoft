@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Alimentos prohibidos en Alergias')
+@section('title', 'Alimentos prohibidos en Patologias')
 
 @section('content_header')
-    <h1>Alimentos prohibidos en Alergias</h1>
+    <h1>Alimentos prohibidos en Patologias</h1>
 @stop
 
 @section('content')
@@ -11,7 +11,7 @@
 
     <div class="card card-dark">
         <div class="card-header">
-            <h5>Alimentos prohibidos en Alergias</h5>
+            <h5>Alimentos prohibidos en Patologias</h5>
         </div>
 
         <div class="card-body">

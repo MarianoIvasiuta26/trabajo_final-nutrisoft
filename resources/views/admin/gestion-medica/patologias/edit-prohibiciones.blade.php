@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Alimentos prohibidos en Alergias')
+@section('title', 'Editar prohibición en Patologias')
 
 @section('content_header')
-    <h1>Alimentos prohibidos en Alergias</h1>
+    <h1>Alimentos prohibidos en Patologias</h1>
 @stop
 
 @section('content')
@@ -11,38 +11,38 @@
 
     <div class="card card-dark">
         <div class="card-header">
-            <h5>Alimentos prohibidos en Alergias</h5>
+            <h5>Alimentos prohibidos en Patologias</h5>
         </div>
 
         <div class="card-body">
 
-            <form action="{{route('prohibiciones-intolerancias.store')}}" method="POST">
+            <form action="{{route('prohibiciones-patologias.update', $prohibicion->id)}}" method="POST">
                 @csrf
+                @method('PUT')
 
                 <div class="row">
                     <div class="col-md-6">
                         <h6>Selecciona un Alimento:</h6>
-                        <select name="alimentos[]" class="form-select" id="alimentos" data-placeholder="Alimentos..." multiple>
+                        <select name="alimentos" class="form-select" id="alimentos" data-placeholder="Alimentos...">
                             <option value="">Selecciona un alimento</option>
                             @foreach ($alimentos as $alimento)
-                                <option @if(old('alimento_id', null) == $alimento->id) selected @endif value="{{ $alimento->id }}">{{ $alimento->alimento }}</option>
+                                <option @if($alimento->id == $alimentoSeleccionado->id) selected @endif value="{{ $alimento->id }}">{{ $alimento->alimento }}</option>
                             @endforeach
                         </select>
-
-                        @error('alimento_id')
+                        @error('alimentos')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
 
                     <div class="col-md-6">
                         <h6>Selecciona una intolerancia:</h6>
-                        <select name="intolerancias[]" class="form-select" id="intolerancias" data-placeholder="Intolerancias..." multiple>
+                        <select name="patologias" class="form-select" id="patologias" data-placeholder="Patologias...">
                             <option value="">Ninguna</option>
-                            @foreach ($intolerancias as $intolerancia)
-                                <option value="{{$intolerancia->id}}">{{$intolerancia->intolerancia}}</option>
+                            @foreach ($patologias as $patologia)
+                                <option @if($patologia->id == $patologiaSeleccionada->id) selected @endif value="{{$patologia->id}}">{{$patologia->patologia}}</option>
                             @endforeach
                         </select>
-                        @error('intolerancias')
+                        @error('patologias')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
@@ -52,66 +52,15 @@
                 <div class="row mt-3">
                     <div class="col">
                         <div class="float-right">
-                            <button type="button" class="btn btn-success asociar-button">Prohibir alimento en intolerancia</button>
+                            <a href="{{route('prohibiciones-patologias.create')}}" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Volver</a>
+
+                            <button type="button" class="btn btn-success asociar-button">Guardar</button>
+
                         </div>
                     </div>
                 </div>
 
             </form>
-            <div class="mt-4">
-                <h5>Prohibiciones Actuales:</h5>
-                <table class="table table-dark" id="prohibiciones" >
-                    <thead>
-                        <tr>
-                            <th>Alimento</th>
-                            <th>Tipo de intolerancia</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($prohibiciones as $prohibido)
-                            <tr>
-                                <td>
-                                    @foreach ($alimentos as $alimento)
-                                        @if ($alimento->id == $prohibido->alimento_id)
-                                            {{ $alimento->alimento }}
-                                        @endif
-                                    @endforeach
-                                </td>
-
-                                <td>
-                                    @foreach ($intolerancias as $intolerancia)
-                                        @if ($intolerancia->id == $prohibido->intolerancia_id)
-                                            {{ $intolerancia->intolerancia }}
-                                        @endif
-                                    @endforeach
-                                </td>
-
-                                <td>
-                                    <div>
-                                        <form action="{{ route('prohibiciones-intolerancias.edit', $prohibido->id) }}" method="GET"style="display: inline;">
-                                            @csrf
-                                            <button type="submit" class="btn btn-warning">
-                                                <span class="far fa-edit"></span>
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('prohibiciones-intolerancias.destroy', $prohibido->id) }}" method="POST" style="display: inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="btn btn-danger delete-button">
-                                                <span class="far fa-trash-alt"></span>
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                </td>
-                            </tr>
-                        @empty
-
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 
@@ -169,29 +118,6 @@
             closeOnSelect: false,
         } );
 
-        $(document).ready(function(){
-            $('#prohibiciones').DataTable({
-                responsive: true,
-                autoWidth: false,
-                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
-                "language": {
-                    "lengthMenu": "Mostrar _MENU_ prohibiciones por página",
-                    "zeroRecords": "No se encontró ninguna prohibición",
-                    "info": "Mostrando la página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay prohibiciones",
-                    "infoFiltered": "(filtrado de _MAX_ prohibiciones totales)",
-                    "search": "Buscar:",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    },
-
-                }
-            });
-        });
-
         @if (session('success'))
             Swal.fire({
                 icon: 'success',
@@ -229,11 +155,11 @@
                 button.addEventListener('click', function () {
                     // Muestra un SweetAlert de confirmación
                     swalWithBootstrapButtons.fire({
-                        title: '¿Estás seguro de prohibir el alimento a las alergias seleccionadas?',
+                        title: '¿Estás seguro de editar la prohibicón para la patologiai?',
                         text: 'Luego no se recomendará este alimento en la dieta de los pacientes con estas alergias.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, prohibir alimento.',
+                        confirmButtonText: 'Sí, editar prohibición.',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -247,23 +173,24 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
-            const deleteButtons = document.querySelectorAll('.delete-button');
+            const deleteButtons = document.querySelectorAll('.volver-button');
 
             // Agrega un controlador de clic a cada botón de eliminar
             deleteButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
                     // Muestra un SweetAlert de confirmación
                     swalWithBootstrapButtons.fire({
-                        title: '¿Estás seguro?',
-                        text: 'Esta acción eliminará el alimento recomendado a la dieta.',
+                        title: '¿Estás seguro de volver a la vista principal d elas prohibiciones?',
+                        text: '',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, eliminar',
+                        confirmButtonText: 'Sí, volver',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
-                            button.closest('form').submit();
+                            const form = button.closest('form');
+                            form.submit();form = document.querySelector('#volver-form');
                         }
                     });
                 });

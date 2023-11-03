@@ -81,8 +81,16 @@ class ProhibicionesAlergiaController extends Controller
      */
     public function edit($id)
     {
-        //
+        $prohibicion = AlimentosProhibidosAlergia::find($id);
+
+        $alergias = Alergia::all();
+        $alimentos = Alimento::all();
+        $alergiaSeleccionada = Alergia::where('id',$prohibicion->alergia_id)->first();
+        $alimentoSeleccionado = Alimento::Where('id', $prohibicion->alimento_id)->first();
+
+        return view('admin.gestion-medica.alergias.edit-prohibiciones', compact('prohibicion','alimentos','alergias', 'alergiaSeleccionada', 'alimentoSeleccionado'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -93,7 +101,27 @@ class ProhibicionesAlergiaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $prohibicion = AlimentosProhibidosAlergia::find($id);
+
+        if($prohibicion){
+            $request->validate([
+                'alimento' => ['required'],
+                'alergia' => ['required']
+            ]);
+
+            $alergia = $request->input('alergia');
+            $alimento = $request->input('alimento');
+
+            $prohibicion->update([
+                'alimento_id' => $alimento,
+                'alergia_id' => $alergia
+            ]);
+
+            return redirect()->route('prohibiciones-alergias.create')->with('success','¡Prohibición editada correctamente!');
+
+        }else{
+            return redirect()->back()->with('error', 'No se puedo editar la prohibición');
+        }
     }
 
     /**

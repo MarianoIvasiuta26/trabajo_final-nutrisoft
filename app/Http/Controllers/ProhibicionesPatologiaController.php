@@ -80,7 +80,14 @@ class ProhibicionesPatologiaController extends Controller
      */
     public function edit($id)
     {
-        //
+        $prohibicion = AlimentosProhibidosPatologia::find($id);
+
+        $patologias = Patologia::all();
+        $alimentos = Alimento::all();
+        $patologiaSeleccionada = Patologia::where('id',$prohibicion->patologia_id)->first();
+        $alimentoSeleccionado = Alimento::Where('id', $prohibicion->alimento_id)->first();
+
+        return view('admin.gestion-medica.patologias.edit-prohibiciones', compact('prohibicion','alimentos','patologias', 'patologiaSeleccionada', 'alimentoSeleccionado'));
     }
 
     /**
@@ -92,7 +99,27 @@ class ProhibicionesPatologiaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $prohibicion = AlimentosProhibidosPatologia::find($id);
+
+        if($prohibicion){
+            $request->validate([
+                'alimentos' => ['required'],
+                'patologias' => ['required']
+            ]);
+
+            $patologia = $request->input('patologias');
+            $alimento = $request->input('alimentos');
+
+            $prohibicion->update([
+                'alimento_id' => $alimento,
+                'patologia_id' => $patologia
+            ]);
+
+            return redirect()->route('prohibiciones-patologias.create')->with('success','¡Prohibición editada correctamente!');
+
+        }else{
+            return redirect()->back()->with('error', 'No se puedo editar la prohibición');
+        }
     }
 
     /**

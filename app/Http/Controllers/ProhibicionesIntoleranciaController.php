@@ -29,8 +29,8 @@ class ProhibicionesIntoleranciaController extends Controller
     {
         $alimentos = Alimento::all();
         $intolerancias = Intolerancia::all();
-        $prohiciones = AlimentosProhibidosIntolerancia::all();
-        return view('admin.gestion-medica.intolerancias.alimentos-prohibidos', compact('alimentos','intolerancias','prohiciones'));
+        $prohibiciones = AlimentosProhibidosIntolerancia::all();
+        return view('admin.gestion-medica.intolerancias.alimentos-prohibidos', compact('alimentos','intolerancias','prohibiciones'));
     }
 
     /**
@@ -80,7 +80,13 @@ class ProhibicionesIntoleranciaController extends Controller
      */
     public function edit($id)
     {
-        //
+        $prohibicion = AlimentosProhibidosIntolerancia::find($id);
+        $alimentos = Alimento::all();
+        $intolerancias = Intolerancia::all();
+        $intoleranciaSeleccionada = Intolerancia::where('id',$prohibicion->intolerancia_id)->first();
+        $alimentoSeleccionado = Alimento::Where('id', $prohibicion->alimento_id)->first();
+
+        return view('admin.gestion-medica.intolerancias.edit-prohibiciones', compact('prohibicion','alimentos','intolerancias', 'intoleranciaSeleccionada', 'alimentoSeleccionado'));
     }
 
     /**
@@ -92,7 +98,28 @@ class ProhibicionesIntoleranciaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $prohibicion = AlimentosProhibidosIntolerancia::find($id);
+
+        if($prohibicion){
+            $request->validate([
+                'alimentos' => ['required'],
+                'intolerancias' => ['required']
+            ]);
+
+            $intolerancia = $request->input('intolerancias');
+            $alimento = $request->input('alimentos');
+
+            $prohibicion->update([
+                'alimento_id' => $alimento,
+                'intolerancia_id' => $intolerancia
+            ]);
+
+            return redirect()->route('prohibiciones-intolerancias.create')->with('success','¡Prohibición editada correctamente!');
+
+        }else{
+            return redirect()->back()->with('error', 'No se puedo editar la prohibición');
+        }
+
     }
 
     /**
