@@ -292,97 +292,34 @@ class GestionConsultasController extends Controller
         $alturaMetro = $consulta->altura_actual / 100;
         $gastoEnergeticoBasal = 0;
 
+        //Llamamos a la función para calcular el GEB del paciente
+        $resultadoGEB = $this->determinarGEB($paciente->edad, $paciente->sexo, $consulta->peso_Actual, $consulta->altura_actual, $alturaMetro);
+        $gastoEnergeticoBasal = $resultadoGEB['geb'];
+
+        //Comenzamos a realizar la descripción del plan de alimentación
+        $descripcionPlan = '';
         //Si el IMC es menor a 18.5, el paciente está bajo de peso
         //Dieta HIPERCALÓRICA
         if($imc < 18.50){
             //Bajo peso
+            $descripcionPlan = 'Bajo Peso. Dieta Hipercalórica. ';
             if($imc < 16){
                 //Delgadez severa
+                $descripcionPlan = 'Bajo Peso. Dieta Hipercalórica. Delgadez severa. ';
             }else if($imc >= 16 && $imc <= 16.99){
                 //Delgadez moderada
+                $descripcionPlan = 'Bajo Peso. Dieta Hipercalórica. Delgadez moderada. ';
             }else if($imc >= 17 && $imc <= 18.49){
                 //Delgadez aceptable
+                $descripcionPlan = 'Bajo Peso. Dieta Hipercalórica. Delgadez aceptable. ';
             }
         }
 
         //Si el IMC está entre 18.5 y 24.99, el paciente está normal
         //IMC normal -> Dieta NORMOCALÓRICA
         if($imc >= 18.5 && $imc <= 24.99){
-            //Usamos la fórmula de Mifflin St. Jeor (No recomendable en pacientes menores de 18 años) para calcular el gasto energético basal
-
-            if($paciente->edad > 18){
-                if($paciente->sexo == 'Masculino'){
-                    $gastoEnergeticoBasal = (10 * $consulta->peso_actual) + (6.25 * $consulta->altura_actual) - (5 * $paciente->edad) + 5;
-                }else{
-                    $gastoEnergeticoBasal = (10 * $consulta->peso_actual) + (6.25 * $consulta->altura_actual) - (5 * $paciente->edad) - 161;
-                }
-            }else if($paciente->edad < 18){
-                if($paciente->edad < 3){
-                    //Usamos fórmula de Schofield
-
-                    if($paciente->sexo == 'Masculino'){
-                        $gastoEnergeticoBasalMj = (0.0007 * $consulta->peso_actual) + (6.349 * $alturaMetro) - 2.584; //en Mj
-
-                        //Pasamos de Mj a kj
-                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
-
-                        //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
-
-                    }else if ($paciente->sexo == 'Femenino'){
-                        $gastoEnergeticoBasalMj = (0.068 * $consulta->peso_actual) + (4.281 * $alturaMetro) - 1.730;
-
-                        //Pasamos de Mj a kj
-                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
-
-                        //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
-                    }
-                }else if($paciente->edad >= 3 && $paciente->edad < 10){
-                    //Usamos fórmula de Schofield
-
-                    if($paciente->sexo == 'Masculino'){
-                        $gastoEnergeticoBasalMj = (0.082 * $consulta->peso_actual) + (0.545 * $alturaMetro) - 1.736;
-
-                        //Pasamos de Mj a kj
-                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
-
-                        //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
-
-                    }else if($paciente->sexo == 'Femenino'){
-                        $gastoEnergeticoBasalMj = (0.071 * $consulta->peso_actual) + (0.677 * $alturaMetro) - 1.553;
-
-                        //Pasamos de Mj a kj
-                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
-
-                        //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
-                    }
-                }else if($paciente->edad >= 11 && $paciente->edad <18){
-                    //Usamos fórmula de Schofield
-
-                    if($paciente->sexo == 'Masculino'){
-                        $gastoEnergeticoBasalMj = (0.068 * $consulta->peso_actual) + (0.574 * $alturaMetro) - 2.157;
-
-                        //Pasamos de Mj a kj
-                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
-
-                        //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
-
-                    }else if($paciente->sexo == 'Femenino'){
-                        $gastoEnergeticoBasalMj= (0.035 * $consulta->peso_actual) + (1.9484 * $alturaMetro) - 0.837;
-
-                        //Pasamos de Mj a kj
-                        $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
-
-                        //Pasamos de kj a kcal
-                        $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
-                    }
-                }
-            }
-
+            //Normal
+            $descripcionPlan = 'Peso Normal. Dieta Normocalórica. ';
         }
 
         //Si el IMC es mayor a 25, el paciente tiene sobrepeso
@@ -391,12 +328,16 @@ class GestionConsultasController extends Controller
             //Sobrepeso
             if($imc >= 25 && $imc <= 29.99){
                 //Preobesidad
+                $descripcionPlan = 'Sobrepeso. Dieta Hipocalórica. Preobesidad. ';
             }else if($imc >= 30 && $imc <= 34.99){
                 //Obesidad grado 1
+                $descripcionPlan = 'Sobrepeso. Dieta Hipocalórica. Obesidad grado 1. ';
             }else if($imc >= 35 && $imc <= 39.99){
                 //Obesidad grado 2
+                $descripcionPlan = 'Sobrepeso. Dieta Hipocalórica. Obesidad grado 2. ';
             }else if($imc >= 40){
                 //Obesidad grado 3 o mórbida
+                $descripcionPlan = 'Sobrepeso. Dieta Hipocalórica. Obesidad grado 3 o mórbida. ';
             }
         }
 
@@ -407,12 +348,15 @@ class GestionConsultasController extends Controller
 
         //Verificamos cual es el objetivo de salud del paciente
         if($historiaClinica->objetivo_salud == 'Adelgazar'){
-            $gastoEnergeticoTotal = $gastoEnergeticoTotal - 500;
-        } else if ($historiaClinica->objetivo_salud == 'Ganar masa muscular'){
-            $gastoEnergeticoTotal = $gastoEnergeticoTotal + 500;
-        } else if ($historiaClinica->objetivo_salud == 'Mantener peso'){
-            $gastoEnergeticoTotal = $gastoEnergeticoTotal;
+            $gastoEnergeticoTotal -= 500;
         }
+
+        if ($historiaClinica->objetivo_salud == 'Ganar masa muscular'){
+            $gastoEnergeticoTotal += 500;
+        }
+
+        //Agregamos esto a la descripción del plan.
+        $descripcionPlan .= 'Gasto energético total: ' . $gastoEnergeticoTotal ;
 
         //Determinación de gramos de proteínas, carbohidratos y lípidos (Adultos)
         $resultadoNutriente = $this->determinacionNutrientes($gastoEnergeticoTotal, $paciente->edad);
@@ -420,6 +364,10 @@ class GestionConsultasController extends Controller
         $carbohidratosRecomendados = $resultadoNutriente['carbohidratos'];
         $lipidosRecomendados = $resultadoNutriente['lipidos'];
         $proteinasRecomendadas = $resultadoNutriente['proteinas'];
+
+        //Agregamos esto a la descripción del plan.
+        $descripcionPlan .= '. Carbohidratos Diarios: ' . $carbohidratosRecomendados . '. Lípidos diarios: ' . $lipidosRecomendados . '. Proteínas diarias: ' . $proteinasRecomendadas;
+        $descripcionPlan = substr($descripcionPlan, 0, 255);
 
         //Evaluamos el porcentaje necesario por grupo de alimentos (Según Guia Argentina)
         $resultadoEleccionAlimentos = $this->porcentajeAlimentos($gastoEnergeticoTotal);
@@ -446,8 +394,6 @@ class GestionConsultasController extends Controller
             $alimentosRecomendadosVerduras,
         );
 
-        //dd($imc, $consulta->peso_actual, $consulta->altura_actual, $paciente->edad, $gastoEnergeticoTotal, $gastoEnergeticoBasal, $alimentosRecomendados, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas,  $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas);
-
         $alimentos = Alimento::All();
 
         //Obtenemos el plan generado en consultas anteriores para el paciente y lo volvemos inactivo.
@@ -462,7 +408,7 @@ class GestionConsultasController extends Controller
         $planAlimentacion = PlanAlimentaciones::create([
             'consulta_id' => $consulta->id, // Asocia el plan a la consulta
             'paciente_id' => $paciente->id, // Asocia el plan al paciente
-            'descripcion' => 'Descripción del plan',
+            'descripcion' => $descripcionPlan,
             'estado' => 2, //Estado esperando confirmación del profesional
         ]);
 
@@ -494,8 +440,6 @@ class GestionConsultasController extends Controller
             }
         }
 
-        //dd($alimentosRecomendadosVerduras, $planAlimentacion, $alimentosRecomendados);
-
         return [
             'paciente' => $paciente,
             'historiaClinica' => $historiaClinica,
@@ -510,6 +454,99 @@ class GestionConsultasController extends Controller
             'carbohidratosRecomendados' => $carbohidratosRecomendados,
             'alimentosRecomendadosFrutas' => $alimentosRecomendadosFrutas,
             'alimentosRecomendadosVerduras' => $alimentosRecomendadosVerduras,
+        ];
+    }
+
+    public function determinarGEB($edad, $sexo, $peso, $alturaCM, $alturaMetro){
+
+        $gastoEnergeticoBasal = 0;
+
+        //Usamos la fórmula de Mifflin St. Jeor (No recomendable en pacientes menores de 18 años) para calcular el gasto energético basal
+
+        if($edad > 18){
+            if($sexo == 'Masculino'){
+                $gastoEnergeticoBasal = (10 * $peso) + (6.25 * $alturaCM) - (5 * $edad) + 5;
+            }
+
+            if($sexo == 'Femenino'){
+                $gastoEnergeticoBasal = (10 * $peso) + (6.25 * $alturaCM) - (5 * $edad) - 161;
+            }
+        }
+
+        //Usamos fórmula de Schofield
+        if($edad < 18){
+            if($edad < 3){
+                if($sexo == 'Masculino'){
+                    $gastoEnergeticoBasalMj = (0.0007 * $peso) + (6.349 * $alturaMetro) - 2.584; //en Mj
+
+                    //Pasamos de Mj a kj
+                    $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
+
+                    //Pasamos de kj a kcal
+                    $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
+
+                }
+
+                if ($sexo == 'Femenino'){
+                    $gastoEnergeticoBasalMj = (0.068 * $peso) + (4.281 * $alturaMetro) - 1.730;
+
+                    //Pasamos de Mj a kj
+                    $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
+
+                    //Pasamos de kj a kcal
+                    $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
+                }
+            }else if($edad >= 3 && $edad < 10){
+                //Usamos fórmula de Schofield
+
+                if($sexo == 'Masculino'){
+                    $gastoEnergeticoBasalMj = (0.082 * $peso) + (0.545 * $alturaMetro) - 1.736;
+
+                    //Pasamos de Mj a kj
+                    $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
+
+                    //Pasamos de kj a kcal
+                    $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
+
+                }
+
+                if($sexo == 'Femenino'){
+                    $gastoEnergeticoBasalMj = (0.071 * $peso) + (0.677 * $alturaMetro) - 1.553;
+
+                    //Pasamos de Mj a kj
+                    $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
+
+                    //Pasamos de kj a kcal
+                    $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
+                }
+            }else if($edad >= 11 && $edad <18){
+                //Usamos fórmula de Schofield
+
+                if($sexo == 'Masculino'){
+                    $gastoEnergeticoBasalMj = (0.068 * $peso) + (0.574 * $alturaMetro) - 2.157;
+
+                    //Pasamos de Mj a kj
+                    $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
+
+                    //Pasamos de kj a kcal
+                    $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
+
+                }
+
+                if($sexo == 'Femenino'){
+                    $gastoEnergeticoBasalMj= (0.035 * $peso) + (1.9484 * $alturaMetro) - 0.837;
+
+                    //Pasamos de Mj a kj
+                    $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
+
+                    //Pasamos de kj a kcal
+                    $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
+                }
+            }
+        }
+
+        return [
+            'geb' => $gastoEnergeticoBasal,
         ];
 
     }
