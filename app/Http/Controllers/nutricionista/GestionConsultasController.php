@@ -5,6 +5,9 @@ namespace App\Http\Controllers\nutricionista;
 use App\Http\Controllers\Controller;
 use App\Models\Alimento;
 use App\Models\AlimentoPorTipoDeDieta;
+use App\Models\AlimentosProhibidosAlergia;
+use App\Models\AlimentosProhibidosIntolerancia;
+use App\Models\AlimentosProhibidosPatologia;
 use App\Models\AlimentosRecomendadosPorDieta;
 use App\Models\Comida;
 use App\Models\Consulta;
@@ -663,22 +666,10 @@ class GestionConsultasController extends Controller
         $comidas = Comida::all();
         $unidadesMedidas = UnidadesMedidasPorComida::all();
 
-        //Buscamos datos médicos del paciente
-        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinicaId)->get();
-        //Cirugías del paciente
-        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinicaId)->get();
-        //Anamnesis alimentaria del paciente
-        $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinicaId)->get();
         //ValoresNutricionales y nutrientes
         $nutrientesKcal = Nutriente::where('nombre_nutriente', 'Valor energético')->first();
         $ValoresNutricionales = ValorNutricional::all();
         $nutrientes = Nutriente::all();
-
-        //Obtenemos datos necesarios
-        $alergias = Alergia::all();
-        $patologias = Patologia::all();
-        $intolerancias = Intolerancia::all();
-        $cirugias = Cirugia::all();
 
         //Obtenemos los alimentos que debe consumir el paciente según su porcentaje
         //Tenemos en cuenta los datos médicos (Si tiene o no patologías, alergias etc.). Si tiene, se le recomienda alimentos que no le hagan mal.
@@ -783,7 +774,7 @@ class GestionConsultasController extends Controller
                 $lipidoFrutasDesayuno = (($lipidosDesayuno * 9) * ($caloriasTotalesFrutas/$cantComidasFrutas))/9; //Gramos totales de frutas en desayuno
                 $proteinaFrutasDesayuno = (($proteinasDesayuno * 4) * ($caloriasTotalesFrutas/$cantComidasFrutas))/4; //Gramos totales de frutas en desayuno
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaDesayuno, $grupoAlimentoFruta, $carbohidratoFrutasDesayuno, $lipidoFrutasDesayuno, $proteinaFrutasDesayuno);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaDesayuno, $grupoAlimentoFruta, $carbohidratoFrutasDesayuno, $lipidoFrutasDesayuno, $proteinaFrutasDesayuno);
 
                 $frutasDesayuno = array_merge($frutasDesayuno, $resultados['alimentosRecomendados']);
 
@@ -797,7 +788,7 @@ class GestionConsultasController extends Controller
                 $lipidoFrutasMediaManiana = (($lipidosMediaManiana * 9) * ($caloriasTotalesFrutas/$cantComidasFrutas))/9; //Gramos totales de frutas en media mañana
                 $proteinaFrutasMediaManiana = (($proteinasMediaManiana * 4) * ($caloriasTotalesFrutas/$cantComidasFrutas))/4; //Gramos totales de frutas en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMediaManiana, $grupoAlimentoFruta, $carbohidratoFrutasMediaManiana, $lipidoFrutasMediaManiana, $proteinaFrutasMediaManiana);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMediaManiana, $grupoAlimentoFruta, $carbohidratoFrutasMediaManiana, $lipidoFrutasMediaManiana, $proteinaFrutasMediaManiana);
 
                 $frutasMediaManiana = array_merge($frutasMediaManiana, $resultados['alimentosRecomendados']);
 
@@ -811,7 +802,7 @@ class GestionConsultasController extends Controller
                 $lipidoFrutasAlmuerzo = (($lipidosAlmuerzo * 9) * ($caloriasTotalesFrutas/$cantComidasFrutas))/9; //Gramos totales de frutas en media mañana
                 $proteinaFrutasAlmuerzo = (($proteinasAlmuerzo * 4) * ($caloriasTotalesFrutas/$cantComidasFrutas))/4; //Gramos totales de frutas en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoFruta, $carbohidratoFrutasAlmuerzo, $lipidoFrutasAlmuerzo, $proteinaFrutasAlmuerzo);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoFruta, $carbohidratoFrutasAlmuerzo, $lipidoFrutasAlmuerzo, $proteinaFrutasAlmuerzo);
 
                 $frutasAlmuerzo = array_merge($frutasAlmuerzo, $resultados['alimentosRecomendados']);
 
@@ -825,7 +816,7 @@ class GestionConsultasController extends Controller
                 $lipidoFrutasMediaTarde = (($lipidosMediaTarde * 9) * ($caloriasTotalesFrutas/$cantComidasFrutas))/9; //Gramos totales de frutas en media mañana
                 $proteinaFrutasMediaTarde = (($proteinasMediaTarde * 4) * ($caloriasTotalesFrutas/$cantComidasFrutas))/4; //Gramos totales de frutas en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMerienda, $grupoAlimentoFruta, $carbohidratoFrutasMediaTarde, $lipidoFrutasMediaTarde, $proteinaFrutasMediaTarde);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMerienda, $grupoAlimentoFruta, $carbohidratoFrutasMediaTarde, $lipidoFrutasMediaTarde, $proteinaFrutasMediaTarde);
 
                 $frutasMerienda = array_merge($frutasMerienda, $resultados['alimentosRecomendados']);
             }
@@ -838,7 +829,7 @@ class GestionConsultasController extends Controller
                 $lipidoFrutasCena = (($lipidosCena * 9) * ($caloriasTotalesFrutas/$cantComidasFrutas))/9; //Gramos totales de frutas en media mañana
                 $proteinaFrutasCena = (($proteinasCena * 4) * ($caloriasTotalesFrutas/$cantComidasFrutas))/4; //Gramos totales de frutas en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaCena, $grupoAlimentoFruta, $carbohidratoFrutasCena, $lipidoFrutasCena, $proteinaFrutasCena);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaCena, $grupoAlimentoFruta, $carbohidratoFrutasCena, $lipidoFrutasCena, $proteinaFrutasCena);
 
                 $frutasCena = array_merge($frutasCena, $resultados['alimentosRecomendados']);
             }
@@ -870,7 +861,7 @@ class GestionConsultasController extends Controller
                 $lipidoVerdurasDesayuno = (($lipidosDesayuno * 9) * ($caloriasTotalesVerduras/$cantComidasVerduras))/9; //Gramos totales de verduras en desayuno
                 $proteinaVerdurasDesayuno = (($proteinasDesayuno * 4) * ($caloriasTotalesVerduras/$cantComidasVerduras))/4; //Gramos totales de verduras en desayuno
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaDesayuno, $grupoAlimentoVerdura, $carbohidratoVerdurasDesayuno, $lipidoVerdurasDesayuno, $proteinaVerdurasDesayuno);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaDesayuno, $grupoAlimentoVerdura, $carbohidratoVerdurasDesayuno, $lipidoVerdurasDesayuno, $proteinaVerdurasDesayuno);
 
                 $verdurasDesayuno = array_merge($verdurasDesayuno, $resultados['alimentosRecomendados']);
 
@@ -884,7 +875,7 @@ class GestionConsultasController extends Controller
                 $lipidoVerdurasMediaManiana = (($lipidosMediaManiana * 9) * ($caloriasTotalesVerduras/$cantComidasVerduras))/9; //Gramos totales de verduras en media mañana
                 $proteinaVerdurasMediaManiana = (($proteinasMediaManiana * 4) * ($caloriasTotalesVerduras/$cantComidasVerduras))/4; //Gramos totales de verduras en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMediaManiana, $grupoAlimentoVerdura, $carbohidratoVerdurasMediaManiana, $lipidoVerdurasMediaManiana, $proteinaVerdurasMediaManiana);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMediaManiana, $grupoAlimentoVerdura, $carbohidratoVerdurasMediaManiana, $lipidoVerdurasMediaManiana, $proteinaVerdurasMediaManiana);
 
                 $verdurasMediaManiana = array_merge($verdurasMediaManiana, $resultados['alimentosRecomendados']);
 
@@ -898,7 +889,7 @@ class GestionConsultasController extends Controller
                 $lipidoVerdurasAlmuerzo = (($lipidosAlmuerzo * 9) * ($caloriasTotalesVerduras/$cantComidasVerduras))/9; //Gramos totales de verduras en media mañana
                 $proteinaVerdurasAlmuerzo = (($proteinasAlmuerzo * 4) * ($caloriasTotalesVerduras/$cantComidasVerduras))/4; //Gramos totales de verduras en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoVerdura, $carbohidratoVerdurasAlmuerzo, $lipidoVerdurasAlmuerzo, $proteinaVerdurasAlmuerzo);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoVerdura, $carbohidratoVerdurasAlmuerzo, $lipidoVerdurasAlmuerzo, $proteinaVerdurasAlmuerzo);
 
                 $verdurasAlmuerzo = array_merge($verdurasAlmuerzo, $resultados['alimentosRecomendados']);
 
@@ -912,7 +903,7 @@ class GestionConsultasController extends Controller
                 $lipidoVerdurasMediaTarde = (($lipidosMediaTarde * 9) * ($caloriasTotalesVerduras/$cantComidasVerduras))/9; //Gramos totales de verduras en media mañana
                 $proteinaVerdurasMediaTarde = (($proteinasMediaTarde * 4) * ($caloriasTotalesVerduras/$cantComidasVerduras))/4; //Gramos totales de verduras en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMerienda, $grupoAlimentoVerdura, $carbohidratoVerdurasMediaTarde, $lipidoVerdurasMediaTarde, $proteinaVerdurasMediaTarde);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMerienda, $grupoAlimentoVerdura, $carbohidratoVerdurasMediaTarde, $lipidoVerdurasMediaTarde, $proteinaVerdurasMediaTarde);
 
                 $verdurasMerienda = array_merge($verdurasMerienda, $resultados['alimentosRecomendados']);
             }
@@ -925,7 +916,7 @@ class GestionConsultasController extends Controller
                 $lipidoVerdurasCena = (($lipidosCena * 9) * ($caloriasTotalesVerduras/$cantComidasVerduras))/9; //Gramos totales de verduras en media mañana
                 $proteinaVerdurasCena = (($proteinasCena * 4) * ($caloriasTotalesVerduras/$cantComidasVerduras))/4; //Gramos totales de verduras en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaCena, $grupoAlimentoVerdura, $carbohidratoVerdurasCena, $lipidoVerdurasCena, $proteinaVerdurasCena);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaCena, $grupoAlimentoVerdura, $carbohidratoVerdurasCena, $lipidoVerdurasCena, $proteinaVerdurasCena);
 
                 $verdurasCena = array_merge($verdurasCena, $resultados['alimentosRecomendados']);
             }
@@ -956,7 +947,7 @@ class GestionConsultasController extends Controller
                 $lipidoLegumbresDesayuno = (($lipidosDesayuno * 9) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/9; //Gramos totales de legumbres en desayuno
                 $proteinaLegumbresDesayuno = (($proteinasDesayuno * 4) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/4; //Gramos totales de legumbres en desayuno
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaDesayuno, $grupoAlimentoLegumbres, $carbohidratoLegumbresDesayuno, $lipidoLegumbresDesayuno, $proteinaLegumbresDesayuno);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaDesayuno, $grupoAlimentoLegumbres, $carbohidratoLegumbresDesayuno, $lipidoLegumbresDesayuno, $proteinaLegumbresDesayuno);
 
                 $legumbresDesayuno = array_merge($legumbresDesayuno, $resultados['alimentosRecomendados']);
 
@@ -970,7 +961,7 @@ class GestionConsultasController extends Controller
                 $lipidoLegumbresMediaManiana = (($lipidosMediaManiana * 9) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/9; //Gramos totales de legumbres en media mañana
                 $proteinaLegumbresMediaManiana = (($proteinasMediaManiana * 4) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/4; //Gramos totales de legumbres en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMediaManiana, $grupoAlimentoLegumbres, $carbohidratoLegumbresMediaManiana, $lipidoLegumbresMediaManiana, $proteinaLegumbresMediaManiana);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMediaManiana, $grupoAlimentoLegumbres, $carbohidratoLegumbresMediaManiana, $lipidoLegumbresMediaManiana, $proteinaLegumbresMediaManiana);
 
                 $legumbresMediaManiana = array_merge($legumbresMediaManiana, $resultados['alimentosRecomendados']);
 
@@ -984,7 +975,7 @@ class GestionConsultasController extends Controller
                 $lipidoLegumbresAlmuerzo = (($lipidosAlmuerzo * 9) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/9; //Gramos totales de legumbres en media mañana
                 $proteinaLegumbresAlmuerzo = (($proteinasAlmuerzo * 4) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/4; //Gramos totales de legumbres en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoLegumbres, $carbohidratoLegumbresAlmuerzo, $lipidoLegumbresAlmuerzo, $proteinaLegumbresAlmuerzo);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoLegumbres, $carbohidratoLegumbresAlmuerzo, $lipidoLegumbresAlmuerzo, $proteinaLegumbresAlmuerzo);
 
                 $legumbresAlmuerzo = array_merge($legumbresAlmuerzo, $resultados['alimentosRecomendados']);
 
@@ -998,7 +989,7 @@ class GestionConsultasController extends Controller
                 $lipidoLegumbresMediaTarde = (($lipidosMediaTarde * 9) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/9; //Gramos totales de legumbres en media mañana
                 $proteinaLegumbresMediaTarde = (($proteinasMediaTarde * 4) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/4; //Gramos totales de legumbres en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMerienda, $grupoAlimentoLegumbres, $carbohidratoLegumbresMediaTarde, $lipidoLegumbresMediaTarde, $proteinaLegumbresMediaTarde);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMerienda, $grupoAlimentoLegumbres, $carbohidratoLegumbresMediaTarde, $lipidoLegumbresMediaTarde, $proteinaLegumbresMediaTarde);
 
                 $legumbresMerienda = array_merge($legumbresMerienda, $resultados['alimentosRecomendados']);
             }
@@ -1011,7 +1002,7 @@ class GestionConsultasController extends Controller
                 $lipidoLegumbresCena = (($lipidosCena * 9) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/9; //Gramos totales de legumbres en media mañana
                 $proteinaLegumbresCena = (($proteinasCena * 4) * ($caloriasTotalesLegumbres/$cantComidasLegumbres))/4; //Gramos totales de legumbres en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaCena, $grupoAlimentoLegumbres, $carbohidratoLegumbresCena, $lipidoLegumbresCena, $proteinaLegumbresCena);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaCena, $grupoAlimentoLegumbres, $carbohidratoLegumbresCena, $lipidoLegumbresCena, $proteinaLegumbresCena);
 
                 $legumbresCena = array_merge($legumbresCena, $resultados['alimentosRecomendados']);
             }
@@ -1045,7 +1036,7 @@ class GestionConsultasController extends Controller
                 $lipidoLecheDesayuno = (($lipidosDesayuno * 9) * ($caloriasLecheTotal/$cantComidasLeche))/9; //Gramos totales de leche en desayuno
                 $proteinaLecheDesayuno = (($proteinasDesayuno * 4) * ($caloriasLecheTotal/$cantComidasLeche))/4; //Gramos totales de leche en desayuno
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaDesayuno, $grupoAlimentoLeche, $carbohidratoLecheDesayuno, $lipidoLecheDesayuno, $proteinaLecheDesayuno);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaDesayuno, $grupoAlimentoLeche, $carbohidratoLecheDesayuno, $lipidoLecheDesayuno, $proteinaLecheDesayuno);
 
                 $lecheDesayuno = array_merge($lecheDesayuno, $resultados['alimentosRecomendados']);
 
@@ -1059,7 +1050,7 @@ class GestionConsultasController extends Controller
                 $lipidoLecheMediaManiana = (($lipidosMediaManiana * 9) * ($caloriasLecheTotal/$cantComidasLeche))/9; //Gramos totales de leche en media mañana
                 $proteinaLecheMediaManiana = (($proteinasMediaManiana * 4) * ($caloriasLecheTotal/$cantComidasLeche))/4; //Gramos totales de leche en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMediaManiana, $grupoAlimentoLeche, $carbohidratoLecheMediaManiana, $lipidoLecheMediaManiana, $proteinaLecheMediaManiana);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMediaManiana, $grupoAlimentoLeche, $carbohidratoLecheMediaManiana, $lipidoLecheMediaManiana, $proteinaLecheMediaManiana);
 
                 $lecheMediaManiana = array_merge($lecheMediaManiana, $resultados['alimentosRecomendados']);
 
@@ -1073,7 +1064,7 @@ class GestionConsultasController extends Controller
                 $lipidoLecheAlmuerzo = (($lipidosAlmuerzo * 9) * ($caloriasLecheTotal/$cantComidasLeche))/9; //Gramos totales de leche en media mañana
                 $proteinaLecheAlmuerzo = (($proteinasAlmuerzo * 4) * ($caloriasLecheTotal/$cantComidasLeche))/4; //Gramos totales de leche en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoLeche, $carbohidratoLecheAlmuerzo, $lipidoLecheAlmuerzo, $proteinaLecheAlmuerzo);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoLeche, $carbohidratoLecheAlmuerzo, $lipidoLecheAlmuerzo, $proteinaLecheAlmuerzo);
 
                 $lecheAlmuerzo = array_merge($lecheAlmuerzo, $resultados['alimentosRecomendados']);
 
@@ -1087,7 +1078,7 @@ class GestionConsultasController extends Controller
                 $lipidoLecheMediaTarde = (($lipidosMediaTarde * 9) * ($caloriasLecheTotal/$cantComidasLeche))/9; //Gramos totales de leche en media mañana
                 $proteinaLecheMediaTarde = (($proteinasMediaTarde * 4) * ($caloriasLecheTotal/$cantComidasLeche))/4; //Gramos totales de leche en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMerienda, $grupoAlimentoLeche, $carbohidratoLecheMediaTarde, $lipidoLecheMediaTarde, $proteinaLecheMediaTarde);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMerienda, $grupoAlimentoLeche, $carbohidratoLecheMediaTarde, $lipidoLecheMediaTarde, $proteinaLecheMediaTarde);
 
                 $lecheMerienda = array_merge($lecheMerienda, $resultados['alimentosRecomendados']);
             }
@@ -1100,7 +1091,7 @@ class GestionConsultasController extends Controller
                 $lipidoLecheCena = (($lipidosCena * 9) * ($caloriasLecheTotal/$cantComidasLeche))/9; //Gramos totales de leche en media mañana
                 $proteinaLecheCena = (($proteinasCena * 4) * ($caloriasLecheTotal/$cantComidasLeche))/4; //Gramos totales de leche en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaCena, $grupoAlimentoLeche, $carbohidratoLecheCena, $lipidoLecheCena, $proteinaLecheCena);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaCena, $grupoAlimentoLeche, $carbohidratoLecheCena, $lipidoLecheCena, $proteinaLecheCena);
 
                 $lecheCena = array_merge($lecheCena, $resultados['alimentosRecomendados']);
             }
@@ -1132,7 +1123,7 @@ class GestionConsultasController extends Controller
                 $lipidoYogurDesayuno = (($lipidosDesayuno * 9) * ($caloriasYogurTotal/$cantComidasYogur))/9; //Gramos totales de yogur en desayuno
                 $proteinaYogurDesayuno = (($proteinasDesayuno * 4) * ($caloriasYogurTotal/$cantComidasYogur))/4; //Gramos totales de yogur en desayuno
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaDesayuno, $grupoAlimentoYogur, $carbohidratoYogurDesayuno, $lipidoYogurDesayuno, $proteinaYogurDesayuno);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaDesayuno, $grupoAlimentoYogur, $carbohidratoYogurDesayuno, $lipidoYogurDesayuno, $proteinaYogurDesayuno);
 
                 $yogurDesayuno = array_merge($yogurDesayuno, $resultados['alimentosRecomendados']);
 
@@ -1146,7 +1137,7 @@ class GestionConsultasController extends Controller
                 $lipidoYogurMediaManiana = (($lipidosMediaManiana * 9) * ($caloriasYogurTotal/$cantComidasYogur))/9; //Gramos totales de yogur en media mañana
                 $proteinaYogurMediaManiana = (($proteinasMediaManiana * 4) * ($caloriasYogurTotal/$cantComidasYogur))/4; //Gramos totales de yogur en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMediaManiana, $grupoAlimentoYogur, $carbohidratoYogurMediaManiana, $lipidoYogurMediaManiana, $proteinaYogurMediaManiana);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMediaManiana, $grupoAlimentoYogur, $carbohidratoYogurMediaManiana, $lipidoYogurMediaManiana, $proteinaYogurMediaManiana);
 
                 $yogurMediaManiana = array_merge($yogurMediaManiana, $resultados['alimentosRecomendados']);
 
@@ -1160,7 +1151,7 @@ class GestionConsultasController extends Controller
                 $lipidoYogurAlmuerzo = (($lipidosAlmuerzo * 9) * ($caloriasYogurTotal/$cantComidasYogur))/9; //Gramos totales de leche en media mañana
                 $proteinaYogurAlmuerzo = (($proteinasAlmuerzo * 4) * ($caloriasYogurTotal/$cantComidasYogur))/4; //Gramos totales de leche en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoYogur, $carbohidratoYogurAlmuerzo, $lipidoYogurAlmuerzo, $proteinaYogurAlmuerzo);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoYogur, $carbohidratoYogurAlmuerzo, $lipidoYogurAlmuerzo, $proteinaYogurAlmuerzo);
 
                 $yogurAlmuerzo = array_merge($yogurAlmuerzo, $resultados['alimentosRecomendados']);
 
@@ -1174,7 +1165,7 @@ class GestionConsultasController extends Controller
                 $lipidoYogurMediaTarde = (($lipidosMediaTarde * 9) * ($caloriasYogurTotal/$cantComidasYogur))/9; //Gramos totales de yogur en media mañana
                 $proteinaYogurMediaTarde = (($proteinasMediaTarde * 4) * ($caloriasYogurTotal/$cantComidasYogur))/4; //Gramos totales de yogur en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMerienda, $grupoAlimentoYogur, $carbohidratoYogurMediaTarde, $lipidoYogurMediaTarde, $proteinaYogurMediaTarde);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMerienda, $grupoAlimentoYogur, $carbohidratoYogurMediaTarde, $lipidoYogurMediaTarde, $proteinaYogurMediaTarde);
 
                 $yogurMerienda = array_merge($yogurMerienda, $resultados['alimentosRecomendados']);
             }
@@ -1187,7 +1178,7 @@ class GestionConsultasController extends Controller
                 $lipidoYogurCena = (($lipidosCena * 9) * ($caloriasYogurTotal/$cantComidasYogur))/9; //Gramos totales de leche en media mañana
                 $proteinaYogurCena = (($proteinasCena * 4) * ($caloriasYogurTotal/$cantComidasYogur))/4; //Gramos totales de leche en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaCena, $grupoAlimentoYogur, $carbohidratoYogurCena, $lipidoYogurCena, $proteinaYogurCena);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaCena, $grupoAlimentoYogur, $carbohidratoYogurCena, $lipidoYogurCena, $proteinaYogurCena);
 
                 $yogurCena = array_merge($yogurCena, $resultados['alimentosRecomendados']);
             }
@@ -1218,7 +1209,7 @@ class GestionConsultasController extends Controller
                 $lipidoQuesoDesayuno = (($lipidosDesayuno * 9) * ($caloriasQuesoTotal/$cantComidasQueso))/9; //Gramos totales de queso en desayuno
                 $proteinaQuesoDesayuno = (($proteinasDesayuno * 4) * ($caloriasQuesoTotal/$cantComidasQueso))/4; //Gramos totales de queso en desayuno
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaDesayuno, $grupoAlimentoQueso, $carbohidratoQuesoDesayuno, $lipidoQuesoDesayuno, $proteinaQuesoDesayuno);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaDesayuno, $grupoAlimentoQueso, $carbohidratoQuesoDesayuno, $lipidoQuesoDesayuno, $proteinaQuesoDesayuno);
 
                 $quesoDesayuno = array_merge($quesoDesayuno, $resultados['alimentosRecomendados']);
 
@@ -1232,7 +1223,7 @@ class GestionConsultasController extends Controller
                 $lipidoQuesoMediaManiana = (($lipidosMediaManiana * 9) * ($caloriasQuesoTotal/$cantComidasQueso))/9; //Gramos totales de queso en media mañana
                 $proteinaQuesoMediaManiana = (($proteinasMediaManiana * 4) * ($caloriasQuesoTotal/$cantComidasQueso))/4; //Gramos totales de queso en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMediaManiana, $grupoAlimentoQueso, $carbohidratoQuesoMediaManiana, $lipidoQuesoMediaManiana, $proteinaQuesoMediaManiana);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMediaManiana, $grupoAlimentoQueso, $carbohidratoQuesoMediaManiana, $lipidoQuesoMediaManiana, $proteinaQuesoMediaManiana);
 
                 $quesoMediaManiana = array_merge($quesoMediaManiana, $resultados['alimentosRecomendados']);
 
@@ -1246,7 +1237,7 @@ class GestionConsultasController extends Controller
                 $lipidoQuesoAlmuerzo = (($lipidosAlmuerzo * 9) * ($caloriasQuesoTotal/$cantComidasQueso))/9; //Gramos totales de queso en media mañana
                 $proteinaQuesoAlmuerzo = (($proteinasAlmuerzo * 4) * ($caloriasQuesoTotal/$cantComidasQueso))/4; //Gramos totales de queso en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoQueso, $carbohidratoQuesoAlmuerzo, $lipidoQuesoAlmuerzo, $proteinaQuesoAlmuerzo);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaAlmuerzo, $grupoAlimentoQueso, $carbohidratoQuesoAlmuerzo, $lipidoQuesoAlmuerzo, $proteinaQuesoAlmuerzo);
 
                 $quesoAlmuerzo = array_merge($quesoAlmuerzo, $resultados['alimentosRecomendados']);
 
@@ -1260,7 +1251,7 @@ class GestionConsultasController extends Controller
                 $lipidoQuesoMediaTarde = (($lipidosMediaTarde * 9) * ($caloriasQuesoTotal/$cantComidasQueso))/9; //Gramos totales de queso en media mañana
                 $proteinaQuesoMediaTarde = (($proteinasMediaTarde * 4) * ($caloriasQuesoTotal/$cantComidasQueso))/4; //Gramos totales de queso en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaMerienda, $grupoAlimentoQueso, $carbohidratoQuesoMediaTarde, $lipidoQuesoMediaTarde, $proteinaQuesoMediaTarde);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaMerienda, $grupoAlimentoQueso, $carbohidratoQuesoMediaTarde, $lipidoQuesoMediaTarde, $proteinaQuesoMediaTarde);
 
                 $quesoMerienda = array_merge($quesoMerienda, $resultados['alimentosRecomendados']);
             }
@@ -1273,7 +1264,7 @@ class GestionConsultasController extends Controller
                 $lipidoQuesoCena = (($lipidosCena * 9) * ($caloriasQuesoTotal/$cantComidasQueso))/9; //Gramos totales de queso en media mañana
                 $proteinaQuesoCena = (($proteinasCena * 4) * ($caloriasQuesoTotal/$cantComidasQueso))/4; //Gramos totales de queso en media mañana
 
-                $resultados = $this->obtenerAlimentosRecomendadosPorComida($tipoDieta->id, $comidaCena, $grupoAlimentoQueso, $carbohidratoQuesoCena, $lipidoQuesoCena, $proteinaQuesoCena);
+                $resultados = $this->obtenerAlimentosRecomendadosPorComida($historiaClinica->id, $tipoDieta->id, $comidaCena, $grupoAlimentoQueso, $carbohidratoQuesoCena, $lipidoQuesoCena, $proteinaQuesoCena);
 
                 $quesoCena = array_merge($quesoCena, $resultados['alimentosRecomendados']);
             }
@@ -1287,6 +1278,9 @@ class GestionConsultasController extends Controller
             );
 
         }
+
+
+
 
         return [
             'frutasRecomendadas' => $frutasRecomendadas,
@@ -1357,13 +1351,59 @@ class GestionConsultasController extends Controller
         return $cantComidas;
     }
 
-    public function obtenerAlimentosRecomendadosPorComida($tipoDietaId, $comida, $grupoAlimento, $carbohidratosTotales, $lipidosTotales, $proteinasTotales) {
+    public function obtenerAlimentosRecomendadosPorComida($historiaClinicaId, $tipoDietaId, $comida, $grupoAlimento, $carbohidratosTotales, $lipidosTotales, $proteinasTotales) {
+
+        $historiaClinica = HistoriaClinica::find($historiaClinicaId);
+        //Obtenemos datos necesarios
+        $alergias = Alergia::all();
+        $patologias = Patologia::all();
+        $intolerancias = Intolerancia::all();
+        $cirugias = Cirugia::all();
+
+        $alimentosProhibidosAlergias = AlimentosProhibidosAlergia::all();
+        $alimentosProhibidosPatologias = AlimentosProhibidosPatologia::all();
+        $alimentosProhibidosIntolerancias = AlimentosProhibidosIntolerancia::all();
+
+        //Buscamos datos médicos del paciente
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->get();
+        //Cirugías del paciente
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
+        //Anamnesis alimentaria del paciente
+        $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->get();
+
         $tipoDieta = TiposDeDieta::find($tipoDietaId);
         $alimentosPorDieta = AlimentoPorTipoDeDieta::where('tipo_de_dieta_id', $tipoDieta->id)->get();
         $valoresNutricionales = ValorNutricional::all();
         $nutrientes = Nutriente::all();
         $unidadesMedidas = UnidadesMedidasPorComida::all();
         $alimentosBuscados = Alimento::where('grupo_alimento_id', $grupoAlimento->id)->get();
+
+        $alimentosProhibidos = [];
+
+         foreach($datosMedicos as $datoMedico){
+            foreach($alergias as $alergia){
+                foreach($alimentosProhibidosAlergias as $prohibido){
+                    if($datoMedico->alergia_id == $alergia->id && $alergia->id == $prohibido->alergia_id){
+                        $alimentosProhibidos[] = $prohibido->alimento_id;
+                    }
+                }
+            }
+
+            foreach($patologias as $patologia){
+                foreach($alimentosProhibidosPatologias as $prohibido){
+                    if($datoMedico->patologia_id == $patologia->id && $patologia->id == $prohibido->patologia_id){
+                        $alimentosProhibidos[] = $prohibido->alimento_id;
+                    }
+                }
+            }
+             foreach($intolerancias as $intolerancia){
+                foreach($alimentosProhibidosIntolerancias as $prohibido){
+                    if($datoMedico->intolerancia_id == $intolerancia->id && $intolerancia->id == $prohibido->intolerancia_id){
+                        $alimentosProhibidos[] = $prohibido->alimento_id;
+                    }
+                }
+            }
+        }
 
         $alimentosRecomendadosComida = [];
         $alimentosRecomendadosPorDieta = AlimentosRecomendadosPorDieta::where('comida_id', $comida->id)->get();
@@ -1373,54 +1413,59 @@ class GestionConsultasController extends Controller
                 if ($alimentoDieta->id == $alimentoRecomendado->alimento_por_dieta_id) {
                     foreach ($alimentosBuscados as $alimento) {
                         if ($alimento->id == $alimentoDieta->alimento_id) {
-                            foreach ($valoresNutricionales as $valorN) {
-                                foreach ($nutrientes as $nutriente) {
-                                    foreach ($unidadesMedidas as $unidad) {
-                                        if ($alimentoRecomendado->unidad_medida_id == $unidad->id) {
-                                            $valor = $valorN->valor;
+                            foreach($alimentosProhibidos as $prohibido){
+                                if($prohibido != $alimentoDieta->alimento_id){
+                                    foreach ($valoresNutricionales as $valorN) {
+                                        foreach ($nutrientes as $nutriente) {
+                                            foreach ($unidadesMedidas as $unidad) {
+                                                if ($alimentoRecomendado->unidad_medida_id == $unidad->id) {
+                                                    $valor = $valorN->valor;
 
-                                            if ($unidad->nombre_unidad_medida == 'Gramos') {
-                                                $cantidad = $alimentoRecomendado->cantidad;
-                                            } elseif ($unidad->nombre_unidad_medida == 'Kcal') {
-                                                if ($nutriente->nombre_nutriente === 'Carbohidratos totales') {
-                                                    $cantidad = $alimentoRecomendado->cantidad / 4;
-                                                } elseif ($nutriente->nombre_nutriente === 'Proteínas') {
-                                                    $cantidad = $alimentoRecomendado->cantidad / 4;
-                                                } elseif ($nutriente->nombre_nutriente === 'Lípidos totales') {
-                                                    $cantidad = $alimentoRecomendado->cantidad / 9;
-                                                    $valor = $valor / 100;
-                                                }
-                                            }
+                                                    if ($unidad->nombre_unidad_medida == 'Gramos') {
+                                                        $cantidad = $alimentoRecomendado->cantidad;
+                                                    } elseif ($unidad->nombre_unidad_medida == 'Kcal') {
+                                                        if ($nutriente->nombre_nutriente === 'Carbohidratos totales') {
+                                                            $cantidad = $alimentoRecomendado->cantidad / 4;
+                                                        } elseif ($nutriente->nombre_nutriente === 'Proteínas') {
+                                                            $cantidad = $alimentoRecomendado->cantidad / 4;
+                                                        } elseif ($nutriente->nombre_nutriente === 'Lípidos totales') {
+                                                            $cantidad = $alimentoRecomendado->cantidad / 9;
+                                                            $valor = $valor / 100;
+                                                        }
+                                                    }
 
-                                            if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
-                                                $total = ($valor * $cantidad) / 100;
-                                                if ($total < $carbohidratosTotales && $carbohidratosTotales > 0){
-                                                    if (!in_array($alimentoDieta->id, $alimentosRecomendadosComida, true)) {
-                                                        $alimentosRecomendadosComida[] = $alimentoDieta->id;
+                                                    if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                        $total = ($valor * $cantidad) / 100;
+                                                        if ($total < $carbohidratosTotales && $carbohidratosTotales > 0){
+                                                            if (!in_array($alimentoDieta->id, $alimentosRecomendadosComida, true)) {
+                                                                $alimentosRecomendadosComida[] = $alimentoDieta->id;
+                                                            }
+                                                            $carbohidratosTotales -= $total;
+                                                        }
+                                                    } elseif ($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                                        $total = ($valor * $cantidad) / 100;
+                                                        if ($total < $lipidosTotales && $lipidosTotales > 0){
+                                                            if (!in_array($alimentoDieta->id, $alimentosRecomendadosComida, true)) {
+                                                                $alimentosRecomendadosComida[] = $alimentoDieta->id;
+                                                            }
+                                                            $lipidosTotales -= $total;
+                                                        }
+                                                    } elseif ($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                                        $total = ($valor * $cantidad) / 100;
+                                                        if ($total < $proteinasTotales && $proteinasTotales > 0){
+                                                            if (!in_array($alimentoDieta->id, $alimentosRecomendadosComida, true)) {
+                                                                $alimentosRecomendadosComida[] = $alimentoDieta->id;
+                                                            }
+                                                            $proteinasTotales -= $total;
+                                                        }
                                                     }
-                                                    $carbohidratosTotales -= $total;
-                                                }
-                                            } elseif ($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
-                                                $total = ($valor * $cantidad) / 100;
-                                                if ($total < $lipidosTotales && $lipidosTotales > 0){
-                                                    if (!in_array($alimentoDieta->id, $alimentosRecomendadosComida, true)) {
-                                                        $alimentosRecomendadosComida[] = $alimentoDieta->id;
-                                                    }
-                                                    $lipidosTotales -= $total;
-                                                }
-                                            } elseif ($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
-                                                $total = ($valor * $cantidad) / 100;
-                                                if ($total < $proteinasTotales && $proteinasTotales > 0){
-                                                    if (!in_array($alimentoDieta->id, $alimentosRecomendadosComida, true)) {
-                                                        $alimentosRecomendadosComida[] = $alimentoDieta->id;
-                                                    }
-                                                    $proteinasTotales -= $total;
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
+
                         }
                     }
                 }
