@@ -364,12 +364,12 @@ class GestionConsultasController extends Controller
         //Determinación de gramos de proteínas, carbohidratos y lípidos (Adultos)
         $resultadoNutriente = $this->determinacionNutrientes($gastoEnergeticoTotal, $paciente->edad);
 
-        $carbohidratosRecomendados = $resultadoNutriente['carbohidratos'];
-        $lipidosRecomendados = $resultadoNutriente['lipidos'];
-        $proteinasRecomendadas = $resultadoNutriente['proteinas'];
+        $carbohidratosRecomendados = round($resultadoNutriente['carbohidratos'], 3);
+        $lipidosRecomendados = round($resultadoNutriente['lipidos'], 3);
+        $proteinasRecomendadas = round($resultadoNutriente['proteinas'], 3);
 
         //Agregamos esto a la descripción del plan.
-        $descripcionPlan .= '. Carbohidratos Diarios: ' . $carbohidratosRecomendados . '. Lípidos diarios: ' . $lipidosRecomendados . '. Proteínas diarias: ' . $proteinasRecomendadas;
+        $descripcionPlan .= '. Carbohidratos Diarios: ' . $carbohidratosRecomendados . ' g. Lípidos diarios: ' . $lipidosRecomendados . ' g. Proteínas diarias: ' . $proteinasRecomendadas.' g.';
         $descripcionPlan = substr($descripcionPlan, 0, 255);
 
         //Evaluamos el porcentaje necesario por grupo de alimentos (Según Guia Argentina)
@@ -389,15 +389,11 @@ class GestionConsultasController extends Controller
         $alimentosRecomendadosFrutas = $alimentosPaciente['frutasRecomendadas'];
         $alimentosRecomendadosVerduras = $alimentosPaciente['verdurasRecomendadas'];
 
-        //dd($alimentosRecomendadosFrutas, $alimentosRecomendadosVerduras, $alimentosRecomendadosLegumbres, $alimentosRecomendadosLeche, $alimentosRecomendadosYogur, $alimentosRecomendadosQueso, $alimentosRecomendadosCarnes, $alimentosRecomendadosHuevos, $alimentosRecomendadosPescados, $alimentosRecomendadosAceites, $alimentosRecomendadosFrutasSecas, $alimentosRecomendadosAzucar, $alimentosRecomendadosGolosinas);
-
         //Crea un array con todos estos alimentos
         $alimentosRecomendados = array_merge(
             $alimentosRecomendadosFrutas,
             $alimentosRecomendadosVerduras,
         );
-
-        $alimentos = Alimento::All();
 
         //Obtenemos el plan generado en consultas anteriores para el paciente y lo volvemos inactivo.
         $ultimoPlanAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 1)->orderBy('id', 'desc')->first();
@@ -416,17 +412,68 @@ class GestionConsultasController extends Controller
         ]);
 
         $planAlimentacion->save(); // Guarda el nuevo plan de alimentación
-        //dd($consulta, $planAlimentacion);
 
         $alimentosPorDieta = AlimentoPorTipoDeDieta::where('tipo_de_dieta_id', $tipoDieta->id)->get();
         $alimentosrecomendadosPorDieta = AlimentosRecomendadosPorDieta::all();
 
+        $valoresNutricionales = ValorNutricional::all();
+        $nutrientes = Nutriente::all();
+        $unidadesMedidas = UnidadesMedidasPorComida::all();
+
+        $carbohidratos = [];
+        $lipidos = [];
+        $proteinas = [];
+
+        foreach ($alimentosRecomendados as $alimentoRecomendado) {
+            foreach($alimentosPorDieta as $alimentoDieta){
+                foreach ($alimentosrecomendadosPorDieta as $alimRecomendadoDieta) {
+                    if ($alimentoDieta->id == $alimentoRecomendado && $alimentoDieta->id == $alimRecomendadoDieta->alimento_por_dieta_id) {
+                        foreach ($valoresNutricionales as $valorN) {
+                            foreach ($nutrientes as $nutriente) {
+                                foreach ($unidadesMedidas as $unidad) {
+                                    if ($alimRecomendadoDieta->unidad_medida_id == $unidad->id) {
+                                        $valor = $valorN->valor;
+
+                                        if ($unidad->nombre_unidad_medida == 'Gramos') {
+                                            $cantidad = $alimRecomendadoDieta->cantidad; //Gramos
+                                        } elseif ($unidad->nombre_unidad_medida == 'Kcal') {
+                                            if ($nutriente->nombre_nutriente === 'Carbohidratos totales') {
+                                                $cantidad = $alimRecomendadoDieta->cantidad / 4; //kcal a gramos
+                                            } elseif ($nutriente->nombre_nutriente === 'Proteínas') {
+                                                $cantidad = $alimRecomendadoDieta->cantidad / 4; //kcal a gramos
+                                            } elseif ($nutriente->nombre_nutriente === 'Lípidos totales') {
+                                                $cantidad = $alimRecomendadoDieta->cantidad / 9; //kcal a gramos
+                                            }
+                                        }
+
+                                        if($nutriente->nombre_nutriente == 'Carbohidratos totales' && $valorN->nutriente_id == $nutriente->id){
+                                            $total = ($valor * $cantidad) / 100; //Gramos
+                                            $carbohidratos[] = $total*4; //Kcal
+                                        } elseif ($nutriente->nombre_nutriente == 'Lípidos totales' && $valorN->nutriente_id == $nutriente->id){
+                                            $total = ($valor * $cantidad) / 100; //Gramos
+                                            $lipidos[] = $total*9;//Kcal
+                                        } elseif ($nutriente->nombre_nutriente == 'Proteínas' && $valorN->nutriente_id == $nutriente->id){
+                                            $total = ($valor * $cantidad) / 100; //Gramos
+                                            $proteinas[] = $total*4;//Kcal
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $i = 0;
         // Asocia los detalles del plan de alimentación al plan recién creado
         foreach ($alimentosRecomendados as $alimentoRecomendado) {
+            $observacion = '';
             foreach($alimentosPorDieta as $alimentoDieta){
                 foreach ($alimentosrecomendadosPorDieta as $alimRecomendadoDieta) {
                     $comida = Comida::where('id', $alimRecomendadoDieta->comida_id)->first();
                     $unidadMedida = UnidadesMedidasPorComida::where('id', $alimRecomendadoDieta->unidad_medida_id)->first();
+                    $observacion = 'Carbohidratos: ' . $carbohidratos[$i] . ' kcal. Proteínas: ' . $proteinas[$i] . ' kcal. Lípidos: ' . $lipidos[$i] . ' kcal.';
                     if ($alimentoDieta->id == $alimentoRecomendado && $alimentoDieta->id == $alimRecomendadoDieta->alimento_por_dieta_id) {
                         $detallePlan = DetallePlanAlimentaciones::create([
                             'plan_alimentacion_id' => $planAlimentacion->id, // Asocia el plan al detalle del plan
@@ -434,13 +481,14 @@ class GestionConsultasController extends Controller
                             'horario_consumicion' => $comida->nombre_comida, // Establece el horario según tus necesidades
                             'cantidad' => $alimRecomendadoDieta->cantidad, // Establece la cantidad según tus necesidades
                             'unidad_medida' => $unidadMedida->nombre_unidad_medida, // Establece la unidad de medida según tus necesidades
-                            'observacion' => 'Sin observación', // Añade una observación según tus necesidades
+                            'observacion' => $observacion,
                         ]);
 
                         $detallePlan->save(); // Guarda el detalle del plan
                     }
                 }
             }
+            $i++;
         }
 
         return [
@@ -497,7 +545,7 @@ class GestionConsultasController extends Controller
                     $gatoEnergeticoBasalKj = $gastoEnergeticoBasalMj * 1000; //Kj
 
                     //Pasamos de kj a kcal
-                    $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //rn Kcal
+                    $gastoEnergeticoBasal = $gatoEnergeticoBasalKj * (1 / 4.184); //en Kcal
                 }
             }else if($edad >= 3 && $edad < 10){
                 //Usamos fórmula de Schofield
@@ -1430,7 +1478,7 @@ class GestionConsultasController extends Controller
                                                             $cantidad = $alimentoRecomendado->cantidad / 4;
                                                         } elseif ($nutriente->nombre_nutriente === 'Lípidos totales') {
                                                             $cantidad = $alimentoRecomendado->cantidad / 9;
-                                                            $valor = $valor / 100;
+                                                            //$valor = $valor / 100;
                                                         }
                                                     }
 
