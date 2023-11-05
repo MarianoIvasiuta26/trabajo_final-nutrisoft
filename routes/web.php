@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\ActividadController;
 use App\Http\Controllers\admin\GestionUsuariosController;
 use App\Http\Controllers\DiaController;
 use App\Http\Controllers\HoraController;
@@ -71,6 +72,7 @@ Route::middleware([
     Route::resource('gestion-grupos-alimento', GrupoAlimentoController::class)->names('gestion-grupos-alimento');
     Route::resource('gestion-fuentes', FuenteAlimentoController::class)->names('gestion-fuentes');
     Route::resource('gestion-nutrientes', NutrienteController::class)->names('gestion-nutrientes');
+    Route::resource('gestion-actividades', ActividadController::class)->names('gestion-actividades');
 
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 

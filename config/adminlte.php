@@ -542,6 +542,23 @@ return [
             ],
         ],
 
+        [
+            'text' => 'Gestión Actividades',
+            'icon' => 'fas fa-running',
+            'submenu' => [
+                [
+                    'text' => 'Lista de Actividades',
+                    'icon' =>'fas fa-fw fa-list',
+                    'route'  => 'gestion-actividades.index',
+                ],
+                [
+                    'text' => 'Nueva Actividad',
+                    'icon' =>'fas fa-fw fa-plus',
+                    'route'  => 'gestion-actividades.create',
+                ],
+            ],
+        ],
+
         ['header' => 'GESTIÓN DE USUARIOS'],
         [
             'text' => 'Usuarios',
