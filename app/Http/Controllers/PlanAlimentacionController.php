@@ -81,6 +81,8 @@ class PlanAlimentacionController extends Controller
             }
         }
 
+        $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
+
         $detalleNuevoPlan = DetallePlanAlimentaciones::create([
             'plan_alimentacion_id' => $planGenerado->id,
             'alimento_id' => $request->input('alimento'),
@@ -88,6 +90,7 @@ class PlanAlimentacionController extends Controller
             'cantidad' => $request->input('cantidad'),
             'unidad_medida' => $request->input('unidad_medida'),
             'observacion' => $request->input('observaciones'),
+            'usuario' => $usuario,
         ]);
 
         if($detalleNuevoPlan){

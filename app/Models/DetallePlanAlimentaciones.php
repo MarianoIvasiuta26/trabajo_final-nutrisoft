@@ -16,6 +16,7 @@ class DetallePlanAlimentaciones extends Model
         'cantidad',
         'unidad_medida',
         'observacion',
+        'usuario',
     ];
 
     public function planAlimentaciones()
