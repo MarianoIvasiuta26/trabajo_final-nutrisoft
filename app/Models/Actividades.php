@@ -13,5 +13,9 @@ class Actividades extends Model
         'actividad',
     ];
 
-    
+    public function detallesPlanesSeguimiento()
+    {
+        return $this->hasMany(DetallesPlanesSeguimiento::class);
+    }
+
 }

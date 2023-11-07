@@ -48,4 +48,13 @@ class Paciente extends Model
         return $this->hasMany('App\Models\PlanAlimentaciones');
     }
 
+    public function planDeSeguimiento()
+    {
+        return $this->hasMany('App\Models\PlanDeSeguimiento');
+    }
+
+    public function registroAlimentosConsumidos(){
+        return $this->hasMany('App\Models\RegistroAlimentosConsumidos');
+    }
+
 }

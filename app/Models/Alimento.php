@@ -56,4 +56,8 @@ class Alimento extends Model
         return $this->hasMany('App\Models\AlimentosProhibidosPatologia');
     }
 
+    public function registroAlimentosConsumidos(){
+        return $this->hasMany('App\Models\RegistroAlimentosConsumidos');
+    }
+
 }

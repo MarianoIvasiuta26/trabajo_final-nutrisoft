@@ -40,4 +40,8 @@ class Consulta extends Model
     public function diagnostico(){
         return $this->hasOne('App\Models\Diagnostico');
     }
+
+    public function planesDeSeguimiento(){
+        return $this->hasMany('App\Models\PlanesDeSeguimiento');
+    }
 }
