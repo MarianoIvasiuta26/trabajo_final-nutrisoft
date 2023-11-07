@@ -117,6 +117,7 @@ Route::middleware([
     Route::resource('gestion-alimento-por-dietas', AlimentosPorDietasController::class)->names('gestion-alimento-por-dietas');
 
     Route::resource('plan-alimentacion', PlanAlimentacionController::class)->names('plan-alimentacion');
+    Route::post('plan-alimentacion.guardarDetalle/{planId}/{alimentoNuevo}/{comida}/{cantidad}/{unidadMedida}/{observacion}', [PlanAlimentacionController::class, 'guardarDetalle'])->name('plan-alimentacion.guardarDetalle');
     Route::get('plan-alimentacion.consultarPlanGenerado/{pacienteId}/{turnoId}/{nutricionistaId}', [PlanAlimentacionController::class, 'consultarPlanGenerado'])->name('plan-alimentacion.consultarPlanGenerado');
     Route::post('plan-alimentacion.confirmarPlan/{planId}', [PlanAlimentacionController::class, 'confirmarPlan'])->name('plan-alimentacion.confirmarPlan');
     Route::get('plan-alimentacion.planesAlimentacionAConfirmar', [PlanAlimentacionController::class, 'planesAlimentacionAConfirmar'])->name('plan-alimentacion.planesAlimentacionAConfirmar');

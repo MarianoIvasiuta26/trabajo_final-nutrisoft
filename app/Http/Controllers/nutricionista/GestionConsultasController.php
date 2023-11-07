@@ -1428,7 +1428,7 @@ class GestionConsultasController extends Controller
 
         $alimentosProhibidos = [];
 
-         foreach($datosMedicos as $datoMedico){
+        foreach($datosMedicos as $datoMedico){
             foreach($alergias as $alergia){
                 foreach($alimentosProhibidosAlergias as $prohibido){
                     if($datoMedico->alergia_id == $alergia->id && $alergia->id == $prohibido->alergia_id){

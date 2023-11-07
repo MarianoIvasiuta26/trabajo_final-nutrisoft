@@ -437,7 +437,7 @@
 
                                 <div class="col-md-4">
                                     <label for="unidad_medida">Unidad de medida</label>
-                                    <select class="form-select" name="unidad_medida" id="">
+                                    <select class="form-select" name="unidad_medida" id="unidad_medida_input">
                                         <option value="" disabled>Seleccione la unidad de medida</option>
                                         @foreach ($unidadesMedidas as $unidad)
                                             <option value="{{$unidad->nombre_unidad_medida}}">{{$unidad->nombre_unidad_medida}}</option>
@@ -454,7 +454,7 @@
                             <div class="row mt-3">
                                 <div class="col-md-12">
                                     <label for="observaciones">Observaciones</label>
-                                    <textarea class="form-control" name="observaciones" id="" cols="10" rows="3">{{old('observaciones')}}</textarea>
+                                    <textarea class="form-control" name="observaciones" id="observaciones_input" cols="10" rows="3">{{old('observaciones')}}</textarea>
                                     @error('observaciones')
                                         <small class="text-danger">{{$message}}</small>
                                     @enderror
@@ -463,7 +463,7 @@
 
                             <div class="row mt-3 float-right">
                                 <div class="col">
-                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                    <button type="submit" class="btn btn-success add-button">Guardar cambios</button>
                                 </div>
                             </div>
 
@@ -562,31 +562,11 @@
             })
         @endif
 
-        @if (session('successAlimentoAgregado'))
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: "{{session('successAlimentoAgregado')}}",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        @endif
-
         @if (session('errorAlimentoNoEncontrado'))
             Swal.fire({
                 icon: 'error',
                 title: '¡Error!',
                 text: "{{session('errorAlimentoNoEncontrado')}}",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        @endif
-
-        @if (session('errorAlimentoNoAgregado'))
-            Swal.fire({
-                icon: 'error',
-                title: '¡Error!',
-                text: "{{session('errorAlimentoNoAgregado')}}",
                 showConfirmButton: false,
                 timer: 3000
             })
@@ -612,6 +592,78 @@
             })
         @endif
 
+        @if (session('successAlimentoAgregado'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successAlimentoAgregado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('errorAlimentoNoAgregado'))
+            Swal.fire({
+                icon: 'error',
+                title: '¡Error!',
+                text: "{{session('errorAlimentoNoAgregado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('info'))
+            Swal.fire({
+                icon: 'info',
+                title: '¡Atención!',
+                text: "{{ session('info') }}",
+                showCancelButton: true,
+                confirmButtonText: 'Agregar alimento',
+                cancelButtonText: 'No agregar',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('{{ route('plan-alimentacion.guardarDetalle' ,['planId' => session('planId'), 'alimentoNuevo' => session('alimentoNuevo'), 'comida' => session('comida'), 'cantidad' => session('cantidad'), 'unidadMedida' => session('unidadMedida'),'observacion' => session('observacion')]) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            planId: '{{ session('planId') }}',
+                            alimentoNuevo: '{{ session('alimentoNuevo') }}',
+                            comida: '{{ session('comida') }}',
+                            cantidad: '{{ session('cantidad') }}',
+                            unidadMedida: '{{ session('unidadMedida') }}',
+                            observacion: '{{ session('observacion') }}'
+                        })
+                    }).then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    text: data.success
+                                }).then(() => {
+
+                                    window.location.reload() ;
+                                });
+                            } else if (data.error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: data.error
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            }
+                    }).catch(error => {
+                        // Manejar errores de red o excepciones
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        @endif
+
         //SweetAlert Eliminar alimento
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
@@ -620,6 +672,7 @@
             },
             buttonsStyling: false
         })
+
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
             const deleteButtons = document.querySelectorAll('.delete-button');
@@ -660,15 +713,15 @@
                         })
 
                         swalWithBootstrapButtons.fire({
-                        title: '¿Está seguro de guardar el plan de alimentación generado?',
-                        text: "Al confirmar se asociará el plan al paciente correspondiente.",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: '¡Confirmar plan!',
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonText: '¡No, cancelar!',
-                        cancelButtonColor: '#d33',
-                        reverseButtons: true
+                            title: '¿Está seguro de guardar el plan de alimentación generado?',
+                            text: "Al confirmar se asociará el plan al paciente correspondiente.",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: '¡Confirmar plan!',
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonText: '¡No, cancelar!',
+                            cancelButtonColor: '#d33',
+                            reverseButtons: true
                         }).then((result) => {
                         if (result.isConfirmed) {
                             //Envia el form
@@ -688,5 +741,6 @@
                 });
             });
         });
+
     </script>
 @stop

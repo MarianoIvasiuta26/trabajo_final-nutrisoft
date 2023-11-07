@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Alimento;
+use App\Models\AlimentosProhibidosAlergia;
+use App\Models\AlimentosProhibidosIntolerancia;
+use App\Models\AlimentosProhibidosPatologia;
 use App\Models\Comida;
 use App\Models\DetallePlanAlimentaciones;
 use App\Models\Nutricionista;
@@ -48,12 +51,14 @@ class PlanAlimentacionController extends Controller
         //
     }
 
+
+
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
+     //@param  \Illuminate\Http\Request  $request
+     //@return \Illuminate\Http\Response
+
     public function store(Request $request)
     {
 
@@ -73,11 +78,79 @@ class PlanAlimentacionController extends Controller
         $alimentoNuevo = $request->input('alimento');
         $comida = $request->input('comida');
 
+        $paciente = Paciente::find($planGenerado->paciente_id);
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->get();
+
+        $alergias = Alergia::all();
+        $patologias = Patologia::all();
+        $intolerancias = Intolerancia::all();
+
+        $alimentosProhibidosAlergias = AlimentosProhibidosAlergia::all();
+        $alimentosProhibidosPatologias = AlimentosProhibidosPatologia::all();
+        $alimentosProhibidosIntolerancias = AlimentosProhibidosIntolerancia::all();
+
+        $alimento = Alimento::find($alimentoNuevo);
+
+        foreach($datosMedicos as $datoMedico){
+            foreach($alergias as $alergia){
+                foreach($alimentosProhibidosAlergias as $prohibido){
+                    if($datoMedico->alergia_id == $alergia->id && $alergia->id == $prohibido->alergia_id && $prohibido->alimento_id == $alimentoNuevo){
+                        return back()
+                            ->with('planId',$planGenerado->id)
+                            ->with('alimentoNuevo', $alimentoNuevo)
+                            ->with('comida', $comida)
+                            ->with('cantidad', $request->input('cantidad'))
+                            ->with('unidadMedida', $request->input('unidad_medida'))
+                            ->with('observacion',  $request->input('observaciones'))
+                            ->with('info', 'El alimento '. $alimento->alimento .' podría no ser recomendable para este paciente. ¿Desea agregarlo igualmente?');
+                    }
+                }
+            }
+
+            foreach($patologias as $patologia){
+                foreach($alimentosProhibidosPatologias as $prohibido){
+                    if($datoMedico->patologia_id == $patologia->id && $patologia->id == $prohibido->patologia_id && $prohibido->alimento_id == $alimentoNuevo){
+                        return back()
+                            ->with('planId',$planGenerado->id)
+                            ->with('alimentoNuevo', $alimentoNuevo)
+                            ->with('comida', $comida)
+                            ->with('cantidad', $request->input('cantidad'))
+                            ->with('unidadMedida', $request->input('unidad_medida'))
+                            ->with('observacion',  $request->input('observaciones'))
+                            ->with('info', 'El alimento '. $alimento->alimento .' podría no ser recomendable para este paciente. ¿Desea agregarlo igualmente?');
+                    }
+                }
+            }
+             foreach($intolerancias as $intolerancia){
+                foreach($alimentosProhibidosIntolerancias as $prohibido){
+                    if($datoMedico->intolerancia_id == $intolerancia->id && $intolerancia->id == $prohibido->intolerancia_id && $prohibido->alimento_id == $alimentoNuevo){
+                        return back()
+                            ->with('planId',$planGenerado->id)
+                            ->with('alimentoNuevo', $alimentoNuevo)
+                            ->with('comida', $comida)
+                            ->with('cantidad', $request->input('cantidad'))
+                            ->with('unidadMedida', $request->input('unidad_medida'))
+                            ->with('observacion',  $request->input('observaciones'))
+                            ->with('info', 'El alimento '. $alimento->alimento .' podría no ser recomendable para este paciente. ¿Desea agregarlo igualmente?');
+                    }
+                }
+            }
+        }
+
         $detallesExistentes = DetallePlanAlimentaciones::where('plan_alimentacion_id', $planGenerado->id)->get();
 
         foreach($detallesExistentes as $detalle){
             if($detalle->alimento_id ==  $alimentoNuevo && $detalle->horario_consumicion == $comida){
-                return redirect()->back()->with('errorAlimentoYaAgregado', 'El alimento ya se encuentra agregado al plan de alimentación. Elimine el anterior registro o modifíquelo por favor.');
+                return redirect()->back()
+                    ->with('planId',$planGenerado->id)
+                    ->with('alimentoNuevo', $alimentoNuevo)
+                    ->with('comida', $comida)
+                    ->with('cantidad', $request->input('cantidad'))
+                    ->with('unidadMedida', $request->input('unidad_medida'))
+                    ->with('observacion',  $request->input('observaciones'))
+                    ->with('errorAlimentoYaAgregado', 'El alimento ya se encuentra agregado al plan de alimentación. Elimine el anterior registro o modifíquelo por favor.');
             }
         }
 
@@ -85,8 +158,8 @@ class PlanAlimentacionController extends Controller
 
         $detalleNuevoPlan = DetallePlanAlimentaciones::create([
             'plan_alimentacion_id' => $planGenerado->id,
-            'alimento_id' => $request->input('alimento'),
-            'horario_consumicion' => $request->input('comida'),
+            'alimento_id' => $alimentoNuevo,
+            'horario_consumicion' => $comida,
             'cantidad' => $request->input('cantidad'),
             'unidad_medida' => $request->input('unidad_medida'),
             'observacion' => $request->input('observaciones'),
@@ -96,9 +169,33 @@ class PlanAlimentacionController extends Controller
         if($detalleNuevoPlan){
             return redirect()->back()->with('successAlimentoAgregado', 'Alimento agregado al plan de alimentación.');
         }else{
-            return redirect()->back()->with('errorAlimentoNoAgregado','Error al intentar registrar el nuevo alimento al plan. Inténtelo de nuevo.');
+            return redirect()->back()->with('errorAlimentoNoAgregado', 'Error, no se pudo agregar el alimento al plan de alimentación. Inténtelo de nuevo por favor.');
         }
 
+    }
+
+    public function guardarDetalle($planId, $alimentoNuevo, $comida, $cantidad, $unidadMedida, $observacion){
+        $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
+
+        $detalleNuevoPlan = DetallePlanAlimentaciones::create([
+            'plan_alimentacion_id' => $planId,
+            'alimento_id' => $alimentoNuevo,
+            'horario_consumicion' => $comida,
+            'cantidad' => $cantidad,
+            'unidad_medida' => $unidadMedida,
+            'observacion' => $observacion,
+            'usuario' => $usuario,
+        ]);
+
+        if($detalleNuevoPlan){
+            return response()->json([
+                'success' => 'Alimento agregado al plan de alimentación.',
+            ]);
+        }else{
+            return response()->json([
+                'error' => 'Error, no se pudo agregar el alimento al plan de alimentación. Inténtelo de nuevo por favor.',
+            ]);
+        }
 
     }
 
@@ -156,10 +253,13 @@ class PlanAlimentacionController extends Controller
             'observaciones'=> ['required','string'],
         ]);
 
+        $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
+
         $detallePlan->alimento_id = $request->input('alimento');
         $detallePlan->cantidad = $request->input('cantidad');
         $detallePlan->unidad_medida = $request->input('unidad_medida');
         $detallePlan->observacion = $request->input('observaciones');
+        $detallePlan->usuario = $usuario;
         $detallePlan->save();
 
         return redirect()->back()->with('successAlimentoActualizado', 'Alimento actualizado del plan de alimentación.');
