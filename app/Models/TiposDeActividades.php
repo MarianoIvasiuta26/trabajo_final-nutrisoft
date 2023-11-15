@@ -5,21 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Actividades extends Model
+class TiposDeActividades extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'actividad',
+        'tipo_actividad'
     ];
 
-    public function detallesPlanesSeguimiento()
+    public function tratamientos()
     {
-        return $this->hasMany(DetallesPlanesSeguimiento::class);
+        return $this->hasMany(Tratamiento::class);
     }
 
-    public function actividadesPorTiposDeActividades()
-    {
+    public function actividadesPorTiposDeActividades(){
         return $this->hasMany(ActividadesPorTiposDeActividades::class);
     }
 

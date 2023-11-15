@@ -5,28 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tratamiento extends Model
+class ActividadesPorTiposDeActividades extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'tratamiento',
-        'tipo_de_dieta_id',
+        'actividad_id',
+        'tipo_actividad_id',
     ];
 
-    public function tratamientosPorPaciente()
+    public function actividad()
     {
-        return $this->hasMany(TratamientoPorPaciente::class);
-    }
-
-    public function tipoDeDieta()
-    {
-        return $this->belongsTo(TiposDeDieta::class);
+        return $this->belongsTo(Actividades::class);
     }
 
     public function tipoDeActividad()
     {
         return $this->belongsTo(TiposDeActividades::class);
     }
-
 }

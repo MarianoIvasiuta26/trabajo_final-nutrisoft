@@ -231,7 +231,34 @@ class GestionConsultasController extends Controller
             $planGenerado = $this->generarPlanesAlimentacion($paciente->id, $turno->id, $tratamientoPaciente->id);
         }
 
+        if( $turno->estado == 'Realizado' && $request->has('generar-plan-seguimiento')){
+            $planSeguimientoGenerado = $this->generarPlanesAlimentacion($paciente->id, $turno->id, $tratamientoPaciente->id);
+        }
+
+        if($planSeguimientoGenerado){
+            //Si se retornó solo el plan de seguimiento
+            return redirect()->route('gestion-turnos-nutricionista.index')
+            ->with('successConPlanSeguimientoGenerado', 'Consulta realizada con éxito. Se generó el plan de seguimiento')
+            ->with('pacienteId', $pacienteId)
+            ->with('turnoId', $turno->id)
+            ->with('nutricionistaId', $nutricionista->id);
+        }else{
+            return redirect()->back()->with('errorPlanSeguimientoNoGenerado', 'No se pudo generar el plan');
+        }
+
+        if($planGenerado && $planSeguimientoGenerado){
+            //Si se retornaron los 2 planes
+            return redirect()->route('gestion-turnos-nutricionista.index')
+            ->with('successConPlanesGenerados', 'Consulta realizada con éxito. Se generó el plan de alimentación y el plan de seguimiento')
+            ->with('pacienteId', $pacienteId)
+            ->with('turnoId', $turno->id)
+            ->with('nutricionistaId', $nutricionista->id);
+        }else{
+            return redirect()->back()->with('errorPlanesNoGenerados', 'No se pudo generar el plan');
+        }
+
         if($planGenerado){
+            //Si se retornó solo el plan de alimentación
             return redirect()->route('gestion-turnos-nutricionista.index')
             ->with('successConPlanGenerado', 'Consulta realizada con éxito. Se generó el plan de alimentación')
             ->with('pacienteId', $pacienteId)
@@ -1523,6 +1550,12 @@ class GestionConsultasController extends Controller
         return [
             'alimentosRecomendados' => $alimentosRecomendadosComida,
         ];
+    }
+
+
+    //Generación automática de plan de seguimiento
+    public function generarPlanDeSeguimiento($pacienteId, $turnoId, $tratamientoPacienteId){
+
     }
 
 
