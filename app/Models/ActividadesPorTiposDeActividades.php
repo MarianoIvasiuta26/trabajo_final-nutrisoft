@@ -23,4 +23,9 @@ class ActividadesPorTiposDeActividades extends Model
     {
         return $this->belongsTo(TiposDeActividades::class);
     }
+
+    public function actividadRecPorTipoActividades()
+    {
+        return $this->hasMany(ActividadesRecomendadasPorTiposDeActividades::class);
+    }
 }

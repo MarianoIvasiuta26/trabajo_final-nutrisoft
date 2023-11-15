@@ -556,6 +556,11 @@ return [
                     'icon' =>'fas fa-fw fa-plus',
                     'route'  => 'gestion-actividades.create',
                 ],
+                [
+                    'text' => 'Asociación de Actividades',
+                    'icon' =>'fas fa-fw fa-plus',
+                    'route'  => 'gestion-actividad-por-tipo-actividad.create',
+                ],
             ],
         ],
 

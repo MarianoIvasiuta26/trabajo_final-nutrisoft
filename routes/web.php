@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActividadesPorTipoActividadController;
 use App\Http\Controllers\admin\ActividadController;
 use App\Http\Controllers\admin\GestionUsuariosController;
 use App\Http\Controllers\DiaController;
@@ -115,6 +116,9 @@ Route::middleware([
     Route::resource('gestion-pliegues-cutaneos', GestionPlieguesCutaneosController::class)->names('gestion-pliegues-cutaneos');
 
     Route::resource('gestion-alimento-por-dietas', AlimentosPorDietasController::class)->names('gestion-alimento-por-dietas');
+    Route::resource('gestion-actividad-por-tipo-actividad', ActividadesPorTipoActividadController::class)->names('gestion-actividad-por-tipo-actividad')->parameters([
+        'gestion-actividad-por-tipo-actividad' => 'actividadPorTipo',
+    ]);
 
     Route::resource('plan-alimentacion', PlanAlimentacionController::class)->names('plan-alimentacion');
     Route::post('plan-alimentacion.guardarDetalle/{planId}/{alimentoNuevo}/{comida}/{cantidad}/{unidadMedida}/{observacion}', [PlanAlimentacionController::class, 'guardarDetalle'])->name('plan-alimentacion.guardarDetalle');
