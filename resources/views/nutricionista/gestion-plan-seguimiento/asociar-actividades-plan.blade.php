@@ -134,7 +134,7 @@
 
                                 <td>
                                     <div class="row">
-                                        <div class="col-4">
+                                        <div class="col-3">
                                             <form action="{{ route('gestion-actividad-por-tipo-actividad.edit', $actividadPorTipo->id) }}" method="GET">
                                                 @csrf
                                                 <button type="submit" class="btn btn-warning">
@@ -142,7 +142,7 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        <div class="col-4">
+                                        <div class="col-3">
                                             <form action="{{ route('gestion-actividad-por-tipo-actividad.destroy', $actividadPorTipo->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
