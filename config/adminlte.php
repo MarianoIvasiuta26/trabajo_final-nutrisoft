@@ -557,7 +557,7 @@ return [
                     'route'  => 'gestion-actividades.create',
                 ],
                 [
-                    'text' => 'Asociación de Actividades',
+                    'text' => 'Recomendaciones',
                     'icon' =>'fas fa-fw fa-plus',
                     'route'  => 'gestion-actividad-por-tipo-actividad.create',
                 ],
