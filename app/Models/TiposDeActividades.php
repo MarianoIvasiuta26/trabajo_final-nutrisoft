@@ -13,13 +13,12 @@ class TiposDeActividades extends Model
         'tipo_actividad'
     ];
 
-    public function tratamientos()
-    {
-        return $this->hasMany(Tratamiento::class);
-    }
-
     public function actividadesPorTiposDeActividades(){
         return $this->hasMany(ActividadesPorTiposDeActividades::class);
+    }
+
+    public function tiposActividadesPorTratamientos(){
+        return $this->hasMany(TiposActividadesPorTratamientos::class);
     }
 
 }

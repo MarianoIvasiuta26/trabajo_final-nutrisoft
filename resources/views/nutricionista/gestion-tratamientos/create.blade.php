@@ -43,6 +43,23 @@
                 </div>
 
                 <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label for="actividades">Tipo de Actividades <span class="text-muted">(*)</span></label>
+                        <select name="actividades[]" class="form-select" id="actividades" data-placeholder="Actividades..." multiple>
+                            <option value="">Selecciona una actividad</option>
+                            @foreach ($tiposActividades as $tipoActividad)
+                                <option @if(in_array($tipoActividad->id, old('actividades', []))) selected @endif value="{{ $tipoActividad->id }}">{{ $tipoActividad->tipo_actividad }}</option>
+
+                            @endforeach
+                        </select>
+
+                        @error('actividades')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mt-3">
                     <span class="text-muted">Los datos con la etiqueta (*) significa que son obligatorios</span>
 
                     <div class="col-12">
@@ -60,14 +77,27 @@
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
 @stop
 
 @section('js')
     <script> console.log('Hi!'); </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+
+        //Select2
+        $( '#actividades' ).select2( {
+            theme: "bootstrap-5",
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+            closeOnSelect: false,
+        } );
+
          document.addEventListener('DOMContentLoaded', function () {
             const cancelarButtons = document.querySelectorAll('.cancelar-button');
 

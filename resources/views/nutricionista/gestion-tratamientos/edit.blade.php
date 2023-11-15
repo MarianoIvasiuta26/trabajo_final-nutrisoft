@@ -47,6 +47,29 @@
                 </div>
 
                 <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label for="actividades">Tipo de Actividades <span class="text-muted">(*)</span></label>
+                        <select name="actividades[]" class="form-select" id="actividades" data-placeholder="Actividades..." multiple>
+                            <option value="">Selecciona una actividad</option>
+                            @foreach ($tiposActividades as $tipoActividad)
+                                <option
+                                    @foreach ($tiposActividadesSeleccionadas as $seleccionado)
+                                        @if($tipoActividad->id == $seleccionado->tipo_actividad_id)
+                                            selected
+                                        @endif
+                                    @endforeach
+                                    value="{{ $tipoActividad->id }}">{{ $tipoActividad->tipo_actividad }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        @error('actividades')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row mt-3">
                     <span class="text-muted">Los datos con la etiqueta (*) significa que son obligatorios</span>
                 </div>
 
@@ -74,6 +97,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
     <style>
         .swal2-confirm {
@@ -98,9 +123,19 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-         //SweetAlert
+
+        //Select2
+        $( '#actividades' ).select2( {
+            theme: "bootstrap-5",
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+            closeOnSelect: false,
+        } );
+
+        //SweetAlert
          const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-success',
@@ -112,7 +147,7 @@
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
             const cancelarButtons = document.querySelectorAll('.cancelar-button');
 
-            
+
             cancelarButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
                     // Muestra un SweetAlert de confirmación

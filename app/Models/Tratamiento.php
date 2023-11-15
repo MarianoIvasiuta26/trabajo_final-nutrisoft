@@ -24,9 +24,9 @@ class Tratamiento extends Model
         return $this->belongsTo(TiposDeDieta::class);
     }
 
-    public function tipoDeActividad()
+    public function tiposActividadesPorTratamientos()
     {
-        return $this->belongsTo(TiposDeActividades::class);
+        return $this->hasMany(TiposActividadesPorTratamientos::class);
     }
 
 }

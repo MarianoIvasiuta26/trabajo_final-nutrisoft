@@ -1556,6 +1556,13 @@ class GestionConsultasController extends Controller
     //Generación automática de plan de seguimiento
     public function generarPlanDeSeguimiento($pacienteId, $turnoId, $tratamientoPacienteId){
 
+        //Obtenemos los datos del pacietnte
+
+    }
+
+    //Función para obtener las actividades recomendadas
+    public function obtenerActividadesRecomendadas(){
+
     }
 
 

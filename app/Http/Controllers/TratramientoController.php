@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\TiposActividadesPorTratamientos;
+use App\Models\TiposDeActividades;
 use App\Models\TiposDeDieta;
 use App\Models\Tratamiento;
 use Illuminate\Http\Request;
@@ -31,7 +33,8 @@ class TratramientoController extends Controller
     public function create()
     {
         $tiposDeDietas = TiposDeDieta::all();
-        return view('nutricionista.gestion-tratamientos.create', compact('tiposDeDietas'));
+        $tiposActividades = TiposDeActividades::all();
+        return view('nutricionista.gestion-tratamientos.create', compact('tiposDeDietas','tiposActividades'));
     }
 
     /**
@@ -47,10 +50,13 @@ class TratramientoController extends Controller
         $request->validate([
             'tratamiento' => ['required', 'string', 'max:50'],
             'tipo_de_dieta' => ['required', 'integer'],
+            'actividades' => ['array', 'required']
         ]);
 
         $tratamiento = $request->input('tratamiento');
         $tipoDeDieta = $request->input('tipo_de_dieta');
+
+        $tiposActividades = $request->input('actividades');
 
         $tratamientoCreado = Tratamiento::create([
             'tratamiento' => $tratamiento,
@@ -58,7 +64,15 @@ class TratramientoController extends Controller
         ]);
 
         if($tratamientoCreado){
+            foreach($tiposActividades as $tipoActividad){
+                TiposActividadesPorTratamientos::create([
+                    'tratamiento_id' => $tratamientoCreado->id,
+                    'tipo_actividad_id' => $tipoActividad
+                ]);
+            }
+
             return redirect()->route('gestion-tratamientos.index')->with('success', 'Tratamiento creado correctamente');
+
         } else {
             return redirect()->back()->with('error', 'Error al crear el tratamiento');
         }
@@ -87,6 +101,8 @@ class TratramientoController extends Controller
         // Buscamos el tratamiento
         $tratamiento = Tratamiento::find($id);
         $tiposDeDietas = TiposDeDieta::all();
+        $tiposActividades = TiposDeActividades::all();
+        $tiposActividadesSeleccionadas = TiposActividadesPorTratamientos::where('tratamiento_id', $tratamiento->id)->get();
 
         // Si no existe lanzamos error
         if(!$tratamiento){
@@ -94,7 +110,7 @@ class TratramientoController extends Controller
         }
 
         // Si existe retornamos la vista con el tratamiento
-        return view('nutricionista.gestion-tratamientos.edit', compact('tratamiento', 'tiposDeDietas'));
+        return view('nutricionista.gestion-tratamientos.edit', compact('tratamiento', 'tiposDeDietas', 'tiposActividades','tiposActividadesSeleccionadas'));
     }
 
 
@@ -116,10 +132,37 @@ class TratramientoController extends Controller
         $request->validate([
             'tratamiento' => ['required', 'string', 'max:50'],
             'tipo_de_dieta' => ['required', 'integer'],
+            'actividades' => ['array', 'required']
         ]);
 
         $tratamiento->tratamiento = $request->input('tratamiento');
         $tratamiento->tipo_de_dieta_id = $request->input('tipo_de_dieta');
+
+        $tiposActividadesPorTratamiento = TiposActividadesPorTratamientos::where('tratamiento_id',$tratamiento->id)->pluck('tipo_actividad_id');
+
+        // Actividades a agregar
+        $actividadesNuevas = collect($request->input('actividades'))
+            ->diff($tiposActividadesPorTratamiento)
+            ->toArray();
+
+        // Actividades a eliminar
+        $actividadesEliminar = $tiposActividadesPorTratamiento
+            ->diff($request->input('actividades'))
+            ->toArray();
+
+        // Agregar nuevas actividades
+        foreach ($actividadesNuevas as $actividadNueva) {
+            TiposActividadesPorTratamientos::create([
+                'tratamiento_id' => $tratamiento->id,
+                'tipo_actividad_id' => $actividadNueva,
+            ]);
+        }
+
+        // Eliminar actividades que ya no están en la solicitud actual
+        TiposActividadesPorTratamientos::where('tratamiento_id', $tratamiento->id)
+            ->whereIn('tipo_actividad_id', $actividadesEliminar)
+            ->delete();
+
 
         if($tratamiento->save()){
             return redirect()->route('gestion-tratamientos.index')->with('success', 'Tratamiento actualizado correctamente');
