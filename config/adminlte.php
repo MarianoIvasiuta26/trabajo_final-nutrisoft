@@ -439,6 +439,11 @@ return [
                             'icon' =>'fas fa-fw fa-ban',
                             'route'  => 'prohibiciones-patologias.create',
                         ],
+                        [
+                            'text' => 'Actividades prohibidas',
+                            'icon' =>'fas fa-fw fa-ban',
+                            'route'  => 'prohibiciones-patologias.actividades.create',
+                        ],
                     ],
                 ],
                 [
@@ -475,6 +480,11 @@ return [
                             'text' => 'Nueva Cirugía',
                             'icon' =>'fas fa-fw fa-file-medical',
                             'route'  => 'gestion-cirugias.create',
+                        ],
+                        [
+                            'text' => 'Actividades prohibidas',
+                            'icon' =>'fas fa-fw fa-ban',
+                            'route'  => 'prohibiciones-cirugias.actividades.create',
                         ],
                     ],
                 ],

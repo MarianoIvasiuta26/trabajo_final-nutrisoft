@@ -1,48 +1,47 @@
 @extends('adminlte::page')
 
-@section('title', 'Editar prohibición en Patologias')
+@section('title', 'Editar prohibición en Cirugias')
 
 @section('content_header')
-    <h1>Alimentos prohibidos en Patologias</h1>
+
 @stop
 
 @section('content')
 
 
-    <div class="card card-dark">
+    <div class="card card-dark mt-3">
         <div class="card-header">
-            <h5>Alimentos prohibidos en Patologias</h5>
+            <h5>Actividades prohibidas en Cirugias</h5>
         </div>
 
         <div class="card-body">
 
-            <form action="{{route('prohibiciones-patologias.update', $prohibicion->id)}}" method="POST">
+            <form action="{{route('prohibiciones-cirugias.actividades.update', $prohibicion->id)}}" method="POST">
                 @csrf
-                @method('PUT')
 
                 <div class="row">
                     <div class="col-md-6">
-                        <h6>Selecciona un Alimento:</h6>
-                        <select name="alimentos" class="form-select" id="alimentos" data-placeholder="Alimentos...">
-                            <option value="">Selecciona un alimento</option>
-                            @foreach ($alimentos as $alimento)
-                                <option @if($alimento->id == $alimentoSeleccionado->id) selected @endif value="{{ $alimento->id }}">{{ $alimento->alimento }}</option>
+                        <h6>Selecciona una Actividad:</h6>
+                        <select name="actividades" class="form-select" id="actividades" data-placeholder="Actividades...">
+                            <option value="">Selecciona una actividad</option>
+                            @foreach ($actividades as $actividad)
+                                <option @if($actividad->id == $actividadSeleccionada->id) selected @endif value="{{ $actividad->id }}">{{ $actividad->actividad }}</option>
                             @endforeach
                         </select>
-                        @error('alimentos')
+                        @error('actividades')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
 
                     <div class="col-md-6">
-                        <h6>Selecciona una patología:</h6>
-                        <select name="patologias" class="form-select" id="patologias" data-placeholder="Patologias...">
+                        <h6>Selecciona una cirugía:</h6>
+                        <select name="cirugias" class="form-select" id="cirugias" data-placeholder="Cirugias...">
                             <option value="">Ninguna</option>
-                            @foreach ($patologias as $patologia)
-                                <option @if($patologia->id == $patologiaSeleccionada->id) selected @endif value="{{$patologia->id}}">{{$patologia->patologia}}</option>
+                            @foreach ($cirugias as $cirugia)
+                                <option @if($cirugia->id == $cirugiaSeleccionada->id) selected @endif value="{{$cirugia->id}}">{{$cirugia->cirugia}}</option>
                             @endforeach
                         </select>
-                        @error('patologias')
+                        @error('cirugias')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
@@ -52,7 +51,7 @@
                 <div class="row mt-3">
                     <div class="col">
                         <div class="float-right">
-                            <a href="{{route('prohibiciones-patologias.create')}}" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Volver</a>
+                            <a href="{{route('prohibiciones-cirugias.actividades.create')}}" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Volver</a>
 
                             <button type="button" class="btn btn-success asociar-button">Guardar</button>
 
@@ -104,14 +103,14 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
-        $( '#alimentos' ).select2( {
+        $( '#actividades' ).select2( {
             theme: "bootstrap-5",
             width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
             placeholder: $( this ).data( 'placeholder' ),
             closeOnSelect: false,
         } );
 
-        $( '#patologias' ).select2( {
+        $( '#cirugias' ).select2( {
             theme: "bootstrap-5",
             width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
             placeholder: $( this ).data( 'placeholder' ),
@@ -155,8 +154,8 @@
                 button.addEventListener('click', function () {
                     // Muestra un SweetAlert de confirmación
                     swalWithBootstrapButtons.fire({
-                        title: '¿Estás seguro de editar la prohibicón para la patologia?',
-                        text: 'Luego no se recomendará este alimento en la dieta de los pacientes con estas patologias.',
+                        title: '¿Estás seguro de editar la prohibición para la cirugía?',
+                        text: 'Luego no se recomendará esta actividad en los planes de seguimiento de los pacientes con estas cirugías.',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, editar prohibición.',

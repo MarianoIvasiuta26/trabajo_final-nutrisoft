@@ -20,4 +20,8 @@ class Cirugia extends Model
     public function cirugiasPaciente(){
         return $this->hasMany('App/Models/Paciente/CirugiasPaciente');
     }
+
+    public function actividadesProhibidasCirugias(){
+        return $this->hasMany('App/Models/ActividadesProhibidasCirugia');
+    }
 }

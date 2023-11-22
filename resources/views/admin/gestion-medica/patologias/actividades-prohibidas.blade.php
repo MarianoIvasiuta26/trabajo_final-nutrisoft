@@ -1,45 +1,48 @@
 @extends('adminlte::page')
 
-@section('title', 'Editar prohibición en Patologias')
+@section('title', 'Actividades prohibidas en Patologías')
 
 @section('content_header')
-    <h1>Alimentos prohibidos en Patologias</h1>
+
 @stop
 
 @section('content')
 
-
-    <div class="card card-dark">
+    <div class="card card-dark mt-3">
         <div class="card-header">
-            <h5>Alimentos prohibidos en Patologias</h5>
+            <h5>Actividades prohibidas en Patologías</h5>
         </div>
 
         <div class="card-body">
 
-            <form action="{{route('prohibiciones-patologias.update', $prohibicion->id)}}" method="POST">
+            <form action="{{route('prohibiciones-patologias.actividades.store')}}" method="POST">
                 @csrf
-                @method('PUT')
 
                 <div class="row">
                     <div class="col-md-6">
-                        <h6>Selecciona un Alimento:</h6>
-                        <select name="alimentos" class="form-select" id="alimentos" data-placeholder="Alimentos...">
-                            <option value="">Selecciona un alimento</option>
-                            @foreach ($alimentos as $alimento)
-                                <option @if($alimento->id == $alimentoSeleccionado->id) selected @endif value="{{ $alimento->id }}">{{ $alimento->alimento }}</option>
+                        <h6>Selecciona una Actividad:</h6>
+                        <select name="actividades[]" class="form-select" id="actividades" data-placeholder="Actividades..." multiple>
+                            <option value="">Selecciona una actividad</option>
+                            @foreach ($actividades as $actividad)
+                                <option @if(old('actividad_id', null) == $actividad->id) selected @endif value="{{ $actividad->id }}">{{ $actividad->actividad }}</option>
                             @endforeach
                         </select>
-                        @error('alimentos')
+
+                        @error('actividad_id')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
                     </div>
 
                     <div class="col-md-6">
-                        <h6>Selecciona una patología:</h6>
-                        <select name="patologias" class="form-select" id="patologias" data-placeholder="Patologias...">
+                        <h6>Selecciona una patologia:</h6>
+                        <select name="patologias[]" class="form-select" id="patologias" data-placeholder="Patologias..." multiple>
                             <option value="">Ninguna</option>
-                            @foreach ($patologias as $patologia)
-                                <option @if($patologia->id == $patologiaSeleccionada->id) selected @endif value="{{$patologia->id}}">{{$patologia->patologia}}</option>
+                            @foreach ($patologias->groupBy('grupo_patologia') as $grupo_patologia => $patologias_del_grupo)
+                                <optgroup label="{{$grupo_patologia}}">
+                                    @foreach ($patologias_del_grupo as $patologia)
+                                        <option value="{{$patologia->id}}">{{$patologia->patologia}}</option>
+                                    @endforeach
+                                </optgroup>
                             @endforeach
                         </select>
                         @error('patologias')
@@ -52,15 +55,65 @@
                 <div class="row mt-3">
                     <div class="col">
                         <div class="float-right">
-                            <a href="{{route('prohibiciones-patologias.create')}}" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Volver</a>
-
-                            <button type="button" class="btn btn-success asociar-button">Guardar</button>
-
+                            <button type="button" class="btn btn-success asociar-button">Prohibir actividad en patología</button>
                         </div>
                     </div>
                 </div>
 
             </form>
+            <div class="mt-4">
+                <h5>Asociaciones Actuales:</h5>
+                <table class="table table-dark" id="prohibiciones" >
+                    <thead>
+                        <tr>
+                            <th>Actividad</th>
+                            <th>Tipo de Patología</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($prohibiciones as $prohibido)
+                            <tr>
+                                <td>
+                                    @foreach ($actividades as $actividad)
+                                        @if ($actividad->id == $prohibido->actividad_id)
+                                            {{ $actividad->actividad }}
+                                        @endif
+                                    @endforeach
+                                </td>
+
+                                <td>
+                                    @foreach ($patologias as $patologia)
+                                        @if ($patologia->id == $prohibido->patologia_id)
+                                            {{ $patologia->patologia }}
+                                        @endif
+                                    @endforeach
+                                </td>
+
+                                <td>
+                                    <div>
+                                        <form action="{{ route('prohibiciones-patologias.actividades.edit', $prohibido->id) }}" method="GET"style="display: inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-warning">
+                                                <span class="far fa-edit"></span>
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('prohibiciones-patologias.actividades.destroy', $prohibido->id) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            <button type="button" class="btn btn-danger delete-button">
+                                                <span class="far fa-trash-alt"></span>
+                                            </button>
+                                        </form>
+                                    </div>
+
+                                </td>
+                            </tr>
+                        @empty
+
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -104,7 +157,7 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
-        $( '#alimentos' ).select2( {
+        $( '#actividades' ).select2( {
             theme: "bootstrap-5",
             width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
             placeholder: $( this ).data( 'placeholder' ),
@@ -117,6 +170,29 @@
             placeholder: $( this ).data( 'placeholder' ),
             closeOnSelect: false,
         } );
+
+        $(document).ready(function(){
+            $('#prohibiciones').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ prohibiciones por página",
+                    "zeroRecords": "No se encontró ninguna prohibición",
+                    "info": "Mostrando la página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay prohibiciones",
+                    "infoFiltered": "(filtrado de _MAX_ prohibiciones totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+
+                }
+            });
+        });
 
         @if (session('success'))
             Swal.fire({
@@ -155,11 +231,11 @@
                 button.addEventListener('click', function () {
                     // Muestra un SweetAlert de confirmación
                     swalWithBootstrapButtons.fire({
-                        title: '¿Estás seguro de editar la prohibicón para la patologia?',
-                        text: 'Luego no se recomendará este alimento en la dieta de los pacientes con estas patologias.',
+                        title: '¿Estás seguro de prohibir la actividad a las patologías seleccionadas?',
+                        text: 'Luego no se recomendará esta actividad en el plan de seguimiento de los pacientes con estas patologias.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, editar prohibición.',
+                        confirmButtonText: 'Sí, prohibir actividad.',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -173,24 +249,23 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
-            const deleteButtons = document.querySelectorAll('.volver-button');
+            const deleteButtons = document.querySelectorAll('.delete-button');
 
             // Agrega un controlador de clic a cada botón de eliminar
             deleteButtons.forEach(function (button) {
                 button.addEventListener('click', function () {
                     // Muestra un SweetAlert de confirmación
                     swalWithBootstrapButtons.fire({
-                        title: '¿Estás seguro de volver a la vista principal de las prohibiciones?',
-                        text: '',
+                        title: '¿Estás seguro?',
+                        text: 'Esta acción eliminará la actividad prohibida para esta patología.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, volver',
+                        confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
-                            const form = button.closest('form');
-                            form.submit();form = document.querySelector('#volver-form');
+                            button.closest('form').submit();
                         }
                     });
                 });

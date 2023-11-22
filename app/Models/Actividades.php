@@ -23,4 +23,14 @@ class Actividades extends Model
         return $this->hasMany(ActividadesPorTiposDeActividades::class);
     }
 
+    public function actividadesProhibidasCirugias()
+    {
+        return $this->hasMany(ActividadesProhibidasCirugia::class);
+    }
+
+    public function actividadesProhibidasPatologias()
+    {
+        return $this->hasMany(ActividadesProhibidasPatologia::class);
+    }
+
 }

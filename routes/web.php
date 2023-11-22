@@ -27,6 +27,7 @@ use App\Http\Controllers\paciente\HistoriaClinicaController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\PlanAlimentacionController;
 use App\Http\Controllers\ProhibicionesAlergiaController;
+use App\Http\Controllers\ProhibicionesCirugiaController;
 use App\Http\Controllers\ProhibicionesIntoleranciaController;
 use App\Http\Controllers\ProhibicionesPatologiaController;
 use App\Http\Controllers\TratramientoController;
@@ -69,6 +70,21 @@ Route::middleware([
     Route::resource('gestion-analisis', AnalisisClinicoController::class)->names('gestion-analisis');
     Route::resource('gestion-patologias', PatologiaController::class)->names('gestion-patologias');
     Route::resource('prohibiciones-patologias', ProhibicionesPatologiaController::class)->names('prohibiciones-patologias');
+    Route::resource('prohibiciones-cirugias', ProhibicionesCirugiaController::class)->names('prohibiciones-cirugias');
+
+    //Actividades prohibidas
+    Route::get('prohibiciones-patologias.create', [ProhibicionesPatologiaController::class, 'create_actividades'])->name('prohibiciones-patologias.actividades.create');
+    Route::post('prohibiciones-patologias.store', [ProhibicionesPatologiaController::class, 'store_actividades'])->name('prohibiciones-patologias.actividades.store');
+    Route::get('prohibiciones-patologias.edit/{id}', [ProhibicionesPatologiaController::class, 'edit_actividades'])->name('prohibiciones-patologias.actividades.edit');
+    Route::post('prohibiciones-patologias.update/{id}', [ProhibicionesPatologiaController::class, 'update_actividades'])->name('prohibiciones-patologias.actividades.update');
+    Route::post('prohibiciones-patologias.destroy/{id}', [ProhibicionesPatologiaController::class, 'destroy_actividades'])->name('prohibiciones-patologias.actividades.destroy');
+
+    Route::get('prohibiciones-cirugias.create', [ProhibicionesCirugiaController::class, 'create_actividades'])->name('prohibiciones-cirugias.actividades.create');
+    Route::post('prohibiciones-cirugias.store', [ProhibicionesCirugiaController::class, 'store_actividades'])->name('prohibiciones-cirugias.actividades.store');
+    Route::get('prohibiciones-cirugias.edit/{id}', [ProhibicionesCirugiaController::class, 'edit_actividades'])->name('prohibiciones-cirugias.actividades.edit');
+    Route::post('prohibiciones-cirugias.update/{id}', [ProhibicionesCirugiaController::class, 'update_actividades'])->name('prohibiciones-cirugias.actividades.update');
+    Route::post('prohibiciones-cirugias.destroy/{id}', [ProhibicionesCirugiaController::class, 'destroy_actividades'])->name('prohibiciones-cirugias.actividades.destroy');
+
     Route::resource('gestion-alimentos', AlimentoController::class)->names('gestion-alimentos');
     Route::resource('gestion-grupos-alimento', GrupoAlimentoController::class)->names('gestion-grupos-alimento');
     Route::resource('gestion-fuentes', FuenteAlimentoController::class)->names('gestion-fuentes');

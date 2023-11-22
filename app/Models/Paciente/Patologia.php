@@ -20,4 +20,8 @@ class Patologia extends Model
     public function alimentosProhibidosPatologias(){
         return $this->hasMany('App/Models/AlimentosProhibidosPatologia');
     }
+
+    public function actividadesProhibidasPatologias(){
+        return $this->hasMany('App/Models/ActividadesProhibidasPatologia');
+    }
 }
