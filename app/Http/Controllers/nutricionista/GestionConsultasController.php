@@ -3,6 +3,11 @@
 namespace App\Http\Controllers\nutricionista;
 
 use App\Http\Controllers\Controller;
+use App\Models\Actividades;
+use App\Models\ActividadesPorTiposDeActividades;
+use App\Models\ActividadesProhibidasCirugia;
+use App\Models\ActividadesProhibidasPatologia;
+use App\Models\ActividadRecPorTipoActividades;
 use App\Models\Alimento;
 use App\Models\AlimentoPorTipoDeDieta;
 use App\Models\AlimentosProhibidosAlergia;
@@ -12,6 +17,7 @@ use App\Models\AlimentosRecomendadosPorDieta;
 use App\Models\Comida;
 use App\Models\Consulta;
 use App\Models\DetallePlanAlimentaciones;
+use App\Models\DetallesPlanesSeguimiento;
 use App\Models\Diagnostico;
 use App\Models\MedicionesDePlieguesCutaneos;
 use App\Models\Nutricionista;
@@ -32,8 +38,12 @@ use App\Models\Paciente\Cirugia;
 use App\Models\Paciente\Intolerancia;
 use App\Models\Paciente\Patologia;
 use App\Models\PlanAlimentaciones;
+use App\Models\PlanesDeSeguimiento;
 use App\Models\TagsDiagnostico;
+use App\Models\TiposActividadesPorTratamientos;
+use App\Models\TiposDeActividades;
 use App\Models\Tratamiento;
+use App\Models\UnidadesDeTiempo;
 use App\Models\UnidadesMedidasPorComida;
 use App\Models\ValorNutricional;
 use Illuminate\Http\Request;
@@ -232,7 +242,7 @@ class GestionConsultasController extends Controller
         }
 
         if( $turno->estado == 'Realizado' && $request->has('generar-plan-seguimiento')){
-            $planSeguimientoGenerado = $this->generarPlanesAlimentacion($paciente->id, $turno->id, $tratamientoPaciente->id);
+            $planSeguimientoGenerado = $this->generarPlanDeSeguimiento($paciente->id, $turno->id, $tratamientoPaciente->id);
         }
 
         if($planSeguimientoGenerado){
@@ -1556,12 +1566,231 @@ class GestionConsultasController extends Controller
     //Generación automática de plan de seguimiento
     public function generarPlanDeSeguimiento($pacienteId, $turnoId, $tratamientoPacienteId){
 
-        //Obtenemos los datos del pacietnte
+        //Obtenemos los datos del paciente
+        $paciente = Paciente::find($pacienteId);
+        $turno = Turno::find($turnoId);
+        $consulta = Consulta::where('turno_id', $turno->id)->first();
+
+        //Generamos la descripción del plan
+        $descripcionPlan = 'Plan de seguimiento para el paciente '.$paciente->user->name.' '.$paciente->user->apellido.' con fecha de inicio '.$turno->fecha.'.';
+
+        $tratamientoPaciente = TratamientoPorPaciente::find($tratamientoPacienteId);
+
+        if( $tratamientoPaciente ){
+            $tratamiento = Tratamiento::where('id', $tratamientoPaciente->tratamiento_id)->first();
+
+            //Llamamos a la función para obtener los alimentos del tratamiento del paciente
+            $tipoActividadesObtenidas = $this->obtenerTipoActividadesTratamiento($tratamiento->id, $pacienteId);
+
+            $actividadesProhibidas = $tipoActividadesObtenidas['actividadesProhibidas'];
+            $tipoActividadesAnalizar = $tipoActividadesObtenidas['tipoActividadesAnalizar'];
+
+            if(!empty($tipoActividadesAnalizar)){
+                $obtenerActividades = $this->actividadesAnalizar($tipoActividadesAnalizar);
+                $actividadesAnalizar = $obtenerActividades['actividadesAnalizar'];
+
+                $actividades = Actividades::all();
+                $actividadesPorTipo = ActividadesPorTiposDeActividades::all();
+                $actividadesRecomendadasPorTipo = ActividadRecPorTipoActividades::all();
+
+                $actividadesRecomendadas = [];
+                $actividadesNoRecomendadas = [];
+
+                if(!empty($actividadesProhibidas) && !empty($actividadesAnalizar)){
+                    foreach($actividadesAnalizar as $actividadAnalizada){
+                        foreach($actividadesProhibidas as $actividadProhibida){
+                            foreach($actividades as $actividad){
+                                if($actividadAnalizada == $actividadProhibida){
+                                    if($actividad->id == $actividadAnalizada){
+                                        $actividadesNoRecomendadas[] = $actividad->actividad;
+                                    }
+                                }
+                                if($actividadAnalizada != $actividadProhibida){
+                                    if($actividad->id == $actividadAnalizada){
+                                        $actividadesRecomendadas[] = $actividad->actividad;
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }else{
+                    return 'No se encontraron actividades para el paciente.';
+                }
+
+                //Generamos el plan
+                $planSeguimiento = PlanesDeSeguimiento::create([
+                    'consulta_id' => $consulta->id,
+                    'paciente_id' => $paciente->id,
+                    'descripcion' => $descripcionPlan,
+                    'estado' => 2, //Esperando confirmacion
+                ]);
+
+
+                //Ahora pasamos a la generación de los detalles del plan
+                foreach($actividadesRecomendadas as $recomendacion){
+                    foreach($actividades as $actividad){
+                        if($actividad->actividad == $recomendacion){
+                            foreach($actividadesPorTipo as $actividadPorTipo){
+                                if($actividad->id == $actividadPorTipo->actividad_id){
+                                    foreach($actividadesRecomendadasPorTipo as $actividadRecomendada){
+                                        if($actividadPorTipo->id == $actividadRecomendada->act_tipoAct_id){
+                                            $unidadTiempo = UnidadesDeTiempo::where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo;
+                                            $obtenerDatosPlan = $this->obtenerDatosPlan($consulta->imc_actual, $consulta->peso_actual, $consulta->altura_actual);
+                                            $estadoIMC = $obtenerDatosPlan['estadoIMC'];
+                                            $pesoIdeal = $obtenerDatosPlan['pesoIdeal'];
+                                            DetallesPlanesSeguimiento::create([
+                                                'plan_de_seguimiento_id' => $planSeguimiento->id,
+                                                'actividad_id' => $actividad->id,
+                                                'completada' => 0, //No completada por defecto
+                                                'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
+                                                'unidad_tiempo_realizacion' => $unidadTiempo,
+                                                'recursos_externos' => '',
+                                                'estado_imc' => $estadoIMC,
+                                                'peso_ideal' => $pesoIdeal,
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return [
+                    'planSeguimiento' => $planSeguimiento,
+                    'detallesPlanSeguimiento' => DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $planSeguimiento->id)->get(),
+                    'actividadesNoRecomendadas' => $actividadesNoRecomendadas,
+                ];
+            }else{
+                return 'No se encontraron actividades para el paciente.';
+            }
+        }
+    }
+
+    public function obtenerDatosPlan($imc, $peso, $altura){
+
+        $estadoIMC = '';
+        $alturaMetro = $altura / 100;
+
+        if($imc < 18.5){
+            $estadoIMC = 'IMC bajo. Bajo peso. ';
+            $pesoIdeal = 18.5 * ($alturaMetro * $alturaMetro); //Bajo peso
+        }else if($imc >= 18.5 && $imc <= 24.99){
+            $estadoIMC = 'IMC normal. Peso saludable. ';
+            $pesoIdeal = $peso; //Peso normal
+        }else if($imc >= 25 && $imc <= 29.99){
+            $estadoIMC = 'IMC elevado. Sobrepeso. ';
+            $pesoIdeal = 25 * ($alturaMetro * $alturaMetro); //Sobrepeso
+        }else if($imc >= 30 && $imc <= 34.99){
+            $estadoIMC = 'IMC elevado. Obesidad de grado 1. ';
+            $pesoIdeal = 30 * ($alturaMetro * $alturaMetro); //Obesidad grado 1
+        }else if($imc >= 35 && $imc <= 39.99){
+            $estadoIMC = 'IMC elevado. Obesidad de grado 2. ';
+            $pesoIdeal = 35 * ($alturaMetro * $alturaMetro); //Obesidad grado 2
+        }else if($imc >= 40){
+            $estadoIMC = 'IMC elevado. Obesidad mórbida. ';
+            $pesoIdeal = 40 * ($alturaMetro * $alturaMetro); //Obesidad grado 3 o mórbida
+        }
+
+        return [
+            'estadoIMC' => $estadoIMC,
+            'pesoIdeal' => $pesoIdeal,
+        ];
+
+    }
+
+    public function actividadesAnalizar($tipoActividadesAnalizar){
+
+        $actividades = Actividades::all();
+        $actividadesPorTipo = ActividadesPorTiposDeActividades::all();
+
+        $actividadesAnalizar = [];
+        foreach($tipoActividadesAnalizar as $tipoActividadAnalizar){
+            foreach($actividades as $actividad){
+                foreach($actividadesPorTipo as $actividadPorTipo){
+                    if($actividadPorTipo->tipo_actividad_id == $tipoActividadAnalizar && $actividadPorTipo->actividad_id == $actividad->id){
+                        $actividadesAnalizar[] = $actividad->id;
+                    }
+                }
+            }
+        }
+
+        return [
+            'actividadesAnalizar' => $actividadesAnalizar,
+        ];
 
     }
 
     //Función para obtener las actividades recomendadas
-    public function obtenerActividadesRecomendadas(){
+    public function obtenerTipoActividadesTratamiento($tratamientoId, $pacienteId){
+        $tipoActividadPorTratamiento = TiposActividadesPorTratamientos::where('tratamiento_id', $tratamientoId)->get();
+        $paciente = Paciente::where('id', $pacienteId)->first();
+        $historiaPaciente = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        $tipoActividades = TiposDeActividades::all();
+
+        $obtenerProhibiciones = $this->obtenerProhibiciones($historiaPaciente->id);
+
+        $actividadesProhibidas = $obtenerProhibiciones['actividadesProhibidas'];
+
+        $tipoActividadesAnalizar = [];
+        foreach($tipoActividades as $tipoActividad){
+            foreach($tipoActividadPorTratamiento as $tipoPorTratamiento){
+                if($tipoActividad->id == $tipoPorTratamiento->tipo_actividad_id){
+                    $tipoActividadesAnalizar[] = $tipoActividad->id;
+                }
+            }
+        }
+
+        return [
+            'actividadesProhibidas' => $actividadesProhibidas,
+            'tipoActividadesAnalizar' => $tipoActividadesAnalizar,
+        ];
+
+    }
+
+    public function obtenerProhibiciones($historiaPacienteId){
+
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaPacienteId)->get();
+        $patologias = Patologia::all();
+        $cirugias = Cirugia::All();
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaPacienteId)->get();
+
+        $actividadesProhibidas = [];
+
+        $prohibicionesCirugia = ActividadesProhibidasCirugia::all();
+        $prohibicionesPatologia = ActividadesProhibidasPatologia::all();
+
+        //Comenzamos la búsqueda de las actividades prohibidas
+        //Buscamos las cirugias del paciente
+        foreach($cirugias as $cirugia){
+            foreach($cirugiasPaciente as $cirugiaPaciente){
+                if($cirugiaPaciente->cirugia_id == $cirugia->id && $cirugia->cirugia != 'Ninguna'){
+                    foreach($prohibicionesCirugia as $prohibicion){
+                        if($prohibicion->cirugia_id == $cirugia->id){
+                            $actividadesProhibidas[] = $prohibicion->actividad_id;
+                        }
+                    }
+
+                }
+            }
+        }
+
+        foreach($patologias as $patologia){
+            foreach($datosMedicos as $datoMedico){
+                if($datoMedico->patologia_id == $patologia->id && $patologia->patologia != 'Ninguna'){
+                    foreach($prohibicionesPatologia as $prohibicion){
+                        if($prohibicion->patologia_id == $patologia->id){
+                            $actividadesProhibidas[] = $prohibicion->actividad_id;
+                        }
+                    }
+                }
+            }
+        }
+
+        return [
+            'actividadesProhibidas' => $actividadesProhibidas,
+        ];
 
     }
 
