@@ -573,7 +573,7 @@
                       <div id="flush-collapseHistorialTurnos" class="accordion-collapse collapse" aria-labelledby="flush-historial-turnos" data-bs-parent="#accordionFlushExample">
                         <div class="accordion-body">
                             <div class="row">
-                                @if ($turno->tipo_consulta_id == 2)
+                                @if (count($turnosPaciente) > 0)
                                     <div class="col-md-12">
                                         <ul class="list-group list-group">
                                             <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -747,8 +747,6 @@
 
                                         </div>
                                     </div>
-                                @else
-                                    <span>Sin turnos previos.</span>
                                 @endif
 
                             </div>

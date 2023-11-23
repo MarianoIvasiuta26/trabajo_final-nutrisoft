@@ -26,6 +26,7 @@ use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
 use App\Http\Controllers\PacienteController;
 use App\Http\Controllers\PlanAlimentacionController;
+use App\Http\Controllers\PlanDeSeguimientoController;
 use App\Http\Controllers\ProhibicionesAlergiaController;
 use App\Http\Controllers\ProhibicionesCirugiaController;
 use App\Http\Controllers\ProhibicionesIntoleranciaController;
@@ -143,7 +144,8 @@ Route::middleware([
     Route::get('plan-alimentacion.planesAlimentacionAConfirmar', [PlanAlimentacionController::class, 'planesAlimentacionAConfirmar'])->name('plan-alimentacion.planesAlimentacionAConfirmar');
     Route::get('plan-alimentacion.pdf/{planId}', [PlanAlimentacionController::class, 'pdf'])->name('plan-alimentacion.pdf');
 
-
+    Route::resource('plan-seguimiento', PlanDeSeguimientoController::class)->names('plan-seguimiento');
+    Route::get('plan-seguimiento.consultarPlanGenerado/{pacienteId}/{turnoId}/{nutricionistaId}', [PlanDeSeguimientoController::class, 'consultarPlanGenerado'])->name('plan-seguimiento.consultarPlanGenerado');
 
     //Paciente
 

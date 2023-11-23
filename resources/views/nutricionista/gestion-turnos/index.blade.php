@@ -17,6 +17,26 @@
                 <button type="submit" class="btn btn-primary">Consultar Plan</button>
             </form>
         </div>
+
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            {{ session('successConPlanSeguimientoGenerado') }}
+            <form action="{{ route('plan-seguimiento.consultarPlanGenerado', ['pacienteId' => session('pacienteId'), 'turnoId' => session('turnoId'), 'nutricionistaId' => session('nutricionistaId')]) }}" method="get">
+                @csrf
+                <button type="submit" class="btn btn-primary">Consultar Plan</button>
+            </form>
+        </div>
+
+        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+            {{ session('successConPlanesGenerados') }}
+            <form action="{{ route('plan-seguimiento.consultarPlanGenerado', ['pacienteId' => session('pacienteId'), 'turnoId' => session('turnoId'), 'nutricionistaId' => session('nutricionistaId')]) }}" method="get">
+                @csrf
+                <button type="submit" class="btn btn-primary">Consultar Plan de Segumiento</button>
+            </form>
+            <form action="{{ route('plan-alimentacion.consultarPlanGenerado', ['pacienteId' => session('pacienteId'), 'turnoId' => session('turnoId'), 'nutricionistaId' => session('nutricionistaId')]) }}" method="get">
+                @csrf
+                <button type="submit" class="btn btn-info">Consultar Plan de Alimentación</button>
+            </form>
+        </div>
     @endif
 
     <div class="card card-dark">

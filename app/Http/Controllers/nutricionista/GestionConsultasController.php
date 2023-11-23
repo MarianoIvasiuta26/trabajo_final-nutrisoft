@@ -237,51 +237,43 @@ class GestionConsultasController extends Controller
         //Obtener paciente de la consulta
         $paciente = Paciente::find($turno->paciente_id);
 
-        if( $turno->estado == 'Realizado' && $request->has('generar-plan-alimentacion')){
+        $planGenerado = null;
+        $planSeguimientoGenerado = null;
+
+        if ($turno->estado == 'Realizado' && $request->has('generar-plan-alimentacion')) {
             $planGenerado = $this->generarPlanesAlimentacion($paciente->id, $turno->id, $tratamientoPaciente->id);
         }
 
-        if( $turno->estado == 'Realizado' && $request->has('generar-plan-seguimiento')){
+        if ($turno->estado == 'Realizado' && $request->has('generar-plan-seguimiento')) {
             $planSeguimientoGenerado = $this->generarPlanDeSeguimiento($paciente->id, $turno->id, $tratamientoPaciente->id);
         }
 
-        if($planSeguimientoGenerado){
-            //Si se retornó solo el plan de seguimiento
+        if ($planGenerado && $planSeguimientoGenerado) {
+            // Si se retornaron ambos planes
             return redirect()->route('gestion-turnos-nutricionista.index')
-            ->with('successConPlanSeguimientoGenerado', 'Consulta realizada con éxito. Se generó el plan de seguimiento')
-            ->with('pacienteId', $pacienteId)
-            ->with('turnoId', $turno->id)
-            ->with('nutricionistaId', $nutricionista->id);
-        }else{
-            return redirect()->back()->with('errorPlanSeguimientoNoGenerado', 'No se pudo generar el plan');
-        }
-
-        if($planGenerado && $planSeguimientoGenerado){
-            //Si se retornaron los 2 planes
+                ->with('successConPlanesGenerados', 'Consulta realizada con éxito. Se generó el plan de alimentación y el plan de seguimiento')
+                ->with('pacienteId', $pacienteId)
+                ->with('turnoId', $turno->id)
+                ->with('nutricionistaId', $nutricionista->id);
+        } elseif ($planGenerado) {
+            // Si se retornó solo el plan de alimentación
             return redirect()->route('gestion-turnos-nutricionista.index')
-            ->with('successConPlanesGenerados', 'Consulta realizada con éxito. Se generó el plan de alimentación y el plan de seguimiento')
-            ->with('pacienteId', $pacienteId)
-            ->with('turnoId', $turno->id)
-            ->with('nutricionistaId', $nutricionista->id);
-        }else{
-            return redirect()->back()->with('errorPlanesNoGenerados', 'No se pudo generar el plan');
-        }
-
-        if($planGenerado){
-            //Si se retornó solo el plan de alimentación
+                ->with('successConPlanGenerado', 'Consulta realizada con éxito. Se generó el plan de alimentación')
+                ->with('pacienteId', $pacienteId)
+                ->with('turnoId', $turno->id)
+                ->with('nutricionistaId', $nutricionista->id);
+        } elseif ($planSeguimientoGenerado) {
+            // Si se retornó solo el plan de seguimiento
             return redirect()->route('gestion-turnos-nutricionista.index')
-            ->with('successConPlanGenerado', 'Consulta realizada con éxito. Se generó el plan de alimentación')
-            ->with('pacienteId', $pacienteId)
-            ->with('turnoId', $turno->id)
-            ->with('nutricionistaId', $nutricionista->id);
-
-        }else{
-            return redirect()->back()->with('errorPlanNoGenerado', 'No se pudo generar el plan');
+                ->with('successConPlanSeguimientoGenerado', 'Consulta realizada con éxito. Se generó el plan de seguimiento')
+                ->with('pacienteId', $pacienteId)
+                ->with('turnoId', $turno->id)
+                ->with('nutricionistaId', $nutricionista->id);
+        } else {
+            // Si no se generó ningún plan
+            return redirect()->back()->with('errorPlanesNoGenerados', 'No se pudo generar ningún plan');
         }
 
-        if(!$planGenerado){
-            return redirect()->route('gestion-turnos-nutricionista.index')->with('successSinPlanGenerado', 'Consulta realizada con éxito.');
-        }
 
     }
 
@@ -1596,25 +1588,22 @@ class GestionConsultasController extends Controller
                 $actividadesRecomendadas = [];
                 $actividadesNoRecomendadas = [];
 
-                if(!empty($actividadesProhibidas) && !empty($actividadesAnalizar)){
-                    foreach($actividadesAnalizar as $actividadAnalizada){
-                        foreach($actividadesProhibidas as $actividadProhibida){
-                            foreach($actividades as $actividad){
-                                if($actividadAnalizada == $actividadProhibida){
-                                    if($actividad->id == $actividadAnalizada){
-                                        $actividadesNoRecomendadas[] = $actividad->actividad;
-                                    }
-                                }
-                                if($actividadAnalizada != $actividadProhibida){
-                                    if($actividad->id == $actividadAnalizada){
-                                        $actividadesRecomendadas[] = $actividad->actividad;
-                                    }
-                                }
+                if (!empty($actividadesAnalizar)) {
+                    if (empty($actividadesProhibidas)) {
+                        // Si no hay actividades prohibidas, todas son recomendadas
+                        $actividadesRecomendadas = $actividades->pluck('actividad', 'id')->all();
+                    } else {
+                        foreach ($actividadesAnalizar as $actividadAnalizada) {
+                            $actividadEncontrada = in_array($actividadAnalizada, $actividadesProhibidas);
 
+                            if ($actividadEncontrada) {
+                                $actividadesNoRecomendadas[] = $actividades->find($actividadAnalizada)->actividad;
+                            } else {
+                                $actividadesRecomendadas[] = $actividades->find($actividadAnalizada)->actividad;
                             }
                         }
                     }
-                }else{
+                } else {
                     return 'No se encontraron actividades para el paciente.';
                 }
 
