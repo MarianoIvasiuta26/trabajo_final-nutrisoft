@@ -26,6 +26,6 @@ class ActividadesPorTiposDeActividades extends Model
 
     public function actividadRecPorTipoActividades()
     {
-        return $this->hasMany(ActividadesRecomendadasPorTiposDeActividades::class);
+        return $this->hasMany(ActividadRecPorTipoActividades::class);
     }
 }

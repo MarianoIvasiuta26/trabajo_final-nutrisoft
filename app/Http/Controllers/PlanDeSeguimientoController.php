@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Actividades;
 use App\Models\ActividadesPorTiposDeActividades;
+use App\Models\ActividadesProhibidasCirugia;
+use App\Models\ActividadesProhibidasPatologia;
 use App\Models\ActividadRecPorTipoActividades;
 use App\Models\DetallesPlanesSeguimiento;
 use App\Models\Nutricionista;
@@ -52,12 +54,128 @@ class PlanDeSeguimientoController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
+    /*
+        * @param  \Illuminate\Http\Request  $request
+        * @return \Illuminate\Http\Response
+    */
     public function store(Request $request)
     {
-        //
+        $planGenerado = PlanesDeSeguimiento::find($request->input('plan_id'));
+
+        if (!$planGenerado) {
+            return redirect()->back()->with('errorPlanNoEncontrado', 'Error, no se pudo encontrar el plan generado. Inténtelo de nuevo por favor.');
+        }
+
+        $actividadesSeleccionadas = $request->input('actividades_seleccionadas', []);
+        $unidadesTiempo = UnidadesDeTiempo::all();
+        $detallesPlan = DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $planGenerado->id)->get();
+
+        foreach ($actividadesSeleccionadas as $actividadNueva) {
+            $tipoActividad = ActividadesPorTiposDeActividades::find($actividadNueva);
+            $actividad = Actividades::where('id', $tipoActividad->actividad_id)->first();
+
+            if ($this->esActividadProhibida($actividad, $planGenerado)) {
+                return back()
+                    ->with('planId', $planGenerado->id)
+                    ->with('tipoActividadId', $actividadNueva)
+                    ->with('info', 'La actividad ' . $actividad->actividad . ' podría no ser recomendable para este paciente. ¿Desea agregarlo igualmente?');
+            }
+
+            $this->agregarActividadAlPlan($actividadNueva, $planGenerado, $unidadesTiempo, $detallesPlan);
+        }
+
+        return redirect()->back()->with('successActividadAgregada', 'Actividad agregada al plan de seguimiento.');
+    }
+
+    private function esActividadProhibida($actividad, $planGenerado)
+    {
+        $paciente = Paciente::find($planGenerado->paciente_id);
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->get();
+        $cirugias = Cirugia::all();
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->get();
+        $patologias = Patologia::all();
+        $actividadesProhibidasCirugias = ActividadesProhibidasCirugia::all();
+        $actividadesProhibidasPatologias = ActividadesProhibidasPatologia::all();
+
+        foreach ($cirugiasPaciente as $cirugiaPaciente) {
+            foreach ($cirugias as $cirugia) {
+                foreach ($actividadesProhibidasCirugias as $prohibido) {
+                    if ($cirugiaPaciente->cirugia_id == $cirugia->id && $cirugia->id == $prohibido->cirugia_id && $prohibido->actividad_id == $actividad->id) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        foreach ($datosMedicos as $datoMedico) {
+            foreach ($patologias as $patologia) {
+                foreach ($actividadesProhibidasPatologias as $prohibido) {
+                    if ($datoMedico->patologia_id == $patologia->id && $patologia->id == $prohibido->patologia_id && $prohibido->actividad_id == $actividad) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function agregarActividadAlPlan($actividadNueva, $planGenerado, $unidadesTiempo, $detallesPlan)
+    {
+        // Lógica para agregar la actividad al plan
+        // Ajusta según tus necesidades exactas
+        $usuario = auth()->user()->apellido . ' ' . auth()->user()->name;
+        $tipo = ActividadesPorTiposDeActividades::where('tipo_actividad_id', $actividadNueva)->first();
+        $actividad = Actividades::where('id', $tipo->actividad_id)->first();
+
+        $actividadRecomendada = ActividadRecPorTipoActividades::where('act_tipoAct_id', $tipo->id)->first();
+
+        DetallesPlanesSeguimiento::create([
+            'plan_de_seguimiento_id' => $planGenerado->id,
+            'actividad_id' => $actividad->id,
+            'completada' => 0,
+            'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
+            'unidad_tiempo_realizacion' => $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo,
+            'recursos_externos' => '',
+            'estado_imc' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->estado_imc,
+            'peso_ideal' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->peso_ideal,
+            'usuario' => $usuario,
+        ]);
+    }
+
+       //Función para guardar el detalle del plan de seguimiento al agregar una nueva actividad
+    public function guardarDetalle($planId, $tipoActividadId)
+    {
+        $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
+        $tipo = ActividadesPorTiposDeActividades::where('tipo_actividad_id', $tipoActividadId)->first();
+        $actividad = Actividades::where('id', $tipo->actividad_id)->first();
+
+        $actividadRecomendada = ActividadRecPorTipoActividades::where('act_tipoAct_id', $tipo->id)->first();
+        $unidadesTiempo = UnidadesDeTiempo::all();
+        $detallesPlan = DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $planId)->get();
+
+        $detalleNuevoPlan = DetallesPlanesSeguimiento::create([
+            'plan_de_seguimiento_id' => $planId,
+            'actividad_id' => $actividad->id,
+            'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
+            'unidad_tiempo_realizacion' => $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo,
+            'recursos_externos' => '',
+            'estado_imc' => $detallesPlan->where('plan_de_seguimiento_id', $planId)->first()->estado_imc,
+            'peso_ideal' => $detallesPlan->where('plan_de_seguimiento_id', $planId)->first()->peso_ideal,
+            'usuario' => $usuario,
+        ]);
+
+        if($detalleNuevoPlan){
+            return response()->json([
+                'success' => 'Actividad agregada al plan de seguimiento.',
+            ]);
+        }else{
+            return response()->json([
+                'error' => 'Error, no se pudo agregar la actividad al plan de seguimiento. Inténtelo de nuevo por favor.',
+            ]);
+        }
     }
 
     /**
@@ -134,7 +252,7 @@ class PlanDeSeguimientoController extends Controller
         $tratamientos = Tratamiento::all();
         $tratamientosPaciente = TratamientoPorPaciente::where('paciente_id', $paciente->id)->get();
 
-        return view('plan-alimentacion.plan-generado', compact('paciente', 'turno', 'nutricionista' , 'planSeguimientoGenerado', 'detallesPlan', 'alimentos', 'historiaClinica', 'datosMedicos', 'alergias', 'patologias', 'intolerancias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'tratamientosPaciente', 'unidadesTiempo', 'tiposActividades', 'actividadesPorTipo', 'actividadesRecomendadas'));
+        return view('plan-seguimiento.plan-generado', compact('paciente', 'actividades', 'turno', 'nutricionista' , 'planSeguimientoGenerado', 'detallesPlan', 'historiaClinica', 'datosMedicos', 'alergias', 'patologias', 'intolerancias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'tratamientosPaciente', 'unidadesTiempo', 'tiposActividades', 'actividadesPorTipo', 'actividadesRecomendadas'));
 
     }
 
@@ -169,31 +287,9 @@ class PlanDeSeguimientoController extends Controller
         $plan = PlanesDeSeguimiento::find($id);
         $detallesPlan = DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $plan->id)->get();
         $actividades = Actividades::all();
-        $pdf = Pdf::loadView('plan-alimentacion.pdf', compact('plan','detallesPlan','actividades'));
+        $pdf = Pdf::loadView('plan-seguimiento.pdf', compact('plan','detallesPlan','actividades'));
         return $pdf->stream();
     }
 
-    //Función para guardar el detalle del plan de seguimiento al agregar una nueva actividad
-    public function guardarDetalle($planId, $actividadNueva, $tiempoRealizacion, $unidadTiempo, $recursosExternos){
-        $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
 
-        $detalleNuevoPlan = DetallesPlanesSeguimiento::create([
-            'plan_de_seguimiento_id' => $planId,
-            'actividad_id' => $actividadNueva,
-            'tiempo_realizacion' => $tiempoRealizacion,
-            'unidad_tiempo_realizacion' => $unidadTiempo,
-            'recursos_externos' => $recursosExternos,
-            'usuario' => $usuario,
-        ]);
-
-        if($detalleNuevoPlan){
-            return response()->json([
-                'success' => 'Actividad agregada al plan de seguimiento.',
-            ]);
-        }else{
-            return response()->json([
-                'error' => 'Error, no se pudo agregar la actividad al plan de seguimiento. Inténtelo de nuevo por favor.',
-            ]);
-        }
-    }
 }

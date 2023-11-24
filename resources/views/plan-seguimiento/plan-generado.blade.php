@@ -23,7 +23,6 @@
                             <tr style="text-align: center;">
                                 <th>Fecha generación</th>
                                 <th>Profesional</th>
-                                <th>Descripción del Plan</th>
                             </tr>
                         </thead>
 
@@ -31,7 +30,6 @@
                             <tr style="text-align: center;">
                                 <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y')}}</td>
                                 <td>{{$nutricionista->user->apellido}}, {{$nutricionista->user->name}}</td>
-                                <td>{{$planSeguimientoGenerado->descripcion}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -78,15 +76,18 @@
 
             <!-- Tabla con información de las actividades -->
 
-            <div class="row mt-3">
+            <div class="row">
                 <div class="col-md-12">
-                    <table class="table table-striped">
+                    <button type="button" class="btn btn-success btn-sm add-button" data-bs-toggle="modal" data-bs-target="#add">
+                        <i class="bi bi-plus-circle"></i> Agregar actividad
+                    </button>
+                    <table class="table table-striped mt-2">
                         <thead class="table-dark">
                             <tr style="text-align: center;">
                                 <th>Actividad</th>
                                 <th>Tipo de actividad</th>
-                                <th>Tiempo de realización</th>
-                                <th>Unidad de tiempo</th>
+                                <th>Duración</th>
+                                <th>Recursos externos</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -112,14 +113,14 @@
                                             @endforeach
                                         @endforeach
                                     </td>
-                                    <td>{{$detalle->tiempo_realizacion}}</td>
-                                    <td>{{$detalle->unidad_tiempo_realizacion}}</td>
+                                    <td>{{$detalle->tiempo_realizacion}} {{$detalle->unidad_tiempo_realizacion}}</td>
+                                    <td></td>
                                     <td>
                                         <div>
-                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit_{{$detallePlan->id}}">
+                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit_{{$detalle->id}}">
                                                 <span class="far fa-edit"></span>
                                             </button>
-                                            <form action="{{route('plan-seguimiento.destroy', $detallePlan->id)}}" method="POST" style="display: inline;">
+                                            <form action="{{route('plan-seguimiento.destroy', $detalle->id)}}" method="POST" style="display: inline;">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="button" class="btn btn-danger delete-button">
@@ -161,15 +162,12 @@
     </div>
 
     <!-- Modal Add-->
-    <!--
+
     <div class="modal fade" id="add" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="add" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addLabel">
-                        @if ($comida->nombre_comida == 'Media maniana')
-                            Agregar actividad
-                        @endif
                         Agregar actividad al plan
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -182,7 +180,94 @@
 
                         <div class="row">
                            <div class="col-md-12">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <th>Actividad</th>
+                                        <th>Tipo de actividad</th>
+                                        <th>Duración</th>
+                                        <th>Agregar</th>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($actividadesRecomendadas as $recomendada)
+                                            <tr>
+                                                <th>
+                                                    @foreach ($actividades as $actividad)
+                                                        @foreach ($tiposActividades as $tipo)
+                                                            @foreach ($actividadesPorTipo as $porTipo)
+                                                                @if ($porTipo->actividad_id == $actividad->id)
+                                                                    @if ($porTipo->tipo_actividad_id == $tipo->id)
+                                                                        @if ($recomendada->act_tipoAct_id == $porTipo->id)
+                                                                            {{$actividad->actividad}}
+                                                                        @endif
+                                                                    @endif
+                                                                @endif
+                                                            @endforeach
+                                                        @endforeach
+                                                    @endforeach
+                                                </th>
 
+                                                <th>
+                                                    @foreach ($actividades as $actividad)
+                                                        @foreach ($tiposActividades as $tipo)
+                                                            @foreach ($actividadesPorTipo as $porTipo)
+                                                                @if ($porTipo->actividad_id == $actividad->id)
+                                                                    @if ($porTipo->tipo_actividad_id == $tipo->id)
+                                                                        @if ($recomendada->act_tipoAct_id == $porTipo->id)
+                                                                            {{$tipo->tipo_actividad}}
+                                                                        @endif
+                                                                    @endif
+                                                                @endif
+                                                            @endforeach
+                                                        @endforeach
+                                                    @endforeach
+                                                </th>
+
+                                                <th>
+                                                    @foreach ($actividades as $actividad)
+                                                        @foreach ($tiposActividades as $tipo)
+                                                            @foreach ($actividadesPorTipo as $porTipo)
+                                                                @if ($porTipo->actividad_id == $actividad->id)
+                                                                    @if ($porTipo->tipo_actividad_id == $tipo->id)
+                                                                        @if ($recomendada->act_tipoAct_id == $porTipo->id)
+                                                                            @foreach ($unidadesTiempo as $tiempo)
+                                                                                @if ($tiempo->id == $recomendada->unidad_tiempo_id)
+                                                                                    {{$recomendada->duracion_actividad}} {{$tiempo->nombre_unidad_tiempo}}
+                                                                                @endif
+                                                                            @endforeach
+                                                                        @endif
+                                                                    @endif
+                                                                @endif
+                                                            @endforeach
+                                                        @endforeach
+                                                    @endforeach
+                                                </th>
+
+                                                <th>
+                                                    @foreach ($actividades as $actividad)
+                                                        @foreach ($tiposActividades as $tipo)
+                                                            @foreach ($actividadesPorTipo as $porTipo)
+                                                                @if ($porTipo->actividad_id == $actividad->id)
+                                                                    @if ($porTipo->tipo_actividad_id == $tipo->id)
+                                                                        @if ($recomendada->act_tipoAct_id == $porTipo->id)
+                                                                            <div class="form-check form-switch">
+                                                                                <input class="form-check-input" type="checkbox" id="actividad{{$porTipo->id}}" name="actividades_seleccionadas[]" value="{{$porTipo->id}}"
+                                                                                    @foreach ($detallesPlan as $detalle)
+                                                                                        @if($detalle->actividad_id == $actividad->id) checked @endif
+                                                                                    @endforeach
+                                                                                >
+                                                                                <label class="form-check-label" for="actividad{{$porTipo->id}}"></label>
+                                                                            </div>
+                                                                        @endif
+                                                                    @endif
+                                                                @endif
+                                                            @endforeach
+                                                        @endforeach
+                                                    @endforeach
+                                                </th>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                            </div>
 
                         </div>
@@ -201,7 +286,6 @@
             </div>
         </div>
     </div>
-    -->
 
 @stop
 
@@ -307,7 +391,7 @@
             })
         @endif
 
-        @if (session('errorAlimentoYaAgregado'))
+        @if (session('errorActividadYaAgregada'))
             Swal.fire({
                 icon: 'error',
                 title: '¡Error!',
@@ -317,7 +401,7 @@
             })
         @endif
 
-        @if (session('successAlimentoAgregado'))
+        @if (session('successActividadAgregada'))
             Swal.fire({
                 icon: 'success',
                 title: '¡Éxito!',
@@ -343,11 +427,12 @@
                 title: '¡Atención!',
                 text: "{{ session('info') }}",
                 showCancelButton: true,
-                confirmButtonText: 'Agregar alimento',
+                confirmButtonText: 'Agregar actividad',
                 cancelButtonText: 'No agregar',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('{{ route('plan-alimentacion.guardarDetalle' ,['planId' => session('planId'), 'alimentoNuevo' => session('alimentoNuevo'), 'comida' => session('comida'), 'cantidad' => session('cantidad'), 'unidadMedida' => session('unidadMedida'),'observacion' => session('observacion')]) }}', {
+                    // Enviar solicitud Ajax para guardar igualmente
+                    fetch('{{ route('plan-seguimiento.guardarDetalle', ['planId' => session('planId'), 'tipoActividadId' => session('tipoActividadId')]) }}/' + accion, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -355,11 +440,7 @@
                         },
                         body: JSON.stringify({
                             planId: '{{ session('planId') }}',
-                            alimentoNuevo: '{{ session('alimentoNuevo') }}',
-                            comida: '{{ session('comida') }}',
-                            cantidad: '{{ session('cantidad') }}',
-                            unidadMedida: '{{ session('unidadMedida') }}',
-                            observacion: '{{ session('observacion') }}'
+                            tipoActividadId: '{{ session('tipoActividadId') }}',
                         })
                     }).then(response => response.json())
                         .then(data => {
@@ -369,8 +450,7 @@
                                     title: 'Éxito',
                                     text: data.success
                                 }).then(() => {
-
-                                    window.location.reload() ;
+                                    window.location.reload();
                                 });
                             } else if (data.error) {
                                 Swal.fire({
@@ -388,6 +468,7 @@
                 }
             });
         @endif
+
 
         //SweetAlert Eliminar alimento
         const swalWithBootstrapButtons = Swal.mixin({

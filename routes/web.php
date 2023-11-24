@@ -148,7 +148,7 @@ Route::middleware([
     //Nutricionista - Plan de seguimiento
     Route::resource('plan-seguimiento', PlanDeSeguimientoController::class)->names('plan-seguimiento');
     Route::get('plan-seguimiento.consultarPlanGenerado/{pacienteId}/{turnoId}/{nutricionistaId}', [PlanDeSeguimientoController::class, 'consultarPlanGenerado'])->name('plan-seguimiento.consultarPlanGenerado');
-    Route::post('plan-seguimiento.guardarDetalle/{planId}/{actividadNueva}/{tiempoRealizacion}/{unidadTiempo}/{recursosExternos}', [PlanDeSeguimientoController::class, 'guardarDetalle'])->name('plan-seguimiento.guardarDetalle');
+    Route::post('plan-seguimiento.guardarDetalle/{planId}/{tipoActividadId}', [PlanDeSeguimientoController::class, 'guardarDetalle'])->name('plan-seguimiento.guardarDetalle');
     Route::post('plan-seguimiento.confirmarPlan/{planId}', [PlanDeSeguimientoController::class, 'confirmarPlan'])->name('plan-seguimiento.confirmarPlan');
     Route::get('plan-seguimiento.planesSeguimientoAConfirmar', [PlanDeSeguimientoController::class, 'planesSeguimientoAConfirmar'])->name('plan-alimentacion.planesSeguimientoAConfirmar');
     Route::get('plan-seguimiento.pdf/{planId}', [PlanDeSeguimientoController::class, 'pdf'])->name('plan-seguimiento.pdf');
