@@ -23,6 +23,7 @@ use App\Models\Tratamiento;
 use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
 use App\Models\UnidadesDeTiempo;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class PlanDeSeguimientoController extends Controller
@@ -34,7 +35,8 @@ class PlanDeSeguimientoController extends Controller
      */
     public function index()
     {
-
+        $planesPaciente = PlanesDeSeguimiento::where('paciente_id', auth()->user()->paciente->id)->get();
+        return view('plan-alimentacion.index', compact('planesPaciente'));
     }
 
     /**
@@ -136,4 +138,62 @@ class PlanDeSeguimientoController extends Controller
 
     }
 
+    //Función para confirmar el plan generado
+    public function confirmarPlan($id){
+
+        $planAConfirmar = PlanesDeSeguimiento::find($id);
+
+        if(!$planAConfirmar){
+            return redirect()->back()->with('errorPlanNoEncontrado', 'No se encontró el plan de alimentación a confirmar.');
+        }
+
+        $planAConfirmar->estado = 1;
+        $planAConfirmar->save();
+
+        return redirect()->route('nutricionista.planes-a-confirmar.plan-seguimiento.index')->with('successPlanConfirmado', 'Plan de alimentación confirmado y asociado al paciente.');
+
+    }
+
+    //Función para nutricionista consultar los planes generados
+    public function planesSeguimientoAConfirmar(){
+        $planesAConfirmar = PlanesDeSeguimiento::where('estado', 2)->get();
+        $planesGenerados =  PlanesDeSeguimiento::all();
+
+        return view('nutricionista.planes-a-confirmar.plan-seguimiento.index', compact('planesAConfirmar', 'planesGenerados'));
+
+    }
+
+    //Generación de pdf
+    public function pdf($id){
+
+        $plan = PlanesDeSeguimiento::find($id);
+        $detallesPlan = DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $plan->id)->get();
+        $actividades = Actividades::all();
+        $pdf = Pdf::loadView('plan-alimentacion.pdf', compact('plan','detallesPlan','actividades'));
+        return $pdf->stream();
+    }
+
+    //Función para guardar el detalle del plan de seguimiento al agregar una nueva actividad
+    public function guardarDetalle($planId, $actividadNueva, $tiempoRealizacion, $unidadTiempo, $recursosExternos){
+        $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
+
+        $detalleNuevoPlan = DetallesPlanesSeguimiento::create([
+            'plan_de_seguimiento_id' => $planId,
+            'actividad_id' => $actividadNueva,
+            'tiempo_realizacion' => $tiempoRealizacion,
+            'unidad_tiempo_realizacion' => $unidadTiempo,
+            'recursos_externos' => $recursosExternos,
+            'usuario' => $usuario,
+        ]);
+
+        if($detalleNuevoPlan){
+            return response()->json([
+                'success' => 'Actividad agregada al plan de seguimiento.',
+            ]);
+        }else{
+            return response()->json([
+                'error' => 'Error, no se pudo agregar la actividad al plan de seguimiento. Inténtelo de nuevo por favor.',
+            ]);
+        }
+    }
 }

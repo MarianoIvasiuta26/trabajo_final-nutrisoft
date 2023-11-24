@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Planes de alimentación')
+@section('title', 'Planes de Seguimiento')
 
 @section('content_header')
 @stop
@@ -10,7 +10,7 @@
 
     <div class="card card-dark mt-3">
         <div class="card-header">
-            <h5>Planes de alimentación por confirmar</h5>
+            <h5>Planes de seguimiento por confirmar</h5>
         </div>
 
         <div class="card-body">
@@ -28,7 +28,7 @@
                             <td>{{ \Carbon\Carbon::parse($plan->consulta->turno->fecha)->format('d/m/Y')}}</td>
                             <td>{{ $plan->paciente->user->apellido }}, {{ $plan->paciente->user->name }}</td>
                             <td>
-                                <form action="{{ route('plan-alimentacion.consultarPlanGenerado', ['pacienteId'=>$plan->paciente_id, 'turnoId' => $plan->consulta->turno->id, 'nutricionistaId' => $plan->consulta->nutricionista_id]) }}" method="GET" style="display: inline-block;">
+                                <form action="{{ route('plan-seguimiento.consultarPlanGenerado', ['pacienteId'=>$plan->paciente_id, 'turnoId' => $plan->consulta->turno->id, 'nutricionistaId' => $plan->consulta->nutricionista_id]) }}" method="GET" style="display: inline-block;">
                                     @csrf
 
                                     <button class="btn btn-primary btn-sm" type="submit">
@@ -37,7 +37,7 @@
                                     </button>
                                 </form>
 
-                                <form id="confirmar-form" action="{{route('plan-alimentacion.confirmarPlan', $plan->id)}}" method="POST" class="d-inline-block">
+                                <form id="confirmar-form" action="{{route('plan-seguimiento.confirmarPlan', $plan->id)}}" method="POST" class="d-inline-block">
                                     @csrf
 
                                     <button type="button" class="btn btn-success btn-sm confirmar-button">Confirmar</button>
@@ -52,7 +52,7 @@
 
     <div class="card card-dark mt-3">
         <div class="card-header">
-            <h5>Historial de Planes de alimentación generados</h5>
+            <h5>Historial de Planes de seguimiento generados</h5>
         </div>
 
         <div class="card-body">
@@ -81,7 +81,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <form action="{{ route('plan-alimentacion.show', $plan->id) }}" method="GET" style="display: inline-block;">
+                                    <form action="{{ route('plan-seguimiento.show', $plan->id) }}" method="GET" style="display: inline-block;">
                                         @csrf
 
                                         <button class="btn btn-primary btn-sm" type="submit">
@@ -89,7 +89,7 @@
                                             Ver
                                         </button>
                                     </form>
-                                    <a href="{{ route('plan-alimentacion.pdf', $plan->id) }}" target="_blank" class="btn btn-secondary btn-sm">
+                                    <a href="{{ route('plan-seguimiento.pdf', $plan->id) }}" target="_blank" class="btn btn-secondary btn-sm">
                                         <i class="bi bi-printer"></i>
                                         Imprimir
                                     </a>
@@ -178,9 +178,9 @@
                 "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
                 "language": {
                     "lengthMenu": "Mostrar _MENU_ planes por página",
-                    "zeroRecords": "No se encontró ningún plan de alimentación.",
+                    "zeroRecords": "No se encontró ningún plan de seguimiento.",
                     "info": "Mostrando la página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay planes de alimentación existentes.",
+                    "infoEmpty": "No hay planes de seguimiento existentes.",
                     "infoFiltered": "(filtrado de _MAX_ planes totales)",
                     "search": "Buscar:",
                     "paginate": {
@@ -191,50 +191,6 @@
                     },
 
                 }
-            });
-        });
-
-         //SweetAlert Confirmar plan
-         document.addEventListener('DOMContentLoaded', function () {
-            const confirmarPlan = document.querySelectorAll('.confirmar-button');
-
-            confirmarPlan.forEach(button => {
-                button.addEventListener('click', function () {
-                    const swalWithBootstrapButtons = Swal.mixin({
-                        customClass: {
-                            confirmButton: 'btn btn-success',
-                            cancelButton: 'btn btn-danger'
-                        },
-                        buttonsStyling: true
-                        })
-
-                        swalWithBootstrapButtons.fire({
-                        title: '¿Está seguro de guardar el plan de alimentación generado?',
-                        text: "Al confirmar se asociará el plan al paciente correspondiente.",
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: '¡Confirmar plan!',
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonText: '¡No, cancelar!',
-                        cancelButtonColor: '#d33',
-                        reverseButtons: true
-                        }).then((result) => {
-                        if (result.isConfirmed) {
-                            //Envia el form
-                            const form = document.getElementById('confirmar-form');
-                            form.submit();
-                        } else if (
-                            /* Read more about handling dismissals below */
-                            result.dismiss === Swal.DismissReason.cancel
-                        ) {
-                            swalWithBootstrapButtons.fire(
-                            '¡No se guardó el plan de alimentación!',
-                            'El plan aún no se asoció al paciente, puede realizar modificaciones en el mismo.',
-                            'error'
-                            )
-                        }
-                    })
-                });
             });
         });
 

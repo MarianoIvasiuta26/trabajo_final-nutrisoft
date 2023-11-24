@@ -137,6 +137,7 @@ Route::middleware([
         'gestion-actividad-por-tipo-actividad' => 'actividadPorTipo',
     ]);
 
+    //Nutricionista - Plan de alimentación
     Route::resource('plan-alimentacion', PlanAlimentacionController::class)->names('plan-alimentacion');
     Route::post('plan-alimentacion.guardarDetalle/{planId}/{alimentoNuevo}/{comida}/{cantidad}/{unidadMedida}/{observacion}', [PlanAlimentacionController::class, 'guardarDetalle'])->name('plan-alimentacion.guardarDetalle');
     Route::get('plan-alimentacion.consultarPlanGenerado/{pacienteId}/{turnoId}/{nutricionistaId}', [PlanAlimentacionController::class, 'consultarPlanGenerado'])->name('plan-alimentacion.consultarPlanGenerado');
@@ -144,11 +145,16 @@ Route::middleware([
     Route::get('plan-alimentacion.planesAlimentacionAConfirmar', [PlanAlimentacionController::class, 'planesAlimentacionAConfirmar'])->name('plan-alimentacion.planesAlimentacionAConfirmar');
     Route::get('plan-alimentacion.pdf/{planId}', [PlanAlimentacionController::class, 'pdf'])->name('plan-alimentacion.pdf');
 
+    //Nutricionista - Plan de seguimiento
     Route::resource('plan-seguimiento', PlanDeSeguimientoController::class)->names('plan-seguimiento');
     Route::get('plan-seguimiento.consultarPlanGenerado/{pacienteId}/{turnoId}/{nutricionistaId}', [PlanDeSeguimientoController::class, 'consultarPlanGenerado'])->name('plan-seguimiento.consultarPlanGenerado');
+    Route::post('plan-seguimiento.guardarDetalle/{planId}/{actividadNueva}/{tiempoRealizacion}/{unidadTiempo}/{recursosExternos}', [PlanDeSeguimientoController::class, 'guardarDetalle'])->name('plan-seguimiento.guardarDetalle');
+    Route::post('plan-seguimiento.confirmarPlan/{planId}', [PlanDeSeguimientoController::class, 'confirmarPlan'])->name('plan-seguimiento.confirmarPlan');
+    Route::get('plan-seguimiento.planesSeguimientoAConfirmar', [PlanDeSeguimientoController::class, 'planesSeguimientoAConfirmar'])->name('plan-alimentacion.planesSeguimientoAConfirmar');
+    Route::get('plan-seguimiento.pdf/{planId}', [PlanDeSeguimientoController::class, 'pdf'])->name('plan-seguimiento.pdf');
+
 
     //Paciente
-
     Route::resource('historia-clinica', HistoriaClinicaController::class)->names('historia-clinica');
     Route::get('/complete-history', [HistoriaClinicaController::class, 'index'])->name('complete-history');
     Route::post('datos-personales/store', [PacienteController::class, 'store'])->name('datos-personales.store');

@@ -393,7 +393,7 @@ return [
                 [
                     'text' => 'Planes de Seguimiento',
                     'icon' =>'fas fa-fw fa-receipt',
-                    'route'  => 'gestion-turnos-nutricionista.showHistorialTurnos',
+                    'route'  => 'plan-alimentacion.planesSeguimientoAConfirmar',
                 ],
             ],
         ],
