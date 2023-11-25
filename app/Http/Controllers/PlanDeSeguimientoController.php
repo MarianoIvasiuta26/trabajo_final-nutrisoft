@@ -82,7 +82,28 @@ class PlanDeSeguimientoController extends Controller
                     ->with('info', 'La actividad ' . $actividad->actividad . ' podría no ser recomendable para este paciente. ¿Desea agregarlo igualmente?');
             }
 
-            $this->agregarActividadAlPlan($actividadNueva, $planGenerado, $unidadesTiempo, $detallesPlan);
+            $usuario = auth()->user()->apellido . ' ' . auth()->user()->name;
+
+            $actividadRecomendada = ActividadRecPorTipoActividades::where('act_tipoAct_id', $tipoActividad->id)->first();
+
+            foreach($detallesPlan as $detalle){
+                $unidadTiempo = $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo;
+                if($detalle->actividad_id == $actividad->id && $detalle->tiempo_realizacion == $actividadRecomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $unidadTiempo){
+                    continue 2;
+                }
+            }
+
+            DetallesPlanesSeguimiento::create([
+                'plan_de_seguimiento_id' => $planGenerado->id,
+                'actividad_id' => $actividad->id,
+                'completada' => 0,
+                'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
+                'unidad_tiempo_realizacion' => $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo,
+                'recursos_externos' => '',
+                'estado_imc' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->estado_imc,
+                'peso_ideal' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->peso_ideal,
+                'usuario' => $usuario,
+            ]);
         }
 
         return redirect()->back()->with('successActividadAgregada', 'Actividad agregada al plan de seguimiento.');
@@ -120,29 +141,6 @@ class PlanDeSeguimientoController extends Controller
         }
 
         return false;
-    }
-
-    private function agregarActividadAlPlan($actividadNueva, $planGenerado, $unidadesTiempo, $detallesPlan)
-    {
-        // Lógica para agregar la actividad al plan
-        // Ajusta según tus necesidades exactas
-        $usuario = auth()->user()->apellido . ' ' . auth()->user()->name;
-        $tipo = ActividadesPorTiposDeActividades::where('tipo_actividad_id', $actividadNueva)->first();
-        $actividad = Actividades::where('id', $tipo->actividad_id)->first();
-
-        $actividadRecomendada = ActividadRecPorTipoActividades::where('act_tipoAct_id', $tipo->id)->first();
-
-        DetallesPlanesSeguimiento::create([
-            'plan_de_seguimiento_id' => $planGenerado->id,
-            'actividad_id' => $actividad->id,
-            'completada' => 0,
-            'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
-            'unidad_tiempo_realizacion' => $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo,
-            'recursos_externos' => '',
-            'estado_imc' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->estado_imc,
-            'peso_ideal' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->peso_ideal,
-            'usuario' => $usuario,
-        ]);
     }
 
        //Función para guardar el detalle del plan de seguimiento al agregar una nueva actividad
