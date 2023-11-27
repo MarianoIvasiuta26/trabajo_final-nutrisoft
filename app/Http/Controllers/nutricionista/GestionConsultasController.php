@@ -1630,6 +1630,7 @@ class GestionConsultasController extends Controller
                                             $pesoIdeal = $obtenerDatosPlan['pesoIdeal'];
                                             DetallesPlanesSeguimiento::create([
                                                 'plan_de_seguimiento_id' => $planSeguimiento->id,
+                                                'act_rec_id' => $actividadRecomendada->id,
                                                 'actividad_id' => $actividad->id,
                                                 'completada' => 0, //No completada por defecto
                                                 'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,

@@ -8,6 +8,7 @@ use App\Models\ActividadesPorTiposDeActividades;
 use App\Models\ActividadesProhibidasCirugia;
 use App\Models\ActividadesProhibidasPatologia;
 use App\Models\ActividadRecPorTipoActividades;
+use App\Models\Consulta;
 use App\Models\DetallesPlanesSeguimiento;
 use App\Models\Nutricionista;
 use App\Models\Paciente;
@@ -62,6 +63,7 @@ class PlanDeSeguimientoController extends Controller
     public function store(Request $request)
     {
         $planGenerado = PlanesDeSeguimiento::find($request->input('plan_id'));
+        $consulta = Consulta::where('id', $planGenerado->consulta_id)->first();
 
         if (!$planGenerado) {
             return redirect()->back()->with('errorPlanNoEncontrado', 'Error, no se pudo encontrar el plan generado. Inténtelo de nuevo por favor.');
@@ -72,19 +74,18 @@ class PlanDeSeguimientoController extends Controller
         $detallesPlan = DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $planGenerado->id)->get();
 
         foreach ($actividadesSeleccionadas as $actividadNueva) {
-            $tipoActividad = ActividadesPorTiposDeActividades::find($actividadNueva);
+            $actividadRecomendada = ActividadRecPorTipoActividades::find($actividadNueva);
+            $tipoActividad = ActividadesPorTiposDeActividades::where('id', $actividadRecomendada->act_tipoAct_id)->first();
             $actividad = Actividades::where('id', $tipoActividad->actividad_id)->first();
 
             if ($this->esActividadProhibida($actividad, $planGenerado)) {
                 return back()
                     ->with('planId', $planGenerado->id)
-                    ->with('tipoActividadId', $actividadNueva)
+                    ->with('actRecomendadaId', $actividadNueva)
                     ->with('info', 'La actividad ' . $actividad->actividad . ' podría no ser recomendable para este paciente. ¿Desea agregarlo igualmente?');
             }
 
             $usuario = auth()->user()->apellido . ' ' . auth()->user()->name;
-
-            $actividadRecomendada = ActividadRecPorTipoActividades::where('act_tipoAct_id', $tipoActividad->id)->first();
 
             foreach($detallesPlan as $detalle){
                 $unidadTiempo = $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo;
@@ -93,15 +94,24 @@ class PlanDeSeguimientoController extends Controller
                 }
             }
 
+            $obtenerDatosPlan = $this->obtenerDatosPlan($consulta->imc_actual, $consulta->peso_actual, $consulta->altura_actual);
+            $estadoIMC = $obtenerDatosPlan['estadoIMC'];
+            $pesoIdeal = $obtenerDatosPlan['pesoIdeal'];
+
             DetallesPlanesSeguimiento::create([
                 'plan_de_seguimiento_id' => $planGenerado->id,
+                'act_rec_id' => $actividadRecomendada->id,
                 'actividad_id' => $actividad->id,
                 'completada' => 0,
                 'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
                 'unidad_tiempo_realizacion' => $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo,
                 'recursos_externos' => '',
-                'estado_imc' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->estado_imc,
-                'peso_ideal' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->peso_ideal,
+                'estado_imc' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->isNotEmpty()
+                    ? $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->estado_imc
+                    : $estadoIMC,
+                'peso_ideal' => $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->isNotEmpty()
+                    ? $detallesPlan->where('plan_de_seguimiento_id', $planGenerado->id)->first()->peso_ideal
+                    : $pesoIdeal,
                 'usuario' => $usuario,
             ]);
         }
@@ -144,18 +154,19 @@ class PlanDeSeguimientoController extends Controller
     }
 
        //Función para guardar el detalle del plan de seguimiento al agregar una nueva actividad
-    public function guardarDetalle($planId, $tipoActividadId)
+    public function guardarDetalle($planId, $actRecomendadaId)
     {
         $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
-        $tipo = ActividadesPorTiposDeActividades::where('tipo_actividad_id', $tipoActividadId)->first();
+        $actividadRecomendada = ActividadRecPorTipoActividades::find($actRecomendadaId)->first();
+        $tipo = ActividadesPorTiposDeActividades::where('id', $actividadRecomendada->act_tipoAct_id)->first();
         $actividad = Actividades::where('id', $tipo->actividad_id)->first();
 
-        $actividadRecomendada = ActividadRecPorTipoActividades::where('act_tipoAct_id', $tipo->id)->first();
         $unidadesTiempo = UnidadesDeTiempo::all();
         $detallesPlan = DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $planId)->get();
 
         $detalleNuevoPlan = DetallesPlanesSeguimiento::create([
             'plan_de_seguimiento_id' => $planId,
+            'act_rec_id' => $actividadRecomendada->id,
             'actividad_id' => $actividad->id,
             'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
             'unidad_tiempo_realizacion' => $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo,
@@ -327,5 +338,36 @@ class PlanDeSeguimientoController extends Controller
         return $pdf->stream();
     }
 
+    public function obtenerDatosPlan($imc, $peso, $altura){
+
+        $estadoIMC = '';
+        $alturaMetro = $altura / 100;
+
+        if($imc < 18.5){
+            $estadoIMC = 'IMC bajo. Bajo peso. ';
+            $pesoIdeal = 18.5 * ($alturaMetro * $alturaMetro); //Bajo peso
+        }else if($imc >= 18.5 && $imc <= 24.99){
+            $estadoIMC = 'IMC normal. Peso saludable. ';
+            $pesoIdeal = $peso; //Peso normal
+        }else if($imc >= 25 && $imc <= 29.99){
+            $estadoIMC = 'IMC elevado. Sobrepeso. ';
+            $pesoIdeal = 25 * ($alturaMetro * $alturaMetro); //Sobrepeso
+        }else if($imc >= 30 && $imc <= 34.99){
+            $estadoIMC = 'IMC elevado. Obesidad de grado 1. ';
+            $pesoIdeal = 30 * ($alturaMetro * $alturaMetro); //Obesidad grado 1
+        }else if($imc >= 35 && $imc <= 39.99){
+            $estadoIMC = 'IMC elevado. Obesidad de grado 2. ';
+            $pesoIdeal = 35 * ($alturaMetro * $alturaMetro); //Obesidad grado 2
+        }else if($imc >= 40){
+            $estadoIMC = 'IMC elevado. Obesidad mórbida. ';
+            $pesoIdeal = 40 * ($alturaMetro * $alturaMetro); //Obesidad grado 3 o mórbida
+        }
+
+        return [
+            'estadoIMC' => $estadoIMC,
+            'pesoIdeal' => $pesoIdeal,
+        ];
+
+    }
 
 }

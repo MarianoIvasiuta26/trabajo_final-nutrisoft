@@ -20,4 +20,14 @@ class ActividadRecPorTipoActividades extends Model
         return $this->belongsTo(ActividadesPorTiposDeActividades::class);
     }
 
+    public function unidadTiempo()
+    {
+        return $this->belongsTo(UnidadesDeTiempo::class);
+    }
+
+    public function detallesPlanesSeguimiento()
+    {
+        return $this->hasMany(DetallesPlanesSeguimiento::class);
+    }
+
 }

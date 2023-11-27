@@ -11,6 +11,7 @@ class DetallesPlanesSeguimiento extends Model
 
     protected $fillable = [
         'plan_de_seguimiento_id',
+        'act_rec_id',
         'actividad_id',
         'completada',
         'tiempo_realizacion',
@@ -28,5 +29,9 @@ class DetallesPlanesSeguimiento extends Model
     public function actividad()
     {
         return $this->belongsTo(Actividades::class);
+    }
+
+    public function ActividadRecPorTipoActividades(){
+        return $this->belongsTo(ActividadRecPorTipoActividades::class);
     }
 }

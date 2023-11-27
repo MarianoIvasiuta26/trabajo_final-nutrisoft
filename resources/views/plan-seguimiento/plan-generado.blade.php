@@ -93,7 +93,7 @@
                         </thead>
 
                         <tbody>
-                            @foreach ($detallesPlan as $detalle)
+                            @forelse ($detallesPlan as $detalle)
                                 @foreach ($actividadesRecomendadas as $recomendada)
                                     @foreach ($tiposActividades as $tipoActividad)
                                         @foreach ($actividadesPorTipo as $tipo)
@@ -247,7 +247,13 @@
                                         @endforeach
                                     @endforeach
                                 @endforeach
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" style="text-align: center;">
+                                        <h5>No hay actividades agregadas al plan de seguimiento</h5>
+                                    </td>
+                                </tr>
+                            @endforelse
 
                         </tbody>
                     </table>
@@ -368,14 +374,14 @@
                                                                     @if ($porTipo->tipo_actividad_id == $tipo->id)
                                                                         @if ($recomendada->act_tipoAct_id == $porTipo->id)
                                                                             <div class="form-check form-switch">
-                                                                                <input class="form-check-input" type="checkbox" id="actividad{{$porTipo->id}}" name="actividades_seleccionadas[]" value="{{$porTipo->id}}"
+                                                                                <input class="form-check-input" type="checkbox" id="actividad{{$recomendada->id}}" name="actividades_seleccionadas[]" value="{{$recomendada->id}}"
                                                                                     @foreach ($detallesPlan as $detalle)
                                                                                         @foreach ($unidadesTiempo as $tiempo)
                                                                                             @if($detalle->actividad_id == $actividad->id && $tiempo->id == $recomendada->unidad_tiempo_id && $tiempo->nombre_unidad_tiempo == $detalle->unidad_tiempo_realizacion) checked @endif
                                                                                         @endforeach
                                                                                     @endforeach
                                                                                 >
-                                                                                <label class="form-check-label" for="actividad{{$porTipo->id}}"></label>
+                                                                                <label class="form-check-label" for="actividad{{$recomendada->id}}"></label>
                                                                             </div>
                                                                         @endif
                                                                     @endif
@@ -532,7 +538,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Enviar solicitud Ajax para guardar igualmente
-                    fetch('{{ route('plan-seguimiento.guardarDetalle', ['planId' => session('planId'), 'tipoActividadId' => session('tipoActividadId')]) }}/' + accion, {
+                    fetch('{{ route('plan-seguimiento.guardarDetalle', ['planId' => session('planId'), 'actRecomendadaId' => session('actRecomendadaId')]) }}/' + accion, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -540,7 +546,7 @@
                         },
                         body: JSON.stringify({
                             planId: '{{ session('planId') }}',
-                            tipoActividadId: '{{ session('tipoActividadId') }}',
+                            tipoActividadId: '{{ session('actRecomendadaId') }}',
                         })
                     }).then(response => response.json())
                         .then(data => {
