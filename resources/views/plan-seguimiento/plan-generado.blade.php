@@ -106,8 +106,9 @@
                                         @foreach ($tiposActividades as $tipoActividad)
                                             @foreach ($actividadesPorTipo as $tipo)
                                                 @if ($tipo->tipo_actividad_id == $tipoActividad->id)
+                                                
                                                     @if ($tipo->actividad_id == $detalle->actividad_id)
-                                                        {{$tipoActividad->tipo_actividad}}
+                                                        <span class="badge bg-primary">{{$tipoActividad->tipo_actividad}}</span>
                                                     @endif
                                                 @endif
                                             @endforeach
@@ -252,7 +253,9 @@
                                                                             <div class="form-check form-switch">
                                                                                 <input class="form-check-input" type="checkbox" id="actividad{{$porTipo->id}}" name="actividades_seleccionadas[]" value="{{$porTipo->id}}"
                                                                                     @foreach ($detallesPlan as $detalle)
-                                                                                        @if($detalle->actividad_id == $actividad->id) checked @endif
+                                                                                        @foreach ($unidadesTiempo as $tiempo)
+                                                                                            @if($detalle->actividad_id == $actividad->id && $tiempo->id == $recomendada->unidad_tiempo_id && $tiempo->nombre_unidad_tiempo == $detalle->unidad_tiempo_realizacion) checked @endif
+                                                                                        @endforeach
                                                                                     @endforeach
                                                                                 >
                                                                                 <label class="form-check-label" for="actividad{{$porTipo->id}}"></label>
@@ -341,46 +344,6 @@
     <script>
 
         //Respuestas Flash del controlador con SweetAlert
-        @if (session('successPlanConfirmado'))
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: "{{session('successPlanConfirmado')}}",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        @endif
-
-        @if (session('successAlimentoEliminado'))
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: "{{session('successAlimentoEliminado')}}",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        @endif
-
-        @if (session('successAlimentoActualizado'))
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: "{{session('successAlimentoActualizado')}}",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        @endif
-
-        @if (session('errorAlimentoNoEncontrado'))
-            Swal.fire({
-                icon: 'error',
-                title: '¡Error!',
-                text: "{{session('errorAlimentoNoEncontrado')}}",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        @endif
-
         @if (session('errorPlanNoEncontrado'))
             Swal.fire({
                 icon: 'error',
@@ -395,7 +358,7 @@
             Swal.fire({
                 icon: 'error',
                 title: '¡Error!',
-                text: "{{session('errorAlimentoYaAgregado')}}",
+                text: "{{session('errorActividadYaAgregada')}}",
                 showConfirmButton: false,
                 timer: 3000
             })
@@ -405,7 +368,7 @@
             Swal.fire({
                 icon: 'success',
                 title: '¡Éxito!',
-                text: "{{session('successAlimentoAgregado')}}",
+                text: "{{session('successActividadAgregada')}}",
                 showConfirmButton: false,
                 timer: 3000
             })
