@@ -100,6 +100,7 @@
                                             @foreach ($unidadesTiempo as $tiempo)
                                                 @if ($detalle->actividad_id == $tipo->actividad_id && $detalle->tiempo_realizacion == $recomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $tiempo->nombre_unidad_tiempo && $tiempo->id == $recomendada->unidad_tiempo_id && $recomendada->act_tipoAct_id == $tipo->id && $tipoActividad->id == $tipo->tipo_actividad_id)
                                                     <tr style="text-align: center;">
+                                                        <!-- Actividad -->
                                                         <td>
                                                             @foreach ($actividades as $actividad)
                                                                 @if ($actividad->id == $detalle->actividad_id)
@@ -107,6 +108,7 @@
                                                                 @endif
                                                             @endforeach
                                                         </td>
+                                                        <!-- Tipo de actividad -->
                                                         <td>
                                                             @foreach ($actividades as $actividad)
                                                                 @if ($actividad->id == $detalle->actividad_id && $detalle->actividad_id == $tipo->actividad_id)
@@ -114,6 +116,7 @@
                                                                 @endif
                                                             @endforeach
                                                         </td>
+                                                        <!-- Duración -->
                                                         <td>
                                                             @foreach ($actividades as $actividad)
                                                                 @if ($actividad->id == $detalle->actividad_id && $detalle->actividad_id == $tipo->actividad_id)
@@ -121,7 +124,15 @@
                                                                 @endif
                                                             @endforeach
                                                         </td>
-                                                        <td></td>
+                                                        <!-- Recursos externos -->
+                                                        <td>
+                                                            @foreach ($actividades as $actividad)
+                                                                @if ($actividad->id == $detalle->actividad_id)
+                                                                    {{$detalle->recursos_externos}}
+                                                                @endif
+                                                            @endforeach
+                                                        </td>
+                                                        <!-- Acciones -->
                                                         <td>
                                                             <div>
                                                                 <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit_{{$detalle->id}}">
@@ -137,6 +148,100 @@
                                                             </div>
                                                         </td>
                                                     </tr>
+
+                                                    <!-- Modal Edit-->
+                                                    <div class="modal fade" id="edit_{{$detalle->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="edit_{{$detalle->id}}Label" aria-hidden="true">
+                                                        <div class="modal-dialog modal-xl">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="edit_{{$detalle->id}}Label">
+                                                                        Editar actividad del plan de seguimiento
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form id="editForm" action="{{route('plan-seguimiento.update', $detalle->id)}}" method="POST">
+                                                                        @csrf
+                                                                        @method('PUT')
+
+                                                                        <div class="row">
+                                                                            <div class="col-md-4">
+                                                                                <label for="actividad">Actividad</label>
+                                                                                <select id="actividadSelect" class="form-select" name="actividad">
+                                                                                    <option value="" disabled>Seleccione una actividad</option>
+                                                                                    @foreach ($actividades as $actividad)
+                                                                                        @foreach ($detallesPlan as $detallePlan)
+                                                                                            @if ($detalle->id == $detallePlan->id)
+                                                                                                @if ($detallePlan->actividad_id == $actividad->id)
+                                                                                                    <option value="{{$actividad->id}}" selected>{{$actividad->actividad}}</option>
+                                                                                                @else
+                                                                                                    <option value="{{$actividad->id}}">{{$actividad->actividad}}</option>
+                                                                                                @endif
+                                                                                            @endif
+                                                                                        @endforeach
+                                                                                    @endforeach
+                                                                                </select>
+                                                                                @error('actividad')
+                                                                                    <small class="text-danger">{{$message}}</small>
+                                                                                @enderror
+                                                                            </div>
+
+                                                                            <div class="col-md-4">
+                                                                                <label for="duracion">Duración</label>
+                                                                                <input type="text" id="duracionInput" class="form-control" name="duracion" value="{{$detalle->tiempo_realizacion}}">
+                                                                                @error('duracion')
+                                                                                    <small class="text-danger">{{$message}}</small>
+                                                                                @enderror
+                                                                            </div>
+
+                                                                            <div class="col-md-4">
+                                                                                <label for="unidad_tiempo">Unidad de tiempo</label>
+                                                                                <select class="form-select" name="unidad_tiempo" id="">
+                                                                                    <option value="" disabled>Seleccione la unidad de medida</option>
+                                                                                    @foreach ($unidadesTiempo as $unidad)
+                                                                                        @foreach ($detallesPlan as $detallePlan)
+                                                                                            @if ($detalle->id == $detallePlan->id && $unidad->nombre_unidad_tiempo != 'Sin unidad de tiempo')
+                                                                                                @if ($detallePlan->unidad_tiempo_realizacion == $unidad->nombre_unidad_tiempo)
+                                                                                                    <option value="{{$unidad->nombre_unidad_tiempo}}" selected>{{$unidad->nombre_unidad_tiempo}}</option>
+                                                                                                @else
+                                                                                                    <option value="{{$unidad->nombre_unidad_tiempo}}">{{$unidad->nombre_unidad_tiempo}}</option>
+                                                                                                @endif
+                                                                                            @endif
+                                                                                        @endforeach
+                                                                                    @endforeach
+                                                                                </select>
+
+                                                                                @error('unidad_tiempo')
+                                                                                    <small class="text-danger">{{$message}}</small>
+                                                                                @enderror
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="row mt-3">
+                                                                            <div class="col-md-12">
+                                                                                <label for="recursos_externos">Recursos externos</label>
+                                                                                <textarea class="form-control" name="recursos_externos" id="" cols="10" rows="5">{{$detalle->recursos_externos}}</textarea>
+                                                                                @error('recursos_externos')
+                                                                                    <small class="text-danger">{{$message}}</small>
+                                                                                @enderror
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="row mt-3 float-right">
+                                                                            <div class="col">
+                                                                                <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </form>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
                                                 @endif
                                             @endforeach
                                         @endforeach
@@ -159,6 +264,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="float-left">
                 <div class="row">
                     <div class="col">
@@ -385,11 +491,31 @@
             })
         @endif
 
-        @if (session('errorAlimentoNoAgregado'))
+        @if (session('successActividadActualizada'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successActividadActualizada')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('errorActividadNoEncontrada'))
             Swal.fire({
                 icon: 'error',
                 title: '¡Error!',
-                text: "{{session('errorAlimentoNoAgregado')}}",
+                text: "{{session('errorActividadNoEncontrada')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('successActividadEliminada'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successActividadEliminada')}}",
                 showConfirmButton: false,
                 timer: 3000
             })
@@ -444,7 +570,7 @@
         @endif
 
 
-        //SweetAlert Eliminar alimento
+        //SweetAlert Eliminar actividad
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-success',
@@ -462,8 +588,8 @@
                 button.addEventListener('click', function () {
                     // Muestra un SweetAlert de confirmación
                     swalWithBootstrapButtons.fire({
-                        title: '¿Estás seguro de eliminar el alimento del plan?',
-                        text: 'Esta acción eliminará el alimento del plan de alimentación.',
+                        title: '¿Estás seguro de eliminar la actividad del plan?',
+                        text: 'Esta acción eliminará la actividad del plan de seguimiento.',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, eliminar',
@@ -493,7 +619,7 @@
                         })
 
                         swalWithBootstrapButtons.fire({
-                            title: '¿Está seguro de guardar el plan de alimentación generado?',
+                            title: '¿Está seguro de guardar el plan de seguimiento generado?',
                             text: "Al confirmar se asociará el plan al paciente correspondiente.",
                             icon: 'question',
                             showCancelButton: true,
@@ -512,7 +638,7 @@
                             result.dismiss === Swal.DismissReason.cancel
                         ) {
                             swalWithBootstrapButtons.fire(
-                            '¡No se guardó el plan de alimentación!',
+                            '¡No se guardó el plan de seguimiento!',
                             'El plan aún no se asoció al paciente, puede realizar modificaciones en el mismo.',
                             'error'
                             )

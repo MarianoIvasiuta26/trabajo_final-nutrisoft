@@ -243,7 +243,7 @@ class PlanAlimentacionController extends Controller
         $detallePlan = DetallePlanAlimentaciones::find($id);
 
         if(!$detallePlan){
-            return redirect()->back()->with('errorAlimentoNoEncontrado', 'No se encontró el alimento a eliminar del plan de alimentación.');
+            return redirect()->back()->with('errorAlimentoNoEncontrado', 'No se encontró el alimento a meditar del plan de alimentación.');
         }
 
         $request->validate([

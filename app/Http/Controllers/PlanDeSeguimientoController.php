@@ -201,24 +201,62 @@ class PlanDeSeguimientoController extends Controller
     /**
      * Update the specified resource in storage.
      *
+     */
+
+     /*
+
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        //
+        $detallePlan = DetallesPlanesSeguimiento::find($id);
+
+        if(!$detallePlan){
+            return redirect()->back()->with('errorActividadNoEncontrada', 'No se encontró la actividad a editar del plan de seguimiento.');
+        }
+
+        $request->validate([
+            'actividad' => ['required', 'integer'],
+            'duracion'=> ['required','numeric'],
+            'unidad_tiempo'=> ['required','string'],
+            'recursos_externos'=> ['nullable', 'string'],
+        ]);
+
+        $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
+
+        $detallePlan->actividad_id = $request->input('actividad');
+        $detallePlan->tiempo_realizacion = $request->input('duracion');
+        $detallePlan->unidad_tiempo_realizacion = $request->input('unidad_tiempo');
+        $detallePlan->recursos_externos = $request->input('recursos_externos') ?? '';
+        $detallePlan->usuario = $usuario;
+        $detallePlan->save();
+
+        return redirect()->back()->with('successActividadActualizada', 'Actividad actualizada del plan de seguimiento.');
     }
 
     /**
      * Remove the specified resource from storage.
      *
+     */
+
+     /*
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function destroy($id)
     {
-        //
+        $detallePlan = DetallesPlanesSeguimiento::find($id);
+
+        if(!$detallePlan){
+            return redirect()->back()->with('errorActividadNoEncontrada', 'No se encontró la actividad a eliminar del plan de seguimiento.');
+        }
+
+        $detallePlan->delete();
+
+        return redirect()->back()->with('successActividadEliminada', 'Actividad eliminada del plan de seguimiento.');
     }
 
     public function consultarPlanGenerado($pacienteId, $turnoId, $nutriconistaId){
