@@ -94,43 +94,54 @@
 
                         <tbody>
                             @foreach ($detallesPlan as $detalle)
-                                <tr style="text-align: center;">
-                                    <td>
-                                        @foreach ($actividades as $actividad)
-                                            @if ($actividad->id == $detalle->actividad_id)
-                                                {{$actividad->actividad}}
-                                            @endif
-                                        @endforeach
-                                    </td>
-                                    <td>
-                                        @foreach ($tiposActividades as $tipoActividad)
-                                            @foreach ($actividadesPorTipo as $tipo)
-                                                @if ($tipo->tipo_actividad_id == $tipoActividad->id)
-                                                
-                                                    @if ($tipo->actividad_id == $detalle->actividad_id)
-                                                        <span class="badge bg-primary">{{$tipoActividad->tipo_actividad}}</span>
-                                                    @endif
+                                @foreach ($actividadesRecomendadas as $recomendada)
+                                    @foreach ($tiposActividades as $tipoActividad)
+                                        @foreach ($actividadesPorTipo as $tipo)
+                                            @foreach ($unidadesTiempo as $tiempo)
+                                                @if ($detalle->actividad_id == $tipo->actividad_id && $detalle->tiempo_realizacion == $recomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $tiempo->nombre_unidad_tiempo && $tiempo->id == $recomendada->unidad_tiempo_id && $recomendada->act_tipoAct_id == $tipo->id && $tipoActividad->id == $tipo->tipo_actividad_id)
+                                                    <tr style="text-align: center;">
+                                                        <td>
+                                                            @foreach ($actividades as $actividad)
+                                                                @if ($actividad->id == $detalle->actividad_id)
+                                                                    {{$actividad->actividad}}
+                                                                @endif
+                                                            @endforeach
+                                                        </td>
+                                                        <td>
+                                                            @foreach ($actividades as $actividad)
+                                                                @if ($actividad->id == $detalle->actividad_id && $detalle->actividad_id == $tipo->actividad_id)
+                                                                    <span class="badge bg-primary">{{$tipoActividad->tipo_actividad}}</span>
+                                                                @endif
+                                                            @endforeach
+                                                        </td>
+                                                        <td>
+                                                            @foreach ($actividades as $actividad)
+                                                                @if ($actividad->id == $detalle->actividad_id && $detalle->actividad_id == $tipo->actividad_id)
+                                                                    {{$detalle->tiempo_realizacion}} {{$detalle->unidad_tiempo_realizacion}}
+                                                                @endif
+                                                            @endforeach
+                                                        </td>
+                                                        <td></td>
+                                                        <td>
+                                                            <div>
+                                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit_{{$detalle->id}}">
+                                                                    <span class="far fa-edit"></span>
+                                                                </button>
+                                                                <form action="{{route('plan-seguimiento.destroy', $detalle->id)}}" method="POST" style="display: inline;">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="button" class="btn btn-danger delete-button">
+                                                                        <span class="far fa-trash-alt"></span>
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
                                                 @endif
                                             @endforeach
                                         @endforeach
-                                    </td>
-                                    <td>{{$detalle->tiempo_realizacion}} {{$detalle->unidad_tiempo_realizacion}}</td>
-                                    <td></td>
-                                    <td>
-                                        <div>
-                                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit_{{$detalle->id}}">
-                                                <span class="far fa-edit"></span>
-                                            </button>
-                                            <form action="{{route('plan-seguimiento.destroy', $detalle->id)}}" method="POST" style="display: inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="btn btn-danger delete-button">
-                                                    <span class="far fa-trash-alt"></span>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
+                                    @endforeach
+                                @endforeach
                             @endforeach
 
                         </tbody>
