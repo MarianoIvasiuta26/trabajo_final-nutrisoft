@@ -98,7 +98,7 @@
                                     @foreach ($tiposActividades as $tipoActividad)
                                         @foreach ($actividadesPorTipo as $tipo)
                                             @foreach ($unidadesTiempo as $tiempo)
-                                                @if ($detalle->actividad_id == $tipo->actividad_id && $detalle->tiempo_realizacion == $recomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $tiempo->nombre_unidad_tiempo && $tiempo->id == $recomendada->unidad_tiempo_id && $recomendada->act_tipoAct_id == $tipo->id && $tipoActividad->id == $tipo->tipo_actividad_id)
+                                                @if ($detalle->act_rec_id == $recomendada->id && $detalle->actividad_id == $tipo->actividad_id && $detalle->tiempo_realizacion == $recomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $tiempo->nombre_unidad_tiempo && $tiempo->id == $recomendada->unidad_tiempo_id && $recomendada->act_tipoAct_id == $tipo->id && $tipoActividad->id == $tipo->tipo_actividad_id)
                                                     <tr style="text-align: center;">
                                                         <!-- Actividad -->
                                                         <td>
@@ -377,7 +377,7 @@
                                                                                 <input class="form-check-input" type="checkbox" id="actividad{{$recomendada->id}}" name="actividades_seleccionadas[]" value="{{$recomendada->id}}"
                                                                                     @foreach ($detallesPlan as $detalle)
                                                                                         @foreach ($unidadesTiempo as $tiempo)
-                                                                                            @if($detalle->actividad_id == $actividad->id && $tiempo->id == $recomendada->unidad_tiempo_id && $tiempo->nombre_unidad_tiempo == $detalle->unidad_tiempo_realizacion) checked @endif
+                                                                                            @if($detalle->act_rec_id == $recomendada->id && $detalle->actividad_id == $actividad->id && $tiempo->id == $recomendada->unidad_tiempo_id && $tiempo->nombre_unidad_tiempo == $detalle->unidad_tiempo_realizacion) checked @endif
                                                                                         @endforeach
                                                                                     @endforeach
                                                                                 >
@@ -538,7 +538,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Enviar solicitud Ajax para guardar igualmente
-                    fetch('{{ route('plan-seguimiento.guardarDetalle', ['planId' => session('planId'), 'actRecomendadaId' => session('actRecomendadaId')]) }}/' + accion, {
+                    fetch('{{ route('plan-seguimiento.guardarDetalle', ['planId' => session('planId'), 'actRecomendadaId' => session('actRecomendadaId'), 'estadoIMC'=>session('estadoIMC'), 'pesoIdeal'=>session('pesoIdeal')]) }}/' + accion, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -546,7 +546,9 @@
                         },
                         body: JSON.stringify({
                             planId: '{{ session('planId') }}',
-                            tipoActividadId: '{{ session('actRecomendadaId') }}',
+                            actRecomendadaId: '{{ session('actRecomendadaId') }}',
+                            estadoIMC: '{{session('estadoIMC')}}',
+                            pesoIdeal: '{{session('pesoIdeal')}}'
                         })
                     }).then(response => response.json())
                         .then(data => {

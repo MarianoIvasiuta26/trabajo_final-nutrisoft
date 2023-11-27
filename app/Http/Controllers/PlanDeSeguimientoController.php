@@ -65,6 +65,10 @@ class PlanDeSeguimientoController extends Controller
         $planGenerado = PlanesDeSeguimiento::find($request->input('plan_id'));
         $consulta = Consulta::where('id', $planGenerado->consulta_id)->first();
 
+        $obtenerDatosPlan = $this->obtenerDatosPlan($consulta->imc_actual, $consulta->peso_actual, $consulta->altura_actual);
+        $estadoIMC = $obtenerDatosPlan['estadoIMC'];
+        $pesoIdeal = $obtenerDatosPlan['pesoIdeal'];
+
         if (!$planGenerado) {
             return redirect()->back()->with('errorPlanNoEncontrado', 'Error, no se pudo encontrar el plan generado. Inténtelo de nuevo por favor.');
         }
@@ -82,6 +86,8 @@ class PlanDeSeguimientoController extends Controller
                 return back()
                     ->with('planId', $planGenerado->id)
                     ->with('actRecomendadaId', $actividadNueva)
+                    ->with('estadoIMC', $estadoIMC)
+                    ->with('pesoIdeal', $pesoIdeal)
                     ->with('info', 'La actividad ' . $actividad->actividad . ' podría no ser recomendable para este paciente. ¿Desea agregarlo igualmente?');
             }
 
@@ -89,14 +95,10 @@ class PlanDeSeguimientoController extends Controller
 
             foreach($detallesPlan as $detalle){
                 $unidadTiempo = $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo;
-                if($detalle->actividad_id == $actividad->id && $detalle->tiempo_realizacion == $actividadRecomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $unidadTiempo){
+                if($detalle->act_rec_id == $actividadRecomendada->id && $detalle->actividad_id == $actividad->id && $detalle->tiempo_realizacion == $actividadRecomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $unidadTiempo){
                     continue 2;
                 }
             }
-
-            $obtenerDatosPlan = $this->obtenerDatosPlan($consulta->imc_actual, $consulta->peso_actual, $consulta->altura_actual);
-            $estadoIMC = $obtenerDatosPlan['estadoIMC'];
-            $pesoIdeal = $obtenerDatosPlan['pesoIdeal'];
 
             DetallesPlanesSeguimiento::create([
                 'plan_de_seguimiento_id' => $planGenerado->id,
@@ -154,7 +156,7 @@ class PlanDeSeguimientoController extends Controller
     }
 
        //Función para guardar el detalle del plan de seguimiento al agregar una nueva actividad
-    public function guardarDetalle($planId, $actRecomendadaId)
+    public function guardarDetalle($planId, $actRecomendadaId, $estadoIMC, $pesoIdeal)
     {
         $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
         $actividadRecomendada = ActividadRecPorTipoActividades::find($actRecomendadaId)->first();
@@ -171,8 +173,12 @@ class PlanDeSeguimientoController extends Controller
             'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
             'unidad_tiempo_realizacion' => $unidadesTiempo->where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo,
             'recursos_externos' => '',
-            'estado_imc' => $detallesPlan->where('plan_de_seguimiento_id', $planId)->first()->estado_imc,
-            'peso_ideal' => $detallesPlan->where('plan_de_seguimiento_id', $planId)->first()->peso_ideal,
+            'estado_imc' => $detallesPlan->where('plan_de_seguimiento_id', $planId->id)->isNotEmpty()
+                    ? $detallesPlan->where('plan_de_seguimiento_id', $planId->id)->first()->estado_imc
+                    : $estadoIMC,
+                'peso_ideal' => $detallesPlan->where('plan_de_seguimiento_id', $planId->id)->isNotEmpty()
+                    ? $detallesPlan->where('plan_de_seguimiento_id', $planId->id)->first()->peso_ideal
+                    : $pesoIdeal,
             'usuario' => $usuario,
         ]);
 
