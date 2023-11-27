@@ -321,7 +321,7 @@ class PlanDeSeguimientoController extends Controller
         $planAConfirmar->estado = 1;
         $planAConfirmar->save();
 
-        return redirect()->route('nutricionista.planes-a-confirmar.plan-seguimiento.index')->with('successPlanConfirmado', 'Plan de alimentación confirmado y asociado al paciente.');
+        return redirect()->view('nutricionista.planes-a-confirmar.plan-seguimiento.index')->with('successPlanConfirmado', 'Plan de seguimiento confirmado y asociado al paciente.');
 
     }
 
@@ -340,7 +340,12 @@ class PlanDeSeguimientoController extends Controller
         $plan = PlanesDeSeguimiento::find($id);
         $detallesPlan = DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $plan->id)->get();
         $actividades = Actividades::all();
-        $pdf = Pdf::loadView('plan-seguimiento.pdf', compact('plan','detallesPlan','actividades'));
+        $tiposActividades = TiposDeActividades::all();
+        $actividadesPorTipo = ActividadesPorTiposDeActividades::all();
+        $actividadesRecomendadas = ActividadRecPorTipoActividades::all();
+        $unidadesTiempo = UnidadesDeTiempo::all();
+
+        $pdf = Pdf::loadView('plan-seguimiento.pdf', compact('plan','detallesPlan','actividades','tiposActividades', 'actividadesPorTipo', 'actividadesRecomendadas', 'unidadesTiempo'));
         return $pdf->stream();
     }
 
