@@ -15,13 +15,19 @@
         <div class="card-body">
             <form action="{{ route('gestion-estadisticas.filtros') }}" method="GET">
                 <label for="fecha_inicio">Fecha de Inicio:</label>
-                <input type="date" name="fecha_inicio">
+                <input type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
 
                 <label for="fecha_fin">Fecha de Fin:</label>
-                <input type="date" name="fecha_fin">
+                <input type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
 
                 <button type="submit">Filtrar</button>
             </form>
+
+            <form action="{{ route('gestion-estadisticas.clearFilters') }}" method="get">
+                @csrf
+                <button type="submit" class="btn btn-danger">Borrar Filtros</button>
+            </form>
+
             <canvas id="myChart" style="display:block; width:100%; height:600px;"></canvas>
         </div>
     </div>

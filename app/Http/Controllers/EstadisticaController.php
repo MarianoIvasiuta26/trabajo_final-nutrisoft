@@ -19,6 +19,9 @@ class EstadisticaController extends Controller
      //@return \Illuminate\Http\Response
     public function index(Request $request)
     {
+        $fechaInicio = null;
+        $fechaFin = null;
+
         // Obtener todas los tratamientos
         $todosTratamientos = Tratamiento::all();
 
@@ -42,7 +45,7 @@ class EstadisticaController extends Controller
         // Agrega un dd para verificar los datos
         //dd($labels, $data);
 
-        return view('estadisticas.index', compact('labels', 'data'));
+        return view('estadisticas.index', compact('labels', 'data', 'fechaInicio', 'fechaFin'));
     }
 
     public function filtros(Request $request)
@@ -75,7 +78,12 @@ class EstadisticaController extends Controller
         // Agrega un dd para verificar los datos
         // dd($labels, $data);
 
-        return view('estadisticas.index', compact('labels', 'data'));
+        return view('estadisticas.index', compact('labels', 'data'))->with(['fechaInicio' => $fechaInicio, 'fechaFin' => $fechaFin]);
+    }
+
+    public function clearFilters()
+    {
+        return redirect()->route('gestion-estadisticas.index');
     }
 
     /**
