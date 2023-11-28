@@ -139,6 +139,7 @@ Route::middleware([
     ]);
 
     Route::resource('gestion-estadisticas', EstadisticaController::class)->names('gestion-estadisticas');
+    Route::get('gestion-estadisticas.filtros', [EstadisticaController::class, 'filtros'])->name('gestion-estadisticas.filtros');
 
     //Nutricionista - Plan de alimentación
     Route::resource('plan-alimentacion', PlanAlimentacionController::class)->names('plan-alimentacion');

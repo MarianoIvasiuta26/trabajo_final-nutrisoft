@@ -17,33 +17,65 @@ class EstadisticaController extends Controller
      */
 
      //@return \Illuminate\Http\Response
-    public function index()
+    public function index(Request $request)
     {
+        // Obtener todas los tratamientos
+        $todosTratamientos = Tratamiento::all();
 
-       // Obtener todas los tratamientos
-       $todosTratamientos = Tratamiento::all();
+        // Obtener la frecuencia de cada tratamiento desde la base de datos
+        $frecuenciaTratamientos = TratamientoPorPaciente::join('tratamientos', 'tratamientos.id', '=', 'tratamiento_por_pacientes.tratamiento_id')
+            ->groupBy('tratamiento_por_pacientes.tratamiento_id', 'tratamientos.tratamiento')
+            ->selectRaw('tratamientos.tratamiento, count(*) as total')
+            ->pluck('total', 'tratamiento');
 
-       // Obtener la frecuencia de cada tratamiento desde la base de datos
-       $frecuenciaTratamientos = TratamientoPorPaciente::join('tratamientos', 'tratamientos.id', '=', 'tratamiento_por_pacientes.tratamiento_id')
-           ->groupBy('tratamiento_por_pacientes.tratamiento_id', 'tratamientos.tratamiento')
-           ->selectRaw('tratamientos.tratamiento, count(*) as total')
-           ->pluck('total', 'tratamiento');
+        // Completar la frecuencia con tratamientos que no tienen registros
+        $frecuenciaCompleta = $todosTratamientos->map(function ($tratamiento) use ($frecuenciaTratamientos) {
+            $nombreTratamiento = $tratamiento->tratamiento;
+            $frecuencia = $frecuenciaTratamientos->get($nombreTratamiento, 0);
+            return $frecuencia;
+        });
 
-       // Completar la frecuencia con tratamientos que no tienen registros
-       $frecuenciaCompleta = $todosTratamientos->map(function ($tratamiento) use ($frecuenciaTratamientos) {
-           $nombreTratamiento = $tratamiento->tratamiento;
-           $frecuencia = $frecuenciaTratamientos->get($nombreTratamiento, 0);
-           return $frecuencia;
-       });
+        // Obtener las etiquetas y datos para el gráfico
+        $labels = $todosTratamientos->pluck('tratamiento'); // Nombres de los tratamientos
+        $data = $frecuenciaCompleta->values(); // Frecuencia de cada tratamiento
 
-       // Obtener las etiquetas y datos para el gráfico
-       $labels = $todosTratamientos->pluck('tratamiento'); // Nombres de los tratamientos
-       $data = $frecuenciaCompleta->values(); // Frecuencia de cada tratamiento
+        // Agrega un dd para verificar los datos
+        //dd($labels, $data);
 
-       // Agrega un dd para verificar los datos
-       //dd($labels, $data);
+        return view('estadisticas.index', compact('labels', 'data'));
+    }
 
-       return view('estadisticas.index', compact('labels', 'data'));
+    public function filtros(Request $request)
+    {
+        // Obtener todas los tratamientos
+        $todosTratamientos = Tratamiento::all();
+
+        // Obtener las fechas de inicio y fin desde la solicitud
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
+
+        // Lógica para filtrar por fechas en tu consulta
+        $frecuenciaTratamientos = TratamientoPorPaciente::join('tratamientos', 'tratamientos.id', '=', 'tratamiento_por_pacientes.tratamiento_id')
+            ->whereBetween('tratamiento_por_pacientes.fecha_alta', [$fechaInicio, $fechaFin])
+            ->groupBy('tratamiento_por_pacientes.tratamiento_id', 'tratamientos.tratamiento')
+            ->selectRaw('tratamientos.tratamiento, count(*) as total')
+            ->pluck('total', 'tratamiento');
+
+        // Completar la frecuencia con tratamientos que no tienen registros
+        $frecuenciaCompleta = $todosTratamientos->map(function ($tratamiento) use ($frecuenciaTratamientos) {
+            $nombreTratamiento = $tratamiento->tratamiento;
+            $frecuencia = $frecuenciaTratamientos->get($nombreTratamiento, 0);
+            return $frecuencia;
+        });
+
+        // Obtener las etiquetas y datos para el gráfico
+        $labels = $todosTratamientos->pluck('tratamiento'); // Nombres de los tratamientos
+        $data = $frecuenciaCompleta->values(); // Frecuencia de cada tratamiento
+
+        // Agrega un dd para verificar los datos
+        // dd($labels, $data);
+
+        return view('estadisticas.index', compact('labels', 'data'));
     }
 
     /**
