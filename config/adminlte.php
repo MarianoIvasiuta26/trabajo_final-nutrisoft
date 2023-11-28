@@ -592,6 +592,11 @@ return [
             'icon' => 'fas fa-lock',
         ],
 
+        [
+            'text' => 'Estadísticas',
+            'route'  => 'gestion-estadisticas.index',
+            'icon' => 'fas fa-lock',
+        ],
 
         ['header' => 'account_settings'],
         [

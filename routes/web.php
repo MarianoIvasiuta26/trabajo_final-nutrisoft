@@ -19,6 +19,7 @@ use App\Http\Controllers\admin\IntoleranciaController;
 use App\Http\Controllers\admin\NutrienteController;
 use App\Http\Controllers\admin\PatologiaController;
 use App\Http\Controllers\AlimentosPorDietasController;
+use App\Http\Controllers\EstadisticaController;
 use App\Http\Controllers\nutricionista\GestionConsultasController;
 use App\Http\Controllers\nutricionista\GestionPlieguesCutaneosController;
 use App\Http\Controllers\nutricionista\GestionTurnosController;
@@ -136,6 +137,8 @@ Route::middleware([
     Route::resource('gestion-actividad-por-tipo-actividad', ActividadesPorTipoActividadController::class)->names('gestion-actividad-por-tipo-actividad')->parameters([
         'gestion-actividad-por-tipo-actividad' => 'actividadPorTipo',
     ]);
+
+    Route::resource('gestion-estadisticas', EstadisticaController::class)->names('gestion-estadisticas');
 
     //Nutricionista - Plan de alimentación
     Route::resource('plan-alimentacion', PlanAlimentacionController::class)->names('plan-alimentacion');

@@ -1,0 +1,66 @@
+@extends('adminlte::page')
+
+@section('title', 'Estadísticas')
+
+@section('content_header')
+@stop
+
+@section('content')
+
+    <div class="card card-dark mt-3">
+        <div class="card-header">
+            <h5>Estadísticas</h5>
+        </div>
+
+        <div class="card-body">
+                
+            <canvas id="myChart" style="display:block; width:100%; height:600px;"></canvas>
+        </div>
+    </div>
+
+
+@stop
+
+@section('css')
+    <link rel="stylesheet" href="/css/admin_custom.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+
+@stop
+
+@section('js')
+    <script> console.log('Hi!'); </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js" integrity="sha512-6HrPqAvK+lZElIZ4mZ64fyxIBTsaX5zAFZg2V/2WT+iKPrFzTzvx6QAsLW2OaLwobhMYBog/+bvmIEEGXi0p1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        console.log('Labels:', <?= json_encode($labels) ?>);
+        console.log('Data:', <?= json_encode($data) ?>);
+
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($labels) ?>,
+                datasets: [{
+                    label: 'Frecuencia de Tratamientos',
+                    data: <?= json_encode($data) ?>,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+@stop
