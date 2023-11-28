@@ -196,12 +196,28 @@ class PlanDeSeguimientoController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     */
+
+     /*
+        * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        //
+        $plan = PlanesDeSeguimiento::find($id);
+        $detallesPlan = DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $plan->id)->get();
+        $actividades = Actividades::all();
+        $unidadesTiempo = UnidadesDeTiempo::all();
+
+        $actividadesRecomendadas = ActividadRecPorTipoActividades::all();
+        $tiposActividades = TiposDeActividades::all();
+        $actividadesPorTipo = ActividadesPorTiposDeActividades::all();
+
+        if(!$plan){
+            return redirect()->back()->with('errorPlanNoEncontrado', 'No se encontró el plan de seguimiento a consultar.');
+        }
+
+        return view('plan-seguimiento.show', compact('plan','detallesPlan','actividades', 'unidadesTiempo', 'actividadesRecomendadas', 'tiposActividades', 'actividadesPorTipo'));
     }
 
     /**
