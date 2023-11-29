@@ -13,33 +13,43 @@
         </div>
 
         <div class="card-body">
+            <a class="btn btn-warning btn-sm" data-bs-toggle="collapse" href="#filtros" role="button" aria-expanded="false" aria-controls="filtros">
+                <i class="bi bi-funnel"></i>Filtros
+            </a>
 
-            <div class="row">
-                <div class="col-md-10 ">
-                    <form action="{{ route('gestion-estadisticas.filtros') }}" method="GET">
-                        <label for="fecha_inicio">Fecha de Inicio:</label>
-                        <input class="" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
+            <div class="collapse" id="filtros">
+                <div class="card card-body mt-2">
+                    <div class="row">
+                        <div class="col-md-10 ">
+                            <form action="{{ route('gestion-estadisticas.filtros') }}" method="GET">
+                                <label for="fecha_inicio">Fecha de Inicio:</label>
+                                <input class="" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
 
-                        <label for="fecha_fin">Fecha de Fin:</label>
-                        <input class="" type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
+                                <label for="fecha_fin">Fecha de Fin:</label>
+                                <input class="" type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
 
-                        <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
+                                <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
 
-                    </form>
-                </div>
-                <div class="col-md-2">
-                    <form action="{{ route('gestion-estadisticas.clearFilters') }}" method="get">
-                        @csrf
-                        <button type="submit" class="btn btn-danger btn-sm">Borrar Filtros</button>
-                    </form>
+                            </form>
+                        </div>
+                        <div class="col-md-2">
+                            <form action="{{ route('gestion-estadisticas.clearFilters') }}" method="get">
+                                @csrf
+                                <button type="submit" class="btn btn-danger btn-sm">Borrar Filtros</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+
 
             <div class="row mt-3">
                 <div class="col-md-12">
                     <canvas id="myChart" style="display:block; width:100%; height:450px;"></canvas>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -49,6 +59,7 @@
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 @stop
 
