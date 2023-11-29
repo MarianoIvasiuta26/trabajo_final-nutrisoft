@@ -22,10 +22,10 @@
                     <div class="row">
                         <div class="col-md-10 ">
                             <form action="{{ route('gestion-estadisticas.filtros') }}" method="GET">
-                                <label for="fecha_inicio">Fecha de Inicio:</label>
+                                <label for="fecha_inicio">Desde:</label>
                                 <input class="" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
 
-                                <label for="fecha_fin">Fecha de Fin:</label>
+                                <label for="fecha_fin">Hasta:</label>
                                 <input class="" type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
 
                                 <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
