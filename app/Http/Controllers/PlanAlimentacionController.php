@@ -318,9 +318,17 @@ class PlanAlimentacionController extends Controller
     public function confirmarPlan($id){
 
         $planAConfirmar = PlanAlimentaciones::find($id);
+        $paciente = Paciente::find($planAConfirmar->paciente_id);
 
         if(!$planAConfirmar){
             return redirect()->back()->with('errorPlanNoEncontrado', 'No se encontró el plan de alimentación a confirmar.');
+        }
+
+        $ultimoPlanAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 1)->orderBy('id', 'desc')->first();
+
+        if($ultimoPlanAlimentacionPaciente){
+            $ultimoPlanAlimentacionPaciente->estado = 0;
+            $ultimoPlanAlimentacionPaciente->save();
         }
 
         $planAConfirmar->estado = 1;

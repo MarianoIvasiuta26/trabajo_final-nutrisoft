@@ -39,7 +39,7 @@ class PlanDeSeguimientoController extends Controller
     public function index()
     {
         $planesPaciente = PlanesDeSeguimiento::where('paciente_id', auth()->user()->paciente->id)->get();
-        return view('plan-alimentacion.index', compact('planesPaciente'));
+        return view('plan-seguimiento.index', compact('planesPaciente'));
     }
 
     /**
@@ -329,9 +329,17 @@ class PlanDeSeguimientoController extends Controller
     public function confirmarPlan($id){
 
         $planAConfirmar = PlanesDeSeguimiento::find($id);
+        $paciente = Paciente::find($planAConfirmar->paciente_id);
 
         if(!$planAConfirmar){
             return redirect()->back()->with('errorPlanNoEncontrado', 'No se encontró el plan de alimentación a confirmar.');
+        }
+
+        $ultimoPlanSeguimientoPaciente = PlanesDeSeguimiento::where('paciente_id', $paciente->id)->where('estado', 1)->orderBy('id', 'desc')->first();
+
+        if($ultimoPlanSeguimientoPaciente){
+            $ultimoPlanSeguimientoPaciente->estado = 0;
+            $ultimoPlanSeguimientoPaciente->save();
         }
 
         $planAConfirmar->estado = 1;
