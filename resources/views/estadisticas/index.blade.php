@@ -7,9 +7,15 @@
 
 @section('content')
 
-    <div class="card card-dark mt-3">
+
+    <div class="card card-dark mt-3" >
         <div class="card-header">
-            <h5>Estadísticas</h5>
+            <h5 class="card-title">Tratamientos más frecuentes</h5>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget = "collapse" title= "collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
         </div>
 
         <div class="card-body">
@@ -20,7 +26,7 @@
             <div class="collapse" id="filtros">
                 <div class="card card-body mt-2">
                     <div class="row">
-                        <div class="col-md-10 ">
+                        <div class="col-md-10">
                             <form action="{{ route('gestion-estadisticas.filtros') }}" method="GET">
                                 <label for="fecha_inicio">Desde:</label>
                                 <input class="" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
@@ -42,14 +48,38 @@
                 </div>
             </div>
 
+            <canvas id="myChart" style="display:block; width:100%; height:450px;"></canvas>
 
 
             <div class="row mt-3">
                 <div class="col-md-12">
-                    <canvas id="myChart" style="display:block; width:100%; height:450px;"></canvas>
+
+                    <table class="table table-striped" id="tabla-tratamientos">
+                        <thead>
+                            <tr>
+                                <th scope="col">Tratamiento</th>
+                                <th scope="col">Fecha de alta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($todosTratamientos as $tratamiento)
+                                @foreach ($tratamientosPorPaciente as $porPaciente)
+                                    @if ($porPaciente->tratamiento_id == $tratamiento->id)
+                                        <tr>
+                                            <td>
+                                                {{ $tratamiento->tratamiento }}
+                                            </td>
+                                            <td>
+                                                {{\Carbon\Carbon::parse($porPaciente->fecha_alta)->format('d/m/Y')}}
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -60,6 +90,8 @@
     <link rel="stylesheet" href="/css/admin_custom.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
 
 @stop
 
@@ -68,9 +100,38 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js" integrity="sha512-6HrPqAvK+lZElIZ4mZ64fyxIBTsaX5zAFZg2V/2WT+iKPrFzTzvx6QAsLW2OaLwobhMYBog/+bvmIEEGXi0p1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
+
+        //Datatable tratamientos
+        $(document).ready(function(){
+            $('#tabla-tratamientos').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_",
+                    "zeroRecords": "No se encontró ningún tratamientos",
+                    "info": "",
+                    "infoEmpty": "No hay tratamientos",
+                    "infoFiltered": "(filtrado de _MAX_ tratamientos totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+
+                }
+            });
+        });
+
+        //Gráfico 1 - Frecuencia de tratamientos
         var ctx = document.getElementById('myChart').getContext('2d');
         console.log('Labels:', <?= json_encode($labels) ?>);
         console.log('Data:', <?= json_encode($data) ?>);
@@ -92,11 +153,16 @@
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            stepSize: 1
+                            stepSize: 5
                         }
                     }
-                }
+                },
+                responsive: true,
             }
         });
+
+
+
+
     </script>
 @stop

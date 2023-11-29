@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Tag;
 use App\Models\Tratamiento;
 use App\Models\TratamientoPorPaciente;
 use Illuminate\Http\Request;
@@ -22,8 +23,11 @@ class EstadisticaController extends Controller
         $fechaInicio = null;
         $fechaFin = null;
 
+        //---------------------1er Gráfico - Frecuencia de tratamientos---------------------//
+
         // Obtener todas los tratamientos
         $todosTratamientos = Tratamiento::all();
+        $tratamientosPorPaciente = TratamientoPorPaciente::all();
 
         // Obtener la frecuencia de cada tratamiento desde la base de datos
         $frecuenciaTratamientos = TratamientoPorPaciente::join('tratamientos', 'tratamientos.id', '=', 'tratamiento_por_pacientes.tratamiento_id')
@@ -45,7 +49,29 @@ class EstadisticaController extends Controller
         // Agrega un dd para verificar los datos
         //dd($labels, $data);
 
-        return view('estadisticas.index', compact('labels', 'data', 'fechaInicio', 'fechaFin'));
+        //---------------------2do Gráfico - Tags de Diagnósticos---------------------//
+
+        $todosTags = Tag::all();
+
+        // Obtener el porcentaje de cada tag desde la base de datos en la tabla TagsDiagnosticos
+        $porcentajeTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
+            ->selectRaw('tags.name, count(*) * 100 / (select count(*) from tags_diagnosticos) as porcentaje')
+            ->pluck('porcentaje', 'name');
+
+        // Completar el porcentaje con tags que no tienen registros
+        $porcentajeCompleto = $todosTags->map(function ($tag) use ($porcentajeTags) {
+            $nombreTag = $tag->name;
+            $porcentaje = $porcentajeTags->get($nombreTag, 0);
+            return $porcentaje;
+        });
+
+        // Obtener las etiquetas y datos para el gráfico
+        $labels2 = $todosTags->pluck('name'); // Nombres de los tags
+        $data2 = $porcentajeCompleto->values(); // Porcentaje de cada tag
+
+
+        return view('estadisticas.index', compact('labels', 'data', 'fechaInicio', 'fechaFin', 'labels2', 'data2', 'todosTratamientos', 'tratamientosPorPaciente'));
     }
 
     public function filtros(Request $request)
@@ -78,7 +104,11 @@ class EstadisticaController extends Controller
         // Agrega un dd para verificar los datos
         // dd($labels, $data);
 
-        return view('estadisticas.index', compact('labels', 'data'))->with(['fechaInicio' => $fechaInicio, 'fechaFin' => $fechaFin]);
+        $tratamientosPorPaciente = TratamientoPorPaciente::where('fecha_alta', '>=', $fechaInicio)
+            ->where('fecha_alta', '<=', $fechaFin)
+            ->get();
+
+        return view('estadisticas.index', compact('labels', 'data','todosTratamientos', 'tratamientosPorPaciente'))->with(['fechaInicio' => $fechaInicio, 'fechaFin' => $fechaFin]);
     }
 
     public function clearFilters()

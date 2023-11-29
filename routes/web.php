@@ -130,6 +130,8 @@ Route::middleware([
     Route::post('gestion-consultas.store/{id}', [GestionConsultasController::class, 'store'])->name('gestion-consultas.store');
 
     Route::resource('gestion-tratamientos', TratramientoController::class)->names('gestion-tratamientos');
+    Route::get('gestion-tratamientos.filtros', [TratramientoController::class, 'filtros'])->name('gestion-tratamientos.filtros');
+    Route::any('gestion-tratamientos.clearFilters', [TratramientoController::class, 'clearFilters'])->name('gestion-tratamientos.clearFilters');
 
     Route::resource('gestion-pliegues-cutaneos', GestionPlieguesCutaneosController::class)->names('gestion-pliegues-cutaneos');
 
@@ -139,7 +141,7 @@ Route::middleware([
     ]);
 
     Route::resource('gestion-estadisticas', EstadisticaController::class)->names('gestion-estadisticas');
-    Route::get('gestion-estadisticas.filtros', [EstadisticaController::class, 'filtros'])->name('gestion-estadisticas.filtros');
+    Route::post('gestion-estadisticas.filtros', [EstadisticaController::class, 'filtros'])->name('gestion-estadisticas.filtros');
     Route::get('gestion-estadisticas.clearFilters',[EstadisticaController::class,'clearFilters'])->name('gestion-estadisticas.clearFilters');
 
     //Nutricionista - Plan de alimentación

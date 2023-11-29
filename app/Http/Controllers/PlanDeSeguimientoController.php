@@ -345,7 +345,7 @@ class PlanDeSeguimientoController extends Controller
         $planAConfirmar->estado = 1;
         $planAConfirmar->save();
 
-        return redirect()->view('nutricionista.planes-a-confirmar.plan-seguimiento.index')->with('successPlanConfirmado', 'Plan de seguimiento confirmado y asociado al paciente.');
+        return redirect()->route('plan-seguimiento.planesSeguimientoAConfirmar')->with('successPlanConfirmado', 'Plan de seguimiento confirmado y asociado al paciente.');
 
     }
 
