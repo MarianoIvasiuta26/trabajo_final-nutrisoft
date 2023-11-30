@@ -135,20 +135,12 @@ class GestionTurnosController extends Controller
         $todosTags = Tag::all();
         $tagsPorDiagnostico = TagsDiagnostico::all();
 
-        $tagsUsadas = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
-            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
-            ->distinct()
-            ->pluck('tags.name');
+        // Obtener las etiquetas y la cantidad de veces que se usan
+        $etiquetasYCantidad = $this->obtenerEtiquetasYCantidad();
 
-        //Cantidad de veces que se usó cada tag
-        $cantidadTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
-            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
-            ->selectRaw('tags.name, count(*) as porcentaje')
-            ->distinct()
-            ->pluck('porcentaje', 'name');
-
-        // Obtener las etiquetas y datos para el gráfico
-        $labels2 = $tagsUsadas; // Usar solo las etiquetas usadas
+        // Usar los resultados en tu vista
+        $labels2 = $etiquetasYCantidad['tagsUsadas'];
+        $cantidadTags = $etiquetasYCantidad['cantidadTags'];
 
         // Obtener el porcentaje de cada tag desde la base de datos en la tabla TagsDiagnosticos
         $porcentajeTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
@@ -156,17 +148,11 @@ class GestionTurnosController extends Controller
             ->selectRaw('tags.name, count(*) * 100 / (select count(*) from tags_diagnosticos) as porcentaje')
             ->pluck('porcentaje', 'name');
 
-        // Completar el porcentaje con tags que no tienen registros
-        $porcentajeCompleto = $todosTags->map(function ($tag) use ($porcentajeTags) {
-            $nombreTag = $tag->name;
-            $porcentaje = $porcentajeTags->get($nombreTag, 0);
-            return $porcentaje;
-        });
 
         // Obtener las etiquetas y datos para el gráfico
-        $data2 = $porcentajeCompleto->values(); // Porcentaje de cada tag
+        $data2 = $porcentajeTags->values(); // Porcentaje de cada tag
 
-        return view('nutricionista.gestion-turnos.showHistorialTurno', compact('turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'fechaInicio', 'fechaFin', 'data2', 'labels2', 'todosTags', 'tagsPorDiagnostico', 'tagsUsadas', 'cantidadTags'));
+        return view('nutricionista.gestion-turnos.showHistorialTurno', compact('turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'fechaInicio', 'fechaFin', 'data2', 'labels2', 'todosTags', 'tagsPorDiagnostico', 'cantidadTags'));
     }
 
 
@@ -183,20 +169,13 @@ class GestionTurnosController extends Controller
         $fechaInicio = $request->input('fecha_inicio');
         $fechaFin = $request->input('fecha_fin');
 
-        // Lógica para filtrar por fechas en tu consulta
-        $tagsUsadas = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
-            ->whereBetween(DB::raw('DATE(tags_diagnosticos.created_at)'), [$fechaInicio, $fechaFin])
-            ->distinct()
-            ->pluck('tags.name');
+        // Obtener las etiquetas y la cantidad de veces que se usan con filtros
+        $etiquetasYCantidad = $this->obtenerEtiquetasYCantidad($fechaInicio, $fechaFin);
 
-        $cantidadTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
-            ->whereBetween(DB::raw('DATE(tags_diagnosticos.created_at)'), [$fechaInicio, $fechaFin])
-            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
-            ->selectRaw('tags.name, count(*) as porcentaje')
-            ->pluck('porcentaje', 'name');
+        // Usar los resultados en tu vista
+        $labels2 = $etiquetasYCantidad['tagsUsadas'];
+        $cantidadTags = $etiquetasYCantidad['cantidadTags'];
 
-        // Obtener las etiquetas y datos para el gráfico
-        $labels2 = $tagsUsadas; // Usar solo las etiquetas usadas
         $porcentajeTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
             ->whereBetween(DB::raw('DATE(tags_diagnosticos.created_at)'), [$fechaInicio, $fechaFin])
             ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
@@ -207,8 +186,31 @@ class GestionTurnosController extends Controller
 
         $tagsPorDiagnostico = TagsDiagnostico::whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])->get();
 
-        return view('nutricionista.gestion-turnos.showHistorialTurno', compact('turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'labels2', 'data2', 'tagsPorDiagnostico', 'todosTags', 'tagsUsadas', 'cantidadTags'))->with(['fechaInicio' => $fechaInicio, 'fechaFin' => $fechaFin]);
-}
+        return view('nutricionista.gestion-turnos.showHistorialTurno', compact('turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'labels2', 'data2', 'tagsPorDiagnostico', 'todosTags', 'cantidadTags'))->with(['fechaInicio' => $fechaInicio, 'fechaFin' => $fechaFin]);
+    }
+
+    private function obtenerEtiquetasYCantidad($fechaInicio = null, $fechaFin = null)
+    {
+        // Lógica para obtener las etiquetas usadas
+        $tagsUsadas = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->when($fechaInicio && $fechaFin, function ($query) use ($fechaInicio, $fechaFin) {
+                return $query->whereBetween(DB::raw('DATE(tags_diagnosticos.created_at)'), [$fechaInicio, $fechaFin]);
+            })
+            ->distinct()
+            ->pluck('tags.name');
+
+        // Lógica para obtener la cantidad de veces que se usó cada etiqueta
+        $cantidadTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->when($fechaInicio && $fechaFin, function ($query) use ($fechaInicio, $fechaFin) {
+                return $query->whereBetween(DB::raw('DATE(tags_diagnosticos.created_at)'), [$fechaInicio, $fechaFin]);
+            })
+            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
+            ->selectRaw('tags.name, count(*) as porcentaje')
+            ->distinct()
+            ->pluck('porcentaje', 'name');
+
+        return compact('tagsUsadas', 'cantidadTags');
+    }
 
 
     public function clearFilters()

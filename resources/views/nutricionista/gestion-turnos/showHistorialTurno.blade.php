@@ -169,7 +169,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($tagsUsadas as $tagUsada)
+                            @foreach ($labels2 as $tagUsada)
                                 <tr>
                                     <td>
                                         {{ $tagUsada }}
@@ -316,6 +316,7 @@
             borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 1
         };
+        console.log('Labels:', <?= json_encode($labels2) ?>);
 
         // Configuración del gráfico
         var myChart2 = new Chart(ctx2, {
