@@ -115,6 +115,78 @@
         </div>
     </div>
 
+    <!-- Estadística -->
+
+    <div class="card card-dark mt-3" >
+        <div class="card-header">
+            <h3 class="card-title">Estadísticas</h3>
+            <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget = "collapse" title= "collapse">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <a class="btn btn-warning btn-sm" data-bs-toggle="collapse" href="#filtros" role="button" aria-expanded="false" aria-controls="filtros">
+                <i class="bi bi-funnel"></i>Filtros
+            </a>
+
+            <div class="collapse" id="filtros">
+                <div class="card card-body mt-2">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form action="{{ route('gestion-turnos-nutricionista.filtros') }}" method="GET">
+                                <label for="fecha_inicio">Desde:</label>
+                                <input class="" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
+
+                                <label for="fecha_fin">Hasta:</label>
+                                <input class="" type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
+
+                                <div class="justify-end" style="display: inline-block;">
+                                    <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
+                                    <a href="{{route('gestion-turnos-nutricionista.clearFilters')}}" class="btn btn-danger btn-sm">Borrar filtros</a>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="mt-1" style="text-align: center;">Proporción de diagnósticos por Tags</h3>
+
+            <canvas id="myChart2" style="display:block;"></canvas>
+
+            <div class="row mt-3">
+                <div class="col-md-12">
+
+                    <table class="table table-striped" id="tabla-diagnosticos">
+                        <thead>
+                            <tr>
+                                <th scope="col">Tag Diagnóstico</th>
+                                <th scope="col">Cantidad en consultas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($tagsUsadas as $tagUsada)
+                                <tr>
+                                    <td>
+                                        {{ $tagUsada }}
+                                    </td>
+                                    <td>
+                                        {{ $cantidadTags[$tagUsada] ?? 0 }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 @stop
 
 @section('css')
@@ -123,6 +195,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 
 @stop
 
@@ -134,6 +208,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js" integrity="sha512-6HrPqAvK+lZElIZ4mZ64fyxIBTsaX5zAFZg2V/2WT+iKPrFzTzvx6QAsLW2OaLwobhMYBog/+bvmIEEGXi0p1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         $(document).ready(function(){
@@ -187,6 +262,76 @@
             $('#filtro-paciente').on('keyup', function(){
                 table.column(2).search(this.value).draw(); // Columna 2 para el paciente
             });
+        });
+
+        //Datable estadísticas
+        $(document).ready(function(){
+            $('#tabla-diagnosticos').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_",
+                    "zeroRecords": "No se encontró ninguna etiqueta",
+                    "info": "",
+                    "infoEmpty": "No hay etiquetas",
+                    "infoFiltered": "(filtrado de _MAX_ etiquetas totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+                }
+            });
+        });
+
+        //Gráfico 2 - Porcentaje de Diagnósticos por Tags
+        // Configuración del gráfico de pie
+        var ctx2 = document.getElementById('myChart2').getContext('2d');
+        console.log('Labels:', <?= json_encode($labels2) ?>);
+        console.log('Data:', <?= json_encode($data2) ?>);
+
+        // Obtener cantidad de etiquetas
+        var numLabels = <?= count($labels2) ?>;
+
+        // Generar colores de forma dinámica
+        var dynamicColors = function () {
+            var colors = [];
+            for (var i = 0; i < numLabels; i++) {
+                var r = Math.floor(Math.random() * 255);
+                var g = Math.floor(Math.random() * 255);
+                var b = Math.floor(Math.random() * 255);
+                colors.push('rgb(' + r + ',' + g + ',' + b + ')');
+            }
+            return colors;
+        };
+
+        // Configuración del conjunto de datos
+        var datasetConfig = {
+            label: 'Porcentaje de Diagnósticos por Tags',
+            data: <?= json_encode($data2) ?>,
+            backgroundColor: dynamicColors(),
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        };
+
+        // Configuración del gráfico
+        var myChart2 = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: <?= json_encode($labels2) ?>,
+                datasets: [datasetConfig]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: 'Proporción de Diagnósticos por Tags',
+                    position: 'top'
+                },
+                responsive: true,
+            }
         });
     </script>
 @stop

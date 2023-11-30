@@ -27,6 +27,7 @@ use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GestionTurnosController extends Controller
 {
@@ -121,13 +122,100 @@ class GestionTurnosController extends Controller
     }
 
     public function showHistorialTurnos() {
+        $fechaInicio = null; //Fecha necesarias para las estadísticas
+        $fechaFin = null; //Fecha necesarias para las estadísticas
+
         $turnos = Turno::all();
         $pacientes = Paciente::all();
         $historiasClinicas = HistoriaClinica::all();
         $tipoConsultas = TipoConsulta::all();
 
-        return view('nutricionista.gestion-turnos.showHistorialTurno', compact('turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas'));
+        //---------------------2do Gráfico - Tags de Diagnósticos---------------------//
+
+        $todosTags = Tag::all();
+        $tagsPorDiagnostico = TagsDiagnostico::all();
+
+        $tagsUsadas = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
+            ->distinct()
+            ->pluck('tags.name');
+
+        //Cantidad de veces que se usó cada tag
+        $cantidadTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
+            ->selectRaw('tags.name, count(*) as porcentaje')
+            ->distinct()
+            ->pluck('porcentaje', 'name');
+
+        // Obtener las etiquetas y datos para el gráfico
+        $labels2 = $tagsUsadas; // Usar solo las etiquetas usadas
+
+        // Obtener el porcentaje de cada tag desde la base de datos en la tabla TagsDiagnosticos
+        $porcentajeTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
+            ->selectRaw('tags.name, count(*) * 100 / (select count(*) from tags_diagnosticos) as porcentaje')
+            ->pluck('porcentaje', 'name');
+
+        // Completar el porcentaje con tags que no tienen registros
+        $porcentajeCompleto = $todosTags->map(function ($tag) use ($porcentajeTags) {
+            $nombreTag = $tag->name;
+            $porcentaje = $porcentajeTags->get($nombreTag, 0);
+            return $porcentaje;
+        });
+
+        // Obtener las etiquetas y datos para el gráfico
+        $data2 = $porcentajeCompleto->values(); // Porcentaje de cada tag
+
+        return view('nutricionista.gestion-turnos.showHistorialTurno', compact('turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'fechaInicio', 'fechaFin', 'data2', 'labels2', 'todosTags', 'tagsPorDiagnostico', 'tagsUsadas', 'cantidadTags'));
     }
+
+
+    public function filtros(Request $request)
+    {
+        $todosTags = Tag::all();
+
+        $turnos = Turno::all();
+        $pacientes = Paciente::all();
+        $historiasClinicas = HistoriaClinica::all();
+        $tipoConsultas = TipoConsulta::all();
+
+        // Obtener las fechas de inicio y fin desde la solicitud
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
+
+        // Lógica para filtrar por fechas en tu consulta
+        $tagsUsadas = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->whereBetween(DB::raw('DATE(tags_diagnosticos.created_at)'), [$fechaInicio, $fechaFin])
+            ->distinct()
+            ->pluck('tags.name');
+
+        $cantidadTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->whereBetween(DB::raw('DATE(tags_diagnosticos.created_at)'), [$fechaInicio, $fechaFin])
+            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
+            ->selectRaw('tags.name, count(*) as porcentaje')
+            ->pluck('porcentaje', 'name');
+
+        // Obtener las etiquetas y datos para el gráfico
+        $labels2 = $tagsUsadas; // Usar solo las etiquetas usadas
+        $porcentajeTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
+            ->whereBetween(DB::raw('DATE(tags_diagnosticos.created_at)'), [$fechaInicio, $fechaFin])
+            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
+            ->selectRaw('tags.name, count(*) * 100 / (select count(*) from tags_diagnosticos where DATE(created_at) between ? and ?) as porcentaje', [$fechaInicio, $fechaFin])
+            ->pluck('porcentaje', 'name');
+
+        $data2 = $porcentajeTags->values(); // Porcentaje de cada tag
+
+        $tagsPorDiagnostico = TagsDiagnostico::whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])->get();
+
+        return view('nutricionista.gestion-turnos.showHistorialTurno', compact('turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'labels2', 'data2', 'tagsPorDiagnostico', 'todosTags', 'tagsUsadas', 'cantidadTags'))->with(['fechaInicio' => $fechaInicio, 'fechaFin' => $fechaFin]);
+}
+
+
+    public function clearFilters()
+    {
+        return redirect()->route('gestion-turnos-nutricionista.showHistorialTurnos');
+    }
+
 
     public function iniciarConsulta($id){
         $turno = Turno::find($id);

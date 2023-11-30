@@ -32,6 +32,7 @@ use App\Http\Controllers\ProhibicionesAlergiaController;
 use App\Http\Controllers\ProhibicionesCirugiaController;
 use App\Http\Controllers\ProhibicionesIntoleranciaController;
 use App\Http\Controllers\ProhibicionesPatologiaController;
+use App\Http\Controllers\TagsDiagnosticosController;
 use App\Http\Controllers\TratramientoController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\UserController;
@@ -122,6 +123,11 @@ Route::middleware([
     Route::get('gestion-turnos-nutricionista.showHistorialTurnos', [GestionTurnosController::class, 'showHistorialTurnos'])->name('gestion-turnos-nutricionista.showHistorialTurnos');
     Route::post('gestion-turnos-nutricionista.confirmarInasistencia/{id}', [GestionTurnosController::class, 'confirmarInasistencia'])->name('gestion-turnos-nutricionista.confirmarInasistencia');
     Route::get('gestion-turnos-nutricionista.iniciarConsulta/{id}', [GestionTurnosController::class, 'iniciarConsulta'])->name('gestion-turnos-nutricionista.iniciarConsulta');
+
+    //Estadísticas tags de diagnosticos
+    Route::get('gestion-turnos-nutricionista.filtros', [GestionTurnosController::class, 'filtros'])->name('gestion-turnos-nutricionista.filtros');
+    Route::any('gestion-turnos-nutricionista.clearFilters', [GestionTurnosController::class, 'clearFilters'])->name('gestion-turnos-nutricionista.clearFilters');
+
 
     Route::resource('gestion-consultas', GestionConsultasController::class)->names('gestion-consultas');
     Route::post('gestion-consultas.realizarCalculos', [GestionConsultasController::class, 'realizarCalculos'])->name('gestion-consultas.realizarCalculos');
