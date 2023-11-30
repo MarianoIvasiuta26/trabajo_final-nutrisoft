@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActividadesPorTipoActividadController;
 use App\Http\Controllers\admin\ActividadController;
+use App\Http\Controllers\admin\AuditoriaController;
 use App\Http\Controllers\admin\GestionUsuariosController;
 use App\Http\Controllers\DiaController;
 use App\Http\Controllers\HoraController;
@@ -93,6 +94,8 @@ Route::middleware([
     Route::resource('gestion-fuentes', FuenteAlimentoController::class)->names('gestion-fuentes');
     Route::resource('gestion-nutrientes', NutrienteController::class)->names('gestion-nutrientes');
     Route::resource('gestion-actividades', ActividadController::class)->names('gestion-actividades');
+
+    Route::resource('auditoria', AuditoriaController::class)->names('auditoria');
 
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 

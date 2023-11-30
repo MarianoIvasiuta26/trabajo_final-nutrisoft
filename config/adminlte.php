@@ -598,6 +598,12 @@ return [
             'icon' => 'fas fa-lock',
         ],
 
+        [
+            'text' => 'Auditoría',
+            'route' => 'auditoria.index',
+            'icon' => 'fas fa-lock'
+        ],
+
         ['header' => 'account_settings'],
         [
             'text' => 'profile',

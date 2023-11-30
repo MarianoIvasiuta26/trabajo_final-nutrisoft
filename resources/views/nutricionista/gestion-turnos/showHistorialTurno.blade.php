@@ -324,7 +324,7 @@
             type: 'pie',
             data: {
                 labels: <?= json_encode($labels2) ?>,
-                datasets: [datasetConfig]
+                datasets: [datasetConfig],
             },
             options: {
                 title: {
@@ -333,6 +333,10 @@
                     position: 'top'
                 },
                 responsive: false,
+                title: {
+                    display: true,
+                    text: 'Chart.js Pie Chart'
+                }
             }
         });
     </script>
