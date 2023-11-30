@@ -46,7 +46,7 @@ return [
         'user_agent' => OwenIt\Auditing\Resolvers\UserAgentResolver::class,
         'url'        => OwenIt\Auditing\Resolvers\UrlResolver::class,
     ],
-
+    
     /*
     |--------------------------------------------------------------------------
     | Audit Events

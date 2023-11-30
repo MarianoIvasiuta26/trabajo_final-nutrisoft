@@ -156,8 +156,9 @@
 
             <h3 class="mt-1" style="text-align: center;">Proporción de diagnósticos por Tags</h3>
 
-            <canvas id="myChart2" style="display:block;"></canvas>
-
+            <div style="text-align: center;">
+                <canvas id="myChart2" style="display: inline-block;"></canvas>
+            </div>
             <div class="row mt-3">
                 <div class="col-md-12">
 
@@ -331,7 +332,7 @@
                     text: 'Proporción de Diagnósticos por Tags',
                     position: 'top'
                 },
-                responsive: true,
+                responsive: false,
             }
         });
     </script>
