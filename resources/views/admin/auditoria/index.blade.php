@@ -30,8 +30,8 @@
                             @foreach ($audits as $auditoria)
                                 <tr>
                                     <td>{{ $auditoria->user ? $auditoria->user->name : 'Sistema' }}</td>
-                                    <td>{{ $auditoria->event }}</td>
-                                    <td>{{$auditoria->auditable_type}}</td>
+                                    <td>{{ __($auditoria->event) }}</td>
+                                    <td>{{ class_basename($auditoria->auditable_type) }}</td>
                                     <td>{{ $auditoria->created_at }}</td>
                                     <td>{{ json_encode($auditoria->new_values) }}</td>
                                     <td>{{ json_encode($auditoria->old_values) }}</td>
@@ -72,7 +72,7 @@
         $(document).ready(function(){
             $('#tabla-auditoria').DataTable({
                 responsive: true,
-                autoWidth: false,
+                autoWidth: true,
                 "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
                 "language": {
                     "lengthMenu": "Mostrar _MENU_",
