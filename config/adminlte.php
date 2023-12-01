@@ -328,11 +328,13 @@ return [
             'text' => 'Historia Clínica',
             'route'  => 'historia-clinica.index',
             'icon' => 'fas fa-file-medical fa-fw',
+            'can' => 'historia-clinica.index',
         ],
 
         [
             'text' => 'Turnos',
             'icon' => 'fas fa-file-medical fa-fw',
+            'can' => 'turnos',
             'submenu' => [
                 [
                     'text' => 'Mis Turnos',
@@ -350,6 +352,7 @@ return [
         [
             'text' => 'Turnos y Consultas',
             'icon' => 'fas fa-clock fa-fw',
+            'can' => 'gestion-turnos-nutricionista.index',
             'submenu' => [
                 [
                     'text' => 'Turnos Pendientes',
@@ -367,6 +370,7 @@ return [
         [
             'text' => 'Mis Planes',
             'icon' => 'fas fa-clipboard-check fa-fw',
+            'can' => 'mis-planes',
             'submenu' => [
                 [
                     'text' => 'Planes de Alimentación',
@@ -384,6 +388,7 @@ return [
         [
             'text' => 'Planes a confirmar',
             'icon' => 'fas fa-clipboard-check fa-fw',
+            'can' => 'planes-a-confirmar',
             'submenu' => [
                 [
                     'text' => 'Planes de Alimentación',
@@ -402,23 +407,27 @@ return [
             'text' => 'Gestión Tratamientos',
             'route' => 'gestion-tratamientos.index',
             'icon' => 'fas fa-comment-medical fa-fw',
+            'can' => 'gestion-tratamientos.index',
         ],
 
         [
             'text' => 'Pliegues Cutáneos',
             'route' => 'gestion-pliegues-cutaneos.index',
             'icon' => 'fas fa-ruler fa-fw',
+            'can' => 'gestion-pliegues-cutaneos.index',
         ],
 
         [
             'text' => 'Horarios de Atención',
             'route'  => 'gestion-atencion.index',
             'icon' => 'fas fa-lock fa-fw',
+            'can' => 'gestion-atencion.index',
         ],
 
         [
             'text' => 'Gestión Médica',
             'icon' => 'fas fa-laptop-medical',
+            'can' => 'gestion-medica.index',
             'submenu' => [
                 [
                     'text'    => 'Patologías',
@@ -533,6 +542,7 @@ return [
         [
             'text' => 'Gestión Alimentos',
             'icon' => 'fas fa-utensils',
+            'can' => 'gestion-alimentos',
             'submenu' => [
                 [
                     'text' => 'Lista de Alimentos',
@@ -555,6 +565,7 @@ return [
         [
             'text' => 'Gestión Actividades',
             'icon' => 'fas fa-running',
+            'can' => 'gestion-actividades',
             'submenu' => [
                 [
                     'text' => 'Lista de Actividades',
@@ -574,34 +585,41 @@ return [
             ],
         ],
 
-        ['header' => 'GESTIÓN DE USUARIOS'],
+        ['header' => 'GESTIÓN DE USUARIOS',
+            'can' => 'gestion-usuarios.index'
+        ],
         [
             'text' => 'Usuarios',
             'route'  => 'gestion-usuarios.index',
             'icon' => 'fas fa-users fa-fw',
+            'can' => 'gestion-usuarios.index'
         ],
         [
             'text' => 'Nuevo usuario',
             'route'  => 'gestion-usuarios.create',
             'icon' => 'fas fa-fw fa-user-plus',
+            'can' => 'gestion-usuarios.create'
         ],
 
         [
             'text' => 'Roles y permisos',
-            'route'  => 'gestion-usuarios.create',
+            'route'  => 'gestion-rolesYPermisos.index',
             'icon' => 'fas fa-lock',
+            'can' => 'gestion-rolesYPermisos.index'
         ],
 
         [
             'text' => 'Estadísticas',
             'route'  => 'gestion-estadisticas.index',
             'icon' => 'fas fa-lock',
+            'can' => 'gestion-estadisticas.index',
         ],
 
         [
             'text' => 'Auditoría',
             'route' => 'auditoria.index',
-            'icon' => 'fas fa-lock'
+            'icon' => 'fas fa-lock',
+            'can' => 'auditoria.index'
         ],
 
         ['header' => 'account_settings'],
@@ -609,31 +627,33 @@ return [
             'text' => 'profile',
             'url'  => 'profile',
             'icon' => 'fas fa-fw fa-user',
-        ],/*
-        [
-            'text' => 'change_password',
-            'url'  => 'admin/settings',
-            'icon' => 'fas fa-fw fa-lock',
         ],
+        /*
+            [
+                'text' => 'change_password',
+                'url'  => 'admin/settings',
+                'icon' => 'fas fa-fw fa-lock',
+            ],
 
-        ['header' => 'labels'],
-        [
-            'text'       => 'important',
-            'icon_color' => 'red',
-            'url'        => '#',
-        ],
-        [
-            'text'       => 'warning',
-            'icon_color' => 'yellow',
-            'url'        => '#',
-        ],
-        [
-            'text'       => 'information',
-            'icon_color' => 'cyan',
-            'url'        => '#',
-        ],*/
+            ['header' => 'labels'],
+            [
+                'text'       => 'important',
+                'icon_color' => 'red',
+                'url'        => '#',
+            ],
+            [
+                'text'       => 'warning',
+                'icon_color' => 'yellow',
+                'url'        => '#',
+            ],
+            [
+                'text'       => 'information',
+                'icon_color' => 'cyan',
+                'url'        => '#',
+            ],
+        */
     ],
-    /*
+/*
     [
         'text'    => 'level_one',
         'url'     => '#',
@@ -657,7 +677,8 @@ return [
                 ],
             ],
         ],
-    ],*/
+    ],
+*/
 
     /*
     |--------------------------------------------------------------------------

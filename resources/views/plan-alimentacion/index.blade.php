@@ -132,7 +132,7 @@
         });
 
          //SweetAlert Confirmar plan
-         document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             const confirmarPlan = document.querySelectorAll('.confirmar-button');
 
             confirmarPlan.forEach(button => {

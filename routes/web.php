@@ -4,6 +4,7 @@ use App\Http\Controllers\ActividadesPorTipoActividadController;
 use App\Http\Controllers\admin\ActividadController;
 use App\Http\Controllers\admin\AuditoriaController;
 use App\Http\Controllers\admin\GestionUsuariosController;
+use App\Http\Controllers\admin\RolesYPermisosController;
 use App\Http\Controllers\DiaController;
 use App\Http\Controllers\HoraController;
 use App\Http\Controllers\HorarioController;
@@ -66,6 +67,11 @@ Route::middleware([
     //Admin
     Route::get('profile',[UserController::class,'show'])->name('profile');
     Route::resource('gestion-usuarios', GestionUsuariosController::class)->names('gestion-usuarios');
+    Route::resource('gestion-rolesYPermisos', RolesYPermisosController::class)->names('gestion-rolesYPermisos');
+    Route::post('gestion-rolesYPermisos.storePermiso', [RolesYPermisosController::class, 'storePermiso'])->name('gestion-rolesYPermisos.storePermiso');
+    Route::post('gestion-rolesYPermisos.destroyPermiso', [RolesYPermisosController::class, 'destroyPermiso'])->name('gestion-rolesYPermisos.destroyPermiso');
+    Route::post('gestion-rolesYPermisos.updatePermiso/{id}', [RolesYPermisosController::class, 'updatePermiso'])->name('gestion-rolesYPermisos.updatePermiso');
+
     Route::resource('gestion-alergias', AlergiaController::class)->names('gestion-alergias');
     Route::resource('prohibiciones-alergias', ProhibicionesAlergiaController::class)->names('prohibiciones-alergias');
     Route::resource('gestion-intolerancias', IntoleranciaController::class)->names('gestion-intolerancias');
