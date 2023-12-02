@@ -386,7 +386,7 @@ return [
         ],
 
         [
-            'text' => 'Planes a confirmar',
+            'text' => 'Gestión de planes',
             'icon' => 'fas fa-clipboard-check fa-fw',
             'can' => 'planes-a-confirmar',
             'submenu' => [

@@ -20,11 +20,37 @@ class AuditoriaController extends Controller
         $fechaHasta = null;
         $audits = Audit::orderBy('created_at', 'desc')->get();
 
-        return view('admin.auditoria.index', compact('audits', 'fechaDesde', 'fechaHasta'));
+        // Personaliza la presentación de los valores nuevo y antiguo
+        foreach ($audits as $auditoria) {
+            $newValuesFormatted = $this->formatValues($auditoria->new_values);
+            $oldValuesFormatted = $this->formatValues($auditoria->old_values);
+
+            $auditoria->new_value = $newValuesFormatted;
+            $auditoria->old_value = $oldValuesFormatted;
+        }
+
+        $fechaInicio =null;
+        $fechaFin = null;
+
+        return view('admin.auditoria.index', compact('audits', 'fechaDesde', 'fechaHasta', 'fechaInicio', 'fechaFin'));
+    }
+
+    private function formatValues($values)
+    {
+        // Personaliza la lógica de formato según tus necesidades
+        return implode("\n", array_map(function ($key, $value) {
+            return "$key: $value";
+        }, array_keys($values), $values));
     }
 
     public function filtros(Request $request)
     {
+
+        $request->validate([
+            'fecha_desde' => 'required',
+            'fecha_hasta' => 'required',
+        ]);
+
         $fechaDesde = $request->input('fecha_desde');
         $fechaHasta = $request->input('fecha_hasta');
 
@@ -41,12 +67,24 @@ class AuditoriaController extends Controller
 
         $audits = $audits->orderBy('created_at', 'desc')->get();
 
-        return view('admin.auditoria.index', compact('audits', 'fechaDesde', 'fechaHasta'));
+        // Personaliza la presentación de los valores nuevo y antiguo
+        foreach ($audits as $auditoria) {
+            $newValuesFormatted = $this->formatValues($auditoria->new_values);
+            $oldValuesFormatted = $this->formatValues($auditoria->old_values);
+
+            $auditoria->new_value = $newValuesFormatted;
+            $auditoria->old_value = $oldValuesFormatted;
+        }
+
+        $fechaInicio = Carbon::parse($fechaDesde)->startOfDay();
+        $fechaFin = Carbon::parse($fechaHasta)->endOfDay();
+
+        return view('admin.auditoria.index', compact('audits', 'fechaDesde', 'fechaHasta', 'fechaInicio', 'fechaFin'));
     }
 
     public function clearFilters()
     {
-        return $this->index();
+        return redirect()->route('auditoria.index');
     }
 
     /**

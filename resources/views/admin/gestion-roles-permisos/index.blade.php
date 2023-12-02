@@ -304,6 +304,28 @@
         });
     });
 
+    $(document).ready(function(){
+        var table = $('#tabla-permisos').DataTable({
+            responsive: true,
+            autoWidth: false,
+            "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ usuarios por página",
+                "zeroRecords": "No se encontró ningún turno",
+                "info": "Mostrando la página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros de usuarios",
+                "infoFiltered": "(filtrado de _MAX_ usuarios totales)",
+                "search": "Buscar:",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+            }
+        });
+    });
+
      //Select2
      $( '#permisos' ).select2( {
         theme: "bootstrap-5",

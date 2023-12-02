@@ -24,12 +24,20 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_desde">Desde:</label>
-                                        <input class="form-control" type="date" name="fecha_desde" value="{{ old('fecha_desde', $fechaDesde) }}">
+                                        <input class="form-control" type="date" name="fecha_desde" value="{{ old('fecha_desde', $fechaInicio) }}">
+
+                                        @error( 'fecha_desde' )
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
 
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_hasta">Hasta:</label>
-                                        <input class="form-control" type="date" name="fecha_hasta" value="{{ old('fecha_hasta', $fechaHasta) }}">
+                                        <input class="form-control" type="date" name="fecha_hasta" value="{{ old('fecha_hasta', $fechaFin) }}">
+
+                                        @error('fecha_hasta')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
 
@@ -47,11 +55,10 @@
                                 <tr>
                                     <th scope="col">Usuario</th>
                                     <th scope="col">Acción</th>
-                                    <th scope="col">Objeto modificado</th>
+                                    <th scope="col">Objeto</th>
                                     <th scope="col">Fecha y hora</th>
                                     <th scope="col">Valor nuevo</th>
                                     <th scope="col">Valor antiguo</th>
-                                    <th scope="col">Dirección ip</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,9 +68,8 @@
                                         <td>{{ __($auditoria->event) }}</td>
                                         <td>{{ class_basename($auditoria->auditable_type) }}</td>
                                         <td>{{ $auditoria->created_at }}</td>
-                                        <td>{{ json_encode($auditoria->new_values) }}</td>
-                                        <td>{{ json_encode($auditoria->old_values) }}</td>
-                                        <td>{{ $auditoria->ip_address }}</td>
+                                        <td>{!! nl2br(e($auditoria->new_value)) !!}</td>
+                                        <td>{!! nl2br(e($auditoria->old_value)) !!}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -105,7 +111,7 @@
         $(document).ready(function(){
             $('#tabla-auditoria').DataTable({
                 responsive: true,
-                autoWidth: true,
+                autoWidth: false,
                 "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
                 "language": {
                     "lengthMenu": "Mostrar _MENU_",
@@ -130,7 +136,7 @@
                             return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
                         }
                     }
-                ]
+                ],
             });
         });
     </script>
