@@ -111,7 +111,7 @@
                             <select class="form-select" name="fuente" id="fuente">
                                 <option value="">Seleccione una opción...</option>
                                 @foreach ($fuentes as $fuente)
-                                    <option value="{{ $fuente->id }}" @if ($valor->fuente_alimento_id == $fuente->id)
+                                    <option value="{{ $fuente->id }}" @if ($fuente_id == $fuente->id)
                                         selected
                                     @endif>{{ $fuente->fuente }}</option>
                                 @endforeach

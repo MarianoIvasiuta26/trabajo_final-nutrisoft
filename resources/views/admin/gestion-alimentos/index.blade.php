@@ -43,7 +43,7 @@
                                 <div class="col-4">
                                     <form action="{{ route('gestion-alimentos.edit', $alimento->id) }}" method="GET">
                                         @csrf
-                                        <button type="submit" class="btn btn-primary">
+                                        <button type="submit" class="btn btn-warning">
                                             <span class="far fa-edit"></span>
                                         </button>
                                     </form>

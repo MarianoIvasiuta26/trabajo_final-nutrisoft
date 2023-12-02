@@ -125,13 +125,20 @@ class AlimentoController extends Controller
     {
         $alimento = Alimento::find($id);
         $valor = ValorNutricional::where('alimento_id', $id)->first();
+        $fuente_id = 0;
         $grupos = GrupoAlimento::all();
         $fuentes = FuenteAlimento::all();
         $nutrientes = Nutriente::all();
         $tipo_nutrientes = TipoNutriente::all();
         $valores = ValorNutricional::where('alimento_id', $id)->get();
 
-        return view ('admin.gestion-alimentos.edit', compact('alimento', 'valor', 'valores', 'tipo_nutrientes', 'nutrientes', 'grupos', 'fuentes'));
+        //Validación temporal para acceder al edit sin valores nutricionales
+        if(!$valor){
+            $fuente_id = 1;
+            return view ('admin.gestion-alimentos.edit', compact('alimento', 'fuente_id', 'valores', 'tipo_nutrientes', 'nutrientes', 'grupos', 'fuentes'));
+        }
+
+        return view ('admin.gestion-alimentos.edit', compact('alimento', 'fuente_id', 'valores', 'tipo_nutrientes', 'nutrientes', 'grupos', 'fuentes'));
     }
 
     /**
