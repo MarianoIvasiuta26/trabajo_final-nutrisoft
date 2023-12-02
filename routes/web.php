@@ -102,6 +102,8 @@ Route::middleware([
     Route::resource('gestion-actividades', ActividadController::class)->names('gestion-actividades');
 
     Route::resource('auditoria', AuditoriaController::class)->names('auditoria');
+    Route::get('auditoria.filtros', [AuditoriaController::class, 'filtros'])->name('auditoria.filtros');
+    Route::any('auditoria.clearFilters', [AuditoriaController::class, 'clearFilters'])->name('auditoria.clearFilters');
 
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 

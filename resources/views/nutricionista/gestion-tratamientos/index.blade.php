@@ -280,8 +280,7 @@
                         "next": "Siguiente",
                         "previous": "Anterior"
                     },
-
-                }
+                },
             });
         });
 

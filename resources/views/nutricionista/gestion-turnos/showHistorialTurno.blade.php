@@ -3,12 +3,12 @@
 @section('title', 'Historial de Turnos')
 
 @section('content_header')
-    <h1>Historial de Turnos</h1>
+
 @stop
 
 @section('content')
 
-    <div class="card card-dark">
+    <div class="card card-dark mt-3">
         <div class="card-header">
             <h5>Historial de Turnos</h5>
         </div>
@@ -73,7 +73,7 @@
                             @if ($paciente->id == $turno->paciente_id)
                                 <tr>
                                     <td>
-                                        {{ $turno->fecha }}
+                                        {{ \Carbon\Carbon::parse($turno->fecha)->format('d-m-Y') }}
                                     </td>
 
                                     <td>
@@ -134,23 +134,27 @@
 
             <div class="collapse" id="filtros">
                 <div class="card card-body mt-2">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form action="{{ route('gestion-turnos-nutricionista.filtros') }}" method="GET">
+
+                    <form action="{{ route('gestion-turnos-nutricionista.filtros') }}" method="GET">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
                                 <label for="fecha_inicio">Desde:</label>
-                                <input class="" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
+                                <input class="form-control" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
+                            </div>
 
+                            <div class="col-md-6 mb-3">
                                 <label for="fecha_fin">Hasta:</label>
-                                <input class="" type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
-
-                                <div class="justify-end" style="display: inline-block;">
-                                    <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
-                                    <a href="{{route('gestion-turnos-nutricionista.clearFilters')}}" class="btn btn-danger btn-sm">Borrar filtros</a>
-                                </div>
-
-                            </form>
+                                <input class="form-control" type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
+                            </div>
                         </div>
-                    </div>
+
+                        <div class="justify-end float-right" style="display: inline-block;">
+                            <button class="btn btn-primary btn-sm" type="submit">Aplicar</button>
+                            <a href="{{route('gestion-turnos-nutricionista.clearFilters')}}" class="btn btn-danger btn-sm">Borrar filtros</a>
+                        </div>
+
+                    </form>
+
                 </div>
             </div>
 
@@ -210,6 +214,10 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js" integrity="sha512-6HrPqAvK+lZElIZ4mZ64fyxIBTsaX5zAFZg2V/2WT+iKPrFzTzvx6QAsLW2OaLwobhMYBog/+bvmIEEGXi0p1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Moment.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- datetime-moment CDN -->
+    <script src="https://cdn.datatables.net/datetime-moment/2.6.1/js/dataTables.dateTime.min.js"></script>
 
     <script>
         $(document).ready(function(){
@@ -231,7 +239,16 @@
                         "previous": "Anterior"
                     },
                 },
-                "order": [[ 0, "desc" ]],
+                order: [[ 0, "desc" ]],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    }
+                ]
             });
 
             // Aplicar los filtros personalizados

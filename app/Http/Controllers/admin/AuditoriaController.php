@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use OwenIt\Auditing\Models\Audit;
 
@@ -15,9 +16,37 @@ class AuditoriaController extends Controller
      */
     public function index()
     {
+        $fechaDesde = null;
+        $fechaHasta = null;
         $audits = Audit::orderBy('created_at', 'desc')->get();
 
-        return view('admin.auditoria.index', compact('audits'));
+        return view('admin.auditoria.index', compact('audits', 'fechaDesde', 'fechaHasta'));
+    }
+
+    public function filtros(Request $request)
+    {
+        $fechaDesde = $request->input('fecha_desde');
+        $fechaHasta = $request->input('fecha_hasta');
+
+        // Ajusta el formato de las fechas si es necesario
+        $fechaDesde = Carbon::parse($fechaDesde)->startOfDay()->format('Y-m-d H:i:s');
+        $fechaHasta = Carbon::parse($fechaHasta)->endOfDay()->format('Y-m-d H:i:s');
+
+        // Aplica el filtro en la consulta
+        $audits = Audit::query();
+
+        if ($fechaDesde && $fechaHasta) {
+            $audits->whereBetween('created_at', [$fechaDesde, $fechaHasta]);
+        }
+
+        $audits = $audits->orderBy('created_at', 'desc')->get();
+
+        return view('admin.auditoria.index', compact('audits', 'fechaDesde', 'fechaHasta'));
+    }
+
+    public function clearFilters()
+    {
+        return $this->index();
     }
 
     /**

@@ -14,32 +14,61 @@
         <div class="card-body">
             <div class="row mt-2">
                 <div class="col-md-12">
-                    <table class="table table-striped" id="tabla-auditoria">
-                        <thead>
-                            <tr>
-                                <th scope="col">Usuario</th>
-                                <th scope="col">Acción</th>
-                                <th scope="col">Objeto modificado</th>
-                                <th scope="col">Fecha y hora</th>
-                                <th scope="col">Valor nuevo</th>
-                                <th scope="col">Valor antiguo</th>
-                                <th scope="col">Dirección ip</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($audits as $auditoria)
+                    <a class="btn btn-warning btn-sm" data-bs-toggle="collapse" href="#filtros" role="button" aria-expanded="false" aria-controls="filtros">
+                        <i class="bi bi-funnel"></i>Filtros
+                    </a>
+
+                    <div class="collapse" id="filtros">
+                        <div class="card card-body mt-2">
+                            <form action="{{route('auditoria.filtros')}}" method="GET">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="fecha_desde">Desde:</label>
+                                        <input class="form-control" type="date" name="fecha_desde" value="{{ old('fecha_desde', $fechaDesde) }}">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="fecha_hasta">Hasta:</label>
+                                        <input class="form-control" type="date" name="fecha_hasta" value="{{ old('fecha_hasta', $fechaHasta) }}">
+                                    </div>
+                                </div>
+
+                                <div class="justify-end float-right" style="display: inline-block;">
+                                    <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
+                                    <a href="{{route('auditoria.clearFilters')}}" class="btn btn-danger btn-sm">Borrar filtros</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <table class="table table-striped" id="tabla-auditoria">
+                            <thead>
                                 <tr>
-                                    <td>{{ $auditoria->user ? $auditoria->user->name : 'Sistema' }}</td>
-                                    <td>{{ __($auditoria->event) }}</td>
-                                    <td>{{ class_basename($auditoria->auditable_type) }}</td>
-                                    <td>{{ $auditoria->created_at }}</td>
-                                    <td>{{ json_encode($auditoria->new_values) }}</td>
-                                    <td>{{ json_encode($auditoria->old_values) }}</td>
-                                    <td>{{ $auditoria->ip_address }}</td>
+                                    <th scope="col">Usuario</th>
+                                    <th scope="col">Acción</th>
+                                    <th scope="col">Objeto modificado</th>
+                                    <th scope="col">Fecha y hora</th>
+                                    <th scope="col">Valor nuevo</th>
+                                    <th scope="col">Valor antiguo</th>
+                                    <th scope="col">Dirección ip</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($audits as $auditoria)
+                                    <tr>
+                                        <td>{{ $auditoria->user ? $auditoria->user->name : 'Sistema' }}</td>
+                                        <td>{{ __($auditoria->event) }}</td>
+                                        <td>{{ class_basename($auditoria->auditable_type) }}</td>
+                                        <td>{{ $auditoria->created_at }}</td>
+                                        <td>{{ json_encode($auditoria->new_values) }}</td>
+                                        <td>{{ json_encode($auditoria->old_values) }}</td>
+                                        <td>{{ $auditoria->ip_address }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -65,10 +94,14 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <!-- Moment.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- datetime-moment CDN -->
+    <script src="https://cdn.datatables.net/datetime-moment/2.6.1/js/dataTables.dateTime.min.js"></script>
 
     <script>
 
-        //Datatable tratamientos
+        //Datatable auditoría
         $(document).ready(function(){
             $('#tabla-auditoria').DataTable({
                 responsive: true,
@@ -87,8 +120,17 @@
                         "next": "Siguiente",
                         "previous": "Anterior"
                     },
-
-                }
+                },
+                order: [[ 0, "desc" ]],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    }
+                ]
             });
         });
     </script>
