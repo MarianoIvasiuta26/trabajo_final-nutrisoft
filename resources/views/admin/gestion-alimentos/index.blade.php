@@ -37,13 +37,13 @@
                         </td>
                         <td>{{$alimento->estacional}}</td>
                         <td>{{$alimento->estacion}}</td>
-                        <td><a class="btn btn-primary" href="{{route('gestion-alimentos.show', $alimento->id)}}">Ver valores nutricionales</a></td>
+                        <td><a class="btn btn-primary btn-sm" href="{{route('gestion-alimentos.show', $alimento->id)}}"><i class="bi bi-eye"></i> Consultar </a></td>
                         <td>
                             <div class="row">
                                 <div class="col-4">
                                     <form action="{{ route('gestion-alimentos.edit', $alimento->id) }}" method="GET">
                                         @csrf
-                                        <button type="submit" class="btn btn-warning">
+                                        <button type="submit" class="btn btn-warning btn-sm">
                                             <span class="far fa-edit"></span>
                                         </button>
                                     </form>
@@ -52,7 +52,7 @@
                                     <form action="{{ route('gestion-alimentos.destroy', $alimento->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn btn-danger delete-button">
+                                        <button type="button" class="btn btn-danger delete-button btn-sm">
                                             <span class="far fa-trash-alt"></span>
                                         </button>
                                     </form>
@@ -73,6 +73,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
 
     <style>
         .swal2-confirm {
