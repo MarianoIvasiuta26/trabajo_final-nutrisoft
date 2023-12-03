@@ -13,16 +13,18 @@ class RegistroNutricionista extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $userId;
+    public $userId, $passwordTemporal, $email;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($userId)
+    public function __construct($userId, $passwordTemporal, $email)
     {
         $this->userId = $userId;
+        $this->passwordTemporal = $passwordTemporal;
+        $this->email = $email;
     }
 
     /**
@@ -55,7 +57,7 @@ class RegistroNutricionista extends Mailable
 
     public function build(){
         return $this->view('emails.registro-nutricionista')
-        ->with(['userId' => $this->userId])
+        ->with(['userId' => $this->userId, 'passwordTemporal' => $this->passwordTemporal, 'email' => $this->email])
         ->subject('Finalice con el proceso de registro');
     }
 }

@@ -44,11 +44,14 @@ class CreateNewUser implements CreatesNewUsers
 
         if ($tipoUsuario === 'Paciente') {
             Paciente::create(['user_id' => $user->id]);
+            $user->assignRole('Paciente');
             //HistoriaClinica::create(['paciente_id' => $paciente->id]);
         } elseif ($tipoUsuario === 'Administrador') {
             Administrador::create(['user_id' => $user->id]);
+            $user->assignRole('Admin');
         } elseif ($tipoUsuario === 'Nutricionista') {
             Nutricionista::create(['user_id' => $user->id]);
+            $user->assignRole('Nutricionista');
         }
 
         return $user;

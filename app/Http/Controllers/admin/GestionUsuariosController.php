@@ -25,6 +25,7 @@ class GestionUsuariosController extends Controller
     public function index()
     {
         $usuarios = User::All();
+
         return view('admin.gestion-usuarios.index')->with('usuarios', $usuarios);
     }
 
@@ -68,14 +69,17 @@ class GestionUsuariosController extends Controller
 
         if ($request['tipo_usuario'] === 'Paciente') {
             Paciente::create(['user_id' => $user->id]);
+            $user->assignRole('Paciente');
         } elseif ($request['tipo_usuario'] === 'Administrador') {
             Administrador::create(['user_id' => $user->id]);
+            $user->assignRole('Admin');
         } elseif ($request['tipo_usuario'] === 'Nutricionista') {
             $nutricionista = Nutricionista::create(['user_id' => $user->id, 'registrado' => false]);
+            $user->assignRole('Nutricionista');
             $userId = $user->id;
             if ($nutricionista) {
                 // Se envía el correo de completar registro solo si $nutricionista no es null
-                Mail::to($email)->send(new RegistroNutricionista($userId));
+                Mail::to($email)->send(new RegistroNutricionista($userId, $passwordTemporal, $email));
             } else {
                 return redirect()->route('gestion-usuarios.index')->with('error', 'Error al crear el usuario');
             }

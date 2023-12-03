@@ -285,7 +285,7 @@
     $(document).ready(function(){
         var table = $('#tabla-roles').DataTable({
             responsive: true,
-            autoWidth: false,
+            autoWidth: true,
             "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
             "language": {
                 "lengthMenu": "Mostrar _MENU_ usuarios por página",

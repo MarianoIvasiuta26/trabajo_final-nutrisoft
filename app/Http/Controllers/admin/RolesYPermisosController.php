@@ -184,23 +184,9 @@ class RolesYPermisosController extends Controller
      */
     public function destroy($id)
     {
-        $rol = Role::find($id);
-        $permisosRol = $rol->permissions;
-
-        dd($rol, $permisosRol);
-
-        foreach ($permisosRol as $permiso) {
-            $permiso->delete();
-        }
-
-        if(!$rol){
-            return redirect()->route('gestion-rolesYPermisos.index')->with('error', 'Error al eliminar el rol.');
-        }
-
-        $rol->delete();
+        Role::find($id)->delete();
 
         return redirect()->route('gestion-rolesYPermisos.index')->with('success', 'Rol eliminado correctamente.');
-
     }
 
     public function destroyPermiso($id){
