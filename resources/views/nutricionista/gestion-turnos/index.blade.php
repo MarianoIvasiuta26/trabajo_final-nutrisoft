@@ -69,7 +69,7 @@
                                     @endphp
                                     <tr>
                                         <td>
-                                        {{ $turno->fecha }}
+                                        {{ \Carbon\Carbon::parse($turno->fecha)->format('d-m-Y') }}
                                         </td>
                                         <td>
                                             {{ $turno->hora }}
@@ -97,7 +97,7 @@
 
     <div class="card card-dark">
         <div class="card-header">
-            <h5>Turnos de la semana</h5>
+            <h5>Turnos pendientes</h5>
         </div>
 
         <div class="card-body">
@@ -107,7 +107,6 @@
                         <th scope="col">Fecha</th>
                         <th scope="col">Hora</th>
                         <th scope="col">Paciente</th>
-                        <th scope="col">Acciones</th>
                     </tr>
                 </thead>
 
@@ -116,29 +115,22 @@
                         $turnosPendientesEncontrados = false;
                     @endphp
 
-                    @foreach ($turnosSemanaPendiente as $turnoSemana)
-                        @if ($turnoSemana->fecha != $fechaActual && $turnoSemana->estado == 'Pendiente')
+                    @foreach ($turnos as $turno)
+                        @if ($turno->fecha != $fechaActual && $turno->estado == 'Pendiente')
                             @foreach ($pacientes as $paciente)
-                                @if ($paciente->id == $turnoSemana->paciente_id && $turnoSemana->estado == 'Pendiente')
+                                @if ($paciente->id == $turno->paciente_id && $turno->estado == 'Pendiente')
                                     @php
                                         $turnosPendientesEncontrados = true;
                                     @endphp
                                     <tr>
                                         <td>
-                                        {{ $turnoSemana->fecha }}
+                                        {{ \Carbon\Carbon::parse($turno->fecha)->format('d-m-Y') }}
                                         </td>
                                         <td>
-                                            {{ $turnoSemana->hora }}
+                                            {{ $turno->hora }}
                                         </td>
                                         <td>
                                             {{ $paciente->user->name }} {{ $paciente->user->apellido }}
-                                        </td>
-                                        <td>
-                                            <a class="btn btn-success" href="{{route('gestion-turnos-nutricionista.iniciarConsulta', $turno->id)}}">Iniciar consulta</a>
-                                            <form action="{{ route('gestion-turnos-nutricionista.confirmarInasistencia', $turno->id) }}" method="POST" style="display: inline-block;">
-                                                @csrf
-                                                <button type="submit" class="btn btn-danger">No asistió</button>
-                                            </form>
                                         </td>
                                     </tr>
                                 @endif
@@ -171,6 +163,11 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Moment.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- datetime-moment CDN -->
+    <script src="https://cdn.datatables.net/datetime-moment/2.6.1/js/dataTables.dateTime.min.js"></script>
+
     <script>
 
         //Respuestas Flash del controlador con SweetAlert
@@ -242,8 +239,17 @@
                         "next": "Siguiente",
                         "previous": "Anterior"
                     },
-
-                }
+                },
+                order: [[ 0, "desc" ]],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    }
+                ]
             });
         });
 
@@ -265,8 +271,17 @@
                         "next": "Siguiente",
                         "previous": "Anterior"
                     },
-
-                }
+                },
+                order: [[ 0, "asc" ]],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    }
+                ]
             });
         });
     </script>

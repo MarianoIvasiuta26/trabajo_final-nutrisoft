@@ -42,17 +42,8 @@ class GestionTurnosController extends Controller
         $pacientes = Paciente::all();
 
         $fechaActual = Carbon::now()->format('Y-m-d');
-        $hoy = Carbon::now();
-        $inicioSemana = $hoy->startOfWeek()->addDay();
-        $finSemana = $hoy->endOfWeek()->addDay();
 
-        //Obtenemos los turnos pendientes de la semana
-        $turnosSemanaPendiente = Turno::where('estado', 'Pendiente')
-            ->whereBetween('fecha', [$inicioSemana, $finSemana])
-            ->where('fecha', '!=', $fechaActual)
-            ->get();
-
-        return view ('nutricionista.gestion-turnos.index', compact('turnos', 'pacientes', 'fechaActual', 'turnosSemanaPendiente'));
+        return view ('nutricionista.gestion-turnos.index', compact('turnos', 'pacientes', 'fechaActual'));
     }
 
     /**
