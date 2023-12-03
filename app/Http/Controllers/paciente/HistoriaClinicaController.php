@@ -125,18 +125,38 @@ class HistoriaClinicaController extends Controller
         // Verificamos si el paciente ya tiene la historia clínica completa
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
 
+        //Obtenemos los input
+        $peso = $request->input('peso');
+        $altura = $request->input('altura');
+        $circ_munieca = $request->input('circ_munieca') ?? 0.00;
+        $circ_cadera = $request->input('circ_cadera') ?? 0.00;
+        $circ_cintura = $request->input('circ_cintura') ?? 0.00;
+        $circ_pecho = $request->input('circ_pecho') ?? 0.00;
+
         if (!$historiaClinica) {
             // Si no existe un registro, crear uno nuevo con los datos proporcionados o valores predeterminados
             $historiaClinica = HistoriaClinica::create([
                 'paciente_id' => $paciente->id,
+                'peso' => $peso,
+                'altura' => $altura,
+                'circunferencia_munieca' =>  $circ_munieca,
+                'circunferencia_cadera' => $circ_cadera,
+                'circunferencia_cintura' => $circ_cintura,
+                'circunferencia_pecho' => $circ_pecho,
+                'estilo_vida' => $request->input('estilo_vida'),
+                'objetivo_salud' => $request->input('objetivo_salud'),
+            ]);
+        }else{
+            $historiaClinica->update([
+                'paciente_id' => $paciente->id,
                 'peso' => $request->input('peso', 0),
                 'altura' => $request->input('altura', 0),
-                'circunferencia_munieca' => $request->input('circunferencia_munieca', 0),
-                'circunferencia_cadera' => $request->input('circunferencia_cadera', 0),
-                'circunferencia_cintura' => $request->input('circunferencia_cintura', 0),
-                'circunferencia_pecho' => $request->input('circunferencia_pecho', 0),
-                'estilo_vida' => $request->input('estilo_vida', ''),
-                'objetivo_salud' => $request->input('objetivo_salud', ''),
+                'circunferencia_munieca' => $circ_munieca,
+                'circunferencia_cadera' => $circ_cadera,
+                'circunferencia_cintura' => $circ_cintura,
+                'circunferencia_pecho' => $circ_pecho,
+                'estilo_vida' => $request->input('estilo_vida'),
+                'objetivo_salud' => $request->input('objetivo_salud'),
             ]);
         }
 /*
@@ -155,22 +175,38 @@ class HistoriaClinicaController extends Controller
         }
 */
         // Actualizamos o creamos los datos físicos con los valores proporcionados o valores predeterminados
-        $historiaClinica->update([
-            'peso' => $request->input('peso', 0),
-            'altura' => $request->input('altura', 0),
-            'circunferencia_munieca' => $request->input('circunferencia_munieca', 0),
-            'circunferencia_cadera' => $request->input('circunferencia_cadera', 0),
-            'circunferencia_cintura' => $request->input('circunferencia_cintura', 0),
-            'circunferencia_pecho' => $request->input('circunferencia_pecho', 0),
-            'estilo_vida' => $request->input('estilo_vida', ''),
-            'objetivo_salud' => $request->input('objetivo_salud', ''),
-        ]);
 
         session()->put('datos_fisicos', true);
 
         return redirect()->route('historia-clinica.create')->with('success', 'Datos físicos registrados');
     }
 
+    public function completarHistoriaClinica()
+    {
+        $paciente = Paciente::where('user_id', auth()->id())->first();
+
+        // Verificamos si el paciente ya tiene la historia clínica completa
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        if(!$historiaClinica){
+            return redirect()->back()->with('error', 'Error al completar su historia clínica. Inténtelo de nuevo.');
+        }
+
+        //Obtenemos los datos médicos de la historia clínica
+        $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
+
+        $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->first();
+        $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $historiaClinica->id)->first();
+
+        if(!$datosMedicos || !$anamnesisPaciente || !$cirugiasPaciente){
+            return redirect()->back()->with('error', 'Error al completar su historia clínica. Inténtelo de nuevo.');
+        }
+
+        $historiaClinica->completado = 1;
+        $historiaClinica->save();
+
+        return redirect()->route('historia-clinica.index')->with('success', 'Historia clínica completada. Ya puede acceder a las funcionalidades del sistema.');
+    }
 
     /**
      * Display the specified resource.

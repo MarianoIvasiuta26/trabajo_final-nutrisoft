@@ -220,44 +220,44 @@
 
     <script>
         $(document).ready(function () {
-        var currentStep = 1; // Inicialmente, estamos en la etapa 1
+            var currentStep = 1; // Inicialmente, estamos en la etapa 1
 
-        // Oculta todas las etapas excepto la primera
-        $(".step:not(#step1)").hide();
+            // Oculta todas las etapas excepto la primera
+            $(".step:not(#step1)").hide();
 
-        // Manejador para el botón "Siguiente"
-        $(".next-step").click(function () {
-            // Validación personalizada si es necesario
-            if (currentStep === 1) {
-                // Validación para la primera etapa
-                if (!validateStep1()) {
-                    return false; // No avanzar si la validación falla
+            // Manejador para el botón "Siguiente"
+            $(".next-step").click(function () {
+                // Validación personalizada si es necesario
+                if (currentStep === 1) {
+                    // Validación para la primera etapa
+                    if (!validateStep1()) {
+                        return false; // No avanzar si la validación falla
+                    }
                 }
+
+                currentStep++; // Avanzar a la siguiente etapa
+                showStep(currentStep);
+            });
+
+            // Manejador para el botón "Anterior"
+            $(".prev-step").click(function () {
+                currentStep--; // Retroceder a la etapa anterior
+                showStep(currentStep);
+            });
+
+            // Función para mostrar u ocultar etapas
+            function showStep(step) {
+                $(".step").hide(); // Ocultar todas las etapas
+                $("#step" + step).show(); // Mostrar la etapa actual
             }
 
-            currentStep++; // Avanzar a la siguiente etapa
-            showStep(currentStep);
+            // Puedes agregar una función de validación personalizada para la primera etapa
+            function validateStep1() {
+                // Agrega tu lógica de validación aquí
+                // Si la validación es exitosa, devuelve true; de lo contrario, false.
+                return true;
+            }
         });
-
-        // Manejador para el botón "Anterior"
-        $(".prev-step").click(function () {
-            currentStep--; // Retroceder a la etapa anterior
-            showStep(currentStep);
-        });
-
-        // Función para mostrar u ocultar etapas
-        function showStep(step) {
-            $(".step").hide(); // Ocultar todas las etapas
-            $("#step" + step).show(); // Mostrar la etapa actual
-        }
-
-        // Puedes agregar una función de validación personalizada para la primera etapa
-        function validateStep1() {
-            // Agrega tu lógica de validación aquí
-            // Si la validación es exitosa, devuelve true; de lo contrario, false.
-            return true;
-        }
-    });
 
         //SweetAlert
         const swalWithBootstrapButtons = Swal.mixin({

@@ -182,6 +182,7 @@ Route::middleware([
     Route::resource('historia-clinica', HistoriaClinicaController::class)->names('historia-clinica');
     Route::get('/complete-history', [HistoriaClinicaController::class, 'index'])->name('complete-history');
     Route::post('datos-personales/store', [PacienteController::class, 'store'])->name('datos-personales.store');
+    Route::any('historia-clinica.completar', [HistoriaClinicaController::class, 'completarHistoriaClinica'])->name('historia-clinica.completar');
 
     Route::get('datos-personales/edit/{id}', [PacienteController::class, 'edit'])->name('datos-personales.edit');
     Route::post('datos-personales/update/{id}', [PacienteController::class, 'update'])->name('datos-personales.update');

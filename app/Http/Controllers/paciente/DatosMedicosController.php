@@ -107,6 +107,7 @@ class DatosMedicosController extends Controller
             ]);
         }
 
+        /*
         $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->first();
         $alimentoID = Alimento::where('alimento', 'Sin Alimento')->first();
 
@@ -117,41 +118,42 @@ class DatosMedicosController extends Controller
                 'alimento_id' => $alimentoID->id,
                 'gusta' => false,
             ]);
-        }
+        }*/
 
         // Verificar si se proporcionaron datos en alimentosGustos
         if (!empty($alimentosGustos)) {
             foreach ($alimentosGustos as $alimentoGusto) {
-                // Buscar un registro existente
-                $anamnesisExistente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->first();
-                if ($anamnesisExistente) {
-                    // Si existe, actualizarlo
-                    $anamnesisExistente->gusta = true;
-                    $anamnesisExistente->save();
-                } else {
-                    // Si no existe, crear un nuevo registro
-                    $anamnesisPaciente->alimento_id = $alimentoGusto;
-                    $anamnesisPaciente->gusta = true;
-                }
+                AnamnesisAlimentaria::create([
+                    'historia_clinica_id' => $historiaClinica->id,
+                    'alimento_id' => $alimentoGusto,
+                    'gusta' => true,
+                ]);
             }
+        }else{
+            $alimentoID = Alimento::where('alimento', 'Sin Alimento')->first();
+            AnamnesisAlimentaria::create([
+                'historia_clinica_id' => $historiaClinica,
+                'alimento_id' => $alimentoID->id,
+                'gusta' => true,
+            ]);
         }
 
         // Verificar si se proporcionaron datos en alimentosNoGustos
         if(!empty($alimentosNoGustos)){
             foreach($alimentosNoGustos as $alimentoNoGusto){
-                //Buscamos un registro existente
-                $anamnesisExistente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->first();
-
-                if($anamnesisExistente){
-                    //Si existe, actualizarlo
-                    $anamnesisExistente->gusta = false;
-                    $anamnesisExistente->save();
-                }else{
-                    //Si no existe, crear un nuevo registro
-                    $anamnesisPaciente->alimento_id = $alimentoNoGusto;
-                    $anamnesisPaciente->gusta = false;
-                }
+                AnamnesisAlimentaria::create([
+                    'historia_clinica_id' => $historiaClinica->id,
+                    'alimento_id' => $alimentoNoGusto,
+                    'gusta' => false,
+                ]);
             }
+        }else{
+            $alimentoID = Alimento::where('alimento', 'Sin Alimento')->first();
+            AnamnesisAlimentaria::create([
+                'historia_clinica_id' => $historiaClinica->id,
+                'alimento_id' => $alimentoID->id,
+                'gusta' => false,
+            ]);
         }
 
         if(!empty($alergias)){

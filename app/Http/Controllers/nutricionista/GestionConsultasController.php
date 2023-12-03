@@ -164,6 +164,14 @@ class GestionConsultasController extends Controller
             'circunferencia_pecho_actual' => $circPechoActual,
         ]);
 
+        $historiaClinica->peso = $pesoActual;
+        $historiaClinica->altura = $alturaActual;
+        $historiaClinica->circunferencia_munieca = $circMuniecaActual;
+        $historiaClinica->circunferencia_cadera = $circCinturaActual;
+        $historiaClinica->circunferencia_cintura = $circCaderaActual;
+        $historiaClinica->circunferencia_pecho = $circPechoActual;
+        $historiaClinica->save();
+
         $diagnostico = Diagnostico::create([
             'consulta_id' => $consulta->id,
             'descripcion_diagnostico' => $descripcionDiagnostico
