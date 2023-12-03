@@ -6,7 +6,7 @@
 @stop
 
 @section('content')
-    <form action="{{ route('gestion-tratamientos.store') }}" method="POST">
+    <form id="crear-tratamiento" action="{{ route('gestion-tratamientos.store') }}" method="POST" onsubmit="mostrarSpinner()">
         @csrf
 
         <div class="card card-dark mt-3">
@@ -72,6 +72,8 @@
             </div>
         </div>
     </form>
+
+
 @stop
 
 @section('css')
@@ -87,8 +89,29 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        function mostrarSpinner() {
+            let timerInterval;
+            // Muestra la alerta al enviar el formulario
+            Swal.fire({
+                title: "Creando nuevo tratamiento",
+                html: "Cargando...",
+                didOpen: () => {
+                    Swal.showLoading();
+                    const timer = Swal.getPopup().querySelector("b");
+                    timerInterval = setInterval(() => {
+                    timer.textContent = `${Swal.getTimerLeft()}`;
+                    }, 100);
+                },
+                allowOutsideClick: false,
+                showCancelButton: false,
+                showConfirmButton: false,
+            });
+            // Cancela el envío del formulario
+            return false;
+        }
 
         //Select2
         $( '#actividades' ).select2( {
