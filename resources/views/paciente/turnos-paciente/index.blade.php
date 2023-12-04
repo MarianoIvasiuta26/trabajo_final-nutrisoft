@@ -50,6 +50,7 @@
                         <th scope="col">Fecha</th>
                         <th scope="col">Hora</th>
                         <th scope="col">Tipo de consulta</th>
+                        <th scope="col">Motivo de consulta</th>
                         <th scope="col">Estado</th>
                         <th scope="col">Acciones</th>
                     </tr>
@@ -68,9 +69,12 @@
                                         @endif
                                     @endforeach
                                 </td>
+                                <td> {{ $turno->motivo_consulta }} </td>
                                 <td>{{ $turno->estado }}</td>
                                 <td>
-                                    <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary">Ver</a>
+                                    @if ($turno->estado != 'Pendiente')
+                                        <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary btn-sm">Ver</a>
+                                    @endif
                                 {{--   @if ($turno->estado == 'Pendiente')
                                         <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
                                     @endif--}}
@@ -78,7 +82,7 @@
                                         <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger cancelar-turno-button">Cancelar</button>
+                                            <button type="submit" class="btn btn-danger btn-sm cancelar-turno-button">Cancelar</button>
                                         </form>
                                     @endif
                                 </td>

@@ -30,6 +30,7 @@
                         <option value="">Todos</option>
                         <option value="Pendiente">Pendiente</option>
                         <option value="Cancelado">Cancelado</option>
+                        <option value="Inasistencia">Inasistencia</option>
                         <option value="Realizado" selected>Realizado</option>
                     </select>
                 </div>

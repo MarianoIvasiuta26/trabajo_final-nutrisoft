@@ -82,6 +82,11 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Moment.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- datetime-moment CDN -->
+    <script src="https://cdn.datatables.net/datetime-moment/2.6.1/js/dataTables.dateTime.min.js"></script>
+
     <script>
 
         //Respuestas Flash del controlador con SweetAlert
@@ -113,9 +118,9 @@
                 "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
                 "language": {
                     "lengthMenu": "Mostrar _MENU_ planes por página",
-                    "zeroRecords": "No se encontró ningún plan de alimentación.",
+                    "zeroRecords": "No se encontró ningún plan de seguimiento.",
                     "info": "Mostrando la página _PAGE_ de _PAGES_",
-                    "infoEmpty": "No hay planes de alimentación existentes.",
+                    "infoEmpty": "No hay planes de seguimiento existentes.",
                     "infoFiltered": "(filtrado de _MAX_ planes totales)",
                     "search": "Buscar:",
                     "paginate": {
@@ -127,6 +132,26 @@
                 },
                 "order": [
                     [0, 'desc'] // Columna 0 (Fecha de Generación) en orden descendente
+                ],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    },
+                    {
+                        targets: 2, // Índice de la columna de estado
+                        render: function (data, type, row) {
+                            if (data === 'Inactivo') {
+                                return 0; // Asigna un valor numérico para ordenar
+                            } else if (data === 'Activo') {
+                                return 1; // Asigna un valor numérico para ordenar
+                            }
+                            return data;
+                        }
+                    }
                 ]
             });
         });

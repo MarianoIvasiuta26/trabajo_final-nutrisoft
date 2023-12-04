@@ -82,6 +82,12 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Moment.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- datetime-moment CDN -->
+    <script src="https://cdn.datatables.net/datetime-moment/2.6.1/js/dataTables.dateTime.min.js"></script>
+
     <script>
 
         //Respuestas Flash del controlador con SweetAlert
@@ -126,7 +132,28 @@
                     },
                 },
                 "order": [
-                    [0, 'desc'] // Columna 0 (Fecha de Generación) en orden descendente
+                    [0, 'desc'], // Columna 0 (Fecha de Generación) en orden descendente
+                    [2, 'desc'], // Columna 2 (Estado) en orden descendente
+                ],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    },
+                    {
+                        targets: 2, // Índice de la columna de estado
+                        render: function (data, type, row) {
+                            if (data === 'Inactivo') {
+                                return 0; // Asigna un valor numérico para ordenar
+                            } else if (data === 'Activo') {
+                                return 1; // Asigna un valor numérico para ordenar
+                            }
+                            return data;
+                        }
+                    }
                 ]
             });
         });

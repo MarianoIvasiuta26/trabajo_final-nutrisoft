@@ -1190,7 +1190,7 @@
 
 
     <script>
-        
+
         $(document).ready(function() {
             $('[data-bs-toggle="popover"]').popover();
         });
@@ -1259,7 +1259,7 @@
                 if (generarPlanSeguimientoCheckbox.checked) {
                     // Muestra un SweetAlert de confirmación solo si el checkbox se marca
                     Swal.fire({
-                        title: '¿Está seguro de generar un plan de alimentación?',
+                        title: '¿Está seguro de generar un plan de seguimiento?',
                         text: 'Al registrar la consulta se generará automáticamente el plan de seguimiento para el paciente.',
                         icon: 'warning',
                         showCancelButton: true,
