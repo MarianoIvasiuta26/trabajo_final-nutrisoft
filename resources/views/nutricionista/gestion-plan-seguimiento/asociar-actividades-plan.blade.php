@@ -137,7 +137,7 @@
                                         <div class="col-3">
                                             <form action="{{ route('gestion-actividad-por-tipo-actividad.edit', $actividadPorTipo->id) }}" method="GET">
                                                 @csrf
-                                                <button type="submit" class="btn btn-warning">
+                                                <button type="submit" class="btn btn-warning btn-sm">
                                                     <span class="far fa-edit"></span>
                                                 </button>
                                             </form>
@@ -146,7 +146,7 @@
                                             <form action="{{ route('gestion-actividad-por-tipo-actividad.destroy', $actividadPorTipo->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" class="btn btn-danger delete-button">
+                                                <button type="button" class="btn btn-danger btn-sm delete-button">
                                                     <span class="far fa-trash-alt"></span>
                                                 </button>
                                             </form>

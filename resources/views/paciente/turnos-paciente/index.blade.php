@@ -39,7 +39,7 @@
 
         @endforeach
 
-        <div class="card card-dark">
+        <div class="card card-dark mt-3">
             <div class="card-header">
                 <h3>Historial de Turnos</h3>
             </div>
@@ -59,7 +59,7 @@
                     @forelse($turnos as $turno)
                         @if ($turno->paciente_id == $paciente->id)
                             <tr>
-                                <td>{{ $turno->fecha }}</td>
+                                <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}</td>
                                 <td>{{ $turno->hora }}</td>
                                 <td>
                                     @foreach ($tipo_consultas as $tipoConsulta)
@@ -114,6 +114,10 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <!-- Moment.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- datetime-moment CDN -->
+    <script src="https://cdn.datatables.net/datetime-moment/2.6.1/js/dataTables.dateTime.min.js"></script>
 
     <script>
 
@@ -170,7 +174,17 @@
                         "next": "Siguiente",
                         "previous": "Anterior"
                     },
-                }
+                },
+                order: [[ 0, "desc" ]],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    }
+                ]
             });
         });
 

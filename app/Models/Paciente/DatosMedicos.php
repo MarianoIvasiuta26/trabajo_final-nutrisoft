@@ -19,27 +19,27 @@ class DatosMedicos extends Model
     ];
 
     public function historiaClinica(){
-        return $this->belongsTo('App/Models/Paciente/HistoriaClinica');
+        return $this->belongsTo('App\Models\Paciente\HistoriaClinica');
     }
 
     public function alergia(){
-        return $this->belongsTo('App/Models/Paciente/Alergia');
+        return $this->belongsTo('App\Models\Paciente\Alergia');
     }
 
     public function patologia(){
-        return $this->belongsTo('App/Models/Paciente/Patologia');
+        return $this->belongsTo('App\Models\Paciente\Patologia');
     }
 
     public function cirugia(){
-        return $this->belongsTo('App/Models/Paciente/Cirugia');
+        return $this->belongsTo('App\Models\Paciente\Cirugia');
     }
 
     public function intolerancia(){
-        return $this->belongsTo('App/Models/Paciente/Intolerancia');
+        return $this->belongsTo('App\Models\Paciente\Intolerancia');
     }
 
     public function valorAnalisisClinico(){
-        return $this->belongsTo('App/Models/Paciente/ValorAnalisisClinico');
+        return $this->belongsTo('App\Models\Paciente\ValorAnalisisClinico');
     }
 
 }

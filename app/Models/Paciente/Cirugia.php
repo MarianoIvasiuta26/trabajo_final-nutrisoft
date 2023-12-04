@@ -14,14 +14,14 @@ class Cirugia extends Model
         'grupo_cirugia',
     ];
     public function datosMedicos(){
-        return $this->hasMany('App/Models/Paciente/DatosMedicos');
+        return $this->hasMany('App\Models\Paciente\DatosMedicos');
     }
 
     public function cirugiasPaciente(){
-        return $this->hasMany('App/Models/Paciente/CirugiasPaciente');
+        return $this->hasMany('App\Models\Paciente\CirugiasPaciente');
     }
 
     public function actividadesProhibidasCirugias(){
-        return $this->hasMany('App/Models/ActividadesProhibidasCirugia');
+        return $this->hasMany('App\Models\Paciente\ActividadesProhibidasCirugia');
     }
 }

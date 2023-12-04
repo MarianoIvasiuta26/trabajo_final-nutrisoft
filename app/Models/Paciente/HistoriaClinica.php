@@ -21,23 +21,23 @@ class HistoriaClinica extends Model
         'objetivo_salud',
     ];
     public function paciente(){
-        return $this->belongsTo('App/Models/Paciente');
+        return $this->belongsTo('App\Models\Paciente');
     }
 
     public function datosMedicos(){
-        return $this->hasMany('App/Models/Paciente/DatosMedicos');
+        return $this->hasMany('App\Models\Paciente\DatosMedicos');
     }
 
     public function anamnesisAlimentaria(){
-        return $this->hasMany('App/Models/Paciente/AnamnesisAlimentaria');
+        return $this->hasMany('App\Models\Paciente\AnamnesisAlimentaria');
     }
 
     public function cirugiasPaciente(){
-        return $this->hasMany('App/Models/Paciente/CirugiasPaciente');
+        return $this->hasMany('App\Models\Paciente\CirugiasPaciente');
     }
 
     public function medicionesDePlieguesCutaneos(){
-        return $this->hasMany('App/Models/MedicionesDePlieguesCutaneos');
+        return $this->hasMany('App\Models\Paciente\MedicionesDePlieguesCutaneos');
     }
 
 }

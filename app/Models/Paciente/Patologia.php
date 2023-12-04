@@ -14,14 +14,14 @@ class Patologia extends Model
         'grupo_patologia',
     ];
     public function datosMedicos(){
-        return $this->hasMany('App/Models/Paciente/DatosMedicos');
+        return $this->hasMany('App\Models\Paciente\DatosMedicos');
     }
 
     public function alimentosProhibidosPatologias(){
-        return $this->hasMany('App/Models/AlimentosProhibidosPatologia');
+        return $this->hasMany('App\Models\AlimentosProhibidosPatologia');
     }
 
     public function actividadesProhibidasPatologias(){
-        return $this->hasMany('App/Models/ActividadesProhibidasPatologia');
+        return $this->hasMany('App\Models\ActividadesProhibidasPatologia');
     }
 }

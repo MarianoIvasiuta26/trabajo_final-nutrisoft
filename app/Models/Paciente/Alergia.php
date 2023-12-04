@@ -15,11 +15,11 @@ class Alergia extends Model
     ];
 
     public function datosMedicos(){
-        return $this->hasMany('App/Models/Paciente/DatosMedicos');
+        return $this->hasMany('App\Models\Paciente\DatosMedicos');
     }
 
     public function alimentosProhibidosAlergias(){
-        return $this->hasMany('App/Models/AlimentosProhibidosAlergia');
+        return $this->hasMany('App\Models\AlimentosProhibidosAlergia');
     }
 
 }

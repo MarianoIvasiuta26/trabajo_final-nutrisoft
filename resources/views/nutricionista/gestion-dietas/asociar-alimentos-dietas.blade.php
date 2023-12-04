@@ -3,13 +3,13 @@
 @section('title', 'Alimentos recomendados en dietas')
 
 @section('content_header')
-    <h1>Alimentos recomendados en dietas</h1>
+
 @stop
 
 @section('content')
 
 
-    <div class="card card-dark">
+    <div class="card card-dark mt-3">
         <div class="card-header">
             <h5>Alimentos recomendados en dietas</h5>
         </div>
@@ -160,7 +160,7 @@
                                         <div class="col-4">
                                             <form action="{{ route('gestion-alimento-por-dietas.edit', $alimentoPorDieta->id) }}" method="GET">
                                                 @csrf
-                                                <button type="submit" class="btn btn-warning">
+                                                <button type="submit" class="btn btn-warning btn-sm">
                                                     <span class="far fa-edit"></span>
                                                 </button>
                                             </form>
@@ -169,7 +169,7 @@
                                             <form action="{{ route('gestion-alimento-por-dietas.destroy', $alimentoPorDieta->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="button" class="btn btn-danger delete-button">
+                                                <button type="button" class="btn btn-danger btn-sm delete-button">
                                                     <span class="far fa-trash-alt"></span>
                                                 </button>
                                             </form>

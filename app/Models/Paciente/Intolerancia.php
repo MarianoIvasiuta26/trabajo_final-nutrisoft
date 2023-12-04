@@ -14,10 +14,10 @@ class Intolerancia extends Model
     ];
 
     public function datosMedicos(){
-        return $this->hasMany('App/Models/Paciente/DatosMedicos');
+        return $this->hasMany('App\Models\Paciente\DatosMedicos');
     }
 
     public function alimentosProhibidosIntolerancias(){
-        return $this->hasMany('App/Models/AlimentosProhibidosIntolerancia');
+        return $this->hasMany('App\Models\AlimentosProhibidosIntolerancia');
     }
 }
