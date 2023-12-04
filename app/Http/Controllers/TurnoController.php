@@ -518,7 +518,7 @@ class TurnoController extends Controller
         }
 
         //Buscamos todos los turnos
-        $turnos = Turno::all();
+        $turnos = Turno::where('estado', 'Pendiente')->get();
 
         $tipo_consultas = TipoConsulta::all();
 
@@ -558,14 +558,11 @@ class TurnoController extends Controller
                 break;
         }
 
-
         //Recorremos todos los turnos pendientes
         foreach($turnos as $turno){
-            if($turno->estado == 'Pendiente' && $turno->fecha >= $turnoCancelado->fecha && $turno->hora >= $turnoCancelado->hora){
-
+            if($turno->estado == 'Pendiente' && $turno->fecha >= $turnoCancelado->fecha){
                 foreach($tipo_consultas as $tipoConsulta){
                     if($turno->tipo_consulta_id == $tipoConsulta->id && $tipoConsulta->tipo_consulta == 'Seguimiento'){
-
 
                         //Obtenemos todos los turnos del paciente
                         $turnosPaciente = Turno::where('paciente_id', $turno->paciente_id)->where('estado', 'Realizado')->get();
@@ -604,9 +601,10 @@ class TurnoController extends Controller
                                 }
                             }
                         }
-                    }else if($turno->tipo_consulta_id == $tipoConsulta->id && $tipoConsulta == 'Primera consulta'){
+                    }else if($turno->tipo_consulta_id == $tipoConsulta->id && $tipoConsulta->tipo_consulta == 'Primera consulta'){
                         $pacienteTurnoNuevo = Paciente::find($turno->paciente_id);
                         $adelantamientosPaciente = AdelantamientoTurno::where('paciente_id', $pacienteTurnoNuevo->id)->get();
+
                         //Recorremos y verificamos si tiene fijo el mismo día y hora que el turno cancelado
                         foreach($adelantamientosPaciente as $adelantamientoPaciente){
                             if($adelantamientoPaciente->dias_fijos == $diaSeleccionado && $adelantamientoPaciente->horas_fijas == $turnoCancelado->hora){
