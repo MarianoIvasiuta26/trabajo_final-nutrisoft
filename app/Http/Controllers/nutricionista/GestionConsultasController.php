@@ -828,21 +828,22 @@ class GestionConsultasController extends Controller
 
         $alimentosRecomendadosComida = [];
         $alimentosRecomendadosPorDieta = AlimentosRecomendadosPorDieta::where('comida_id', $comida->id)->get();
-        $alimentosPorDieta = AlimentoPorTipoDeDieta::where('tipo_de_dieta_id', $tipoDieta->id)->pluck('alimento_id');
+        $alimentosPorDieta = AlimentoPorTipoDeDieta::where('tipo_de_dieta_id', $tipoDieta->id)->get();
 
         foreach ($alimentosRecomendadosPorDieta as $alimentoRecomendado) {
-            if (in_array($alimentoRecomendado->alimento_por_dieta_id, $alimentosPorDieta->toArray()) && !in_array($alimentoRecomendado->alimento_por_dieta_id, $alimentosProhibidos)) {
-                $total = $this->calcularValorNutricional($alimentoRecomendado, $alimentoRecomendado->cantidad);
-
-                if ($total < $carbohidratosTotales && $carbohidratosTotales > 0) {
-                    $alimentosRecomendadosComida[] = $alimentoRecomendado->alimento_por_dieta_id;
-                    $carbohidratosTotales -= $total;
-                } elseif ($total < $lipidosTotales && $lipidosTotales > 0) {
-                    $alimentosRecomendadosComida[] = $alimentoRecomendado->alimento_por_dieta_id;
-                    $lipidosTotales -= $total;
-                } elseif ($total < $proteinasTotales && $proteinasTotales > 0) {
-                    $alimentosRecomendadosComida[] = $alimentoRecomendado->alimento_por_dieta_id;
-                    $proteinasTotales -= $total;
+            foreach($alimentosPorDieta as $alimentoporDieta){
+                if($alimentoRecomendado->alimento_por_dieta_id == $alimentoporDieta->id && !in_array($alimentoporDieta->alimento_id, $alimentosProhibidos)){
+                    $total = $this->calcularValorNutricional($alimentoporDieta, $alimentoRecomendado);
+                    if ($total['totalCarbohidrato'] < $carbohidratosTotales && $carbohidratosTotales > 0) {
+                        $alimentosRecomendadosComida[] = $alimentoRecomendado->alimento_por_dieta_id;
+                        $carbohidratosTotales -= $total['totalCarbohidrato'];
+                    } elseif ($total['totalLipido'] < $lipidosTotales && $lipidosTotales > 0) {
+                        $alimentosRecomendadosComida[] = $alimentoRecomendado->alimento_por_dieta_id;
+                        $lipidosTotales -= $total['totalLipido'];
+                    } elseif ($total['totalProteina'] < $proteinasTotales && $proteinasTotales > 0) {
+                        $alimentosRecomendadosComida[] = $alimentoRecomendado->alimento_por_dieta_id;
+                        $proteinasTotales -= $total['totalProteina'];
+                    }
                 }
             }
         }
@@ -854,53 +855,113 @@ class GestionConsultasController extends Controller
 
     private function obtenerAlimentosProhibidos($historiaClinica) {
         $alimentosProhibidos = [];
+        $alergias = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->pluck('alergia_id');
+        $patologias = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->pluck('patologia_id');
+        $intolerancias = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->pluck('intolerancia_id');
 
-        foreach ($historiaClinica->datosMedicos as $datoMedico) {
-            if ($datoMedico->alergias !== null) {
-                foreach ($datoMedico->alergias as $alergia) {
-                    $alimentosProhibidos = array_merge($alimentosProhibidos, $alergia->alimentosProhibidos->pluck('alimento_id')->toArray());
-                }
-            }
-            if ($datoMedico->patologias !== null) {
-                foreach ($datoMedico->patologia as $patologia) {
-                    $alimentosProhibidos = array_merge($alimentosProhibidos, $patologia->alimentosProhibidos->pluck('alimento_id')->toArray());
-                }
-            }
+        $alimentosProhibidosAlergia = AlimentosProhibidosAlergia::where('alergia_id', $alergias)->get();
+        $alimentosProhibidos = array_merge($alimentosProhibidos, $alimentosProhibidosAlergia->pluck('alimento_id')->toArray());
 
-            if ($datoMedico->patologias !== null) {
-                foreach ($datoMedico->intolerancia as $intolerancia) {
-                    $alimentosProhibidos = array_merge($alimentosProhibidos, $intolerancia->alimentosProhibidos->pluck('alimento_id')->toArray());
-                }
-            }
-        }
+        $alimentosProhibidosPatologia = AlimentosProhibidosPatologia::where('patologia_id', $patologias)->get();
+        $alimentosProhibidos = array_merge($alimentosProhibidos, $alimentosProhibidosPatologia->pluck('alimento_id')->toArray());
+
+        $alimentosProhibidosIntolerancia = AlimentosProhibidosIntolerancia::where('intolerancia_id', $intolerancias)->get();
+        $alimentosProhibidos = array_merge($alimentosProhibidos, $alimentosProhibidosIntolerancia->pluck('alimento_id')->toArray());
 
         return $alimentosProhibidos;
     }
 
-    private function calcularValorNutricional($alimentoRecomendado, $cantidad) {
-        $valorNutricional = $alimentoRecomendado->valorNutricional;
-        $nutriente = $valorNutricional->nutriente;
-        $unidadMedida = $alimentoRecomendado->unidadMedida;
+    private function calcularValorNutricional($alimentoporDieta, $alimentoRecomendado) {
+        $alimentosRecomendadosPorDieta = AlimentosRecomendadosPorDieta::find($alimentoRecomendado->id);
+        $alimentoPorDieta = AlimentoPorTipoDeDieta::find($alimentoporDieta->id);
 
-        $valor = $valorNutricional->valor;
+        $nutrienteCarbohidratos = Nutriente::where('nombre_nutriente', 'Carbohidratos totales')->first();
+        $nutrienteLipidos = Nutriente::where('nombre_nutriente', 'Lípidos totales')->first();
+        $nutrienteProteinas = Nutriente::where('nombre_nutriente', 'Proteínas')->first();
 
-        if ($unidadMedida->nombre_unidad_medida == 'Gramos') {
-            $total = $valor * $cantidad / 100;
-        } elseif ($unidadMedida->nombre_unidad_medida == 'Kcal') {
-            switch ($nutriente->nombre_nutriente) {
-                case 'Carbohidratos totales':
-                case 'Proteínas':
-                    $total = $valor * $cantidad / 4;
-                    break;
-                case 'Lípidos totales':
-                    $total = $valor * $cantidad / 9;
-                    break;
-                default:
-                    $total = 0;
+        $unidadMedida = UnidadesMedidasPorComida::find($alimentosRecomendadosPorDieta->unidad_medida_id);
+        if ($unidadMedida) {
+            $nombreUnidadMedida = $unidadMedida->nombre_unidad_medida;
+        }else{
+            $nombreUnidadMedida = '';
+        }
+
+        // Inicializar las variables
+        $totalCarbohidrato = 0;
+        $totalLipido = 0;
+        $totalProteina = 0;
+
+        if ($nombreUnidadMedida == 'Gramos') {
+            $cantidad = $alimentosRecomendadosPorDieta->cantidad;
+            $valorNutricionalCarbohidrato = ValorNutricional::where('alimento_id', $alimentoPorDieta->alimento_id)
+                ->where('nutriente_id', $nutrienteCarbohidratos->id)
+                ->first();
+                // Verificar si $valorNutricionalCarbohidrato es null
+            if ($valorNutricionalCarbohidrato !== null) {
+                $totalCarbohidrato = ($valorNutricionalCarbohidrato->valor * $cantidad) / 100;
+            } else {
+                $totalCarbohidrato = 0;
+            }
+
+            $valorNutricionalLipido = ValorNutricional::where('alimento_id', $alimentoPorDieta->alimento_id)
+                ->where('nutriente_id', $nutrienteLipidos->id)
+                ->first();
+
+            if ($valorNutricionalLipido !== null) {
+                $totalLipido = ($valorNutricionalLipido->valor * $cantidad) / 100;
+            } else {
+                $totalLipido = 0;
+            }
+
+            $valorNutricionalProteina = ValorNutricional::where('alimento_id', $alimentoPorDieta->alimento_id)
+                ->where('nutriente_id', $nutrienteProteinas->id)
+                ->first();
+
+            if ($valorNutricionalProteina !== null) {
+                $totalProteina = ($valorNutricionalProteina->valor * $cantidad) / 100;
+            } else {
+                $totalProteina = 0;
+            }
+
+        } elseif ($nombreUnidadMedida == 'Kcal') {
+            $cantidadCarbohidrato = $alimentosRecomendadosPorDieta->cantidad / 4;
+            $cantidadLipido =  $alimentosRecomendadosPorDieta->cantidad / 9;
+            $cantidadProteina = $alimentosRecomendadosPorDieta->cantidad / 4;
+            $valorNutricionalCarbohidrato = ValorNutricional::where('alimento_id', $alimentoPorDieta->alimento_id)
+                ->where('nutriente_id', $nutrienteCarbohidratos->id)
+                ->first();
+            if ($valorNutricionalCarbohidrato !== null) {
+                $totalCarbohidrato = ($valorNutricionalCarbohidrato->valor * $cantidadCarbohidrato) / 100;
+            } else {
+                $totalCarbohidrato = 0;
+            }
+
+            $valorNutricionalLipido = ValorNutricional::where('alimento_id', $alimentoPorDieta->alimento_id)
+                    ->where('nutriente_id', $nutrienteLipidos->id)
+                    ->first();
+            if ($valorNutricionalLipido !== null) {
+                $totalLipido = ($valorNutricionalLipido->valor * $cantidadLipido) / 100;
+            } else {
+                $totalLipido = 0;
+            }
+
+            $valorNutricionalProteina = ValorNutricional::where('alimento_id', $alimentoPorDieta->alimento_id)
+            ->where('nutriente_id', $nutrienteProteinas->id)
+            ->first();
+            if ($valorNutricionalProteina !== null) {
+                $totalProteina = ($valorNutricionalProteina->valor * $cantidadProteina) / 100;
+            } else {
+                $totalProteina = 0;
             }
         }
 
-        return $total;
+
+
+        return [
+            'totalCarbohidrato' => $totalCarbohidrato,
+            'totalLipido' => $totalLipido,
+            'totalProteina' => $totalProteina
+        ];
     }
 
 
