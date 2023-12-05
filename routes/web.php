@@ -105,6 +105,15 @@ Route::middleware([
     Route::get('auditoria.filtros', [AuditoriaController::class, 'filtros'])->name('auditoria.filtros');
     Route::any('auditoria.clearFilters', [AuditoriaController::class, 'clearFilters'])->name('auditoria.clearFilters');
 
+    //Estadísticas
+    Route::resource('gestion-estadisticas', EstadisticaController::class)->names('gestion-estadisticas');
+    Route::get('gestion-estadisticas.filtrosTratamiento', [EstadisticaController::class, 'filtrosTratamiento'])->name('gestion-estadisticas.filtrosTratamiento');
+    Route::get('gestion-estadisticas.filtrosTag', [EstadisticaController::class, 'filtrosTag'])->name('gestion-estadisticas.filtrosTag');
+    Route::any('gestion-estadisticas.clearTratamientoFilters',[EstadisticaController::class,'clearTratamientoFilters'])->name('gestion-estadisticas.clearTratamientoFilters');
+    Route::any('gestion-estadisticas.clearTagsFilters',[EstadisticaController::class,'clearTagsFilters'])->name('gestion-estadisticas.clearTagsFilters');
+
+
+
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');
 
 
@@ -157,9 +166,6 @@ Route::middleware([
         'gestion-actividad-por-tipo-actividad' => 'actividadPorTipo',
     ]);
 
-    Route::resource('gestion-estadisticas', EstadisticaController::class)->names('gestion-estadisticas');
-    Route::post('gestion-estadisticas.filtros', [EstadisticaController::class, 'filtros'])->name('gestion-estadisticas.filtros');
-    Route::get('gestion-estadisticas.clearFilters',[EstadisticaController::class,'clearFilters'])->name('gestion-estadisticas.clearFilters');
 
     //Nutricionista - Plan de alimentación
     Route::resource('plan-alimentacion', PlanAlimentacionController::class)->names('plan-alimentacion');

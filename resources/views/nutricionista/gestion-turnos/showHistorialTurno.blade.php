@@ -164,6 +164,7 @@
             <div style="text-align: center;">
                 <canvas id="myChart2" style="display: inline-block;"></canvas>
             </div>
+            
             <div class="row mt-3">
                 <div class="col-md-12">
 

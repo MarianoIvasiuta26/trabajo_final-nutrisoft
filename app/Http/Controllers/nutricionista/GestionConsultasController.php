@@ -410,6 +410,7 @@ class GestionConsultasController extends Controller
         $descripcionPlan = substr($descripcionPlan, 0, 255);
 
         //Evaluamos el porcentaje necesario por grupo de alimentos (Según Guia Argentina)
+        /*
         $resultadoEleccionAlimentos = $this->porcentajeAlimentos($gastoEnergeticoTotal);
 
         $porcentajeFrutasVerduras = $resultadoEleccionAlimentos['porcentajeFrutasVerduras'];
@@ -418,9 +419,9 @@ class GestionConsultasController extends Controller
         $porcentajeCarnesHuevo = $resultadoEleccionAlimentos['porcentajeCarnesHuevo'];
         $porcentajeAceitesFrutasSecasSemillas = $resultadoEleccionAlimentos['porcentajeAceitesFrutasSecasSemillas'];
         $porcentajeAzucarDulcesGolosinas = $resultadoEleccionAlimentos['porcentajeAzucarDulcesGolosinas'];
-
+        */
         //Selección de alimentos
-        $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $tipoDieta->id, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas);
+        $alimentosPaciente = $this->eleccionAlimentos($historiaClinica->id, $tipoDieta->id, $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas);
 
         //Obtenemos los alimentos recomendados
         $alimentosRecomendadosDesayuno = $alimentosPaciente['comidasDesayuno'];
@@ -437,6 +438,8 @@ class GestionConsultasController extends Controller
             $alimentosRecomendadosMerienda,
             $alimentosRecomendadosCena
         );
+
+
 
         //Obtenemos el plan generado en consultas anteriores para el paciente y lo volvemos inactivo.
     /*    $ultimoPlanAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 1)->orderBy('id', 'desc')->first();
@@ -466,6 +469,10 @@ class GestionConsultasController extends Controller
         $carbohidratos = [];
         $lipidos = [];
         $proteinas = [];
+
+
+
+        /*
 
         foreach ($alimentosRecomendados as $alimentoRecomendado) {
             foreach($alimentosPorDieta as $alimentoDieta){
@@ -508,15 +515,17 @@ class GestionConsultasController extends Controller
             }
         }
 
-        $i = 0;
+        */
+        //dd('hola');
+        //$i = 0;
+        $observacion = '';
         // Asocia los detalles del plan de alimentación al plan recién creado
         foreach ($alimentosRecomendados as $alimentoRecomendado) {
-            $observacion = '';
             foreach($alimentosPorDieta as $alimentoDieta){
                 foreach ($alimentosrecomendadosPorDieta as $alimRecomendadoDieta) {
                     $comida = Comida::where('id', $alimRecomendadoDieta->comida_id)->first();
                     $unidadMedida = UnidadesMedidasPorComida::where('id', $alimRecomendadoDieta->unidad_medida_id)->first();
-                    $observacion = 'Carbohidratos: ' . $carbohidratos[$i] . ' kcal. Proteínas: ' . $proteinas[$i] . ' kcal. Lípidos: ' . $lipidos[$i] . ' kcal.';
+                    //$observacion = 'Carbohidratos: ' . $carbohidratos[$i] . ' kcal. Proteínas: ' . $proteinas[$i] . ' kcal. Lípidos: ' . $lipidos[$i] . ' kcal.';
                     if ($alimentoDieta->id == $alimentoRecomendado && $alimentoDieta->id == $alimRecomendadoDieta->alimento_por_dieta_id) {
                         $detallePlan = DetallePlanAlimentaciones::create([
                             'plan_alimentacion_id' => $planAlimentacion->id, // Asocia el plan al detalle del plan
@@ -531,7 +540,7 @@ class GestionConsultasController extends Controller
                     }
                 }
             }
-            $i++;
+            //$i++;
         }
 
         return [
@@ -699,6 +708,7 @@ class GestionConsultasController extends Controller
 
     }
 
+    /*
     public function porcentajeAlimentos($get){
         //Función para determinar los alimentos que debe consumir el paciente según grupos de alimentos.
         /* Tenemos en cuenta:
@@ -716,7 +726,7 @@ class GestionConsultasController extends Controller
             5% Aceites, frutas secas y semillas
             5% Azúcar, dulces y golosinas (OPCIONAL).
         */
-
+        /*
         //Resultados en Kcal/día
         $frutasVerduras = ($get * 0.5);
         $legumbresCereales = ($get * 0.25);
@@ -736,8 +746,8 @@ class GestionConsultasController extends Controller
             'porcentajeAzucarDulcesGolosinas' => $azucarDulcesGolosinas,
         ];
     }
-
-    public function eleccionAlimentos($historiaClinicaId, $tipoDietaId, $porcentajeFrutasVerduras, $porcentajeLegumbresCereales, $porcentajeLecheYogurQueso, $porcentajeCarnesHuevo, $porcentajeAceitesFrutasSecasSemillas, $porcentajeAzucarDulcesGolosinas,  $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas){
+*/
+    public function eleccionAlimentos($historiaClinicaId, $tipoDietaId,  $carbohidratosRecomendados, $lipidosRecomendados, $proteinasRecomendadas){
 
         //Buscamos la historia Clinica
         $historiaClinica = HistoriaClinica::find($historiaClinicaId);
@@ -777,6 +787,7 @@ class GestionConsultasController extends Controller
         $lipidosCena = $lipidosRecomendados * $porcentajeCena; //Total de gramos de lípidos para la cena
         $proteinasCena = $proteinasRecomendadas * $porcentajeCena;  //Total de gramos de proteínas para la cena
 
+        //dd($carbohidratosDesayuno,$lipidosDesayuno, $proteinasDesayuno,$carbohidratosCena, $lipidosCena,$proteinasCena);
 
         //COMIENZO DE SELECCIÓN DE ALIMENTOS
         $comidaDesayuno = Comida::where('nombre_comida', 'Desayuno')->first();
