@@ -588,7 +588,7 @@ return [
         [
             'text' => 'Gestión Recetas',
             'route' => 'gestion-recetas.index',
-            'icon' => 'fas fa-comment-medical fa-fw',
+            'icon' => 'fas fa-pizza-slice fa-fw',
             'can' => 'gestion-recetas.index',
         ],
 

@@ -114,7 +114,7 @@
                     <div class="button-container">
                         <a href="{{ route('login') }}"  class="button login-button">
                             <img src="{{asset('img/salud.png')}}" alt="Login">
-                            <span>Log in</span>
+                            <span>Iniciar Sesión</span>
                         </a>
 
                         @if (Route::has('register'))

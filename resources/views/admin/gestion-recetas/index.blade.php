@@ -228,7 +228,9 @@
                                                     </table>
 
                                                     <button type="button" class="btn btn-success mt-3" onclick="agregarIngredienteEdit()">Agregar Ingrediente</button>
+                                                    <script>
 
+                                                    </script>
                                                     <!-- Sección para cada Ingrediente -->
                                                     <div id="ingredientes-section-edit" class="row mt-3">
                                                         <!-- Los ingredientes seleccionados se agregarán dinámicamente aquí -->
@@ -519,13 +521,14 @@
             ingredienteContainer.appendChild(nuevoIngrediente);
         }
 
+
         function agregarIngredienteEdit() {
             // Clonar la sección de ingrediente y agregarla al contenedor
-            const ingredienteContainer = document.getElementById('ingredientes-section-edit');
-            const nuevoIngrediente = document.createElement('div');
-            nuevoIngrediente.classList.add('row', 'mb-3', 'align-items-center');
+            const ingredienteEditContainer = document.getElementById('ingredientes-section-edit');
+            const nuevoEditIngrediente = document.createElement('div');
+            nuevoEditIngrediente.classList.add('row', 'mb-3', 'align-items-center');
 
-            nuevoIngrediente.innerHTML = `
+            nuevoEditIngrediente.innerHTML = `
                 <div class="col-md-4">
                     <div class="form-floating">
                         <select name="alimentos[]" class="form-select" placeholder="Alimento" required>
@@ -559,7 +562,7 @@
                 </div>
             `;
 
-            ingredienteContainer.appendChild(nuevoIngrediente);
+            ingredienteEditContainer.appendChild(nuevoEditIngrediente);
         }
 
         function eliminarIngrediente(elemento) {
