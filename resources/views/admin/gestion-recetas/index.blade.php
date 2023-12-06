@@ -86,14 +86,14 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form action="" method="POST">
+                                <form action="{{route('gestion-recetas.update', $receta->id)}}" method="POST">
                                     @csrf
                                     @method('PUT')
 
                                     <div class="row">
                                         <div class="col">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="nombre_receta" name="nombre_receta" placeholder="Nombre de la receta" required  value="{{old('nombre_receta')}}" @if($errors->has('nombre_receta')) value="{{old('nombre_receta')}}" @endif>
+                                                <input type="text" class="form-control" id="nombre_receta" name="nombre_receta" placeholder="Nombre de la receta" required  value="{{$receta->nombre_receta}}" @if($errors->has('nombre_receta')) value="{{old('nombre_receta')}}" @endif>
                                                 <label for="nombre_receta">Nombre de la receta</label>
 
                                                 @error('nombre_receta')
@@ -105,7 +105,7 @@
                                         </div>
                                         <div class="col">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="porciones" name="porciones" placeholder="Porciones" required value="{{old('porciones')}}" @if($errors->has('porciones')) value="{{old('porciones')}}" @endif>
+                                                <input type="text" class="form-control" id="porciones" name="porciones" placeholder="Porciones" required value="{{$receta->porciones}}" @if($errors->has('porciones')) value="{{old('porciones')}}" @endif>
                                                 <label for="porciones">Porciones</label>
 
                                                 @error('porciones')
@@ -121,7 +121,7 @@
                                     <div class="row">
                                         <div class="col">
                                             <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion" placeholder="Tiempo de preparación" required  value="{{old('tiempo_preparacion')}}" @if($errors->has('tiempo_preparacion')) value="{{old('tiempo_preparacion')}}" @endif>
+                                                <input type="text" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion" placeholder="Tiempo de preparación" required  value="{{$receta->tiempo_preparacion}}" @if($errors->has('tiempo_preparacion')) value="{{old('tiempo_preparacion')}}" @endif>
                                                 <label for="tiempo_preparacion">Tiempo de preparación</label>
 
                                                 @error('tiempo_preparacion')
@@ -136,7 +136,7 @@
                                                 <select class="form-select" id="unidad_de_tiempo" name="unidad_de_tiempo" aria-label="Floating label select example" required>
                                                     <option selected disabled value="">Seleccione una unidad de tiempo</option>
                                                     @foreach($unidades_de_tiempo as $unidad_de_tiempo)
-                                                        <option value="{{$unidad_de_tiempo->id}}" @if($errors->has('unidad_de_tiempo')) selected @endif>{{$unidad_de_tiempo->nombre_unidad_tiempo}}</option>
+                                                        <option @if($receta->unidad_de_tiempo_id == $unidad_de_tiempo->id) selected @endif value="{{$unidad_de_tiempo->id}}" @if($errors->has('unidad_de_tiempo')) selected @endif>{{$unidad_de_tiempo->nombre_unidad_tiempo}}</option>
                                                     @endforeach
                                                 </select>
                                                 <label for="unidad_de_tiempo">Unidad de tiempo</label>
@@ -154,7 +154,7 @@
                                     <div class="row">
                                         <div class="col">
                                             <div class="form-floating mb-3">
-                                                <textarea class="form-control" placeholder="Recursos externos" id="recursos_externos" name="recursos_externos" style="height: 100px" >{{old('recursos_externos')}}@if($errors->has('recursos_externos')) {{old('recursos_externos')}}@endif</textarea>
+                                                <textarea class="form-control" placeholder="Recursos externos" id="recursos_externos" name="recursos_externos" style="height: 100px" >{{$receta->recursos_externos}}@if($errors->has('recursos_externos')) {{old('recursos_externos')}}@endif</textarea>
                                                 <label for="recursos_externos">Recursos externos</label>
 
                                                 @error('recursos_externos')
@@ -164,14 +164,12 @@
                                                 @enderror
                                             </div>
                                         </div>
-
-
                                     </div>
 
                                     <div class="row">
                                         <div class="col">
                                             <div class="form-floating">
-                                                <textarea class="form-control" placeholder="Preparación" id="preparacion" name="preparacion" style="height: 100px" required>{{old('preparacion')}}@if($errors->has('preparacion')) {{old('preparacion')}} @endif</textarea>
+                                                <textarea class="form-control" placeholder="Preparación" id="preparacion" name="preparacion" style="height: 100px" required>{{$receta->preparacion}}@if($errors->has('preparacion')) {{old('preparacion')}} @endif</textarea>
                                                 <label for="preparacion">Preparación</label>
 
                                                 @error('preparacion')
@@ -542,7 +540,7 @@
                 <div class="col-md-3">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="cantidades[]" placeholder="Cantidad" required>
-                        <label for="cantidad">Cantidad</label>
+                        <label for="cantidades">Cantidad</label>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -553,23 +551,29 @@
                                 <option value="{{$unidad_de_medida->id}}">{{$unidad_de_medida->nombre_unidad_medida}}</option>
                             @endforeach
                         </select>
-                        <label for="unidad_de_medida">Unidad de medida</label>
+                        <label for="unidades_de_medida">Unidad de medida</label>
                     </div>
                 </div>
                 <div class="col">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarIngrediente(this)"><i class="bi bi-trash"></i></button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarIngredienteEdit(this)"><i class="bi bi-trash"></i></button>
                 </div>
             `;
 
             ingredienteContainer.appendChild(nuevoIngrediente);
         }
 
-
         function eliminarIngrediente(elemento) {
             // Obtener el elemento padre y eliminarlo
             const ingredienteContainer = document.getElementById('ingredientes-section');
             const padre = elemento.parentNode.parentNode; // Dos niveles arriba para llegar al div.row
             ingredienteContainer.removeChild(padre);
+        }
+
+        function eliminarIngredienteEdit(elemento) {
+            // Obtener el elemento padre y eliminarlo
+            const ingredienteEditContainer = document.getElementById('ingredientes-section-edit');
+            const padre = elemento.parentNode.parentNode; // Dos niveles arriba para llegar al div.row
+            ingredienteEditContainer.removeChild(padre);
         }
 
         //Datatable Tags
