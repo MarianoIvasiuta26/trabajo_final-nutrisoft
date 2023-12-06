@@ -19,6 +19,7 @@ class RolesYPermisosController extends Controller
         $roles = Role::All();
         $permisos = Permission::All();
 
+
         return view('admin.gestion-roles-permisos.index', compact('roles','permisos'));
     }
 
@@ -81,7 +82,7 @@ class RolesYPermisosController extends Controller
         }
 
         $permiso = Permission::create([
-            'name' => $request->input('permiso'),
+            'name' => $request->input('nombre'),
             'guard_name' => 'web',
         ]);
 
@@ -127,12 +128,12 @@ class RolesYPermisosController extends Controller
 
         $request->validate([
             'nombre' => ['required', 'string'],
-            'permisos' => 'required',
+            'permisosEvaluar' => ['array'],
         ]);
 
         $role = Role::find($id);
 
-        if(!$role){
+        if (!$role) {
             return redirect()->route('gestion-rolesYPermisos.index')->with('error', 'Error al actualizar el rol.');
         }
 
@@ -140,17 +141,13 @@ class RolesYPermisosController extends Controller
         $role->guard_name = 'web';
         $role->save();
 
-        $permisos = Permission::all();
-
-        foreach ($permisos as $permiso) {
-            $role->revokePermissionTo($permiso);
-        }
-
-        foreach ($request->input('permisos') as $permisoNuevo) {
-            foreach($permisos as $permiso){
-                if($permiso->id == $permisoNuevo){
-                    $role->givePermissionTo($permiso);
-                }
+        // Obtener los permisos seleccionados
+        $permisosSeleccionados = Permission::whereIn('id', $request->input('permisosEvaluar'))->get();
+        
+        // Asignar los permisos al rol
+        foreach ($permisosSeleccionados as $permisoNuevo) {
+            if (!$role->hasPermissionTo($permisoNuevo->name)) {
+                $role->givePermissionTo($permisoNuevo);
             }
         }
 

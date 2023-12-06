@@ -59,7 +59,7 @@
                                 <td>
                                     <div class="row g-1">
                                         <div class="col-auto">
-                                            <a href="" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a>
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#editReceta{{$receta->id}}" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></button>
                                         </div>
                                         <div class="col-auto">
                                             <form action="{{route('gestion-recetas.destroy', $receta->id)}}" method="POST">
@@ -75,6 +75,185 @@
                     </tbody>
                 </table>
             </div>
+
+            @foreach($recetas as $receta)
+                <!-- Modal Editar Receta -->
+                <div class="modal fade" id="editReceta{{$receta->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="editReceta{{$receta->id}}Label" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editReceta{{$receta->id}}Label">Editar Receta</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" method="POST">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" id="nombre_receta" name="nombre_receta" placeholder="Nombre de la receta" required  value="{{old('nombre_receta')}}" @if($errors->has('nombre_receta')) value="{{old('nombre_receta')}}" @endif>
+                                                <label for="nombre_receta">Nombre de la receta</label>
+
+                                                @error('nombre_receta')
+                                                <span class="invalid-feedback d-block" role="alert">
+                                                        <strong>{{$message}}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" id="porciones" name="porciones" placeholder="Porciones" required value="{{old('porciones')}}" @if($errors->has('porciones')) value="{{old('porciones')}}" @endif>
+                                                <label for="porciones">Porciones</label>
+
+                                                @error('porciones')
+                                                <span class="invalid-feedback d-block" role="alert">
+                                                        <strong>{{$message}}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-floating mb-3">
+                                                <input type="text" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion" placeholder="Tiempo de preparación" required  value="{{old('tiempo_preparacion')}}" @if($errors->has('tiempo_preparacion')) value="{{old('tiempo_preparacion')}}" @endif>
+                                                <label for="tiempo_preparacion">Tiempo de preparación</label>
+
+                                                @error('tiempo_preparacion')
+                                                <span class="invalid-feedback d-block" role="alert">
+                                                        <strong>{{$message}}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-floating mb-3">
+                                                <select class="form-select" id="unidad_de_tiempo" name="unidad_de_tiempo" aria-label="Floating label select example" required>
+                                                    <option selected disabled value="">Seleccione una unidad de tiempo</option>
+                                                    @foreach($unidades_de_tiempo as $unidad_de_tiempo)
+                                                        <option value="{{$unidad_de_tiempo->id}}" @if($errors->has('unidad_de_tiempo')) selected @endif>{{$unidad_de_tiempo->nombre_unidad_tiempo}}</option>
+                                                    @endforeach
+                                                </select>
+                                                <label for="unidad_de_tiempo">Unidad de tiempo</label>
+
+                                                @error('unidad_de_tiempo')
+                                                <span class="invalid-feedback d-block" role="alert">
+                                                        <strong>{{$message}}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-floating mb-3">
+                                                <textarea class="form-control" placeholder="Recursos externos" id="recursos_externos" name="recursos_externos" style="height: 100px" >{{old('recursos_externos')}}@if($errors->has('recursos_externos')) {{old('recursos_externos')}}@endif</textarea>
+                                                <label for="recursos_externos">Recursos externos</label>
+
+                                                @error('recursos_externos')
+                                                <span class="invalid-feedback d-block" role="alert">
+                                                        <strong>{{$message}}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-floating">
+                                                <textarea class="form-control" placeholder="Preparación" id="preparacion" name="preparacion" style="height: 100px" required>{{old('preparacion')}}@if($errors->has('preparacion')) {{old('preparacion')}} @endif</textarea>
+                                                <label for="preparacion">Preparación</label>
+
+                                                @error('preparacion')
+                                                <span class="invalid-feedback d-block" role="alert">
+                                                        <strong>{{$message}}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Sección de Ingredientes -->
+                                    <div class="accordion accordion-flush mt-3" id="accordionEdit">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="flush-accordionEdit">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-accordionEdit" aria-expanded="false" aria-controls="flush-accordionEdit">
+                                                    Ingredientes
+                                                </button>
+                                            </h2>
+                                            <div id="flush-accordionEdit" class="accordion-collapse collapse" aria-labelledby="flush-accordionEdit" data-bs-parent="#accordionEdit">
+                                                <div class="accordion-body">
+                                                    <p>Seleccione los ingredientes de la lista o agréguelos:</p>
+
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Alimento</th>
+                                                                <th>Cantidad</th>
+                                                                <th>Seleccionar</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($ingredientes as $ingrediente)
+                                                                @if ($receta->id == $ingrediente->receta_id && $ingrediente->cantidad != 0 && $ingrediente->unidad_medida_por_comida->nombre_unidad_medida != 'Sin unidad de medida')
+                                                                    <tr>
+                                                                        <td>{{$ingrediente->alimento->alimento}}</td>
+                                                                        <td>
+                                                                            {{$ingrediente->cantidad}} {{$ingrediente->unidad_medida_por_comida->nombre_unidad_medida}}
+                                                                        </td>
+                                                                        <td>
+                                                                            <div class="form-check form-switch">
+                                                                                <input class="form-check-input" type="checkbox" name="ingredientes_seleccionados[]" value="{{$ingrediente->id}}" id="switch_{{$ingrediente->id}}"
+                                                                                    @if ($receta->id == $ingrediente->receta_id)
+                                                                                        checked
+                                                                                    @endif
+                                                                                >
+                                                                                <label class="form-check-label" for="switch_{{$ingrediente->id}}">Seleccionar</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endif
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+
+                                                    <button type="button" class="btn btn-success mt-3" onclick="agregarIngredienteEdit()">Agregar Ingrediente</button>
+
+                                                    <!-- Sección para cada Ingrediente -->
+                                                    <div id="ingredientes-section-edit" class="row mt-3">
+                                                        <!-- Los ingredientes seleccionados se agregarán dinámicamente aquí -->
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row mt-3 float-right">
+                                        <div class="col">
+                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                            <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
 
         </div>
     </div>
@@ -95,14 +274,26 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="nombre_receta" name="nombre_receta" placeholder="Nombre de la receta" required>
+                                    <input type="text" class="form-control" id="nombre_receta" name="nombre_receta" placeholder="Nombre de la receta" required  value="{{old('nombre_receta')}}" @if($errors->has('nombre_receta')) value="{{old('nombre_receta')}}" @endif>
                                     <label for="nombre_receta">Nombre de la receta</label>
+
+                                    @error('nombre_receta')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{$message}}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="porciones" name="porciones" placeholder="Porciones" required>
+                                    <input type="text" class="form-control" id="porciones" name="porciones" placeholder="Porciones" required value="{{old('porciones')}}" @if($errors->has('porciones')) value="{{old('porciones')}}" @endif>
                                     <label for="porciones">Porciones</label>
+
+                                    @error('porciones')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{$message}}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -110,8 +301,14 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-floating mb-3">
-                                    <input type="text" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion" placeholder="Tiempo de preparación" required>
+                                    <input type="text" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion" placeholder="Tiempo de preparación" required  value="{{old('tiempo_preparacion')}}" @if($errors->has('tiempo_preparacion')) value="{{old('tiempo_preparacion')}}" @endif>
                                     <label for="tiempo_preparacion">Tiempo de preparación</label>
+
+                                    @error('tiempo_preparacion')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{$message}}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col">
@@ -119,10 +316,16 @@
                                     <select class="form-select" id="unidad_de_tiempo" name="unidad_de_tiempo" aria-label="Floating label select example" required>
                                         <option selected disabled value="">Seleccione una unidad de tiempo</option>
                                         @foreach($unidades_de_tiempo as $unidad_de_tiempo)
-                                            <option value="{{$unidad_de_tiempo->id}}">{{$unidad_de_tiempo->nombre_unidad_tiempo}}</option>
+                                            <option value="{{$unidad_de_tiempo->id}}" @if($errors->has('unidad_de_tiempo')) selected @endif>{{$unidad_de_tiempo->nombre_unidad_tiempo}}</option>
                                         @endforeach
                                     </select>
                                     <label for="unidad_de_tiempo">Unidad de tiempo</label>
+
+                                    @error('unidad_de_tiempo')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{$message}}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -130,8 +333,14 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-floating mb-3">
-                                    <textarea class="form-control" placeholder="Recursos externos" id="recursos_externos" name="recursos_externos" style="height: 100px" required></textarea>
+                                    <textarea class="form-control" placeholder="Recursos externos" id="recursos_externos" name="recursos_externos" style="height: 100px" >{{old('recursos_externos')}}@if($errors->has('recursos_externos')) {{old('recursos_externos')}}@endif</textarea>
                                     <label for="recursos_externos">Recursos externos</label>
+
+                                    @error('recursos_externos')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{$message}}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -140,8 +349,14 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-floating">
-                                    <textarea class="form-control" placeholder="Preparación" id="preparacion" name="preparacion" style="height: 100px" required></textarea>
+                                    <textarea class="form-control" placeholder="Preparación" id="preparacion" name="preparacion" style="height: 100px" required>{{old('preparacion')}}@if($errors->has('preparacion')) {{old('preparacion')}} @endif</textarea>
                                     <label for="preparacion">Preparación</label>
+
+                                    @error('preparacion')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                            <strong>{{$message}}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -198,10 +413,10 @@
                             </div>
                         </div>
 
-                        <div class="row mt-3">
+                        <div class="row mt-3 float-right">
                             <div class="col">
-                                <button type="submit" class="btn btn-primary">Guardar</button>
                                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success">Guardar</button>
                             </div>
 
                     </form>
@@ -209,9 +424,6 @@
             </div>
         </div>
     </div>
-
-
-
 
 @stop
 
@@ -231,8 +443,20 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <script>
+
+        @if($errors->any())
+            $(document).ready(function(){
+                $('#addReceta').modal('show');
+            });
+        @endif
+
+        @if($errors->any())
+            $(document).ready(function(){
+                $('#editReceta').modal('show');
+            });
+        @endif
 
         //Mensajes fhash
 
@@ -275,6 +499,49 @@
                 <div class="col-md-3">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="cantidades[]" placeholder="Cantidad" required>
+                        <label for="cantidades">Cantidad</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <select class="form-select" name="unidades_de_medida[]" placeholder="Unidad de medida" required>
+                            <option value="" selected>Selecciona la unidad de medida</option>
+                            @foreach($unidades_de_medida as $unidad_de_medida)
+                                <option value="{{$unidad_de_medida->id}}">{{$unidad_de_medida->nombre_unidad_medida}}</option>
+                            @endforeach
+                        </select>
+                        <label for="unidades_de_medida">Unidad de medida</label>
+                    </div>
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarIngrediente(this)"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+
+            ingredienteContainer.appendChild(nuevoIngrediente);
+        }
+
+        function agregarIngredienteEdit() {
+            // Clonar la sección de ingrediente y agregarla al contenedor
+            const ingredienteContainer = document.getElementById('ingredientes-section-edit');
+            const nuevoIngrediente = document.createElement('div');
+            nuevoIngrediente.classList.add('row', 'mb-3', 'align-items-center');
+
+            nuevoIngrediente.innerHTML = `
+                <div class="col-md-4">
+                    <div class="form-floating">
+                        <select name="alimentos[]" class="form-select" placeholder="Alimento" required>
+                            <option value="" selected>Selecciona el alimento</option>
+                            @foreach($alimentos as $alimento)
+                                <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                            @endforeach
+                        </select>
+                        <label for="alimento">Alimento</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" name="cantidades[]" placeholder="Cantidad" required>
                         <label for="cantidad">Cantidad</label>
                     </div>
                 </div>
@@ -296,6 +563,7 @@
 
             ingredienteContainer.appendChild(nuevoIngrediente);
         }
+
 
         function eliminarIngrediente(elemento) {
             // Obtener el elemento padre y eliminarlo

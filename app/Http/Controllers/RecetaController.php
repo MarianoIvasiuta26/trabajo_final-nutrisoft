@@ -50,7 +50,6 @@ class RecetaController extends Controller
             'porciones' => ['required','numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'tiempo_preparacion' => ['required', 'integer'],
             'unidad_de_tiempo' => ['required', 'integer'],
-            'recursos_externos' => ['string'],
             'preparacion' => ['required', 'string'],
             'ingredientes_seleccionados' => ['array', 'sometimes'],
             'alimentos' => ['sometimes', 'array'],
@@ -85,7 +84,7 @@ class RecetaController extends Controller
                     'receta_id' => $receta->id,
                     'alimento_id' => $ingrediente->alimento_id,
                     'cantidad' => $ingrediente->cantidad,
-                    'unidad_de_medida_id' => $ingrediente->unidad_de_medida_id,
+                    'unidad_medida_por_comida_id' => $ingrediente->unidad_medida_por_comida_id,
                 ]);
 
                 if(!$ingredienteCreado){
@@ -101,7 +100,7 @@ class RecetaController extends Controller
                         'receta_id' => $receta->id,
                         'alimento_id' => $alimentos[$i],
                         'cantidad' => $cantidades[$i],
-                        'unidad_de_medida_id' => $unidades_de_medida[$i],
+                        'unidad_medida_por_comida_id' => $unidades_de_medida[$i],
                     ]);
                     if(!$ingredienteCreado){
                         return redirect()->route('gestion-recetas.index')->with('error', 'Error al registrar el ingrediente.');

@@ -585,6 +585,13 @@ return [
             ],
         ],
 
+        [
+            'text' => 'Gestión Recetas',
+            'route' => 'gestion-recetas.index',
+            'icon' => 'fas fa-comment-medical fa-fw',
+            'can' => 'gestion-recetas.index',
+        ],
+
         ['header' => 'GESTIÓN DE USUARIOS',
             'can' => 'gestion-usuarios.index'
         ],

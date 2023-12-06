@@ -48,13 +48,13 @@
                                     @endforeach
                                 </td>
                                 <td>
-                                    <div class="row">
-                                        <div class="col">
-                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editRol">
+                                    <div class="row g-1">
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editRol{{$rol->id}}">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
                                         </div>
-                                        <div class="col">
+                                        <div class="col-auto">
                                             <form action="{{ route('gestion-rolesYPermisos.destroy', $rol->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
@@ -133,48 +133,76 @@
                 </div>
             </div>
 
-            <!-- Modal editar rol -->
-            <div class="modal fade" id="editRol" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editRolLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editRolLabel">Editar rol</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="{{route('gestion-rolesYPermisos.update', $rol->id)}}" method="POST" id="form-editRol">
-                                @csrf
-                                @method('PUT')
+            @foreach ($roles as $rol)
+                 <!-- Modal editar rol -->
+                 <div class="modal fade" id="editRol{{$rol->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editRol{{$rol->id}}Label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editRol{{$rol->id}}Label">Editar rol</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{route('gestion-rolesYPermisos.update', $rol->id)}}" method="POST" id="form-editRol">
+                                    @csrf
+                                    @method('PUT')
 
-                                <div class="mb-3">
-                                    <label for="nombre" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del rol..." value="{{$rol->name}}">
-                                </div>
+                                    <div class="mb-3">
+                                        <label for="nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del rol..." value="{{$rol->name}}">
+                                    </div>
 
-                                <div class="mb-3">
-                                    <label for="permisos" class="form-label">Permisos</label>
-                                    <select name="permisos[]" class="form-select" id="permisos" data-placeholder="Permisos..." multiple>
-                                        <option value="">Selecciona un permiso</option>
-                                        @foreach ($permisos as $permisoAEvaluar)
-                                            <option
-                                                @if($rol->hasPermissionTo($permisoAEvaluar->name))
-                                                    selected
-                                                @endif
+                                    <!-- Sección de Permisos -->
+                                    <div class="accordion accordion-flush mt-3" id="accordionFlushExample">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="flush-headingOne">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                                                    Permisos
+                                                </button>
+                                            </h2>
+                                            <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                                <div class="accordion-body">
+                                                    <p>Seleccione los permisos de la lista:</p>
 
-                                                value="{{ $permiso->id }}">{{ $permiso->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                            <button type="button" class="btn btn-primary add-permiso">Guardar</button>
+                                                    <table class="table table-striped tabla-editRol-permisos    ">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Permiso</th>
+                                                                <th>Seleccionar</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($permisos as $permisoAEvaluar)
+                                                                @if (!$rol->hasPermissionTo($permisoAEvaluar->name))
+
+                                                                    <tr>
+                                                                        <td>{{$permisoAEvaluar->name}}</td>
+                                                                        <td>
+                                                                            <div class="form-check form-switch">
+                                                                                <input class="form-check-input" type="checkbox" name="permisosEvaluar[]" value="{{$permisoAEvaluar->id}}" id="permisosEvaluar">
+                                                                                <label class="form-check-label" for="permisosEvaluar">Seleccionar</label>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endif
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-primary edit-rol">Guardar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endforeach
+
 
         </div>
     </div>
@@ -206,13 +234,13 @@
                                 <td>{{$permiso->id}}</td>
                                 <td>{{$permiso->name}}</td>
                                 <td>
-                                    <div class="row">
-                                        <div class="col">
+                                    <div class="row g-1">
+                                        <div class="col-auto">
                                             <a class="btn btn-warning btn-sm" href="">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
                                         </div>
-                                        <div class="col">
+                                        <div class="col-auto">
                                             <form action="{{ route('gestion-rolesYPermisos.destroyPermiso', $permiso->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
@@ -284,15 +312,15 @@
 <script>
     $(document).ready(function(){
         var table = $('#tabla-roles').DataTable({
-            responsive: true,
+            responsive: false,
             autoWidth: true,
             "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
             "language": {
-                "lengthMenu": "Mostrar _MENU_ usuarios por página",
-                "zeroRecords": "No se encontró ningún turno",
+                "lengthMenu": "Mostrar _MENU_ roles por página",
+                "zeroRecords": "No se encontró ningún role",
                 "info": "Mostrando la página _PAGE_ de _PAGES_",
-                "infoEmpty": "No hay registros de usuarios",
-                "infoFiltered": "(filtrado de _MAX_ usuarios totales)",
+                "infoEmpty": "No hay registros de roles",
+                "infoFiltered": "(filtrado de _MAX_ roles totales)",
                 "search": "Buscar:",
                 "paginate": {
                     "first": "Primero",
@@ -310,11 +338,33 @@
             autoWidth: false,
             "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
             "language": {
-                "lengthMenu": "Mostrar _MENU_ usuarios por página",
-                "zeroRecords": "No se encontró ningún turno",
+                "lengthMenu": "Mostrar _MENU_ permisos por página",
+                "zeroRecords": "No se encontró ningún permiso",
                 "info": "Mostrando la página _PAGE_ de _PAGES_",
-                "infoEmpty": "No hay registros de usuarios",
-                "infoFiltered": "(filtrado de _MAX_ usuarios totales)",
+                "infoEmpty": "No hay registros de permisos",
+                "infoFiltered": "(filtrado de _MAX_ permisos totales)",
+                "search": "Buscar:",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+            }
+        });
+    });
+
+    $(document).ready(function(){
+        var table = $('.tabla-editRol-permisos').DataTable({
+            responsive: true,
+            autoWidth: false,
+            "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ permisos por página",
+                "zeroRecords": "No se encontró ningún permiso",
+                "info": "Mostrando la página _PAGE_ de _PAGES_",
+                "infoEmpty": "No hay registros de permisos",
+                "infoFiltered": "(filtrado de _MAX_ permisos totales)",
                 "search": "Buscar:",
                 "paginate": {
                     "first": "Primero",
@@ -362,6 +412,48 @@
                     if (result.isConfirmed) {
                         //Envia el form
                         const form = document.getElementById('form-addRol');
+                        form.submit();
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel
+                    ) {
+                        swalWithBootstrapButtons.fire(
+                        '¡No se guardó el rol con sus permisos!'
+                        )
+                    }
+                })
+            });
+        });
+    });
+
+    //SweetAlert para editar rol
+    document.addEventListener('DOMContentLoaded', function () {
+        const editarRol = document.querySelectorAll('.edit-rol');
+
+        editarRol.forEach(button => {
+            button.addEventListener('click', function () {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-success',
+                        cancelButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: true
+                    })
+
+                    swalWithBootstrapButtons.fire({
+                    title: '¿Está seguro de editar el rol y sus permisos?',
+                    text: "Al confirmar se guardará el rol y los permisos asociados.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Editar rol!',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonText: '¡No, cancelar!',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        //Envia el form
+                        const form = document.getElementById('form-editRol');
                         form.submit();
                     } else if (
                         /* Read more about handling dismissals below */
