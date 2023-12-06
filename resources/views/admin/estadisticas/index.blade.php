@@ -108,9 +108,11 @@
                         </div>
                     </div>
 
-                    <div style="text-align: center;">
-                        <canvas id="myChart" style="display:block; width:100%; height:450px;"></canvas>
+                    <div id="chart-container">
+
                     </div>
+                    <canvas id="myChart" style="display:block; width:100%; height:450px;"></canvas>
+
                 </div>
             </div>
         </div>
@@ -206,9 +208,8 @@
                         </div>
                     </div>
 
-                    <div style="text-align: center;">
-                        <canvas id="myChart2" style="display: inline-block;"></canvas>
-                    </div>
+                    <canvas id="myChart2" style="display: inline-block;"></canvas>
+
                 </div>
             </div>
         </div>
@@ -228,7 +229,7 @@
                 </div>
                 <div class="card-body">
 
-                    <a class="btn btn-warning btn-sm" data-bs-toggle="collapse" href="#filtrosObjetivoSalud" role="button" aria-expanded="false" aria-controls="filtrosAlimentosRecomendados">
+                    <a class="btn btn-warning btn-sm" data-bs-toggle="collapse" href="#filtrosAlimentosRecomendados" role="button" aria-expanded="false" aria-controls="filtrosAlimentosRecomendados">
                         <i class="bi bi-funnel"></i>Filtros
                     </a>
 
@@ -342,7 +343,7 @@
                         }
                     }
                 },
-                responsive: false,
+                responsive: true,
             }
         });
 
@@ -390,7 +391,7 @@
                     text: 'Proporción de Diagnósticos por Tags',
                     position: 'top'
                 },
-                responsive: false,
+                responsive: true,
                 title: {
                     display: true,
                     text: 'Chart.js Pie Chart'

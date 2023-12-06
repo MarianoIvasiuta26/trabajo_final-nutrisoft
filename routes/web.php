@@ -34,6 +34,7 @@ use App\Http\Controllers\ProhibicionesAlergiaController;
 use App\Http\Controllers\ProhibicionesCirugiaController;
 use App\Http\Controllers\ProhibicionesIntoleranciaController;
 use App\Http\Controllers\ProhibicionesPatologiaController;
+use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\TagsDiagnosticosController;
 use App\Http\Controllers\TratramientoController;
 use App\Http\Controllers\TurnoController;
@@ -112,6 +113,9 @@ Route::middleware([
     Route::any('gestion-estadisticas.clearTratamientoFilters',[EstadisticaController::class,'clearTratamientoFilters'])->name('gestion-estadisticas.clearTratamientoFilters');
     Route::any('gestion-estadisticas.clearTagsFilters',[EstadisticaController::class,'clearTagsFilters'])->name('gestion-estadisticas.clearTagsFilters');
 
+
+    //Receta
+    Route::resource('gestion-recetas', RecetaController::class)->names('gestion-recetas');
 
 
     //Route::resource('gestion-atencion', HorasDiasAtencionController::class)->names('gestion-atencion');

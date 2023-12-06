@@ -62,4 +62,8 @@ class Alimento extends Model implements Auditable
         return $this->hasMany('App\Models\RegistroAlimentosConsumidos');
     }
 
+    public function ingredientes()
+    {
+        return $this->hasMany(Ingrediente::class);
+    }
 }

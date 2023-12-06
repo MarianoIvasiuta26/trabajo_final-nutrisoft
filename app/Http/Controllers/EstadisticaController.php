@@ -93,17 +93,6 @@ class EstadisticaController extends Controller
         $detallesPlanAlimentación = DetallePlanAlimentaciones::all();
 
         $alimentosYCantidad = $this->obtenerAlimentosYCantidad();
-        /*
-        $frecuenciaAlimentos = DetallePlanAlimentaciones::join('alimentos', 'alimento.id', '=', 'detalle_plan_alimentaciones.alimento_id')
-            ->groupBy('detalle_plan_alimentaciones.alimento_id', 'alimentos.alimento')
-            ->selectRaw('alimentos.alimento, count(*) as total')
-            ->pluck('total', 'alimento');
-
-        $frecuenciaCompletaAlimentos = $alimentos->map(function ($alimento) use ($frecuenciaAlimentos) {
-            $nombreAlimento = $alimento->alimento;
-            $frecuencia = $frecuenciaAlimentos->get($nombreAlimento, 0);
-            return $frecuencia;
-        }); */
 
         // Usar los resultados en tu vista
         $labels3 = $alimentosYCantidad['alimentosUsados'];
@@ -169,8 +158,9 @@ class EstadisticaController extends Controller
         $todosTratamientos = Tratamiento::all();
 
         // Obtener las fechas de inicio y fin desde la solicitud
-        $fechaInicio = $request->input('fecha_inicio');
-        $fechaFin = $request->input('fecha_fin');
+        $tratamientoFilters = session('tratamientoFilters', []);
+        $fechaInicio = $tratamientoFilters['fecha_inicio'] ?? null;
+        $fechaFin = $tratamientoFilters['fecha_fin'] ?? null;
 
         // Lógica para filtrar por fechas en tu consulta
         $frecuenciaTratamientos = TratamientoPorPaciente::join('tratamientos', 'tratamientos.id', '=', 'tratamiento_por_pacientes.tratamiento_id')
@@ -237,6 +227,10 @@ class EstadisticaController extends Controller
 
     public function filtrosTag(Request $request)
     {
+
+        $tagsFilters = session('tagsFilters', []);
+        $fechaInicio = $tagsFilters['fecha_inicio'] ?? null;
+        $fechaFin = $tagsFilters['fecha_fin'] ?? null;
 
         $todosTratamientos = Tratamiento::all();
         $tratamientosPorPaciente = TratamientoPorPaciente::all();

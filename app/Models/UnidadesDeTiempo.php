@@ -12,4 +12,9 @@ class UnidadesDeTiempo extends Model
     protected $fillable = [
         'nombre_unidad_tiempo',
     ];
+
+    public function recetas()
+    {
+        return $this->hasMany(Receta::class);
+    }
 }
