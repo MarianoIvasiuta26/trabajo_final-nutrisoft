@@ -133,8 +133,8 @@
                                 </td>
 
                                 <td>
-                                    <div class="row">
-                                        <div class="col-3">
+                                    <div class="row g-1">
+                                        <div class="col-auto">
                                             <form action="{{ route('gestion-actividad-por-tipo-actividad.edit', $actividadPorTipo->id) }}" method="GET">
                                                 @csrf
                                                 <button type="submit" class="btn btn-warning btn-sm">
@@ -142,7 +142,7 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        <div class="col-3">
+                                        <div class="col-auto">
                                             <form action="{{ route('gestion-actividad-por-tipo-actividad.destroy', $actividadPorTipo->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
@@ -254,7 +254,7 @@
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -269,8 +269,11 @@
                         text: 'Esta acción asociará la actividad con este tipo de actividad.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, asociar actividad.',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, asociar actividad.',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
@@ -294,8 +297,11 @@
                         text: 'Esta acción eliminará la asociación de la actividad.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

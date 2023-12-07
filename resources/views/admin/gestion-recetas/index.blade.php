@@ -75,182 +75,6 @@
                     </tbody>
                 </table>
             </div>
-
-            @foreach($recetas as $receta)
-                <!-- Modal Editar Receta -->
-                <div class="modal fade" id="editReceta{{$receta->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="editReceta{{$receta->id}}Label" aria-hidden="true">
-                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editReceta{{$receta->id}}Label">Editar Receta</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <form action="{{route('gestion-recetas.update', $receta->id)}}" method="POST" id="form-edit-receta">
-                                    @csrf
-                                    @method('PUT')
-
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="nombre_receta" name="nombre_receta" placeholder="Nombre de la receta" required  value="{{$receta->nombre_receta}}" @if($errors->has('nombre_receta')) value="{{old('nombre_receta')}}" @endif>
-                                                <label for="nombre_receta">Nombre de la receta</label>
-
-                                                @error('nombre_receta')
-                                                <span class="invalid-feedback d-block" role="alert">
-                                                        <strong>{{$message}}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="porciones" name="porciones" placeholder="Porciones" required value="{{$receta->porciones}}" @if($errors->has('porciones')) value="{{old('porciones')}}" @endif>
-                                                <label for="porciones">Porciones</label>
-
-                                                @error('porciones')
-                                                <span class="invalid-feedback d-block" role="alert">
-                                                        <strong>{{$message}}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-floating mb-3">
-                                                <input type="text" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion" placeholder="Tiempo de preparación" required  value="{{$receta->tiempo_preparacion}}" @if($errors->has('tiempo_preparacion')) value="{{old('tiempo_preparacion')}}" @endif>
-                                                <label for="tiempo_preparacion">Tiempo de preparación</label>
-
-                                                @error('tiempo_preparacion')
-                                                <span class="invalid-feedback d-block" role="alert">
-                                                        <strong>{{$message}}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-floating mb-3">
-                                                <select class="form-select" id="unidad_de_tiempo" name="unidad_de_tiempo" aria-label="Floating label select example" required>
-                                                    <option selected disabled value="">Seleccione una unidad de tiempo</option>
-                                                    @foreach($unidades_de_tiempo as $unidad_de_tiempo)
-                                                        <option @if($receta->unidad_de_tiempo_id == $unidad_de_tiempo->id) selected @endif value="{{$unidad_de_tiempo->id}}" @if($errors->has('unidad_de_tiempo')) selected @endif>{{$unidad_de_tiempo->nombre_unidad_tiempo}}</option>
-                                                    @endforeach
-                                                </select>
-                                                <label for="unidad_de_tiempo">Unidad de tiempo</label>
-
-                                                @error('unidad_de_tiempo')
-                                                <span class="invalid-feedback d-block" role="alert">
-                                                        <strong>{{$message}}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-floating mb-3">
-                                                <textarea class="form-control" placeholder="Recursos externos" id="recursos_externos" name="recursos_externos" style="height: 100px" >{{$receta->recursos_externos}}@if($errors->has('recursos_externos')) {{old('recursos_externos')}}@endif</textarea>
-                                                <label for="recursos_externos">Recursos externos</label>
-
-                                                @error('recursos_externos')
-                                                <span class="invalid-feedback d-block" role="alert">
-                                                        <strong>{{$message}}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col">
-                                            <div class="form-floating">
-                                                <textarea class="form-control" placeholder="Preparación" id="preparacion" name="preparacion" style="height: 100px" required>{{$receta->preparacion}}@if($errors->has('preparacion')) {{old('preparacion')}} @endif</textarea>
-                                                <label for="preparacion">Preparación</label>
-
-                                                @error('preparacion')
-                                                <span class="invalid-feedback d-block" role="alert">
-                                                        <strong>{{$message}}</strong>
-                                                    </span>
-                                                @enderror
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                    <!-- Sección de Ingredientes -->
-                                    <div class="accordion accordion-flush mt-3" id="accordionEdit">
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="flush-accordionEdit">
-                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-accordionEdit" aria-expanded="false" aria-controls="flush-accordionEdit">
-                                                    Ingredientes
-                                                </button>
-                                            </h2>
-                                            <div id="flush-accordionEdit" class="accordion-collapse collapse" aria-labelledby="flush-accordionEdit" data-bs-parent="#accordionEdit">
-                                                <div class="accordion-body">
-                                                    <p>Seleccione los ingredientes de la lista o agréguelos:</p>
-
-                                                    <table class="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Alimento</th>
-                                                                <th>Cantidad</th>
-                                                                <th>Seleccionar</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach($ingredientes as $ingrediente)
-                                                                @if ($receta->id == $ingrediente->receta_id && $ingrediente->cantidad != 0 && $ingrediente->unidad_medida_por_comida->nombre_unidad_medida != 'Sin unidad de medida')
-                                                                    <tr>
-                                                                        <td>{{$ingrediente->alimento->alimento}}</td>
-                                                                        <td>
-                                                                            {{$ingrediente->cantidad}} {{$ingrediente->unidad_medida_por_comida->nombre_unidad_medida}}
-                                                                        </td>
-                                                                        <td>
-                                                                            <div class="form-check form-switch">
-                                                                                <input class="form-check-input" type="checkbox" name="ingredientes_seleccionados[]" value="{{$ingrediente->id}}" id="switch_{{$ingrediente->id}}"
-                                                                                    @if ($receta->id == $ingrediente->receta_id)
-                                                                                        checked
-                                                                                    @endif
-                                                                                >
-                                                                                <label class="form-check-label" for="switch_{{$ingrediente->id}}">Seleccionar</label>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                @endif
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-
-                                                    <button type="button" class="btn btn-success mt-3" onclick="agregarIngredienteEdit()">Agregar Ingrediente</button>
-                                                    <script>
-
-                                                    </script>
-                                                    <!-- Sección para cada Ingrediente -->
-                                                    <div id="ingredientes-section-edit" class="row mt-3">
-                                                        <!-- Los ingredientes seleccionados se agregarán dinámicamente aquí -->
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-success edit-receta">Guardar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-
         </div>
     </div>
 
@@ -417,6 +241,181 @@
             </div>
         </div>
     </div>
+
+    @foreach($recetas as $receta)
+        <!-- Modal Editar Receta -->
+        <div class="modal fade" id="editReceta{{$receta->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="editReceta{{$receta->id}}Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editReceta{{$receta->id}}Label">Editar Receta</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{route('gestion-recetas.update', $receta->id)}}" method="POST" id="form-edit-receta">
+                            @csrf
+                            @method('PUT')
+
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="nombre_receta" name="nombre_receta" placeholder="Nombre de la receta" required  value="{{$receta->nombre_receta}}" @if($errors->has('nombre_receta')) value="{{old('nombre_receta')}}" @endif>
+                                        <label for="nombre_receta">Nombre de la receta</label>
+
+                                        @error('nombre_receta')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{$message}}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="porciones" name="porciones" placeholder="Porciones" required value="{{$receta->porciones}}" @if($errors->has('porciones')) value="{{old('porciones')}}" @endif>
+                                        <label for="porciones">Porciones</label>
+
+                                        @error('porciones')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{$message}}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="tiempo_preparacion" name="tiempo_preparacion" placeholder="Tiempo de preparación" required  value="{{$receta->tiempo_preparacion}}" @if($errors->has('tiempo_preparacion')) value="{{old('tiempo_preparacion')}}" @endif>
+                                        <label for="tiempo_preparacion">Tiempo de preparación</label>
+
+                                        @error('tiempo_preparacion')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{$message}}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="unidad_de_tiempo" name="unidad_de_tiempo" aria-label="Floating label select example" required>
+                                            <option selected disabled value="">Seleccione una unidad de tiempo</option>
+                                            @foreach($unidades_de_tiempo as $unidad_de_tiempo)
+                                                <option @if($receta->unidad_de_tiempo_id == $unidad_de_tiempo->id) selected @endif value="{{$unidad_de_tiempo->id}}" @if($errors->has('unidad_de_tiempo')) selected @endif>{{$unidad_de_tiempo->nombre_unidad_tiempo}}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="unidad_de_tiempo">Unidad de tiempo</label>
+
+                                        @error('unidad_de_tiempo')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{$message}}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-floating mb-3">
+                                        <textarea class="form-control" placeholder="Recursos externos" id="recursos_externos" name="recursos_externos" style="height: 100px" >{{$receta->recursos_externos}}@if($errors->has('recursos_externos')) {{old('recursos_externos')}}@endif</textarea>
+                                        <label for="recursos_externos">Recursos externos</label>
+
+                                        @error('recursos_externos')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{$message}}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" placeholder="Preparación" id="preparacion" name="preparacion" style="height: 100px" required>{{$receta->preparacion}}@if($errors->has('preparacion')) {{old('preparacion')}} @endif</textarea>
+                                        <label for="preparacion">Preparación</label>
+
+                                        @error('preparacion')
+                                        <span class="invalid-feedback d-block" role="alert">
+                                                <strong>{{$message}}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Sección de Ingredientes -->
+                            <div class="accordion accordion-flush mt-3" id="accordionEdit">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="flush-accordionEdit">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-accordionEdit" aria-expanded="false" aria-controls="flush-accordionEdit">
+                                            Ingredientes
+                                        </button>
+                                    </h2>
+                                    <div id="flush-accordionEdit" class="accordion-collapse collapse" aria-labelledby="flush-accordionEdit" data-bs-parent="#accordionEdit">
+                                        <div class="accordion-body">
+                                            <p>Seleccione los ingredientes de la lista o agréguelos:</p>
+
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Alimento</th>
+                                                        <th>Cantidad</th>
+                                                        <th>Seleccionar</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($ingredientes as $ingrediente)
+                                                        @if ($receta->id == $ingrediente->receta_id && $ingrediente->cantidad != 0 && $ingrediente->unidad_medida_por_comida->nombre_unidad_medida != 'Sin unidad de medida')
+                                                            <tr>
+                                                                <td>{{$ingrediente->alimento->alimento}}</td>
+                                                                <td>
+                                                                    {{$ingrediente->cantidad}} {{$ingrediente->unidad_medida_por_comida->nombre_unidad_medida}}
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form-check form-switch">
+                                                                        <input class="form-check-input" type="checkbox" name="ingredientes_seleccionados[]" value="{{$ingrediente->id}}" id="switch_{{$ingrediente->id}}"
+                                                                            @if ($receta->id == $ingrediente->receta_id)
+                                                                                checked
+                                                                            @endif
+                                                                        >
+                                                                        <label class="form-check-label" for="switch_{{$ingrediente->id}}">Seleccionar</label>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+
+                                            <button type="button" class="btn btn-success mt-3" onclick="agregarIngredienteEdit()">Agregar Ingrediente</button>
+                                            <script>
+
+                                            </script>
+                                            <!-- Sección para cada Ingrediente -->
+                                            <div id="ingredientes-section-edit" class="row mt-3">
+                                                <!-- Los ingredientes seleccionados se agregarán dinámicamente aquí -->
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-success edit-receta">Guardar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
 @stop
 
@@ -615,7 +614,7 @@
                         icon: 'question',
                         showCancelButton: true,
                         cancelButtonText: '¡No, cancelar!',
-                        confirmButtonColor: '#28a745',
+                        confirmButtonColor: '#198754',
                         confirmButtonText: '¡Guardar receta!',
                         cancelButtonColor: '#d33',
                         reverseButtons: true
@@ -657,7 +656,7 @@
                         icon: 'question',
                         showCancelButton: true,
                         cancelButtonText: '¡No, cancelar!',
-                        confirmButtonColor: '#28a745',
+                        confirmButtonColor: '#198754',
                         confirmButtonText: '¡Guardar edición!',
                         cancelButtonColor: '#d33',
                         reverseButtons: true

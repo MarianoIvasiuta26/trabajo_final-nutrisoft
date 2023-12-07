@@ -31,15 +31,15 @@
                         <td>{{$usuario->tipo_usuario}}</td>
                         <td>{{$usuario->email}}</td>
                         <td>
-                            <div class="row">
-                                <div class="col">
-                                    <a class="btn btn-info" href="{{ route('gestion-usuarios.edit', $usuario->id) }}">Editar</a>
+                            <div class="row g-1">
+                                <div class="col-auto">
+                                    <a class="btn btn-warning btn-sm" href="{{ route('gestion-usuarios.edit', $usuario->id) }}"><i class="bi bi-pencil-square"></i></a>
                                 </div>
-                                <div class="col">
+                                <div class="col-auto">
                                     <form action="{{ route('gestion-usuarios.destroy', $usuario->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">Borrar</button>
+                                        <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
                                     </form>
                                 </div>
                             </div>
@@ -56,6 +56,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 @stop
 
 @section('js')

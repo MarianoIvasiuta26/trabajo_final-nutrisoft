@@ -156,8 +156,8 @@
                                 </td>
 
                                 <td>
-                                    <div class="row">
-                                        <div class="col-4">
+                                    <div class="row g-1">
+                                        <div class="col-auto">
                                             <form action="{{ route('gestion-alimento-por-dietas.edit', $alimentoPorDieta->id) }}" method="GET">
                                                 @csrf
                                                 <button type="submit" class="btn btn-warning btn-sm">
@@ -165,7 +165,7 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        <div class="col-4">
+                                        <div class="col-auto">
                                             <form action="{{ route('gestion-alimento-por-dietas.destroy', $alimentoPorDieta->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
@@ -278,7 +278,7 @@
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -293,8 +293,11 @@
                         text: 'Esta acción asociará el alimento con este tipo de dieta.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, asociar alimento con la dieta.',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, asociar alimento con la dieta.',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
@@ -318,8 +321,11 @@
                         text: 'Esta acción eliminará el alimento recomendado a la dieta.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

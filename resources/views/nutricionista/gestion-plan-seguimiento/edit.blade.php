@@ -81,8 +81,9 @@
                 <div class="row mt-3">
                     <div class="col">
                         <div class="float-right">
-                            <button type="button" class="btn btn-success asociar-button">Guardar</button>
                             <a href="{{route('gestion-actividad-por-tipo-actividad.create')}}" class="btn btn-danger">Cancelar</a>
+                            <button type="button" class="btn btn-success asociar-button">Guardar</button>
+
                         </div>
                     </div>
                 </div>
@@ -156,7 +157,7 @@
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -171,8 +172,11 @@
                         text: 'Esta acción modificará los datos anteriores.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, guardar edición.',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, guardar edición.',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

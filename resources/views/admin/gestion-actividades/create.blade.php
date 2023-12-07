@@ -80,14 +80,14 @@
                 timer: 3000
             })
         @endif
-        
+
         //SweetAlert
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -102,8 +102,11 @@
                         text: 'Esta acción guardará el registro de actividad.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, Guardar actividad.',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, Guardar actividad.',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

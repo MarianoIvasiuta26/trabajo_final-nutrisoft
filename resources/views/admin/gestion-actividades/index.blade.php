@@ -28,14 +28,14 @@
                             <div>
                                 <form action="{{ route('gestion-actividades.edit', $actividad->id) }}" method="GET"style="display: inline;">
                                     @csrf
-                                    <button type="submit" class="btn btn-warning">
+                                    <button type="submit" class="btn btn-warning btn-sm">
                                         <span class="far fa-edit"></span>
                                     </button>
                                 </form>
                                 <form action="{{ route('gestion-actividades.destroy', $actividad->id) }}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="btn btn-danger delete-button">
+                                    <button type="button" class="btn btn-danger delete-button btn-sm">
                                         <span class="far fa-trash-alt"></span>
                                     </button>
                                 </form>

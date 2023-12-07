@@ -101,7 +101,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                            <button type="button" class="btn btn-primary add-rol">Guardar</button>
+                            <button type="button" class="btn btn-success add-rol">Guardar</button>
                         </div>
                     </div>
                 </div>
@@ -127,7 +127,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                            <button type="button" class="btn btn-primary add-permiso">Guardar</button>
+                            <button type="button" class="btn btn-success add-permiso">Guardar</button>
                         </div>
                     </div>
                 </div>
@@ -196,7 +196,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-primary edit-rol">Guardar</button>
+                                <button type="button" class="btn btn-success edit-rol">Guardar</button>
                             </div>
                         </div>
                     </div>
@@ -404,7 +404,7 @@
                     icon: 'question',
                     showCancelButton: true,
                     cancelButtonText: '¡No, cancelar!',
-                    confirmButtonColor: '#28a745',
+                    confirmButtonColor: '#198754',
                     confirmButtonText: '¡Guardar rol!',
                     cancelButtonColor: '#d33',
                     reverseButtons: true
@@ -446,7 +446,7 @@
                     icon: 'question',
                     showCancelButton: true,
                     cancelButtonText: '¡No, cancelar!',
-                    confirmButtonColor: '#28a745',
+                    confirmButtonColor: '#198754',
                     confirmButtonText: 'Editar rol!',
                     cancelButtonColor: '#d33',
                     reverseButtons: true
@@ -487,9 +487,9 @@
                     text: "Al confirmar se guardará permiso.",
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: '¡Guardar permiso!',
-                    confirmButtonColor: '#3085d6',
                     cancelButtonText: '¡No, cancelar!',
+                    confirmButtonColor: '#198754',
+                    confirmButtonText: '¡Guardar permiso!',
                     cancelButtonColor: '#d33',
                     reverseButtons: true
                     }).then((result) => {

@@ -84,7 +84,7 @@
                confirmButton: 'btn btn-success',
                cancelButton: 'btn btn-danger'
            },
-           buttonsStyling: false
+           buttonsStyling: true
        })
         document.addEventListener('DOMContentLoaded', function () {
            // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -95,12 +95,15 @@
                button.addEventListener('click', function () {
                    // Muestra un SweetAlert de confirmación
                    swalWithBootstrapButtons.fire({
-                       title: '¿Estás seguro de cancelar la edición?',
-                       text: 'Esta acción redirigirá a la vista con todas las intolerancias.',
-                       icon: 'warning',
-                       showCancelButton: true,
-                       confirmButtonText: 'Sí, cancelar edición',
-                       cancelButtonText: 'No, volver a edición.',
+                        title: '¿Estás seguro de cancelar la edición?',
+                        text: 'Esta acción redirigirá a la vista con todas las intolerancias.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        cancelButtonText: 'No, volver a edición.',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, cancelar edición',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                    }).then((result) => {
                        if (result.isConfirmed) {
                            // Si el usuario confirma, envía el formulario
@@ -125,8 +128,11 @@
                        text: 'Esta acción modificará la información actual de la intolerancia.',
                        icon: 'warning',
                        showCancelButton: true,
-                       confirmButtonText: 'Sí, editar intolerancia',
                        cancelButtonText: 'No, cancelar edición',
+                        confirmButtonColor: '#198754',
+                       confirmButtonText: 'Sí, editar intolerancia',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                    }).then((result) => {
                        if (result.isConfirmed) {
                            // Si el usuario confirma, envía el formulario

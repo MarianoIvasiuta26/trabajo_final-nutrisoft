@@ -39,8 +39,8 @@
                         <td>{{$alimento->estacion}}</td>
                         <td><a class="btn btn-primary btn-sm" href="{{route('gestion-alimentos.show', $alimento->id)}}"><i class="bi bi-eye"></i> Consultar </a></td>
                         <td>
-                            <div class="row">
-                                <div class="col-4">
+                            <div class="row g-1">
+                                <div class="col-auto">
                                     <form action="{{ route('gestion-alimentos.edit', $alimento->id) }}" method="GET">
                                         @csrf
                                         <button type="submit" class="btn btn-warning btn-sm">
@@ -48,7 +48,7 @@
                                         </button>
                                     </form>
                                 </div>
-                                <div class="col-4">
+                                <div class="col-auto">
                                     <form action="{{ route('gestion-alimentos.destroy', $alimento->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')

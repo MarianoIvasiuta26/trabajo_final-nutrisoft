@@ -220,7 +220,7 @@
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -235,8 +235,11 @@
                         text: 'Luego no se recomendará esta actividad en el plan de seguimiento de los pacientes con estas cirugías.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, prohibir actividad.',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, prohibir actividad.',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
@@ -260,8 +263,11 @@
                         text: 'Esta acción eliminará la actividad prohibida para esta cirugía.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

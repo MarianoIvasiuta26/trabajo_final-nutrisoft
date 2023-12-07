@@ -32,14 +32,14 @@
                             <div>
                                 <form action="{{route('gestion-patologias.edit', $patologia->id)}}" method="GET" style="display: inline;">
                                     @csrf
-                                    <button type="submit" class="btn btn-info">
+                                    <button type="submit" class="btn btn-warning btn-sm">
                                         <span class="far fa-edit"></span>
                                     </button>
                                 </form>
                                 <form action="{{route('gestion-patologias.destroy', $patologia->id)}}" method="POST" style="display: inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="button" class="btn btn-danger delete-button">
+                                    <button type="button" class="btn btn-danger delete-button btn-sm">
                                         <span class="far fa-trash-alt"></span>
                                     </button>
                                 </form>

@@ -89,7 +89,7 @@
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
          document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -104,8 +104,11 @@
                         text: 'Esta acción redirigirá a la vista con todas las alergias.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, cancelar edición',
                         cancelButtonText: 'No, volver a edición.',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, cancelar edición',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
@@ -130,8 +133,11 @@
                         text: 'Esta acción modificará la información actual de la alergia.',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, editar patología',
                         cancelButtonText: 'No, cancelar edición',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Sí, editar patología',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

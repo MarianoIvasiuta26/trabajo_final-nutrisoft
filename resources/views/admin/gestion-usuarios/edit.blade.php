@@ -32,8 +32,8 @@
             <input type="email" name="email" id="email" class="form-control" value="{{$usuario->email}}">
         </div>
 
-        <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-secondary" tabindex="7">Cancelar</a>
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>
+        <button type="submit" class="btn btn-success">Guardar</button>
     </form>
 @stop
 
