@@ -5,10 +5,12 @@ namespace App\Models;
 use App\Models\Paciente\Cirugia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ActividadesProhibidasCirugia extends Model
 {
     use HasFactory;
+    //use SoftDeletes;
 
     protected $fillable = [
         'cirugia_id',

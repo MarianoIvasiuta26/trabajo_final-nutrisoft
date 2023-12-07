@@ -10,7 +10,7 @@
 
     <div class="card card-dark mt-3">
         <div class="card-header">
-            <h1 style="text-align:center;">Completar Historia Clínica</h1>
+            <h1 style="text-align:center;">Completar Registro</h1>
         </div>
 
         <div class="card-body">
@@ -24,7 +24,16 @@
 
             @endphp
 
+            <!-- Barra de Progreso -->
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+            <!-- Step 1 -->
             <div class="step mt-3" id="step1">
+
+                <h5>Datos Personales</h5>
+
                 @if ($paciente->dni != NULL && $paciente->telefono != NULL && $paciente->sexo != NULL && $paciente->fecha_nacimiento != NULL)
                     <div class="row mt-3">
                         <div class="alert alert-success" role="alert">
@@ -34,30 +43,34 @@
                             <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                         </div>
                     </div>
+
+                    <button type="button" id="next-step1" class="btn btn-primary next-step">Siguiente</button>
                 @else
-                    <form class="row g-3" action="{{route('datos-personales.store')}}" method="POST" id="form-datos-personales">
+                    <form class="row g-3 mt-3" method="POST" id="form-datos-personales">
                         @csrf
-                        <div class="row">
+                        <div class="row mt-3">
                             <div class="col-md-6">
                                 <label for="dni" class="form-label">DNI(*)</label>
-                                <input type="text" class="form-control @error('dni') is-invalid @enderror" id="dni" name="dni" value="{{old('dni')}}{{ session('dni') }}">
+                                <input maxlength="8" type="text" class="form-control @error('dni') is-invalid @enderror" id="dni" name="dni" value="{{old('dni')}}{{ session('dni') }}">
 
                                 @error('dni')
                                     <div class="invalid-feedback">{{ $message}}</div>
                                 @enderror
+                                <span class="text-muted" id="dni-char-count">0/8</span>
                             </div>
 
                             <div class="col-md-6">
                                 <label for="telefono" class="form-label">Teléfono(*)</label>
-                                <input type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{old('telefono')}}{{ session('telefono') }}">
+                                <input maxlength="10" type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{old('telefono')}}{{ session('telefono') }}">
 
                                 @error('telefono')
                                     <div class="invalid-feedback">{{ $message}}</div>
                                 @enderror
+                                <span class="text-muted" id="telefono-char-count">0/10</span>
                             </div>
                         </div>
 
-                        <div class="row">
+                        <div class="row mt-3">
                             <div class="col-md-6">
                                 <label for="sexo" class="form-label">Sexo biológico(*)</label>
                                 <select id="sexo" class="form-select @error('sexo') is-invalid @enderror" name="sexo">
@@ -91,19 +104,21 @@
 
                         <div class="col-12">
                             <div class="float-right">
-                                <button type="submit" class="btn btn-success">Guardar</button>
+                                <button type="button" class="btn btn-success" id="guardar-step1">Guardar</button>
                                 <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                             </div>
                         </div>
                     </form>
 
                 @endif
-
-                <br>
-                <button type="button" class="btn btn-primary next-step">Siguiente</button>
             </div>
 
+            <!-- Step 2 -->
             <div class="step mt-3" id="step2">
+
+                <h5>Días y horarios Disponibles</h5>
+                <span class="text-muted">En este apartado puede registrar sus días y horas disponibles para posibles adelantamientos de turnos automático.</span>
+
                 @if (count($paciente->adelantamientoTurno) > 0)
                     <div class="alert alert-success" role="alert">
                         <h5 class="alert-heading">Días y horas registradas</h5>
@@ -113,7 +128,7 @@
                         <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                     </div>
                 @else
-                    <form action="{{route('adelantamiento-turno.store')}}" method="POST">
+                    <form id="form-dias-fijos" method="POST">
                         @csrf
                         <div class="alert alert-warning mt-3" role="alert">
                             <h5 class="alert-heading">¡Atención!</h5>
@@ -147,7 +162,7 @@
                         <div class="row mt-3">
                             <div class="col-12">
                                 <div class="float-right">
-                                    <button type="submit" class="btn btn-success">Guardar</button>
+                                    <button id="guardar-step2" type="button" class="btn btn-success">Guardar</button>
                                     <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                                 </div>
                             </div>
@@ -156,10 +171,13 @@
                 @endif
 
                 <br>
-                <button type="button" class="btn btn-primary prev-step">Anterior</button>
+                @if ($paciente->dni == NULL && $paciente->telefono == NULL && $paciente->sexo == NULL && $paciente->fecha_nacimiento == NULL)
+                    <button type="button" class="btn btn-danger prev-step" id="prev-step2">Anterior</button>
+                @endif
                 <button type="button" class="btn btn-primary next-step">Siguiente</button>
             </div>
 
+            <!-- Step 3 -->
             <div class="step mt-3" id="step3">
                 @if($paciente->historiaClinica)
                     <div class="row mt-3">
@@ -170,8 +188,11 @@
                             <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                         </div>
                     </div>
+                    <br>
+                    <button type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</button>
+                    <button type="button" class="btn btn-primary next-step">Siguiente</button>
                 @else
-                <form action="{{route('historia-clinica.store')}}" method="POST">
+                <form id="form-datos-corporales" method="POST">
                     @csrf
 
                     <div class="row">
@@ -275,7 +296,7 @@
                     <div class="row mt-3">
                         <div class="col-12">
                             <div class="float-right">
-                                <button type="submit" class="btn btn-success">Guardar</button>
+                                <button id="guardar-step3" type="button" class="btn btn-success">Guardar</button>
                                 <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                             </div>
                         </div>
@@ -285,10 +306,12 @@
 
 
                 <br>
-                <button type="button" class="btn btn-primary prev-step">Anterior</button>
-                <button type="button" class="btn btn-primary next-step">Siguiente</button>
+                @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
+                    <button type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</button>
+                @endif
             </div>
 
+            <!-- Step 4 -->
             <div class="step mt-3" id="step4">
                 @if (count($datosMedicos) > 0 && count($anamnesis) > 0 && count($cirugiasPaciente) > 0)
                     <div class="col-md-12">
@@ -300,8 +323,9 @@
                             <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                         </div>
                     </div>
+                    <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning">Completar historia clínica</a>
                 @else
-                <form action="{{route('datos-medicos.store')}}" method="POST">
+                <form id="form-datos-medicos" method="POST">
                 @csrf
                 <div class="row">
                     <h5>Anamnesis Alimentaria</h5>
@@ -417,7 +441,7 @@
                 <div class="row mt-3">
                     <div class="col-12">
                         <div class="float-right">
-                            <button type="submit" class="btn btn-success">Guardar</button>
+                            <button id="guardar-step4" type="button" class="btn btn-success">Guardar</button>
                             <!--<a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                         </div>
                     </div>
@@ -426,8 +450,9 @@
                 @endif
 
                 <br>
-                <button type="button" class="btn btn-primary prev-step">Anterior</button>
-                <a href="{{route('historia-clinica.completar')}}" class="btn btn-warning">Completar historia clínica</a>
+                @if(!$paciente->historiaClinica)
+                    <button type="button" class="btn btn-danger prev-step" id="prev-step4">Anterior</button>
+                @endif
             </div>
         </div>
     </div>
@@ -451,6 +476,14 @@
             display: none;
         }
         */
+        .progress {
+            height: 20px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            transition: width 0.6s ease;
+        }
     </style>
 
 
@@ -467,10 +500,94 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
 
-$(document).ready(function () {
+        $(document).ready(function () {
+            $('#dni').on('input', function () {
+                var maxLength = $(this).attr('maxlength');
+                var currentLength = $(this).val().length;
+
+                $('#dni-char-count').text(currentLength + '/' + maxLength);
+
+                if (currentLength > maxLength) {
+                    $('#dni-char-count').addClass('text-danger');
+                } else {
+                    $('#dni-char-count').removeClass('text-danger');
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('#telefono').on('input', function () {
+                var maxLength = $(this).attr('maxlength');
+                var currentLength = $(this).val().length;
+
+                $('#telefono-char-count').text(currentLength + '/' + maxLength);
+
+                if (currentLength > maxLength) {
+                    $('#telefono-char-count').addClass('text-danger');
+                } else {
+                    $('#telefono-char-count').removeClass('text-danger');
+                }
+            });
+        });
+
+        //MultiStep con progress
+        $(document).ready(function () {
+
+            var totalSteps = $(".step").length;
+            var currentStep = 1;
+
+            $('#completar-registro').hide();
+
+            $(".step:not(#step1)").hide();
+            $(".prev-step").prop('disabled', true); // Deshabilitar el botón "Anterior" al principio
+
+            $(".next-step").click(function () {
+                if (currentStep === 1 && !validateStep1()) {
+                    return false;
+                }
+
+                currentStep++;
+                showStep(currentStep);
+                updateProgressBar();
+                $(".prev-step").prop('disabled', false); // Habilitar el botón "Anterior"
+            });
+
+            $(".prev-step").click(function () {
+                currentStep--;
+                showStep(currentStep);
+                updateProgressBar();
+                if (currentStep === 1) {
+                    $(".prev-step").prop('disabled', true); // Deshabilitar el botón "Anterior" en el primer paso
+                }
+            });
+
+            function showStep(step) {
+                $(".step").hide();
+                $("#step" + step).show();
+            }
+
+            function validateStep1() {
+                // Lógica de validación para la primera etapa
+                return true;
+            }
+
+            function updateProgressBar() {
+                var progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+                $(".progress-bar").css("width", progress + "%").attr("aria-valuenow", progress);
+
+                // Mostrar el porcentaje actual
+                $(".progress-bar").text(progress.toFixed(2) + "%");
+            }
+        });
+
+
+
+        /*Multi step anterior
+        $(document).ready(function () {
             var currentStep = 1; // Inicialmente, estamos en la etapa 1
 
             // Oculta todas las etapas excepto la primera
@@ -509,7 +626,9 @@ $(document).ready(function () {
                 return true;
             }
         });
+        */
 
+        /*
         function toggleCard(cardId) {
             const card = document.getElementById(cardId);
             const icon = card.previousElementSibling.querySelector("i.fa");
@@ -549,7 +668,7 @@ $(document).ready(function () {
                 iconPrimerCard.classList.add("fa-minus");
             @endif
         });
-
+        */
         //SELECT2
         $( '#gustos' ).select2( {
             theme: "bootstrap-5",
@@ -593,6 +712,7 @@ $(document).ready(function () {
             closeOnSelect: false,
         } );
 
+
         //Función para agregar y eliminar cirugías
         $(document).ready(function() {
             // Manejar clic en el botón "Agregar Cirugía"
@@ -609,6 +729,7 @@ $(document).ready(function () {
             });
         });
 
+        /*
         //Función para saber que card minimizar al completar registro
         document.addEventListener("DOMContentLoaded", function(){
             if(sessionStorage.getItem('datos_personales')){
@@ -635,6 +756,7 @@ $(document).ready(function () {
             });
 
         });
+        */
 
         //Funciones para obtener días y horas fijos
         $(document).ready(function() {

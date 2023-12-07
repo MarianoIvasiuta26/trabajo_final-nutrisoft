@@ -178,7 +178,9 @@ class HistoriaClinicaController extends Controller
 
         session()->put('datos_fisicos', true);
 
-        return redirect()->route('historia-clinica.create')->with('success', 'Datos físicos registrados');
+        //return redirect()->route('historia-clinica.create')->with('success', 'Datos físicos registrados');
+        return response()
+        ->json(array('success' => true, 'datos_corporales' => true, 'message' => 'Datos corporales registrados'));
     }
 
     public function completarHistoriaClinica()
