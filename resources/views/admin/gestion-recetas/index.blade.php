@@ -86,7 +86,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form action="{{route('gestion-recetas.update', $receta->id)}}" method="POST">
+                                <form action="{{route('gestion-recetas.update', $receta->id)}}" method="POST" id="form-edit-receta">
                                     @csrf
                                     @method('PUT')
 
@@ -240,15 +240,11 @@
                                             </div>
                                         </div>
                                     </div>
-
-
-                                    <div class="row mt-3 float-right">
-                                        <div class="col">
-                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                                            <button type="submit" class="btn btn-success">Guardar cambios</button>
-                                        </div>
-                                    </div>
                                 </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-success edit-receta">Guardar</button>
                             </div>
                         </div>
                     </div>
@@ -268,7 +264,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{route('gestion-recetas.store')}}" method="POST">
+                    <form action="{{route('gestion-recetas.store')}}" method="POST" id="form-add-receta">
                         @csrf
 
                         <div class="row">
@@ -412,14 +408,11 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="row mt-3 float-right">
-                            <div class="col">
-                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="submit" class="btn btn-success">Guardar</button>
-                            </div>
-
                     </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success add-receta">Guardar</button>
                 </div>
             </div>
         </div>
@@ -599,6 +592,90 @@
                         "previous": "Anterior"
                     },
                 }
+            });
+        });
+
+        //SweetAlert para guardar nueva receta
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarRol = document.querySelectorAll('.add-receta');
+
+            guardarRol.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar la receta con sus ingredientes?',
+                        text: "Al confirmar se guardará la receta con sus ingredientes",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#28a745',
+                        confirmButtonText: '¡Guardar receta!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-add-receta');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardó la receta!'
+                            )
+                        }
+                    })
+                });
+            });
+        });
+
+        //SweetAlert para editar receta
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarRol = document.querySelectorAll('.edit-receta');
+
+            guardarRol.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de editar la receta con sus ingredientes?',
+                        text: "Al confirmar se editará la receta con sus ingredientes",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#28a745',
+                        confirmButtonText: '¡Guardar edición!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-edit-receta');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se editó la receta!'
+                            )
+                        }
+                    })
+                });
             });
         });
     </script>

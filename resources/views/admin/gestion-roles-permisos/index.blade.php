@@ -403,9 +403,9 @@
                     text: "Al confirmar se guardará el rol y los permisos asociados.",
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: '¡Guardar rol!',
-                    confirmButtonColor: '#3085d6',
                     cancelButtonText: '¡No, cancelar!',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: '¡Guardar rol!',
                     cancelButtonColor: '#d33',
                     reverseButtons: true
                     }).then((result) => {
@@ -445,9 +445,9 @@
                     text: "Al confirmar se guardará el rol y los permisos asociados.",
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Editar rol!',
-                    confirmButtonColor: '#3085d6',
                     cancelButtonText: '¡No, cancelar!',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'Editar rol!',
                     cancelButtonColor: '#d33',
                     reverseButtons: true
                     }).then((result) => {
