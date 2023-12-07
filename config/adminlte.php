@@ -561,6 +561,12 @@ return [
                 ],
             ],
         ],
+        [
+            'text' => 'Menú Semanal',
+            'icon' => 'fas fa-pizza-slice',
+            'route' => 'menu-semanal.index',
+            'can' => 'consultar-menuSemanal'
+        ],
 
         [
             'text' => 'Gestión Actividades',

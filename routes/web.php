@@ -22,6 +22,7 @@ use App\Http\Controllers\admin\NutrienteController;
 use App\Http\Controllers\admin\PatologiaController;
 use App\Http\Controllers\AlimentosPorDietasController;
 use App\Http\Controllers\EstadisticaController;
+use App\Http\Controllers\MenuSemanalController;
 use App\Http\Controllers\nutricionista\GestionConsultasController;
 use App\Http\Controllers\nutricionista\GestionPlieguesCutaneosController;
 use App\Http\Controllers\nutricionista\GestionTurnosController;
@@ -211,6 +212,8 @@ Route::middleware([
     Route::get('obtener-confirmacion-nuevo-turno/{id}', [TurnoController::class, 'showConfirmacionNuevoTurno'])->name('obtener-confirmacion-nuevo-turno');
     Route::post('confirmar-adelantamiento-turno/{id}', [TurnoController::class, 'confirmarAdelantamientoTurno'])->name('confirmar-adelantamiento-turno');
     Route::post('rechazar-adelantamiento-turno/{id}', [TurnoController::class, 'rechazarAdelantamientoTurno'])->name('rechazar-adelantamiento-turno');
+
+    Route::resource('menu-semanal', MenuSemanalController::class)->names('menu-semanal');
 
     //Proceso automatizado Generación automática de Planes de Alimentación
     Route::get('generar-plan-alimentacion', [GestionConsultasController::class, 'generarPlanesAlimentacion'])->name('generar-plan-alimentacion');

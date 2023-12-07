@@ -350,14 +350,14 @@
                             </div>
 
                             <!-- Sección de Ingredientes -->
-                            <div class="accordion accordion-flush mt-3" id="accordionEdit">
+                            <div class="accordion accordion mt-3" id="accordionEdit">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="flush-accordionEdit">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-accordionEdit" aria-expanded="false" aria-controls="flush-accordionEdit">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-accordionEdit-content" aria-expanded="false" aria-controls="flush-accordionEdit-content">
                                             Ingredientes
                                         </button>
                                     </h2>
-                                    <div id="flush-accordionEdit" class="accordion-collapse collapse" aria-labelledby="flush-accordionEdit" data-bs-parent="#accordionEdit">
+                                    <div id="flush-accordionEdit-content" class="accordion-collapse collapse" aria-labelledby="flush-accordionEdit" data-bs-parent="#accordionEdit">
                                         <div class="accordion-body">
                                             <p>Seleccione los ingredientes de la lista o agréguelos:</p>
 
@@ -394,9 +394,7 @@
                                             </table>
 
                                             <button type="button" class="btn btn-success mt-3" onclick="agregarIngredienteEdit()">Agregar Ingrediente</button>
-                                            <script>
 
-                                            </script>
                                             <!-- Sección para cada Ingrediente -->
                                             <div id="ingredientes-section-edit" class="row mt-3">
                                                 <!-- Los ingredientes seleccionados se agregarán dinámicamente aquí -->

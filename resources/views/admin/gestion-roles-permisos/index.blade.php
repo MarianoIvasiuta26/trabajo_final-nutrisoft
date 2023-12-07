@@ -139,11 +139,11 @@
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="editRol{{$rol->id}}Label">Editar rol</h5>
+                                <h5 class="modal-title" id="editRol{{$rol->id}}Label">Editar rol - {{$rol->name}}</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form action="{{route('gestion-rolesYPermisos.update', $rol->id)}}" method="POST" id="form-editRol">
+                                <form action="{{route('gestion-rolesYPermisos.update', $rol->id)}}" method="POST" id="form-editRol{{$rol->id}}">
                                     @csrf
                                     @method('PUT')
 
@@ -179,8 +179,8 @@
                                                                         <td>{{$permisoAEvaluar->name}}</td>
                                                                         <td>
                                                                             <div class="form-check form-switch">
-                                                                                <input class="form-check-input" type="checkbox" name="permisosEvaluar[]" value="{{$permisoAEvaluar->id}}" id="permisosEvaluar">
-                                                                                <label class="form-check-label" for="permisosEvaluar">Seleccionar</label>
+                                                                                <input class="form-check-input" type="checkbox" name="permisosEvaluar[]" value="{{$permisoAEvaluar->id}}" id="permisosEvaluar_{{$permisoAEvaluar->id}}">
+                                                                                <label class="form-check-label" for="permisosEvaluar_{{$permisoAEvaluar->id}}">Seleccionar</label>
                                                                             </div>
                                                                         </td>
                                                                     </tr>
@@ -427,46 +427,50 @@
     });
 
     //SweetAlert para editar rol
-    document.addEventListener('DOMContentLoaded', function () {
-        const editarRol = document.querySelectorAll('.edit-rol');
+    @foreach ($roles as $rol)
+        document.addEventListener('DOMContentLoaded', function () {
+            const editarRol = document.querySelectorAll('.edit-rol');
 
-        editarRol.forEach(button => {
-            button.addEventListener('click', function () {
-                const swalWithBootstrapButtons = Swal.mixin({
-                    customClass: {
-                        confirmButton: 'btn btn-success',
-                        cancelButton: 'btn btn-danger'
-                    },
-                    buttonsStyling: true
+            editarRol.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de editar el rol y sus permisos?',
+                        text: "Al confirmar se guardará el rol y los permisos asociados.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: 'Editar rol!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-editRol{{$rol->id}}');
+                            console.log(form);
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardó el rol con sus permisos!'
+                            )
+                        }
                     })
-
-                    swalWithBootstrapButtons.fire({
-                    title: '¿Está seguro de editar el rol y sus permisos?',
-                    text: "Al confirmar se guardará el rol y los permisos asociados.",
-                    icon: 'question',
-                    showCancelButton: true,
-                    cancelButtonText: '¡No, cancelar!',
-                    confirmButtonColor: '#198754',
-                    confirmButtonText: 'Editar rol!',
-                    cancelButtonColor: '#d33',
-                    reverseButtons: true
-                    }).then((result) => {
-                    if (result.isConfirmed) {
-                        //Envia el form
-                        const form = document.getElementById('form-editRol');
-                        form.submit();
-                    } else if (
-                        /* Read more about handling dismissals below */
-                        result.dismiss === Swal.DismissReason.cancel
-                    ) {
-                        swalWithBootstrapButtons.fire(
-                        '¡No se guardó el rol con sus permisos!'
-                        )
-                    }
-                })
+                });
             });
         });
-    });
+    @endforeach
+
 
     //SweetAlert para guardar nuevo permiso
     document.addEventListener('DOMContentLoaded', function () {

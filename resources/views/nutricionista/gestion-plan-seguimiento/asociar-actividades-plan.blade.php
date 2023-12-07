@@ -271,9 +271,9 @@
                         showCancelButton: true,
                         cancelButtonText: 'Cancelar',
                         confirmButtonColor: '#198754',
-                        confirmButtonText: 'Sí, asociar actividad.',
+                        confirmButtonTe
                         cancelButtonColor: '#d33',
-                        reverseButtons: true
+                        reverseButtons: truext: 'Sí, asociar actividad.',
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

@@ -19,7 +19,7 @@ class RecetaController extends Controller
      */
     public function index()
     {
-        $recetas = Receta::all();
+        $recetas = Receta::where('nombre_receta', '!=', 'Sin receta')->get();
         $alimentos = Alimento::all();
         $ingredientes = Ingrediente::all();
         $unidades_de_tiempo = UnidadesDeTiempo::where('nombre_unidad_tiempo', '!=', 'Sin unidad de tiempo')->get();

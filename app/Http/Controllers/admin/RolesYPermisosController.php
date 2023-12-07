@@ -141,15 +141,20 @@ class RolesYPermisosController extends Controller
         $role->guard_name = 'web';
         $role->save();
 
+        $permisosEvaluados = $request->input('permisosEvaluar');
+        //dd($permisosEvaluados);
         // Obtener los permisos seleccionados
-        $permisosSeleccionados = Permission::whereIn('id', $request->input('permisosEvaluar'))->get();
-        
-        // Asignar los permisos al rol
-        foreach ($permisosSeleccionados as $permisoNuevo) {
-            if (!$role->hasPermissionTo($permisoNuevo->name)) {
-                $role->givePermissionTo($permisoNuevo);
+        if ($permisosEvaluados !== null) {
+            $permisosSeleccionados = Permission::whereIn('id', $permisosEvaluados)->get();
+             // Asignar los permisos al rol
+            foreach ($permisosSeleccionados as $permisoNuevo) {
+                if (!$role->hasPermissionTo($permisoNuevo->name)) {
+                    $role->givePermissionTo($permisoNuevo);
+                }
             }
+
         }
+
 
         return redirect()->route('gestion-rolesYPermisos.index')->with('success', 'Rol actualizado correctamente.');
     }
