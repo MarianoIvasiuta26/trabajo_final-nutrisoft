@@ -171,7 +171,7 @@
                                                     </thead>
 
                                                     <tbody>
-                                                        @forelse ($adelantamientos as $adelantamiento)
+                                                        @foreach ($adelantamientos as $adelantamiento)
                                                             <tr>
                                                                 <td>
                                                                     @if(is_array($adelantamiento->dias_fijos))
@@ -204,12 +204,7 @@
                                                                     </div>
                                                                 </td>
                                                             </tr>
-                                                        @empty
-                                                            <tr>
-                                                                <td colspan="2">No se encontraron registros de días y horarios de atención.</td>
-
-                                                            </tr>
-                                                        @endforelse
+                                                        @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>

@@ -155,9 +155,9 @@ class AdelantamientoTurnoController extends Controller
         }
         session()->put('profesional', $profesional);
         session()->put('dias_y_horas_fijas', true);
-        //return redirect()->route('historia-clinica.create')->with('success', 'Días y horas disponibles registrados');
-        return response()
-        ->json(array('success' => true, 'horarios_libres' => true, 'message' => 'Días y horas libres registrados'));
+        return redirect()->route('historia-clinica.create')->with('success', 'Días y horas disponibles registrados');
+        //return response()
+        //->json(array('success' => true, 'horarios_libres' => true, 'message' => 'Días y horas libres registrados'));
     }
 
     /**

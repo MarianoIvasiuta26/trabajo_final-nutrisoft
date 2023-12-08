@@ -118,13 +118,13 @@ class PacienteController extends Controller
             session()->put('edad', $edad);
             session()->put('datos_personales', true);
 
-            //return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
-            return response()
-                ->json(array('success' => true, 'datos_personales' => true, 'message' => 'Datos personales registrados'));
+            return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
+            //return response()
+                //->json(array('success' => true, 'datos_personales' => true, 'message' => 'Datos personales registrados'));
         }else{
-            //return redirect()->route('historia-clinica.create')->with('error', 'Ya existe un paciente con estos datos');
-            return response()
-                ->json(array('success' => false, 'datos_personales' => false, 'message' => 'Ya existe un paciente con estos datos'));
+            return redirect()->route('historia-clinica.create')->with('error', 'Ya existe un paciente con estos datos');
+            //return response()
+                //->json(array('success' => false, 'datos_personales' => false, 'message' => 'Ya existe un paciente con estos datos'));
         }
 /*
             //Verificacimos que no existe ya la historia clínica para el paciente

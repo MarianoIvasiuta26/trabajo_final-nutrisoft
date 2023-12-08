@@ -224,8 +224,8 @@
                                 // Agrega los checkboxes de horas disponibles a la fila
                                 var checkbox = '<div class="col-md-2">' +
                                     '<div class="icheck-primary">' +
-                                    '<input value="' + hora + '" type="checkbox" id="horasFijas-' + hora + '" name="horasFijas[]"/>' +
-                                    '<label for="horasFijas-' + hora + '">' + hora + '</label>' +
+                                    '<input value="' + hora + '" type="checkbox" id="horasFijas-' + hora + '-' + diaSeleccionado + '" name="horasFijas[]"/>' +
+                                    '<label for="horasFijas-' + hora + '-' + diaSeleccionado + '">' + hora + '</label>' +
                                     '</div>' +
                                     '</div>';
                                 row += checkbox;

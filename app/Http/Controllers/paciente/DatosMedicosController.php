@@ -258,9 +258,9 @@ class DatosMedicosController extends Controller
             }
         }
         session()->put('datos_medicos', true);
-        //return redirect()->route('historia-clinica.create')->with('success', 'Datos médicos registrados correctamente');
-        return response()
-        ->json(array('success' => true, 'datos_medicos' => true, 'message' => 'Datos médicos registrados'));
+        return redirect()->route('historia-clinica.create')->with('success', 'Datos médicos registrados correctamente');
+        //return response()
+        //->json(array('success' => true, 'datos_medicos' => true, 'message' => 'Datos médicos registrados'));
     }
 
     /**

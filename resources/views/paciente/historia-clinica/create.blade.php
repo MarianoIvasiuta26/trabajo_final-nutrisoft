@@ -46,7 +46,7 @@
 
                     <button type="button" id="next-step1" class="btn btn-primary next-step">Siguiente</button>
                 @else
-                    <form class="row g-3 mt-3" method="POST" id="form-datos-personales">
+                    <form class="row g-3 mt-3" action="{{route('datos-personales.store')}}" method="POST" id="form-datos-personales">
                         @csrf
                         <div class="row mt-3">
                             <div class="col-md-6">
@@ -104,7 +104,7 @@
 
                         <div class="col-12">
                             <div class="float-right">
-                                <button type="button" class="btn btn-success" id="guardar-step1">Guardar</button>
+                                <button type="button" class="btn btn-success guardar-step1" id="guardar-step1">Guardar</button>
                                 <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                             </div>
                         </div>
@@ -128,7 +128,7 @@
                         <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                     </div>
                 @else
-                    <form id="form-dias-fijos" method="POST">
+                    <form id="form-dias-fijos" method="POST" action="{{route('adelantamiento-turno.store')}}">
                         @csrf
                         <div class="alert alert-warning mt-3" role="alert">
                             <h5 class="alert-heading">¡Atención!</h5>
@@ -154,15 +154,17 @@
                             </div>
 
                             <!-- Horas -->
-                            <div class="col-md-12" id="horas-disponibles">
+                            @foreach ($dias as $dia)
+                                <div class="col-md-12" id="horas-disponibles-{{$dia->dia}}">
 
-                            </div>
+                                </div>
+                            @endforeach
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-12">
                                 <div class="float-right">
-                                    <button id="guardar-step2" type="button" class="btn btn-success">Guardar</button>
+                                    <button id="guardar-step2" type="button" class="btn btn-success guardar-step2">Guardar</button>
                                     <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                                 </div>
                             </div>
@@ -192,10 +194,12 @@
                         </div>
                     </div>
                     <br>
-                    <button type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</button>
+                    @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
+                        <button type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</button>
+                    @endif
                     <button type="button" class="btn btn-primary next-step">Siguiente</button>
                 @else
-                <form id="form-datos-corporales" method="POST">
+                <form id="form-datos-corporales" action="{{route('historia-clinica.store')}}" method="POST">
                     @csrf
 
                     <div class="row">
@@ -299,7 +303,7 @@
                     <div class="row mt-3">
                         <div class="col-12">
                             <div class="float-right">
-                                <button id="guardar-step3" type="button" class="btn btn-success">Guardar</button>
+                                <button id="guardar-step3" type="button" class="btn btn-success guardar-step3">Guardar</button>
                                 <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                             </div>
                         </div>
@@ -329,9 +333,12 @@
                             <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                         </div>
                     </div>
-                    <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning">Completar historia clínica</a>
+
+                    <div class="mt-3 float-right">
+                        <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning completar-registro">Completar registro</a>
+                    </div>
                 @else
-                <form class="mt-3" id="form-datos-medicos" method="POST">
+                <form class="mt-3" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
                 @csrf
                 <div class="row mt-3">
                     <h5>Anamnesis Alimentaria</h5>
@@ -447,7 +454,7 @@
                 <div class="row mt-3">
                     <div class="col-12">
                         <div class="float-right">
-                            <button id="guardar-step4" type="button" class="btn btn-success">Guardar</button>
+                            <button id="guardar-step4" type="button" class="btn btn-success guardar-step4">Guardar</button>
                             <!--<a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                         </div>
                     </div>
@@ -540,6 +547,7 @@
             });
         });
 
+        /*
         //MultiStep con progress
         $(document).ready(function () {
 
@@ -586,6 +594,71 @@
                 $(".progress-bar").css("width", progress + "%").attr("aria-valuenow", progress);
 
                 // Mostrar el porcentaje actual
+                $(".progress-bar").text(progress.toFixed(2) + "%");
+            }
+        });
+        */
+
+        $(document).ready(function () {
+            var totalSteps = $(".step").length;
+            var currentStep = 1;
+
+            // Obtén el estado de completitud desde el lado del cliente (puedes usar cookies o localStorage)
+            var completedSteps = [false, false, false, false];
+
+            $(".step:not(:first)").hide();
+            $(".prev-step").prop('disabled', true);
+
+            $(".next-step").click(function () {
+                if (currentStep === 1 && !validateStep1()) {
+                    return false;
+                }
+
+                // Actualiza el estado de completitud
+                completedSteps[currentStep - 1] = true;
+
+                // Redirige al siguiente paso si el formulario actual se completó correctamente
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    showStep(currentStep);
+                    updateProgressBar();
+                    $(".prev-step").prop('disabled', false);
+                } else {
+                    // Aquí podrías realizar alguna acción especial si todos los pasos están completos
+                    // Por ejemplo, mostrar un botón para completar el registro
+                    $('#completar-registro').show();
+                }
+            });
+
+            $(".prev-step").click(function () {
+                currentStep--;
+                showStep(currentStep);
+                updateProgressBar();
+                if (currentStep === 1) {
+                    $(".prev-step").prop('disabled', true);
+                }
+            });
+
+            function showStep(step) {
+                $(".step").hide();
+                $("#step" + step).show();
+
+                // Oculta los pasos completados
+                for (var i = 0; i < completedSteps.length; i++) {
+                    if (completedSteps[i]) {
+                        $("#step" + (i + 1)).hide();
+                    }
+                }
+            }
+
+            function validateStep1() {
+                // Lógica de validación para la primera etapa
+                return true;
+            }
+
+            function updateProgressBar() {
+                var progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+                $(".progress-bar").css("width", progress + "%").attr("aria-valuenow", progress);
                 $(".progress-bar").text(progress.toFixed(2) + "%");
             }
         });
@@ -776,88 +849,324 @@
                     $('#dias-consultas').empty();
                     $('#horas-disponibles').empty();
                 }
-                // Función para cargar los días disponibles
-            function cargarDiasDisponibles(profesionalSeleccionado) {
-                // Realiza una solicitud Ajax para obtener los días disponibles
-                $.ajax({
-                    url: "{{ route('adelantamiento-turno.obtener-dias') }}",
-                    type: "POST",
-                    data: {
-                        profesional: profesionalSeleccionado,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function (diasDisponibles) {
-                        var diasContainer = $('#dias-consultas');
-                        diasContainer.empty();
-                        var indicacion = '<h5>Seleccione los días que tiene disponibles:</h5>'
-                        diasContainer.append(indicacion);
-                        $.each(diasDisponibles.diasFijos, function (index, dia) {
-                            // Agrega los checkboxes de días disponibles al contenedor
 
-                            var checkbox = '<div class="col-md-2">' +
-                                '<div class="icheck-primary">' +
-                                '<input value="' + dia + '" type="checkbox" id="diasFijos-' + dia + '" name="diasFijos[]"/>' +
-                                '<label for="diasFijos-' + dia + '">' + dia + '</label>' +
-                                '</div>' +
-                                '</div>';
-                            diasContainer.append(checkbox);
-                        });
-                        console.log(diasDisponibles);
-                    },
-                    error: function (error) {
-                        console.log(error);
+                // Función para cargar los días disponibles
+                function cargarDiasDisponibles(profesionalSeleccionado) {
+                    // Realiza una solicitud Ajax para obtener los días disponibles
+                    $.ajax({
+                        url: "{{ route('adelantamiento-turno.obtener-dias') }}",
+                        type: "POST",
+                        data: {
+                            profesional: profesionalSeleccionado,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function (diasDisponibles) {
+                            var diasContainer = $('#dias-consultas');
+                            diasContainer.empty();
+                            var indicacion = '<h5>Seleccione los días que tiene disponibles:</h5>';
+                            diasContainer.append(indicacion);
+
+                            // Agrega una fila para los días
+                            var row = '<div class="row">';
+                            $.each(diasDisponibles.diasFijos, function (index, dia) {
+                                // Agrega los checkboxes de días disponibles a la fila
+                                var checkbox = '<div class="col-md-2">' +
+                                    '<div class="icheck-primary">' +
+                                    '<input value="' + dia + '" type="checkbox" id="diasFijos-' + dia + '" name="diasFijos[]"/>' +
+                                    '<label for="diasFijos-' + dia + '">' + dia + '</label>' +
+                                    '</div>' +
+                                    '</div>';
+                                row += checkbox;
+                            });
+                            row += '</div>';
+                            diasContainer.append(row);
+
+                            console.log(diasDisponibles);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
+                }
+
+                var horasContainer;
+                // Agrega un evento de cambio a los checkboxes de días
+                $(document).on('change', 'input[name="diasFijos[]"]', function() {
+                    if (this.checked) {
+                        var diaSeleccionado = $(this).val();
+
+                        console.log('Día seleccionado: ' + diaSeleccionado);
+                        cargarHorasDisponibles(profesionalSeleccionado, diaSeleccionado);
+                    } else {
+                        // Si se desmarca el día, borra las horas correspondientes
+                        var diaDeseleccionado = $(this).val();
+                        var horasContainerId = 'horas-disponibles-' + diaDeseleccionado;
+                        var horasContainer = $('#' + horasContainerId);
+                        horasContainer.empty();
+                        console.log('Se ha desmarcado el día. ' + diaDeseleccionado);
                     }
                 });
-            }
 
-            // Agrega un evento de cambio a los checkboxes de días
-            $(document).on('change', 'input[name="diasFijos[]"]', function() {
-                if (this.checked) {
-                    var diaSeleccionado = $(this).val();
-                    console.log('Día seleccionado: ' + diaSeleccionado);
-                    cargarHorasDisponibles(profesionalSeleccionado, diaSeleccionado);
-                } else {
-                    console.log('Se ha desmarcado el día.');
-                    // Si se desmarca el día, borra las horas correspondientes
-                    $('#horas-disponibles').empty();
+                // Función para cargar las horas disponibles
+                function cargarHorasDisponibles(profesionalSeleccionado, diaSeleccionado) {
+                    console.log('La función cargarHorasDisponibles se ha activado.');
+                    // Realiza una solicitud Ajax para obtener las horas disponibles
+                    $.ajax({
+                        url: "{{ route('adelantamiento-turno.obtener-horas') }}",
+                        type: "POST",
+                        data: {
+                            profesional: profesionalSeleccionado,
+                            dia: diaSeleccionado,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function (horasDisponibles) {
+                            var horasContainerId = 'horas-disponibles-' + diaSeleccionado; // Identificador único por día
+                            var horasContainer = $('#' + horasContainerId);
+                            var indicacion = '<h5>Seleccione las horas disponibles para el día ' + diaSeleccionado + ':</h5>';
+                            horasContainer.empty();
+                            horasContainer.append(indicacion);
+
+                            // Agrega una fila para las horas
+                            var row = '<div class="row">';
+                            $.each(horasDisponibles.horas, function (index, hora) {
+                                // Agrega los checkboxes de horas disponibles a la fila
+                                var checkbox = '<div class="col-md-2">' +
+                                    '<div class="icheck-primary">' +
+                                    '<input value="' + hora + '" type="checkbox" id="horasFijas-' + hora + '-' + diaSeleccionado + '" name="horasFijas[]"/>' +
+                                    '<label for="horasFijas-' + hora + '-' + diaSeleccionado + '">' + hora + '</label>' +
+                                    '</div>' +
+                                    '</div>';
+                                row += checkbox;
+                            });
+                            row += '</div>';
+                            horasContainer.append(row);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
                 }
             });
+        });
 
-            // Función para cargar las horas disponibles
-            function cargarHorasDisponibles(profesionalSeleccionado, diaSeleccionado) {
-                console.log('La función cargarHorasDisponibles se ha activado.');
-                // Realiza una solicitud Ajax para obtener las horas disponibles
-                $.ajax({
-                    url: "{{ route('adelantamiento-turno.obtener-horas') }}",
-                    type: "POST",
-                    data: {
-                        profesional: profesionalSeleccionado,
-                        dia: diaSeleccionado,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function (horasDisponibles) {
-                        var horasContainer = $('#horas-disponibles');
-                        var indicacion = '<h5>Seleccione las horas disponibles:</h5>'
-                        horasContainer.append(indicacion);
+        //SweetAlert - Step1
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarStep1 = document.querySelectorAll('.guardar-step1');
 
-                        $.each(horasDisponibles.horas, function (index, hora) {
-                            // Agrega los checkboxes de horas disponibles al contenedor
-                            var checkbox = '<div class="col-md-2">' +
-                                '<div class="icheck-primary">' +
-                                '<input value="' + hora + '" type="checkbox" id="horasFijas-' + hora + '" name="horasFijas[]"/>' +
-                                '<label for="horasFijas-' + hora + '">' + hora + '</label>' +
-                                '</div>' +
-                                '</div>';
-                            horasContainer.append(checkbox);
-                        });
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
+            guardarStep1.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar sus datos personales?',
+                        text: "Al confirmar se guardará el registro y no podrá modificarlo hasta haber completado el registro.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Guardar!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-datos-personales');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardaron sus datos personales!'
+                            )
+                        }
+                    })
                 });
-            }
             });
         });
+
+        //SweetAlert - Step2
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarStep2 = document.querySelectorAll('.guardar-step2');
+
+            guardarStep2.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar los días y las horas seleccionadas para adelantamiento de turnos?',
+                        text: "Al confirmar se guardará el registro y no podrá modificarlo hasta haber completado el registro.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Guardar!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-dias-fijos');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardaron sus días y horas disponibles!'
+                            )
+                        }
+                    })
+                });
+            });
+        });
+
+        //SweetAlert - Step3
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarStep3 = document.querySelectorAll('.guardar-step3');
+
+            guardarStep3.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar sus datos corporales?',
+                        text: "Al confirmar se guardará el registro y no podrá modificarlo hasta haber completado el registro.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Guardar!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-datos-corporales');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardaron sus datos corporales!'
+                            )
+                        }
+                    })
+                });
+            });
+        });
+
+        //SweetAlert - Step4
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarStep4 = document.querySelectorAll('.guardar-step4');
+
+            guardarStep4.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar sus datos médicos?',
+                        text: "Al confirmar se guardará el registro y no podrá modificarlo hasta haber completado el registro.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Guardar!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-datos-medicos');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardaron sus datos médicos!'
+                            )
+                        }
+                    })
+                });
+            });
+        });
+
+        //SweetAlert - completar registro
+        document.addEventListener('DOMContentLoaded', function () {
+            const completarRegistro = document.querySelectorAll('.completar-registro');
+
+            completarRegistro.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de completar su registro?',
+                        text: "Al confirmar se completará su registro y tendrá acceso a las funcionalidades del sistema.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Completar!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-completar-registro');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se completó su registro!'
+                            )
+                        }
+                    })
+                });
+            });
+        });
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '{{session('success')}}',
+                showConfirmButton: false,
+                timer: 1500
+            })
+        @endif
 
         document.addEventListener('DOMContentLoaded', function() {
         const formulario = document.querySelector('form'); // Obtén el formulario
