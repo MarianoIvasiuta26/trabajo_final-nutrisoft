@@ -7,6 +7,7 @@ use App\Models\Actividades;
 use App\Models\ActividadesPorTiposDeActividades;
 use App\Models\ActividadesProhibidasCirugia;
 use App\Models\ActividadesProhibidasPatologia;
+use App\Models\ActividadesRecomendadasPorTiposDeActividades;
 use App\Models\ActividadRecPorTipoActividades;
 use App\Models\Alimento;
 use App\Models\AlimentoPorTipoDeDieta;
@@ -1041,35 +1042,40 @@ class GestionConsultasController extends Controller
 
 
                 //Ahora pasamos a la generación de los detalles del plan
-                foreach($actividadesRecomendadas as $recomendacion){
-                    foreach($actividades as $actividad){
-                        if($actividad->actividad == $recomendacion){
-                            foreach($actividadesPorTipo as $actividadPorTipo){
-                                if($actividad->id == $actividadPorTipo->actividad_id){
-                                    foreach($actividadesRecomendadasPorTipo as $actividadRecomendada){
-                                        if($actividadPorTipo->id == $actividadRecomendada->act_tipoAct_id){
-                                            $unidadTiempo = UnidadesDeTiempo::where('id', $actividadRecomendada->unidad_tiempo_id)->first()->nombre_unidad_tiempo;
-                                            $obtenerDatosPlan = $this->obtenerDatosPlan($consulta->imc_actual, $consulta->peso_actual, $consulta->altura_actual);
-                                            $estadoIMC = $obtenerDatosPlan['estadoIMC'];
-                                            $pesoIdeal = $obtenerDatosPlan['pesoIdeal'];
-                                            DetallesPlanesSeguimiento::create([
-                                                'plan_de_seguimiento_id' => $planSeguimiento->id,
-                                                'act_rec_id' => $actividadRecomendada->id,
-                                                'actividad_id' => $actividad->id,
-                                                'completada' => 0, //No completada por defecto
-                                                'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
-                                                'unidad_tiempo_realizacion' => $unidadTiempo,
-                                                'recursos_externos' => '',
-                                                'estado_imc' => $estadoIMC,
-                                                'peso_ideal' => $pesoIdeal,
-                                            ]);
-                                        }
-                                    }
-                                }
+                // Obtener datos de actividades recomendadas por tipo
+                $actividadesRecomendadasPorTipo = ActividadRecPorTipoActividades::whereIn('act_tipoAct_id', $actividadesPorTipo->pluck('id'))->get();
+
+                foreach ($actividadesRecomendadas as $recomendacion) {
+                    $actividad = $actividades->where('actividad', $recomendacion)->first();
+
+                    if ($actividad) {
+                        $actividadPorTipo = $actividadesPorTipo->where('actividad_id', $actividad->id)->first();
+
+                        if ($actividadPorTipo) {
+                            $actividadRecomendada = $actividadesRecomendadasPorTipo->where('act_tipoAct_id', $actividadPorTipo->id)->first();
+
+                            if ($actividadRecomendada) {
+                                $unidadTiempo = UnidadesDeTiempo::find($actividadRecomendada->unidad_tiempo_id)->nombre_unidad_tiempo;
+                                $obtenerDatosPlan = $this->obtenerDatosPlan($consulta->imc_actual, $consulta->peso_actual, $consulta->altura_actual);
+                                $estadoIMC = $obtenerDatosPlan['estadoIMC'];
+                                $pesoIdeal = $obtenerDatosPlan['pesoIdeal'];
+
+                                DetallesPlanesSeguimiento::create([
+                                    'plan_de_seguimiento_id' => $planSeguimiento->id,
+                                    'act_rec_id' => $actividadRecomendada->id,
+                                    'actividad_id' => $actividad->id,
+                                    'completada' => 0, // No completada por defecto
+                                    'tiempo_realizacion' => $actividadRecomendada->duracion_actividad,
+                                    'unidad_tiempo_realizacion' => $unidadTiempo,
+                                    'recursos_externos' => '',
+                                    'estado_imc' => $estadoIMC,
+                                    'peso_ideal' => $pesoIdeal,
+                                ]);
                             }
                         }
                     }
                 }
+
                 return [
                     'planSeguimiento' => $planSeguimiento,
                     'detallesPlanSeguimiento' => DetallesPlanesSeguimiento::where('plan_de_seguimiento_id', $planSeguimiento->id)->get(),
