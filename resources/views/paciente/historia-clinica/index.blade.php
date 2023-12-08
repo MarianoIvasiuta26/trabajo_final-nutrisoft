@@ -156,65 +156,64 @@
                                         </div>
 
                                         <div id="dias-horas" class="tab-pane">
+                                            <a href="{{route('adelantamiento-turno.create', $paciente->id)}}" class="btn btn-warning">
+                                                Agregar
+                                            </a>
 
-                                            <table class="table table-striped mt-4">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Días libres</th>
-                                                        <th scope="col">Horas libres</th>
-                                                        <th scope="col">Acciones</th>
-                                                    </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                    @forelse ($adelantamientos as $adelantamiento)
+                                            <div class="mt-3">
+                                                <table class="table table-striped mt-4" id="tabla-dias-horas">
+                                                    <thead>
                                                         <tr>
-                                                            <td>
-                                                                @if(is_array($adelantamiento->dias_fijos))
-                                                                    @foreach ($adelantamiento->dias_fijos as $dia)
-                                                                        {{ $dia }}
-                                                                    @endforeach
-                                                                @else
-                                                                    {{ $adelantamiento->dias_fijos }}
-                                                                @endif
-                                                            </td>
-
-                                                            <td>
-                                                                @if(is_array($adelantamiento->horas_fijas))
-                                                                    @foreach ($adelantamiento->horas_fijas as $hora)
-                                                                        {{ $hora }}
-                                                                    @endforeach
-                                                                @else
-                                                                    {{ $adelantamiento->horas_fijas }}
-                                                                @endif
-                                                            </td>
-
-                                                            <td>
-                                                                <div class="btn-group">{{--
-                                                                    <a class="btn btn-info" href="{{ route('adelantamiento-turno.edit', $paciente->id) }}">Editar</a>--}}
-                                                                    <form action="{{ route('adelantamiento-turno.destroy', $adelantamiento->id) }}" method="POST">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button class="btn btn-danger ml-2 delete-button" type="button">Eliminar</button>
-                                                                    </form>
-                                                                </div>
-                                                            </td>
+                                                            <th scope="col">Días libres</th>
+                                                            <th scope="col">Horas libres</th>
+                                                            <th scope="col">Acciones</th>
                                                         </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="2">No se encontraron registros de días y horarios de atención.</td>
+                                                    </thead>
 
-                                                        </tr>
-                                                    @endforelse
-                                                    <tr>
-                                                        <td colspan="3">
-                                                            <a href="{{route('adelantamiento-turno.create', $paciente->id)}}" class="btn btn-warning">
-                                                                Agregar
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                                    <tbody>
+                                                        @forelse ($adelantamientos as $adelantamiento)
+                                                            <tr>
+                                                                <td>
+                                                                    @if(is_array($adelantamiento->dias_fijos))
+                                                                        @foreach ($adelantamiento->dias_fijos as $dia)
+                                                                            {{ $dia }}
+                                                                        @endforeach
+                                                                    @else
+                                                                        {{ $adelantamiento->dias_fijos }}
+                                                                    @endif
+                                                                </td>
+
+                                                                <td>
+                                                                    @if(is_array($adelantamiento->horas_fijas))
+                                                                        @foreach ($adelantamiento->horas_fijas as $hora)
+                                                                            {{ $hora }}
+                                                                        @endforeach
+                                                                    @else
+                                                                        {{ $adelantamiento->horas_fijas }}
+                                                                    @endif
+                                                                </td>
+
+                                                                <td>
+                                                                    <div class="btn-group">{{--
+                                                                        <a class="btn btn-info" href="{{ route('adelantamiento-turno.edit', $paciente->id) }}">Editar</a>--}}
+                                                                        <form action="{{ route('adelantamiento-turno.destroy', $adelantamiento->id) }}" method="POST">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button class="btn btn-danger ml-2 delete-button" type="button">Eliminar</button>
+                                                                        </form>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="2">No se encontraron registros de días y horarios de atención.</td>
+
+                                                            </tr>
+                                                        @endforelse
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
                                         </div>
 
                                         <!-- Datos Físicos -->
@@ -793,6 +792,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Bootstrap icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
 @stop
 
 @section('js')
@@ -800,6 +801,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
         // Inicializa las pestañas al cargar la página
@@ -847,6 +852,31 @@
                 });
             });
         });
+
+        //Datatable días y horas libres
+        $(document).ready(function(){
+            $('#tabla-dias-horas').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ días y horas por página",
+                    "zeroRecords": "No se encontró ningún día y hora.",
+                    "info": "Mostrando la página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay días y horas existentes.",
+                    "infoFiltered": "(filtrado de _MAX_ días y horas totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+                },
+                "order": [[ 0, "asc" ]],
+            });
+        });
+
     </script>
 
 @stop

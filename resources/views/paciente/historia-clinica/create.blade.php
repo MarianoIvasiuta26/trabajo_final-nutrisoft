@@ -37,7 +37,7 @@
                 @if ($paciente->dni != NULL && $paciente->telefono != NULL && $paciente->sexo != NULL && $paciente->fecha_nacimiento != NULL)
                     <div class="row mt-3">
                         <div class="alert alert-success" role="alert">
-                            <h4 class="alert-heading">¡Bienvenido/a {{$paciente->user->name}}!</h4>
+                            <h4 class="alert-heading">¡Bien {{$paciente->user->name}}!</h4>
                             <p>Ya completaste tus datos personales, ahora puedes completar el resto de tu historia clínica.</p>
                             <hr>
                             <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
@@ -179,10 +179,13 @@
 
             <!-- Step 3 -->
             <div class="step mt-3" id="step3">
+                <h5>Datos corporales</h5>
+                <span class="text-muted">En este apartado puede registrar sus datos corporales y estado físico.</span>
+
                 @if($paciente->historiaClinica)
                     <div class="row mt-3">
                         <div class="alert alert-success" role="alert">
-                            <h4 class="alert-heading">¡Bienvenido/a {{$paciente->user->name}}!</h4>
+                            <h4 class="alert-heading">¡Bien {{$paciente->user->name}}!</h4>
                             <p>Ya completaste tus datos físicos, peudes modificarlos una vez completada su historia clínica.</p>
                             <hr>
                             <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
@@ -313,6 +316,9 @@
 
             <!-- Step 4 -->
             <div class="step mt-3" id="step4">
+                <h5>Datos médicos</h5>
+                <span class="text-muted">En este apartado puede registrar información sobre su salud, datos importantes para la realización de consultas nutricionales.</span>
+
                 @if (count($datosMedicos) > 0 && count($anamnesis) > 0 && count($cirugiasPaciente) > 0)
                     <div class="col-md-12">
                         <div class="alert alert-success" role="alert">
@@ -325,9 +331,9 @@
                     </div>
                     <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning">Completar historia clínica</a>
                 @else
-                <form id="form-datos-medicos" method="POST">
+                <form class="mt-3" id="form-datos-medicos" method="POST">
                 @csrf
-                <div class="row">
+                <div class="row mt-3">
                     <h5>Anamnesis Alimentaria</h5>
                     <div class="col-md-6">
                         <label for="gustos" class="form-label">Seleccione sus alimentos preferidos</label>
