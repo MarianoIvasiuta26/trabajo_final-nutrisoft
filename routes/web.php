@@ -36,6 +36,7 @@ use App\Http\Controllers\ProhibicionesCirugiaController;
 use App\Http\Controllers\ProhibicionesIntoleranciaController;
 use App\Http\Controllers\ProhibicionesPatologiaController;
 use App\Http\Controllers\RecetaController;
+use App\Http\Controllers\SeguimientoPacienteController;
 use App\Http\Controllers\TagsDiagnosticosController;
 use App\Http\Controllers\TratramientoController;
 use App\Http\Controllers\TurnoController;
@@ -214,6 +215,9 @@ Route::middleware([
     Route::post('rechazar-adelantamiento-turno/{id}', [TurnoController::class, 'rechazarAdelantamientoTurno'])->name('rechazar-adelantamiento-turno');
 
     Route::resource('menu-semanal', MenuSemanalController::class)->names('menu-semanal');
+
+    //Seguimiento
+    Route::resource('mi-seguimiento', SeguimientoPacienteController::class)->names('mi-seguimiento');
 
     //Proceso automatizado Generación automática de Planes de Alimentación
     Route::get('generar-plan-alimentacion', [GestionConsultasController::class, 'generarPlanesAlimentacion'])->name('generar-plan-alimentacion');
