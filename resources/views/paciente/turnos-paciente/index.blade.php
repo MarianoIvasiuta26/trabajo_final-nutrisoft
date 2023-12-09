@@ -192,6 +192,8 @@
             });
         });
 
+         //SweetAlert
+
         document.addEventListener('DOMContentLoaded', function () {
             const cancelarButtons = document.querySelectorAll('.cancelar-turno-button');
 
@@ -202,9 +204,11 @@
                         text: "¡No podrás revertir esto!",
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
+                        confirmButtonColor: '#198754',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'Si, cancelar turno'
+                        confirmButtonText: 'Si, cancelar turno',
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
                         }).then((result) => {
                         if (result.isConfirmed) {
                             //Envia el form
@@ -215,5 +219,6 @@
                 });
             });
         });
+
     </script>
 @stop

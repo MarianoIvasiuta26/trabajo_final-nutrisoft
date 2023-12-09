@@ -274,7 +274,7 @@
                                         <div id="datos-medicos" class="tab-pane">
                                             <div class="row">
                                                 <div class="col-9 mb-3">
-                                                    <h5>Anamnesis Alimentaria</h5>
+                                                    <h5>Gustos alimenticios</h5>
                                                 </div>
                                                 {{--
                                                 <div class="col-3">

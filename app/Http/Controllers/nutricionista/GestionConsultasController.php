@@ -520,28 +520,27 @@ class GestionConsultasController extends Controller
         //dd('hola');
         //$i = 0;
         $observacion = '';
-        // Asocia los detalles del plan de alimentación al plan recién creado
+
         foreach ($alimentosRecomendados as $alimentoRecomendado) {
-            foreach($alimentosPorDieta as $alimentoDieta){
+            foreach ($alimentosPorDieta as $alimentoDieta) {
                 foreach ($alimentosrecomendadosPorDieta as $alimRecomendadoDieta) {
-                    $comida = Comida::where('id', $alimRecomendadoDieta->comida_id)->first();
-                    $unidadMedida = UnidadesMedidasPorComida::where('id', $alimRecomendadoDieta->unidad_medida_id)->first();
-                    //$observacion = 'Carbohidratos: ' . $carbohidratos[$i] . ' kcal. Proteínas: ' . $proteinas[$i] . ' kcal. Lípidos: ' . $lipidos[$i] . ' kcal.';
                     if ($alimentoDieta->id == $alimentoRecomendado && $alimentoDieta->id == $alimRecomendadoDieta->alimento_por_dieta_id) {
+                        $comida = Comida::find($alimRecomendadoDieta->comida_id);
+                        $unidadMedida = UnidadesMedidasPorComida::find($alimRecomendadoDieta->unidad_medida_id);
+
                         $detallePlan = DetallePlanAlimentaciones::create([
-                            'plan_alimentacion_id' => $planAlimentacion->id, // Asocia el plan al detalle del plan
-                            'alimento_id' => $alimentoDieta->alimento_id, // Asocia el alimento al detalle del plan
-                            'horario_consumicion' => $comida->nombre_comida, // Establece el horario según tus necesidades
-                            'cantidad' => $alimRecomendadoDieta->cantidad, // Establece la cantidad según tus necesidades
-                            'unidad_medida' => $unidadMedida->nombre_unidad_medida, // Establece la unidad de medida según tus necesidades
+                            'plan_alimentacion_id' => $planAlimentacion->id,
+                            'alimento_id' => $alimentoDieta->alimento_id,
+                            'horario_consumicion' => optional($comida)->nombre_comida,
+                            'cantidad' => $alimRecomendadoDieta->cantidad,
+                            'unidad_medida' => optional($unidadMedida)->nombre_unidad_medida,
                             'observacion' => $observacion,
                         ]);
 
-                        $detallePlan->save(); // Guarda el detalle del plan
+                        $detallePlan->save();
                     }
                 }
             }
-            //$i++;
         }
 
         return [

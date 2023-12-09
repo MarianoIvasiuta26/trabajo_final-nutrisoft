@@ -17,7 +17,9 @@
                 <button type="submit" class="btn btn-primary">Consultar Plan</button>
             </form>
         </div>
+    @endif
 
+    @if (session('successConPlanSeguimientoGenerado'))
         <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
             {{ session('successConPlanSeguimientoGenerado') }}
             <form action="{{ route('plan-seguimiento.consultarPlanGenerado', ['pacienteId' => session('pacienteId'), 'turnoId' => session('turnoId'), 'nutricionistaId' => session('nutricionistaId')]) }}" method="get">
@@ -25,17 +27,27 @@
                 <button type="submit" class="btn btn-primary">Consultar Plan</button>
             </form>
         </div>
+    @endif
 
+    @if (session('successConPlanesGenerados'))
         <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
             {{ session('successConPlanesGenerados') }}
-            <form action="{{ route('plan-seguimiento.consultarPlanGenerado', ['pacienteId' => session('pacienteId'), 'turnoId' => session('turnoId'), 'nutricionistaId' => session('nutricionistaId')]) }}" method="get">
-                @csrf
-                <button type="submit" class="btn btn-primary">Consultar Plan de Segumiento</button>
-            </form>
-            <form action="{{ route('plan-alimentacion.consultarPlanGenerado', ['pacienteId' => session('pacienteId'), 'turnoId' => session('turnoId'), 'nutricionistaId' => session('nutricionistaId')]) }}" method="get">
-                @csrf
-                <button type="submit" class="btn btn-info">Consultar Plan de Alimentación</button>
-            </form>
+            <div class="row mt-3">
+                <div class="col-auto">
+                    <form action="{{ route('plan-alimentacion.planesAlimentacionAConfirmar')}}" method="get">
+                        @csrf
+                        <button type="submit" class="btn btn-primary">Sección planes de alimentación</button>
+                    </form>
+                </div>
+
+                <div class="col-auto">
+                    <form action="{{ route('plan-seguimiento.planesSeguimientoAConfirmar') }}" method="get">
+                        @csrf
+                        <button type="submit" class="btn btn-info">Sección planes de seguimiento</button>
+                    </form>
+                </div>
+            </div>
+
         </div>
     @endif
 
@@ -79,9 +91,9 @@
                                         </td>
                                         <td>
                                             <a class="btn btn-success" href="{{route('gestion-turnos-nutricionista.iniciarConsulta', $turno->id)}}">Iniciar consulta</a>
-                                            <form action="{{ route('gestion-turnos-nutricionista.confirmarInasistencia', $turno->id) }}" method="POST" style="display: inline-block;">
+                                            <form id="inasistencia-form" action="{{ route('gestion-turnos-nutricionista.confirmarInasistencia', $turno->id) }}" method="POST" style="display: inline-block;">
                                                 @csrf
-                                                <button type="submit" class="btn btn-danger">No asistió</button>
+                                                <button type="button" class="btn btn-danger marcar-inasistencia">No asistió</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -181,6 +193,36 @@
             })
         @endif
 
+        @if (session('successConPlanesGenerados'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successConPlanesGenerados')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('successConPlanSeguimientoGenerado'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('successConPlanSeguimientoGenerado')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('success')}}",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        @endif
+
         @if (session('successSinPlanGenerado'))
             Swal.fire({
                 icon: 'success',
@@ -211,11 +253,11 @@
             })
         @endif
 
-        @if (session('errorPlanNoGenerado'))
+        @if (session('errorPlanesNoGenerados'))
             Swal.fire({
                 icon: 'error',
                 title: '¡Error!',
-                text: "{{session('errorPlanNoGenerado')}}",
+                text: "{{session('errorPlanesNoGenerados')}}",
                 showConfirmButton: false,
                 timer: 3000
             })
@@ -282,6 +324,50 @@
                         }
                     }
                 ]
+            });
+        });
+
+        //SweetAlert Confirmar inasistencia
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmarInasistencia = document.querySelectorAll('.marcar-inasistencia');
+
+            confirmarInasistencia.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de marcar la inasistencia del paciente?',
+                        text: "Al confirmar no se podrá modificar el estado del turno.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Confirmar inasistencia!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('inasistencia-form');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se marcó la inasistencia!',
+                            'El plan aún no se asoció al paciente, puede realizar modificaciones en el mismo.',
+                            'error'
+                            )
+                        }
+                    })
+                });
             });
         });
     </script>

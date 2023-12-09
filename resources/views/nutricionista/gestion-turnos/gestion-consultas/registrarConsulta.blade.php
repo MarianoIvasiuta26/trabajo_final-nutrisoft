@@ -405,9 +405,8 @@
                         </div>
 
 
-                        <div class="row mt-3">
-                            <div class="col-12 d-flex justify-content-end">
-                                <button type="button" class="btn btn-success guardar-button">Guardar</button>
+                        <div class="row mt-3 float-right">
+                            <div class="col-auto">
                                 <form action="{{ route('gestion-turnos-nutricionista.index') }}" method="GET">
                                     @csrf
                                     <button class="btn btn-danger ml-2 cancelar-button" type="button">
@@ -415,6 +414,11 @@
                                     </button>
                                 </form>
                             </div>
+
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-success guardar-button">Guardar</button>
+                            </div>
+
                         </div>
                     </form>
                 </div>
@@ -1539,6 +1543,13 @@
             // Agrega un controlador de clic a cada botón de eliminar
             cancelarButton.forEach(function (button) {
                 button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
                     // Muestra un SweetAlert de confirmación
                     swalWithBootstrapButtons.fire({
                         title: '¿Está seguro de cancelar el registro de la consulta?',
@@ -1546,11 +1557,15 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, cancelar registro de consulta.',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: 'Cancelar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
-                            button.closest('form').submit();
+                            //button.closest('form').submit();
+                            window.location.href = '{{ route('gestion-turnos-nutricionista.index') }}';
                         }
                     });
                 });
@@ -1577,7 +1592,7 @@
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: '¡Si, registrar consulta!',
-                        confirmButtonColor: '#3085d6',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: '¡No, cancelar!',
                         cancelButtonColor: '#d33',
                         reverseButtons: true

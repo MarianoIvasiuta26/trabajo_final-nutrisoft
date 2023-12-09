@@ -341,7 +341,7 @@
                 <form class="mt-3" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
                 @csrf
                 <div class="row mt-3">
-                    <h5>Anamnesis Alimentaria</h5>
+                    <h5>Gustos alimenticios</h5>
                     <div class="col-md-6">
                         <label for="gustos" class="form-label">Seleccione sus alimentos preferidos</label>
                         <select name="alimentos_gustos[]" class="form-select" id="gustos" data-placeholder="Alimentos preferidos..." multiple>
