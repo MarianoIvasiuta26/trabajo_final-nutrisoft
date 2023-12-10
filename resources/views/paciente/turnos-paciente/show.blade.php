@@ -3,15 +3,15 @@
 @section('title', 'Mis turnos')
 
 @section('content_header')
-    <h1>Turno - {{$paciente->user->name}}</h1>
+
 @stop
 
 @section('content')
 
 
-    <div class="card card-dark">
+    <div class="card card-dark mt-3">
         <div class="card-header">
-            <h5>Turno {{$turno->id}}</h5>
+            <h5>Turno - {{$paciente->user->apellido}}, {{$paciente->user->name}}</h5>
         </div>
         <div class="card-body">
             <table class="table table-striped" id="turnos">
@@ -29,7 +29,7 @@
                 <tbody>
                     <tr>
                         <td>{{ $paciente->user->name }}</td>
-                        <td>{{ $turno->fecha }}</td>
+                        <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d/m/Y') }}</td>
                         <td>{{ $turno->hora }}</td>
                         <td>
                             @foreach ($historias_clinicas as $hitoriaClinica)
@@ -45,7 +45,11 @@
                                 @endif
                             @endforeach
                         </td>
-                        <td>{{ $turno->estado }}</td>
+                        <td>
+                            <span class="badge bg-{{$turno->estado == 'Cancelado' ? 'danger' : ($turno->estado == 'Realizado' ? 'success' : ($turno->estado == 'Inasistencia' ? 'secondary' : 'warning'))}}">
+                                {{ $turno->estado }}
+                            </span>
+                        </td>
                         <td>
                             @foreach ($profesionales as $profesional)
                                 @foreach ($horarios as $horario)
@@ -80,6 +84,11 @@
                                     <tr>
                                         <th scope="col">Altura Actual</th>
                                         <td>{{ $turno->consulta->altura_actual }} (cm)</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th scope="col">IMC</th>
+                                        <td>{{ $turno->consulta->imc_actual }}</td>
                                     </tr>
 
                                     <tr>

@@ -70,9 +70,15 @@
                                     @endforeach
                                 </td>
                                 <td> {{ $turno->motivo_consulta }} </td>
-                                <td>{{ $turno->estado }}</td>
+
                                 <td>
-                                    @if ($turno->estado != 'Pendiente')
+                                    <span class="badge bg-{{$turno->estado == 'Cancelado' ? 'danger' : ($turno->estado == 'Realizado' ? 'success' : ($turno->estado == 'Inasistencia' ? 'secondary' : 'warning'))}}">
+                                        {{ $turno->estado }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if ($turno->estado == 'Realizado')
                                         <a href="{{ route('turnos.show', $turno->id) }}" class="btn btn-primary btn-sm">Ver</a>
                                     @endif
                                 {{--   @if ($turno->estado == 'Pendiente')

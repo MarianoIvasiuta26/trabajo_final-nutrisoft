@@ -567,6 +567,7 @@
             </div>
 
             <div class="row mt-2">
+                <!-- Accoridon de historial de turnos -->
                 <div class="accordion accordion-flush-success" id="accordionFlushHistorialTurnos">
                     <div class="accordion-item">
                       <h2 class="accordion-header" id="flush-historial-turnos">
@@ -664,6 +665,7 @@
                                                 Historial de Turnos
                                             </button>
 
+                                            <!-- Modal historial de turnos -->
                                             <div class="modal fade" id="modal-historial-turnos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-xl">
                                                     <div class="modal-content">
@@ -672,7 +674,7 @@
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                     <div class="modal-body">
-                                                        <table class="table table-striped" id="turnos">
+                                                        <table class="table table-striped" id="tabla-turnos">
                                                             <thead>
                                                                 <tr>
                                                                     <th scope="col">Fecha</th>
@@ -764,6 +766,7 @@
             </div>
 
             <div class="row mt-2">
+                <!-- Accordion de planes de alimentación -->
                 <div class="accordion accordion-flush-success" id="accordionFlushPlanesAlimentacion">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="flush-planes-alimentacion">
@@ -830,6 +833,7 @@
                                             </div>
                                         </div>
 
+                                        <!-- Modal detalle del plan -->
                                         <div class="modal fade" id="modal-detalles-plan-alimentacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-xl">
                                                 <div class="modal-content">
@@ -851,9 +855,9 @@
                                                                 <td>{{ \Carbon\Carbon::parse($ultimoPlanAlimentacionPaciente->consulta->turno->fecha)->format('d/m/Y') }}</td>
                                                                 <td>
                                                                     @if ($ultimoPlanAlimentacionPaciente->estado == 1)
-                                                                        Activo
+                                                                        <span class="badge bg-success rounded-pill">Activo</span>
                                                                     @else
-                                                                        Inactivo
+                                                                        <span class="badge bg-danger rounded-pill">Inactivo</span>
                                                                     @endif
                                                                 </td>
                                                                 <td>
@@ -863,7 +867,7 @@
                                                         </tbody>
                                                     </table>
 
-                                                    <table class="table table-striped" id="turnos">
+                                                    <table class="table table-striped">
                                                         <thead>
                                                             <tr>
                                                                 <th scope="col">Alimento</th>
@@ -926,15 +930,16 @@
                                             </div>
                                         </div>
 
+                                        <!-- Modal Otros planes -->
                                         <div class="modal fade" id="modal-planes-alimentacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-xl">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="staticBackdropLabel">Detalles del Plan</h5>
+                                                        <h5 class="modal-title" id="staticBackdropLabel">Otros planes</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                     </div>
                                                 <div class="modal-body">
-                                                    <table class="table table-stripped">
+                                                    <table class="table table-stripped" id="tabla-otros-planes">
                                                         <thead>
                                                             <tr>
                                                                 <th scope="col">Fecha Generación</th>
@@ -944,98 +949,28 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            @forelse ($planesAlimentacionPaciente as $plan)
+                                                            @foreach ($planesAlimentacionPaciente as $plan)
                                                                 <tr>
                                                                     <td>{{ \Carbon\Carbon::parse($plan->consulta->turno->fecha)->format('d/m/Y') }}</td>
                                                                     <td>
                                                                         @if ($plan->estado == 1)
-                                                                            Activo
+                                                                        <span class="badge bg-success">Activo</span>
                                                                         @else
-                                                                            Inactivo
+                                                                            <span class="badge bg-danger">Inactivo</span>
                                                                         @endif
                                                                     </td>
                                                                     <td>
                                                                         {{$plan->descripcion}}
                                                                     </td>
                                                                     <td>
-                                                                        <button type="button" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#collapseExample-{{$plan->id}}" aria-expanded="false" aria-controls="collapseExample">
+                                                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#plan{{$plan->id}}">
                                                                             Ver detalles
                                                                         </button>
                                                                     </td>
                                                                 </tr>
-                                                            @empty
-
-                                                            @endforelse
-
+                                                            @endforeach
                                                         </tbody>
                                                     </table>
-
-                                                    @foreach ($planesAlimentacionPaciente as $plan)
-                                                        <div class="collapse mt-2" id="collapseExample-{{$plan->id}}">
-                                                            <div class="card card-body">
-                                                                <table class="table table-striped" id="turnos">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th scope="col">Alimento</th>
-                                                                            <th scope="col">Comida</th>
-                                                                            <th scope="col">Cantidad</th>
-                                                                            <th scope="col">Unidad de medida</th>
-                                                                            <th scope="col">Observación</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        @forelse ($detallesPlanesPlanes as $detallePlan)
-                                                                            @if ($detallePlan->plan_alimentacion_id == $plan->id)
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        @foreach ($alimentos as $alimento)
-                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                                {{ $alimento->alimento }}
-                                                                                            @endif
-                                                                                        @endforeach
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        @foreach ($alimentos as $alimento)
-                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                                {{ $detallePlan->horario_consumicion }}
-                                                                                            @endif
-                                                                                        @endforeach
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        @foreach ($alimentos as $alimento)
-                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                                {{ $detallePlan->cantidad }}
-                                                                                            @endif
-                                                                                        @endforeach
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        @foreach ($alimentos as $alimento)
-                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                                {{ $detallePlan->unidad_medida }}
-                                                                                            @endif
-                                                                                        @endforeach
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        @foreach ($alimentos as $alimento)
-                                                                                            @if ($detallePlan->alimento_id == $alimento->id)
-                                                                                                {{ $detallePlan->observacion }}
-                                                                                            @endif
-                                                                                        @endforeach
-                                                                                    </td>
-                                                                                </tr>
-                                                                            @endif
-                                                                        @empty
-                                                                            <tr>
-                                                                                <td>
-                                                                                    <span class="text-danger">No se registraron alimentos</span>
-                                                                                </td>
-                                                                            </tr>
-                                                                        @endforelse
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    @endforeach
 
                                                 </div>
                                                 <div class="modal-footer">
@@ -1057,6 +992,7 @@
             </div>
 
             <div class="row mt-2">
+                <!-- Accordion de gustos alimenticios -->
                 <div class="accordion accordion-flush-success" id="accordionFlushGustosAlimenticios">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="flush-gustos-alimenticios">
@@ -1112,12 +1048,92 @@
         </div>
     </div>
 
+    @foreach ($planesAlimentacionPaciente as $plan)
+        <div class="modal fade" id="plan{{$plan->id}}" data-bs-backdrop="static" tabindex="-1" aria-labelledby="plan{{$plan->id}}Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="plan{{$plan->id}}Label">Detalles plan</h5>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped" id="turnos">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Alimento</th>
+                                    <th scope="col">Comida</th>
+                                    <th scope="col">Cantidad</th>
+                                    <th scope="col">Unidad de medida</th>
+                                    <th scope="col">Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($detallesPlanesPlanes as $detallePlan)
+                                    @if ($detallePlan->plan_alimentacion_id == $plan->id)
+                                        <tr>
+                                            <td>
+                                                @foreach ($alimentos as $alimento)
+                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                        {{ $alimento->alimento }}
+                                                    @endif
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @foreach ($alimentos as $alimento)
+                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                        {{ $detallePlan->horario_consumicion }}
+                                                    @endif
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @foreach ($alimentos as $alimento)
+                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                        {{ $detallePlan->cantidad }}
+                                                    @endif
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @foreach ($alimentos as $alimento)
+                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                        {{ $detallePlan->unidad_medida }}
+                                                    @endif
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @foreach ($alimentos as $alimento)
+                                                    @if ($detallePlan->alimento_id == $alimento->id)
+                                                        {{ $detallePlan->observacion }}
+                                                    @endif
+                                                @endforeach
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @empty
+                                    <tr>
+                                        <td>
+                                            <span class="text-danger">No se registraron alimentos</span>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="modal-footer">
+                        <a class="btn btn-danger" data-bs-toggle="modal" href="#modal-planes-alimentacion" role="button">Volver</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
 @stop
 
 @section('css')
     <link rel="stylesheet" href="/css/admin_custom.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
 
     <style>
         .seccion {
@@ -1191,7 +1207,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <!-- Moment.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <!-- datetime-moment CDN -->
+    <script src="https://cdn.datatables.net/datetime-moment/2.6.1/js/dataTables.dateTime.min.js"></script>
 
     <script>
 
@@ -1613,6 +1636,71 @@
                         }
                     })
                 });
+            });
+        });
+
+        //Datatables
+        $(document).ready(function(){
+            var table = $('#tabla-otros-planes').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ planes por página",
+                    "zeroRecords": "No se encontró ningún plan",
+                    "info": "Mostrando la página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay registros de planes",
+                    "infoFiltered": "(filtrado de _MAX_ planes totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+                },
+                order: [[ 0, "desc" ]],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    }
+                ]
+            });
+        });
+
+        $(document).ready(function(){
+            var table = $('#tabla-turnos').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ turnos por página",
+                    "zeroRecords": "No se encontró ningún turno",
+                    "info": "Mostrando la página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay registros de turnos",
+                    "infoFiltered": "(filtrado de _MAX_ turnos totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+                },
+                order: [[ 0, "desc" ]],
+                columnDefs: [
+                    {
+                        targets: 0, // Índice de la columna de fecha
+                        type: 'datetime-moment',
+                        render: function (data, type, row) {
+                            return type === 'sort' ? moment(data, 'DD-MM-YYYY').format('YYYY-MM-DD') : data;
+                        }
+                    }
+                ]
             });
         });
 
