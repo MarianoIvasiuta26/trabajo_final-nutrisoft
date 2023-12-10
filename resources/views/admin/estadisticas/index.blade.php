@@ -37,13 +37,13 @@
                     <!-- Filtros -->
                     <div class="collapse" id="filtros">
                         <div class="card card-body mt-2">
-                            <form action="{{ route('gestion-estadisticas.filtrosTratamiento') }}" method="GET">
+                            <form id="formFiltrosTratamiento" action="{{ route('gestion-estadisticas.filtrosTratamiento') }}" method="GET">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_inicio">Desde:</label>
                                         <input class="form-control" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', session('tratamientoFilters.fecha_inicio')) }}">
 
-                                        @error( 'fecha_desde' )
+                                        @error( 'fecha_inicio' )
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
@@ -52,14 +52,14 @@
                                         <label for="fecha_fin">Hasta:</label>
                                         <input class="form-control" type="date" name="fecha_fin" value="{{ old('fecha_fin', session('tratamientoFilters.fecha_fin')) }}">
 
-                                        @error('fecha_hasta')
+                                        @error('fecha_fin')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
                                 </div>
 
                                 <div class="justify-end float-right" style="display: inline-block;">
-                                    <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
+                                    <button class="btn btn-primary btn-sm" type="submit">Aplicar</button>
                                     <a href="{{route('gestion-estadisticas.clearTratamientoFilters')}}" class="btn btn-danger btn-sm">Borrar filtros</a>
                                 </div>
 
@@ -148,7 +148,7 @@
                     <div class="collapse" id="filtrosTag">
                         <div class="card card-body mt-2">
 
-                            <form action="{{ route('gestion-estadisticas.filtrosTag') }}" method="GET">
+                            <form id="formFiltrosTag" action="{{ route('gestion-estadisticas.filtrosTag') }}" method="GET">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_inicio">Desde:</label>
@@ -315,6 +315,7 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js" integrity="sha512-6HrPqAvK+lZElIZ4mZ64fyxIBTsaX5zAFZg2V/2WT+iKPrFzTzvx6QAsLW2OaLwobhMYBog/+bvmIEEGXi0p1w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
     <script>
         //Gráfico 1 - Frecuencia de tratamientos
@@ -484,6 +485,118 @@
                     },
                 }
             });
+        });
+
+        //-------------------------------AJAX para filtros-----------------------------------------------------------
+
+        $(document).ready(function () {
+            // Capturar el evento de envío del formulario de filtros de tratamiento
+            $('#formFiltrosTratamiento').submit(function (e) {
+                e.preventDefault(); // Evitar el envío del formulario tradicional
+
+                // Realizar la llamada AJAX
+                $.ajax({
+                    type: 'GET',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        console.log('Respuesta completa: ', response);
+
+                        // Actualizar el gráfico de tratamiento (supongamos que usas Chart.js)
+                        actualizarGraficoTratamiento(response.labels, response.data);
+
+                        // También puedes actualizar la tabla de datos tratamientos
+                        actualizarTablaTratamientos(response.todosTratamientos, response.tratamientosPorPaciente);
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error en la solicitud AJAX:', error);
+                        // Puedes mostrar un mensaje de error al usuario si lo deseas
+                    }
+                });
+            });
+
+            // Capturar el evento de envío del formulario de filtros de tags
+            $('#formFiltrosTag').submit(function (e) {
+                e.preventDefault(); // Evitar el envío del formulario tradicional
+
+                // Realizar la llamada AJAX
+                $.ajax({
+                    type: 'GET',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        // Actualizar el gráfico de tags (supongamos que usas Chart.js)
+                        actualizarGraficoTags(response.labels2, response.data2);
+
+                        // También puedes actualizar la tabla de datos tags
+                        actualizarTablaTags(response.labels2, response.cantidadTags);
+
+                        console.log(response);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+            // Función para actualizar el gráfico de tratamiento (ejemplo usando Chart.js)
+            function actualizarGraficoTratamiento(labels, data) {
+                // Actualizar los datos del gráfico
+                myChart.data.labels = labels;
+                myChart.data.datasets[0].data = data;
+
+                // Actualizar el gráfico
+                myChart.update();
+
+            }
+
+            // Función para actualizar la tabla de datos tratamientos
+            function actualizarTablaTratamientos(todosTratamientos,tratamientosPorPaciente) {
+                var tablaTratamientos = $('#tabla-tratamientos').DataTable();
+                tablaTratamientos.clear().draw(); // Limpiar y redibujar la tabla antes de actualizar
+
+                $.each(todosTratamientos, function (index, tratamiento) {
+                    $.each(tratamientosPorPaciente, function (index, porPaciente) {
+                        if (porPaciente.tratamiento_id == tratamiento.id) {
+                            // Agregar una nueva fila a la tabla con los datos actualizados
+                            var fechaFormateada = moment(porPaciente.fecha_alta).format('DD/MM/YYYY');
+                            tablaTratamientos.row.add([
+                                tratamiento.tratamiento,
+                                fechaFormateada
+                            ]).draw(false);
+                        }
+                    });
+                });
+
+            }
+
+            // Función para actualizar el gráfico de tags (ejemplo usando Chart.js)
+            function actualizarGraficoTags(labels, data) {
+
+                // Actualizar los datos del gráfico
+                myChart2.data.labels = labels;
+                myChart2.data.datasets[0].data = data;
+
+                // Actualizar el gráfico
+                myChart2.update();
+            }
+
+            // Función para actualizar la tabla de datos tags
+            function actualizarTablaTags(labels2, cantidadTags) {
+                var tablaDiagnostico = $('#tabla-diagnosticos').DataTable();
+                tablaDiagnostico.clear().draw(); // Limpiar y redibujar la tabla antes de actualizar
+
+                $.each(labels2, function (index, tagUsada) {
+                    // Agregar una nueva fila a la tabla con los datos actualizados
+                    tablaDiagnostico.row.add([
+                        tagUsada,
+                        cantidadTags[tagUsada] || 0
+                    ]).draw(false);
+                });
+            }
+            
+
         });
     </script>
 @stop

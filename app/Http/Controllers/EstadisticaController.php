@@ -100,7 +100,7 @@ class EstadisticaController extends Controller
 
         return view('admin.estadisticas.index', compact(
                 'labels', 'data', 'fechaInicio', 'fechaFin', 'labels2', 'data2', 'todosTratamientos', 'tratamientosPorPaciente',
-                'turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'todosTags', 'tagsPorDiagnostico',
+                'turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'todosTags', 'tagsPorDiagnostico', 'cantidadTags',
                 'labels3', 'data3', 'alimentos', 'detallesPlanAlimentación'
             )
         );
@@ -158,9 +158,14 @@ class EstadisticaController extends Controller
         $todosTratamientos = Tratamiento::all();
 
         // Obtener las fechas de inicio y fin desde la solicitud
+        /*
         $tratamientoFilters = session('tratamientoFilters', []);
         $fechaInicio = $tratamientoFilters['fecha_inicio'] ?? null;
         $fechaFin = $tratamientoFilters['fecha_fin'] ?? null;
+        */
+
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
 
         // Lógica para filtrar por fechas en tu consulta
         $frecuenciaTratamientos = TratamientoPorPaciente::join('tratamientos', 'tratamientos.id', '=', 'tratamiento_por_pacientes.tratamiento_id')
@@ -187,35 +192,10 @@ class EstadisticaController extends Controller
             ->where('fecha_alta', '<=', $fechaFin)
             ->get();
 
-        //---------------------2do Gráfico - Tags de Diagnósticos---------------------//
-
-        $turnos = Turno::all();
-        $pacientes = Paciente::all();
-        $historiasClinicas = HistoriaClinica::all();
-        $tipoConsultas = TipoConsulta::all();
-
-        $todosTags = Tag::all();
-        $tagsPorDiagnostico = TagsDiagnostico::all();
-
-        // Obtener las etiquetas y la cantidad de veces que se usan
-        $etiquetasYCantidad = $this->obtenerEtiquetasYCantidad();
-
-        // Usar los resultados en tu vista
-        $labels2 = $etiquetasYCantidad['tagsUsadas'];
-        $cantidadTags = $etiquetasYCantidad['cantidadTags'];
-
-        // Obtener el porcentaje de cada tag desde la base de datos en la tabla TagsDiagnosticos
-        $porcentajeTags = Tag::join('tags_diagnosticos', 'tags.id', '=', 'tags_diagnosticos.tag_id')
-            ->groupBy('tags_diagnosticos.tag_id', 'tags.name')
-            ->selectRaw('tags.name, count(*) * 100 / (select count(*) from tags_diagnosticos) as porcentaje')
-            ->pluck('porcentaje', 'name');
-
-
-        // Obtener las etiquetas y datos para el gráfico
-        $data2 = $porcentajeTags->values(); // Porcentaje de cada tag
-
         // Almacena los filtros en variables de sesión
         session(['tratamientoFilters' => $request->all()]);
+
+        /*
 
         return view('admin.estadisticas.index', compact(
                 'labels', 'data','todosTratamientos', 'tratamientosPorPaciente',
@@ -223,43 +203,23 @@ class EstadisticaController extends Controller
                 'labels2', 'data2', 'fechaInicio', 'fechaFin'
             )
         )->with(['fechaInicio' => $fechaInicio, 'fechaFin' => $fechaFin]);
+        */
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => $data,
+            'todosTratamientos' => $todosTratamientos,
+            'tratamientosPorPaciente' => $tratamientosPorPaciente
+        ]);
     }
 
     public function filtrosTag(Request $request)
     {
-
-        $tagsFilters = session('tagsFilters', []);
-        $fechaInicio = $tagsFilters['fecha_inicio'] ?? null;
-        $fechaFin = $tagsFilters['fecha_fin'] ?? null;
-
-        $todosTratamientos = Tratamiento::all();
-        $tratamientosPorPaciente = TratamientoPorPaciente::all();
-
-        // Obtener la frecuencia de cada tratamiento desde la base de datos
-        $frecuenciaTratamientos = TratamientoPorPaciente::join('tratamientos', 'tratamientos.id', '=', 'tratamiento_por_pacientes.tratamiento_id')
-            ->groupBy('tratamiento_por_pacientes.tratamiento_id', 'tratamientos.tratamiento')
-            ->selectRaw('tratamientos.tratamiento, count(*) as total')
-            ->pluck('total', 'tratamiento');
-
-        // Completar la frecuencia con tratamientos que no tienen registros
-        $frecuenciaCompleta = $todosTratamientos->map(function ($tratamiento) use ($frecuenciaTratamientos) {
-            $nombreTratamiento = $tratamiento->tratamiento;
-            $frecuencia = $frecuenciaTratamientos->get($nombreTratamiento, 0);
-            return $frecuencia;
-        });
-
-        // Obtener las etiquetas y datos para el gráfico
-        $labels = $todosTratamientos->pluck('tratamiento'); // Nombres de los tratamientos
-        $data = $frecuenciaCompleta->values(); // Frecuencia de cada tratamiento
-
         //---------------------2do Gráfico - Tags de Diagnósticos---------------------//
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
 
         $todosTags = Tag::all();
-
-        $turnos = Turno::all();
-        $pacientes = Paciente::all();
-        $historiasClinicas = HistoriaClinica::all();
-        $tipoConsultas = TipoConsulta::all();
 
         // Obtener las fechas de inicio y fin desde la solicitud
         $fechaInicio = $request->input('fecha_inicio');
@@ -285,17 +245,27 @@ class EstadisticaController extends Controller
         // Almacena los filtros en variables de sesión
         session(['tagsFilters' => $request->all()]);
 
+        /*
+
         return view('admin.estadisticas.index', compact(
                 'turnos', 'pacientes', 'historiasClinicas', 'tipoConsultas', 'labels2', 'data2', 'tagsPorDiagnostico', 'todosTags', 'cantidadTags'
 
             )
         )->with(['fechaInicio' => $fechaInicio, 'fechaFin' => $fechaFin]);
+        */
 
+        return response()->json([
+            'labels2' => $labels2,
+            'data2' => $data2,
+            'tagsPorDiagnostico' => $tagsPorDiagnostico,
+            'todosTags' => $todosTags,
+            'cantidadTags' => $cantidadTags
+        ]);
     }
 
     public function clearTratamientoFilters()
-{
-    session()->forget('tratamientoFilters');
+    {
+        session()->forget('tratamientoFilters');
         session()->forget('tratamientoFilters');
         return $this->index();
     }
