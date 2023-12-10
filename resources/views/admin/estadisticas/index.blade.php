@@ -248,7 +248,7 @@
                     <div class="collapse" id="filtrosAlimentosRecomendados">
                         <div class="card card-body mt-2">
 
-                            <form action="{{ route('gestion-estadisticas.filtrosTag') }}" method="GET">
+                            <form id="formFiltrosAlimentosRecomendados" action="{{ route('gestion-estadisticas.filtrosAlimentosRecomendados') }}" method="GET">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="fecha_inicio">Desde:</label>
@@ -540,6 +540,32 @@
                 });
             });
 
+            // Capturar el evento de envío del formulario de filtros de alimentos recomendados
+            $('#formFiltrosAlimentosRecomendados').submit(function (e) {
+                e.preventDefault(); // Evitar el envío del formulario tradicional
+
+                // Realizar la llamada AJAX
+                $.ajax({
+                    type: 'GET',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        console.log('Respuesta completa: ', response);
+
+                        // Actualizar el gráfico de tratamiento (supongamos que usas Chart.js)
+                        actualizarGraficoAlimentosRecomendados(response.labels3, response.data3);
+
+                        // También puedes actualizar la tabla de datos tratamientos
+                        actualizarTablaAlimentosRecomendados(response.alimentos, response.detallesPlanAlimentación);
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error en la solicitud AJAX:', error);
+                        // Puedes mostrar un mensaje de error al usuario si lo deseas
+                    }
+                });
+            });
+
             // Función para actualizar el gráfico de tratamiento (ejemplo usando Chart.js)
             function actualizarGraficoTratamiento(labels, data) {
                 // Actualizar los datos del gráfico
@@ -595,7 +621,37 @@
                     ]).draw(false);
                 });
             }
-            
+
+            // Función para actualizar el gráfico de alimentos recomendados (ejemplo usando Chart.js)
+            function actualizarGraficoAlimentosRecomendados(labels3, data3) {
+
+                // Actualizar los datos del gráfico
+                myChart3.data.labels = labels3;
+                myChart3.data.datasets[0].data = data3;
+
+                // Actualizar el gráfico
+                myChart3.update();
+            }
+
+            // Función para actualizar la tabla de datos alimentos recomendados
+            function actualizarTablaAlimentosRecomendados(alimentos, detallesPlanAlimentación) {
+                var tablaAlimentosRecomendados = $('#tabla-alimentos-recomendados').DataTable();
+                tablaAlimentosRecomendados.clear().draw(); // Limpiar y redibujar la tabla antes de actualizar
+
+                $.each(alimentos, function (index, alimento) {
+                    $.each(detallesPlanAlimentación, function (index, detalle) {
+                        if (detalle.alimento_id == alimento.id) {
+                            // Agregar una nueva fila a la tabla con los datos actualizados
+                            tablaAlimentosRecomendados.row.add([
+                                alimento.alimento,
+                                detalle.cantidad,
+                                detalle.unidad_medida
+                            ]).draw(false);
+                        }
+                    });
+                });
+            }
+
 
         });
     </script>

@@ -263,6 +263,35 @@ class EstadisticaController extends Controller
         ]);
     }
 
+    public function filtrosAlimentosRecomendados(Request $request)
+    {
+        //---------------------3er Gráfico - Alimentos Recomendados---------------------//
+        $fechaInicio = $request->input('fecha_inicio');
+        $fechaFin = $request->input('fecha_fin');
+
+        $alimentos = Alimento::all();
+        $detallesPlanAlimentación = DetallePlanAlimentaciones::all();
+
+        // Obtener las etiquetas y la cantidad de veces que se usan con filtros
+        $alimentosYCantidad = $this->obtenerAlimentosYCantidad($fechaInicio, $fechaFin);
+
+        // Usar los resultados en tu vista
+        $labels3 = $alimentosYCantidad['alimentosUsados'];
+        $data3 = $alimentosYCantidad['cantidadAlimentos'];
+
+        $detallesPlanAlimentación = DetallePlanAlimentaciones::whereBetween(DB::raw('DATE(created_at)'), [$fechaInicio, $fechaFin])->get();
+
+        // Almacena los filtros en variables de sesión
+        session(['alimentosFilters' => $request->all()]);
+
+        return response()->json([
+            'labels3' => $labels3,
+            'data3' => $data3,
+            'alimentos' => $alimentos,
+            'detallesPlanAlimentación' => $detallesPlanAlimentación
+        ]);
+    }
+
     public function clearTratamientoFilters()
     {
         session()->forget('tratamientoFilters');

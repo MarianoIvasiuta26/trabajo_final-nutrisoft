@@ -112,6 +112,7 @@ Route::middleware([
     Route::resource('gestion-estadisticas', EstadisticaController::class)->names('gestion-estadisticas');
     Route::get('gestion-estadisticas.filtrosTratamiento', [EstadisticaController::class, 'filtrosTratamiento'])->name('gestion-estadisticas.filtrosTratamiento');
     Route::get('gestion-estadisticas.filtrosTag', [EstadisticaController::class, 'filtrosTag'])->name('gestion-estadisticas.filtrosTag');
+    Route::get('gestion-estadisticas.filtrosAlimentosRecomendados', [EstadisticaController::class, 'filtrosAlimentosRecomendados'])->name('gestion-estadisticas.filtrosAlimentosRecomendados');
     Route::any('gestion-estadisticas.clearTratamientoFilters',[EstadisticaController::class,'clearTratamientoFilters'])->name('gestion-estadisticas.clearTratamientoFilters');
     Route::any('gestion-estadisticas.clearTagsFilters',[EstadisticaController::class,'clearTagsFilters'])->name('gestion-estadisticas.clearTagsFilters');
 
