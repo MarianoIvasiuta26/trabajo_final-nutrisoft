@@ -334,7 +334,7 @@ class PlanAlimentacionController extends Controller
         $planAConfirmar->estado = 1;
         $planAConfirmar->save();
 
-        return redirect()->route('gestion-turnos-nutricionista.index')->with('successPlanConfirmado', 'Plan de alimentación confirmado y asociado al paciente.');
+        return redirect()->route('plan-alimentacion.planesAlimentacionAConfirmar')->with('successPlanConfirmado', 'Plan de alimentación confirmado y asociado al paciente.');
 
     }
 

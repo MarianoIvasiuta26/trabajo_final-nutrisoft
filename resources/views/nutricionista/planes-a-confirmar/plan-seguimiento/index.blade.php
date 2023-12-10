@@ -218,5 +218,49 @@
             });
         });
 
+        //SweetAlert Confirmar plan
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmarPlan = document.querySelectorAll('.confirmar-button');
+
+            confirmarPlan.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar el plan de seguimiento generado?',
+                        text: "Al confirmar se asociará el plan al paciente correspondiente.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: '¡Confirmar plan!',
+                        confirmButtonColor: '#198754',
+                        cancelButtonText: '¡No, cancelar!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('confirmar-form');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardó el plan de seguimiento!',
+                            'El plan aún no se asoció al paciente, puede realizar modificaciones en el mismo.',
+                            'error'
+                            )
+                        }
+                    })
+                });
+            });
+        });
+
     </script>
 @stop

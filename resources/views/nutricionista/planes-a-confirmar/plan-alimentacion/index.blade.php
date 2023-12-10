@@ -217,8 +217,8 @@
             });
         });
 
-         //SweetAlert Confirmar plan
-         document.addEventListener('DOMContentLoaded', function () {
+        //SweetAlert Confirmar plan
+        document.addEventListener('DOMContentLoaded', function () {
             const confirmarPlan = document.querySelectorAll('.confirmar-button');
 
             confirmarPlan.forEach(button => {
@@ -237,7 +237,7 @@
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: '¡Confirmar plan!',
-                        confirmButtonColor: '#3085d6',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: '¡No, cancelar!',
                         cancelButtonColor: '#d33',
                         reverseButtons: true
