@@ -98,150 +98,152 @@
                                     @foreach ($tiposActividades as $tipoActividad)
                                         @foreach ($actividadesPorTipo as $tipo)
                                             @foreach ($unidadesTiempo as $tiempo)
-                                                @if ($detalle->act_rec_id == $recomendada->id && $detalle->actividad_id == $tipo->actividad_id && $detalle->tiempo_realizacion == $recomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $tiempo->nombre_unidad_tiempo && $tiempo->id == $recomendada->unidad_tiempo_id && $recomendada->act_tipoAct_id == $tipo->id && $tipoActividad->id == $tipo->tipo_actividad_id)
-                                                    <tr style="text-align: center;">
-                                                        <!-- Actividad -->
-                                                        <td>
-                                                            @foreach ($actividades as $actividad)
-                                                                @if ($actividad->id == $detalle->actividad_id)
-                                                                    {{$actividad->actividad}}
-                                                                @endif
-                                                            @endforeach
-                                                        </td>
-                                                        <!-- Tipo de actividad -->
-                                                        <td>
-                                                            @foreach ($actividades as $actividad)
-                                                                @if ($actividad->id == $detalle->actividad_id && $detalle->actividad_id == $tipo->actividad_id)
-                                                                    <span class="badge bg-primary">{{$tipoActividad->tipo_actividad}}</span>
-                                                                @endif
-                                                            @endforeach
-                                                        </td>
-                                                        <!-- Duración -->
-                                                        <td>
-                                                            @foreach ($actividades as $actividad)
-                                                                @if ($actividad->id == $detalle->actividad_id && $detalle->actividad_id == $tipo->actividad_id)
-                                                                    {{$detalle->tiempo_realizacion}} {{$detalle->unidad_tiempo_realizacion}}
-                                                                @endif
-                                                            @endforeach
-                                                        </td>
-                                                        <!-- Recursos externos -->
-                                                        <td>
-                                                            @foreach ($actividades as $actividad)
-                                                                @if ($actividad->id == $detalle->actividad_id)
-                                                                    {{$detalle->recursos_externos}}
-                                                                @endif
-                                                            @endforeach
-                                                        </td>
-                                                        <!-- Acciones -->
-                                                        <td>
-                                                            <div>
-                                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit_{{$detalle->id}}">
-                                                                    <span class="far fa-edit"></span>
-                                                                </button>
-                                                                <form action="{{route('plan-seguimiento.destroy', $detalle->id)}}" method="POST" style="display: inline;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="button" class="btn btn-danger delete-button">
-                                                                        <span class="far fa-trash-alt"></span>
+                                                @if ($detalle->act_rec_id == $recomendada->id)
+                                                    @if ($detalle->actividad_id == $tipo->actividad_id && $detalle->tiempo_realizacion == $recomendada->duracion_actividad && $detalle->unidad_tiempo_realizacion == $tiempo->nombre_unidad_tiempo && $tiempo->id == $recomendada->unidad_tiempo_id && $recomendada->act_tipoAct_id == $tipo->id && $tipoActividad->id == $tipo->tipo_actividad_id)
+                                                        <tr style="text-align: center;">
+                                                            <!-- Actividad -->
+                                                            <td>
+                                                                @foreach ($actividades as $actividad)
+                                                                    @if ($actividad->id == $detalle->actividad_id)
+                                                                        {{$actividad->actividad}}
+                                                                    @endif
+                                                                @endforeach
+                                                            </td>
+                                                            <!-- Tipo de actividad -->
+                                                            <td>
+                                                                @foreach ($actividades as $actividad)
+                                                                    @if ($actividad->id == $detalle->actividad_id && $detalle->actividad_id == $tipo->actividad_id)
+                                                                        <span class="badge bg-primary">{{$tipoActividad->tipo_actividad}}</span>
+                                                                    @endif
+                                                                @endforeach
+                                                            </td>
+                                                            <!-- Duración -->
+                                                            <td>
+                                                                @foreach ($actividades as $actividad)
+                                                                    @if ($actividad->id == $detalle->actividad_id && $detalle->actividad_id == $tipo->actividad_id)
+                                                                        {{$detalle->tiempo_realizacion}} {{$detalle->unidad_tiempo_realizacion}}
+                                                                    @endif
+                                                                @endforeach
+                                                            </td>
+                                                            <!-- Recursos externos -->
+                                                            <td>
+                                                                @foreach ($actividades as $actividad)
+                                                                    @if ($actividad->id == $detalle->actividad_id)
+                                                                        {{$detalle->recursos_externos}}
+                                                                    @endif
+                                                                @endforeach
+                                                            </td>
+                                                            <!-- Acciones -->
+                                                            <td>
+                                                                <div>
+                                                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#edit_{{$detalle->id}}">
+                                                                        <span class="far fa-edit"></span>
                                                                     </button>
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-
-                                                    <!-- Modal Edit-->
-                                                    <div class="modal fade" id="edit_{{$detalle->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="edit_{{$detalle->id}}Label" aria-hidden="true">
-                                                        <div class="modal-dialog modal-xl">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title" id="edit_{{$detalle->id}}Label">
-                                                                        Editar actividad del plan de seguimiento
-                                                                    </h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <form id="editForm" action="{{route('plan-seguimiento.update', $detalle->id)}}" method="POST">
+                                                                    <form action="{{route('plan-seguimiento.destroy', $detalle->id)}}" method="POST" style="display: inline;">
                                                                         @csrf
-                                                                        @method('PUT')
-
-                                                                        <div class="row">
-                                                                            <div class="col-md-4">
-                                                                                <label for="actividad">Actividad</label>
-                                                                                <select id="actividadSelect" class="form-select" name="actividad">
-                                                                                    <option value="" disabled>Seleccione una actividad</option>
-                                                                                    @foreach ($actividades as $actividad)
-                                                                                        @foreach ($detallesPlan as $detallePlan)
-                                                                                            @if ($detalle->id == $detallePlan->id)
-                                                                                                @if ($detallePlan->actividad_id == $actividad->id)
-                                                                                                    <option value="{{$actividad->id}}" selected>{{$actividad->actividad}}</option>
-                                                                                                @else
-                                                                                                    <option value="{{$actividad->id}}">{{$actividad->actividad}}</option>
-                                                                                                @endif
-                                                                                            @endif
-                                                                                        @endforeach
-                                                                                    @endforeach
-                                                                                </select>
-                                                                                @error('actividad')
-                                                                                    <small class="text-danger">{{$message}}</small>
-                                                                                @enderror
-                                                                            </div>
-
-                                                                            <div class="col-md-4">
-                                                                                <label for="duracion">Duración</label>
-                                                                                <input type="text" id="duracionInput" class="form-control" name="duracion" value="{{$detalle->tiempo_realizacion}}">
-                                                                                @error('duracion')
-                                                                                    <small class="text-danger">{{$message}}</small>
-                                                                                @enderror
-                                                                            </div>
-
-                                                                            <div class="col-md-4">
-                                                                                <label for="unidad_tiempo">Unidad de tiempo</label>
-                                                                                <select class="form-select" name="unidad_tiempo" id="">
-                                                                                    <option value="" disabled>Seleccione la unidad de medida</option>
-                                                                                    @foreach ($unidadesTiempo as $unidad)
-                                                                                        @foreach ($detallesPlan as $detallePlan)
-                                                                                            @if ($detalle->id == $detallePlan->id && $unidad->nombre_unidad_tiempo != 'Sin unidad de tiempo')
-                                                                                                @if ($detallePlan->unidad_tiempo_realizacion == $unidad->nombre_unidad_tiempo)
-                                                                                                    <option value="{{$unidad->nombre_unidad_tiempo}}" selected>{{$unidad->nombre_unidad_tiempo}}</option>
-                                                                                                @else
-                                                                                                    <option value="{{$unidad->nombre_unidad_tiempo}}">{{$unidad->nombre_unidad_tiempo}}</option>
-                                                                                                @endif
-                                                                                            @endif
-                                                                                        @endforeach
-                                                                                    @endforeach
-                                                                                </select>
-
-                                                                                @error('unidad_tiempo')
-                                                                                    <small class="text-danger">{{$message}}</small>
-                                                                                @enderror
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="row mt-3">
-                                                                            <div class="col-md-12">
-                                                                                <label for="recursos_externos">Recursos externos</label>
-                                                                                <textarea class="form-control" name="recursos_externos" id="" cols="10" rows="5">{{$detalle->recursos_externos}}</textarea>
-                                                                                @error('recursos_externos')
-                                                                                    <small class="text-danger">{{$message}}</small>
-                                                                                @enderror
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="row mt-3 float-right">
-                                                                            <div class="col">
-                                                                                <button type="submit" class="btn btn-success">Guardar cambios</button>
-                                                                            </div>
-                                                                        </div>
-
+                                                                        @method('DELETE')
+                                                                        <button type="button" class="btn btn-danger delete-button">
+                                                                            <span class="far fa-trash-alt"></span>
+                                                                        </button>
                                                                     </form>
                                                                 </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                            </td>
+                                                        </tr>
+
+                                                        <!-- Modal Edit-->
+                                                        <div class="modal fade" id="edit_{{$detalle->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="edit_{{$detalle->id}}Label" aria-hidden="true">
+                                                            <div class="modal-dialog modal-xl">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="edit_{{$detalle->id}}Label">
+                                                                            Editar actividad del plan de seguimiento
+                                                                        </h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <form id="editForm" action="{{route('plan-seguimiento.update', $detalle->id)}}" method="POST">
+                                                                            @csrf
+                                                                            @method('PUT')
+
+                                                                            <div class="row">
+                                                                                <div class="col-md-4">
+                                                                                    <label for="actividad">Actividad</label>
+                                                                                    <select id="actividadSelect" class="form-select" name="actividad">
+                                                                                        <option value="" disabled>Seleccione una actividad</option>
+                                                                                        @foreach ($actividades as $actividad)
+                                                                                            @foreach ($detallesPlan as $detallePlan)
+                                                                                                @if ($detalle->id == $detallePlan->id)
+                                                                                                    @if ($detallePlan->actividad_id == $actividad->id)
+                                                                                                        <option value="{{$actividad->id}}" selected>{{$actividad->actividad}}</option>
+                                                                                                    @else
+                                                                                                        <option value="{{$actividad->id}}">{{$actividad->actividad}}</option>
+                                                                                                    @endif
+                                                                                                @endif
+                                                                                            @endforeach
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                    @error('actividad')
+                                                                                        <small class="text-danger">{{$message}}</small>
+                                                                                    @enderror
+                                                                                </div>
+
+                                                                                <div class="col-md-4">
+                                                                                    <label for="duracion">Duración</label>
+                                                                                    <input type="text" id="duracionInput" class="form-control" name="duracion" value="{{$detalle->tiempo_realizacion}}">
+                                                                                    @error('duracion')
+                                                                                        <small class="text-danger">{{$message}}</small>
+                                                                                    @enderror
+                                                                                </div>
+
+                                                                                <div class="col-md-4">
+                                                                                    <label for="unidad_tiempo">Unidad de tiempo</label>
+                                                                                    <select class="form-select" name="unidad_tiempo" id="">
+                                                                                        <option value="" disabled>Seleccione la unidad de medida</option>
+                                                                                        @foreach ($unidadesTiempo as $unidad)
+                                                                                            @foreach ($detallesPlan as $detallePlan)
+                                                                                                @if ($detalle->id == $detallePlan->id && $unidad->nombre_unidad_tiempo != 'Sin unidad de tiempo')
+                                                                                                    @if ($detallePlan->unidad_tiempo_realizacion == $unidad->nombre_unidad_tiempo)
+                                                                                                        <option value="{{$unidad->nombre_unidad_tiempo}}" selected>{{$unidad->nombre_unidad_tiempo}}</option>
+                                                                                                    @else
+                                                                                                        <option value="{{$unidad->nombre_unidad_tiempo}}">{{$unidad->nombre_unidad_tiempo}}</option>
+                                                                                                    @endif
+                                                                                                @endif
+                                                                                            @endforeach
+                                                                                        @endforeach
+                                                                                    </select>
+
+                                                                                    @error('unidad_tiempo')
+                                                                                        <small class="text-danger">{{$message}}</small>
+                                                                                    @enderror
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="row mt-3">
+                                                                                <div class="col-md-12">
+                                                                                    <label for="recursos_externos">Recursos externos</label>
+                                                                                    <textarea class="form-control" name="recursos_externos" id="" cols="10" rows="5">{{$detalle->recursos_externos}}</textarea>
+                                                                                    @error('recursos_externos')
+                                                                                        <small class="text-danger">{{$message}}</small>
+                                                                                    @enderror
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="row mt-3 float-right">
+                                                                                <div class="col">
+                                                                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </form>
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
 
+                                                    @endif
                                                 @endif
                                             @endforeach
                                         @endforeach
@@ -377,7 +379,12 @@
                                                                                 <input class="form-check-input" type="checkbox" id="actividad{{$recomendada->id}}" name="actividades_seleccionadas[]" value="{{$recomendada->id}}"
                                                                                     @foreach ($detallesPlan as $detalle)
                                                                                         @foreach ($unidadesTiempo as $tiempo)
-                                                                                            @if($detalle->act_rec_id == $recomendada->id && $detalle->actividad_id == $actividad->id && $tiempo->id == $recomendada->unidad_tiempo_id && $tiempo->nombre_unidad_tiempo == $detalle->unidad_tiempo_realizacion) checked @endif
+                                                                                            @if($detalle->act_rec_id == $recomendada->id && $detalle->actividad_id == $actividad->id && $tiempo->id == $recomendada->unidad_tiempo_id
+                                                                                                && $tiempo->nombre_unidad_tiempo == $detalle->unidad_tiempo_realizacion || $detalle->actividad_id == $actividad->id)
+
+                                                                                            checked
+
+                                                                                            @endif
                                                                                         @endforeach
                                                                                     @endforeach
                                                                                 >

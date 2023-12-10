@@ -124,6 +124,10 @@
             cursor: pointer;
         }
 
+        .medallon:hover {
+            transform: scale(1.1);
+        }
+
         /* Estilos adicionales para diferentes medallones */
         .medallon-verde {
             background-color: #27ae60;

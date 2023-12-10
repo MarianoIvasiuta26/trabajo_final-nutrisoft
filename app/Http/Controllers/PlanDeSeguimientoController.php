@@ -257,6 +257,13 @@ class PlanDeSeguimientoController extends Controller
             'recursos_externos'=> ['nullable', 'string'],
         ]);
 
+        $unidadTiempo = UnidadesDeTiempo::where('nombre_unidad_tiempo', $request->input('unidad_tiempo'))->first();
+
+        $recomendada = ActividadRecPorTipoActividades::where('id', $detallePlan->act_rec_id)->first();
+        $recomendada->duracion_actividad = $request->input('duracion');
+        $recomendada->unidad_tiempo_id = $unidadTiempo->id;
+        $recomendada->save();
+
         $usuario = auth()->user()-> apellido . ' ' . auth()->user()->name;
 
         $detallePlan->actividad_id = $request->input('actividad');
