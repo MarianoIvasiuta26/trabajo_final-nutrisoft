@@ -139,7 +139,8 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <form id="formAddAlimento" action="" method="POST">
+                                    <form id="formAddAlimento" action="{{route('mi-seguimiento.registrarAlimentoConsumido')}}" method="POST">
+                                        @csrf
 
                                         <div class="row mt-3">
                                             <h5>Alimentos recomendados en el plan de alimentación</h5>
@@ -165,8 +166,8 @@
                                                                 </td>
                                                                 <td>
                                                                     <div class="form-check form-switch">
-                                                                        <input class="form-check-input" type="checkbox" name="alimentos[]" value="{{$detalle->id}}" id="alimentos_{{$detalle->id}}">
-                                                                        <label class="form-check-label" for="alimentos_{{$detalle->id}}">Consumido</label>
+                                                                        <input class="form-check-input" type="checkbox" name="alimentosPlan[]" value="{{$detalle->id}}" id="alimentosPlan_{{$detalle->id}}">
+                                                                        <label class="form-check-label" for="alimentosPlan_{{$detalle->id}}">Consumido</label>
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -188,7 +189,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                    <button type="button" class="btn btn-success add-rol">Guardar</button>
+                                    <button type="button" class="btn btn-success add-alimento">Guardar</button>
                                 </div>
                             </div>
                         </div>
@@ -238,7 +239,7 @@
                     <div class="row mt-3">
                         <div class="col-auto" style="margin: auto;" >
                             <div class="medallon medallon-amarillo">
-                                {{ $kcal }} kcal <br>
+                                {{ $alimentoConsumido->kcal }} kcal <br>
                             </div>
                         </div>
                     </div>
@@ -430,6 +431,48 @@
                         "previous": "Anterior"
                     },
                 }
+            });
+        });
+
+        //SweetAlert para guardar nuevo alimento
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarAlimento = document.querySelectorAll('.add-alimento');
+
+            guardarAlimento.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar el alimento consumido?',
+                        text: "Al confirmar se registrará el alimento consumido y calculará las kcal.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Guardar alimento!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('formAddAlimento');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardó el alimento!'
+                            )
+                        }
+                    })
+                });
             });
         });
 

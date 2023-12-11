@@ -473,7 +473,7 @@ class GestionConsultasController extends Controller
 
 
 
-        /*
+    /* Bucle que rormpe todo
 
         foreach ($alimentosRecomendados as $alimentoRecomendado) {
             foreach($alimentosPorDieta as $alimentoDieta){
@@ -516,7 +516,7 @@ class GestionConsultasController extends Controller
             }
         }
 
-        */
+    */
         //dd('hola');
         //$i = 0;
         $observacion = '';

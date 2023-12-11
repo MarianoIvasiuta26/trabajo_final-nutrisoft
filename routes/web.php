@@ -219,7 +219,7 @@ Route::middleware([
 
     //Seguimiento
     Route::resource('mi-seguimiento', SeguimientoPacienteController::class)->names('mi-seguimiento');
-    Route::post('mi-seguimiento.registrarAlimentoConsumido', [SeguimientoPacienteController::class, 'registrarConsumo'])->names('mi-seguimiento.registrarAlimentoConsumido');
+    Route::post('mi-seguimiento.registrarAlimentoConsumido', [SeguimientoPacienteController::class, 'registrarConsumo'])->name('mi-seguimiento.registrarAlimentoConsumido');
 
     //Proceso automatizado Generación automática de Planes de Alimentación
     Route::get('generar-plan-alimentacion', [GestionConsultasController::class, 'generarPlanesAlimentacion'])->name('generar-plan-alimentacion');
