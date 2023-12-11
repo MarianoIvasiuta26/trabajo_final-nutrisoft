@@ -352,7 +352,10 @@ class PlanAlimentacionController extends Controller
         $detallesPlan = DetallePlanAlimentaciones::where('plan_alimentacion_id', $plan->id)->get();
         $alimentos = Alimento::all();
         $comidas = Comida::all();
-        $pdf = Pdf::loadView('plan-alimentacion.pdf', compact('plan','detallesPlan','alimentos','comidas'));
+        $fechaActual = now()->format('d-m-Y');
+
+        $pdf = Pdf::loadView('plan-alimentacion.pdf', compact('plan','detallesPlan','alimentos','comidas', 'fechaActual'));
+
         return $pdf->stream();
     }
 
