@@ -108,14 +108,14 @@ class SeguimientoPacienteController extends Controller
             ->where('fecha_consumida', $fechaActual)
             ->get();
 
-        $kcal = 0;
+        $kcal = 0.00;
         $nutriente = Nutriente::where('nombre_nutriente', 'Valor energético')->first();
-
         if($alimentosConsumidos){
             foreach($alimentosConsumidos as $alimentoConsumido){
                 $alimento = Alimento::find($alimentoConsumido->alimento_id);
                 $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $alimento->id)->first();
-                $kcal = $kcal + ($valorN * $alimentoConsumido->cantidad_consumida);
+
+                $kcal = $kcal + ($valorN->valor * ($alimentoConsumido->cantidad / 100));
 
             }
         }else{
@@ -219,10 +219,11 @@ class SeguimientoPacienteController extends Controller
             foreach($alimentosPlan as $alimentoPlan){
                 $detalle = DetallePlanAlimentaciones::find($alimentoPlan);
                 $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $detalle->alimento_id)->first();
+
                 if($detalle->unidad_medida == 'Kcal'){
                     $kcal = $kcal + $detalle->cantidad;
                 }
-                $kcal = $kcal + ($valorN * $detalle->cantidad);
+                $kcal = $kcal + ($valorN->valor * ($detalle->cantidad/100));
                 $fechaActual = now()->format('Y-m-d');
                 RegistroAlimentosConsumidos::create([
                     'plan_de_seguimiento_id' => $planSeguimientoActivo->id,
@@ -240,12 +241,12 @@ class SeguimientoPacienteController extends Controller
             foreach($otrosAlimentos as $key => $otroAlimento){
                 $alimento = Alimento::find($otroAlimento);
                 $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $alimento->id)->first();
-
+                dd($valorN);
                 $unidad = UnidadesMedidasPorComida::find($unidades_de_medida[$key]);
                 if($unidad->nombre_unidad_medida == 'Kcal'){
                     $kcal = $kcal + $cantidades[$key];
                 }
-                $kcal = $kcal + ($valorN * $cantidades[$key]);
+                $kcal = $kcal + ($valorN->valor *( $cantidades[$key] / 100));
 
                 RegistroAlimentosConsumidos::create([
                     'plan_de_seguimiento_id' => $planSeguimientoActivo->id,

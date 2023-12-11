@@ -166,7 +166,11 @@
                                                                 </td>
                                                                 <td>
                                                                     <div class="form-check form-switch">
-                                                                        <input class="form-check-input" type="checkbox" name="alimentosPlan[]" value="{{$detalle->id}}" id="alimentosPlan_{{$detalle->id}}">
+                                                                        <input class="form-check-input" type="checkbox" name="alimentosPlan[]" value="{{$detalle->id}}" id="alimentosPlan_{{$detalle->id}}"
+                                                                            @if ($alimentosConsumidos->contains('alimento_id', $detalle->alimento_id))
+                                                                                checked
+                                                                            @endif
+                                                                        >
                                                                         <label class="form-check-label" for="alimentosPlan_{{$detalle->id}}">Consumido</label>
                                                                     </div>
                                                                 </td>
@@ -239,7 +243,7 @@
                     <div class="row mt-3">
                         <div class="col-auto" style="margin: auto;" >
                             <div class="medallon medallon-amarillo">
-                                {{ $alimentoConsumido->kcal }} kcal <br>
+                                {{ $kcal }} kcal <br>
                             </div>
                         </div>
                     </div>
