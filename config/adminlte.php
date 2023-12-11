@@ -325,15 +325,15 @@ return [
         ],
 
         [
-            'text' => 'Historia Clínica',
+            'text' => 'Mis datos',
             'route'  => 'historia-clinica.index',
-            'icon' => 'fas fa-file-medical fa-fw',
+            'icon' => 'fas fa-notes-medical fa-fw',
             'can' => 'historia-clinica.index',
         ],
 
         [
             'text' => 'Turnos',
-            'icon' => 'fas fa-file-medical fa-fw',
+            'icon' => 'fas fa-calendar-alt fa-fw',
             'can' => 'turnos',
             'submenu' => [
                 [
@@ -560,6 +560,12 @@ return [
                     'route'  => 'gestion-alimento-por-dietas.create',
                 ],
             ],
+        ],
+        [
+            'text' => 'Mi Seguimiento',
+            'icon' => 'fas fa-chart-line',
+            'route' => 'mi-seguimiento.index',
+            'can' => 'consultar-miSeguimiento'
         ],
         [
             'text' => 'Menú Semanal',

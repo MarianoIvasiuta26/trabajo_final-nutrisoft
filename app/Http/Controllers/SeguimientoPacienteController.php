@@ -3,9 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Alimento;
+use App\Models\DetallePlanAlimentaciones;
 use App\Models\DetallesPlanesSeguimiento;
+use App\Models\Nutriente;
 use App\Models\PlanAlimentaciones;
 use App\Models\PlanesDeSeguimiento;
+use App\Models\RegistroAlimentosConsumidos;
+use App\Models\UnidadesMedidasPorComida;
+use App\Models\ValorNutricional;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class SeguimientoPacienteController extends Controller
@@ -48,12 +55,40 @@ class SeguimientoPacienteController extends Controller
             $pesos[] = $consulta->peso_actual;
         }
 
+        $fechaHoy = Carbon::now();
 
-        return view('paciente.mi-seguimiento.index', compact('planAlimentacionActivo', 'planSeguimientoActivo', 'planesAlimentacionPaciente', 'planesSeguimientoPaciente', 'pesoIdeal', 'diagnostico', 'estadoIMC', 'fechas', 'pesos'));
+        //Alimentos consumidos
+        $alimentosConsumidos = RegistroAlimentosConsumidos::where('plan_de_seguimiento_id', $planSeguimientoActivo->id)
+            ->where('paciente_id', auth()->user()->paciente->id)
+            ->where('fecha_consumida', $fechaHoy)
+            ->get();
 
+        $kcal = 0;
+        $nutriente = Nutriente::where('nombre_nutriente', 'Valor energético')->first();
+
+        if($alimentosConsumidos){
+            foreach($alimentosConsumidos as $alimentoConsumido){
+                $alimento = Alimento::find($alimentoConsumido->alimento_id);
+                $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $alimento->id)->first();
+                $kcal = $kcal + ($valorN * $alimentoConsumido->cantidad_consumida);
+
+            }
+        }else{
+            $kcal = 0;
+        }
+
+        $alimentos = Alimento::all();
+        $unidades_de_medida = UnidadesMedidasPorComida::all();
+        $detallesPlanAlimentacionActivo = DetallePlanAlimentaciones::where('plan_alimentacion_id', $planAlimentacionActivo->id)->get();
+
+        return view('paciente.mi-seguimiento.index', compact('planAlimentacionActivo', 'planSeguimientoActivo', 'planesAlimentacionPaciente',
+            'planesSeguimientoPaciente', 'pesoIdeal', 'diagnostico', 'estadoIMC', 'fechas', 'pesos',
+            'alimentosConsumidos', 'kcal', 'alimentos', 'detallesPlanAlimentacionActivo', 'unidades_de_medida')
+        );
     }
 
-    public function calcularIMC($peso, $altura){
+    public function calcularIMC($peso, $altura)
+    {
         // Recopilamos los datos de la solicitud
         $pesoActual = floatval($peso);
         $alturaActual = floatval($altura);
@@ -97,6 +132,10 @@ class SeguimientoPacienteController extends Controller
 
     }
 
+    public function registrarConsumo(Request $request)
+    {
+
+    }
 
     /**
      * Show the form for creating a new resource.
