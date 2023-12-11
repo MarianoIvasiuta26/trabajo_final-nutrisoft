@@ -375,8 +375,9 @@ class PlanDeSeguimientoController extends Controller
         $actividadesPorTipo = ActividadesPorTiposDeActividades::all();
         $actividadesRecomendadas = ActividadRecPorTipoActividades::all();
         $unidadesTiempo = UnidadesDeTiempo::all();
+        $fechaActual = now()->format('d-m-Y');
 
-        $pdf = Pdf::loadView('plan-seguimiento.pdf', compact('plan','detallesPlan','actividades','tiposActividades', 'actividadesPorTipo', 'actividadesRecomendadas', 'unidadesTiempo'));
+        $pdf = Pdf::loadView('plan-seguimiento.pdf', compact('plan','detallesPlan','actividades','tiposActividades', 'actividadesPorTipo', 'actividadesRecomendadas', 'unidadesTiempo', 'fechaActual'));
         return $pdf->stream();
     }
 
