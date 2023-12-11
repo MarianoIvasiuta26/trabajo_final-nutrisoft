@@ -184,7 +184,14 @@ class AlimentoController extends Controller
                     $valor->valor = $nutrienteData['valor'];
                     $valor->save();
                 }else{
-                    return redirect()->route('gestion-alimentos.index')->with('error', 'No se pudo editar el valor nutricional');
+                    ValorNutricional::create([
+                        'alimento_id' => $alimento->id,
+                        'nutriente_id' => $nutrienteId,
+                        'fuente_alimento_id' => $fuente,
+                        'unidad' => $nutrienteData['unidad'],
+                        'valor' => $nutrienteData['valor'],
+                    ]);
+                    //return redirect()->route('gestion-alimentos.index')->with('error', 'No se pudo editar el valor nutricional');
                 }
             }
 

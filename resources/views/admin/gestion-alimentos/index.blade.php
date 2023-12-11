@@ -97,8 +97,29 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '{{session('success')}}',
+                showConfirmButton: false,
+                timer: 1500
+            })
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'success',
+                title: '{{session('error')}}',
+                showConfirmButton: false,
+                timer: 1500
+            })
+        @endif
+
+
         $(document).ready(function(){
             var table = $('#tabla-alimentos').DataTable({
                 responsive: true,
@@ -127,7 +148,7 @@
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -144,6 +165,9 @@
                         showCancelButton: true,
                         confirmButtonText: 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
@@ -153,5 +177,7 @@
                 });
             });
         });
+
+        
     </script>
 @stop

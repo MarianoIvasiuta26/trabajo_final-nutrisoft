@@ -13,7 +13,7 @@
         </div>
         <div class="card-body">
 
-            <form action="{{route('gestion-alimentos.update', $alimento->id)}}" method="POST">
+            <form id="form-edit" action="{{route('gestion-alimentos.update', $alimento->id)}}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -98,7 +98,7 @@
 
                     <div class="row">
                         <div class="col">
-                            <button type="button" class="btn btn-primary next-step">Siguiente</button>
+                            <button type="button" class="btn btn-primary next-step float-right">Siguiente</button>
                             <a href="{{route('gestion-alimentos.index')}}" class="btn btn-danger">Cancelar</a>
                         </div>
                     </div>
@@ -251,7 +251,7 @@
                         <!-- Fin de pestañas desplegables -->
                     </div>
                     <button type="button" class="btn btn-primary prev-step">Anterior</button>
-                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-success guardar-button float-right">Guardar</button>
                 </div>
             </form>
         </div>
@@ -274,6 +274,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     <script>
@@ -315,6 +316,42 @@
                 // Si la validación es exitosa, devuelve true; de lo contrario, false.
                 return true;
             }
+        });
+
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: true
+        })
+        document.addEventListener('DOMContentLoaded', function () {
+            // Selecciona todos los botones de eliminar con la clase 'delete-button'
+            const deleteButtons = document.querySelectorAll('.guardar-button');
+
+            // Agrega un controlador de clic a cada botón de eliminar
+            deleteButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    // Muestra un SweetAlert de confirmación
+                    swalWithBootstrapButtons.fire({
+                        title: '¿Estás seguro de editar el alimento?',
+                        text: 'Esta acción editará el registro de alimento.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, editar',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#198754',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, envía el formulario
+                            const form = document.getElementById('form-edit');
+                            form.submit();
+                        }
+                    });
+                });
+            });
         });
     </script>
 @stop
