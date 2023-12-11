@@ -7,6 +7,7 @@ use App\Models\Alimento;
 use App\Models\Consulta;
 use App\Models\DetallePlanAlimentaciones;
 use App\Models\Diagnostico;
+use App\Models\GruposTags;
 use App\Models\MedicionesDePlieguesCutaneos;
 use App\Models\Paciente;
 use App\Models\Paciente\Alergia;
@@ -241,7 +242,9 @@ class GestionTurnosController extends Controller
         $tratamientosPaciente = TratamientoPorPaciente::where('paciente_id', $paciente->id)->get();
 
         $diagnosticos = Diagnostico::all();
-        $tags = Tag::all();
+        //$tags = Tag::all();
+        $tags = Tag::with('grupoTag')->get();
+        $gruposTags = GruposTags::all();
         $tagsDiagnosticos = TagsDiagnostico::all();
 
         $planesAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', $paciente->id)->get();
@@ -269,7 +272,7 @@ class GestionTurnosController extends Controller
             $ultimoPlanAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 1)->orderBy('id', 'desc')->first();
 
 
-            return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo', 'tags', 'ultimoPlanAlimentacionPaciente', 'planesAlimentacionPaciente', 'detallesPlanesPlanes', 'diagnosticos', 'tagsDiagnosticos', 'diagnosticoAnteriorPaciente', 'consultasPaciente', 'alimentos', 'anamnesisPaciente'));
+            return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo', 'tags', 'gruposTags', 'ultimoPlanAlimentacionPaciente', 'planesAlimentacionPaciente', 'detallesPlanesPlanes', 'diagnosticos', 'tagsDiagnosticos', 'diagnosticoAnteriorPaciente', 'consultasPaciente', 'alimentos', 'anamnesisPaciente'));
 
         }
 

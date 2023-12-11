@@ -13,9 +13,14 @@ class Tag extends Model
 
     protected $fillable = [
         'name',
+        'grupo_tag_id'
     ];
 
     public function tagsDiagnostico(){
         return $this->hasMany(TagsDiagnostico::class);
+    }
+
+    public function grupoTag(){
+        return $this->belongsTo(GruposTags::class, 'grupo_tag_id');
     }
 }

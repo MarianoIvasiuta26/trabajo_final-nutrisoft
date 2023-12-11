@@ -388,15 +388,21 @@
                                         </h2>
                                         <div id="flush-tags-content" class="accordion-collapse collapse" aria-labelledby="flush-tags-heading" data-bs-parent="#accordionFlushTags">
                                             <div class="accordion-body">
-                                                @foreach ($tags as $tag)
-                                                    <div class="d-inline-block">
-                                                        <input class="btn-check" type="checkbox" name="tags_diagnostico[]" value="{{ $tag->id }}" id="tag_{{ $tag->id }}" autocomplete="off">
-                                                        <label class="btn btn-outline-primary w-auto" for="tag_{{ $tag->id }}">{{ $tag->name }}</label>
-                                                    </div>
-                                                    @error('tags_diagnostico')
-                                                        <span class="text-danger">{{$message}}</span>
-                                                    @enderror
+                                                @foreach ($tags->groupBy('grupoTag.grupo_tag') as $grupo => $groupedTags)
+                                                    <h6>{{ $grupo }}</h6>
+                                                    @foreach ($groupedTags as $tag)
+                                                        <div class="d-inline-block">
+                                                            <input class="btn-check" type="checkbox" name="tags_diagnostico[]" value="{{ $tag->id }}" id="tag_{{ $tag->id }}" autocomplete="off">
+                                                            <label class="btn btn-outline-primary w-auto" for="tag_{{ $tag->id }}">{{ $tag->name }}</label>
+                                                        </div>
+                                                    @endforeach
+                                                    <hr> <!-- Línea horizontal entre grupos -->
                                                 @endforeach
+
+                                                @error('tags_diagnostico')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+
                                             </div>
                                         </div>
                                     </div>
