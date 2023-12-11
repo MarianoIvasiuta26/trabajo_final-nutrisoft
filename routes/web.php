@@ -41,6 +41,13 @@ use App\Http\Controllers\TagsDiagnosticosController;
 use App\Http\Controllers\TratramientoController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\UserController;
+use App\Models\Consulta;
+use App\Models\PlanAlimentaciones;
+use App\Models\PlanesDeSeguimiento;
+use App\Models\Tratamiento;
+use App\Models\TratamientoPorPaciente;
+use App\Models\Turno;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -64,7 +71,23 @@ Route::middleware([
     'verified'
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $fechaActual = now()->format('Y-m-d');
+        $turnosPendientes = Turno::where('estado', 'Pendiente')->get();
+        $turnosDelDia = Turno::where('fecha', $fechaActual) ->where('estado', 'Pendiente')->get();
+        $inasistencias = Turno::where('estado', 'Inasistencia')->get();
+        $turnosCancelados = Turno::where('estado', 'Cancelado')->get();
+        $tratamientos = Tratamiento::all();
+        $tratamientoMasBrindado = TratamientoPorPaciente::join('tratamientos', 'tratamiento_por_pacientes.tratamiento_id', '=', 'tratamientos.id')
+            ->select('tratamientos.tratamiento', DB::raw('count(*) as total'))
+            ->groupBy('tratamientos.tratamiento')
+            ->orderBy('total', 'desc')
+            ->first();
+        $consultas = Consulta::all();
+        $planesAlimentacionAConfirmar = PlanAlimentaciones::where('estado', 2)->get();
+        $planesSeguimientoAConfirmar = PlanesDeSeguimiento::where('estado', 2)->get();
+
+        return view('dashboard', compact('turnosDelDia', 'fechaActual', 'inasistencias', 'turnosCancelados', 'consultas',
+        'planesAlimentacionAConfirmar', 'planesSeguimientoAConfirmar', 'turnosPendientes'));
     })->name('dashboard');
 
     //Admin
