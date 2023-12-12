@@ -55,6 +55,93 @@
                 </div>
             @endif
         @endif
+
+        <div class="row mt-3">
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ count($misTurnosPendientes)}}</h3>
+                        <p>Turnos pendientes</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('turnos.index')}}" class="small-box-footer">Ir a Turnos <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>
+                            @if (!$misInasistencias)
+                                {{0}}
+                            @else
+                                {{count($misInasistencias)}}
+                            @endif
+                        </h3>
+                        <p>Mis Inasistencias</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('turnos.index')}}" class="small-box-footer">Historial turnos <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{count($misConsultas)}}</h3>
+                        <p>Consultas recibidas</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('turnos.index')}}" class="small-box-footer">Ver consultas <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>{{count($misTurnosCancelados)}}</h3>
+                        <p>Turnos cancelados</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('turnos.index')}}" class="small-box-footer">Historial turnos <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>{{count($misPlanesAlimentacionAsociados)}}</h3>
+                        <p>Planes de alimentación asociados</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('plan-alimentacion.index')}}" class="small-box-footer">Planes de alimentación <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-dark   ">
+                    <div class="inner">
+                        <h3>{{count($misPlanesSeguimientoAsociados)}}</h3>
+                        <p>Planes seguimiento asociados</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('plan-seguimiento.index')}}" class="small-box-footer">Planes de Seguimiento <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+        </div>
+
     @endrole
 
     @role('Nutricionista')
@@ -176,6 +263,88 @@
                         No hay turnos para mostrar.
                     </div>
                 @endif
+            </div>
+        </div>
+    @endrole
+
+    @role('Admin')
+        <div class="row mt-3">
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ count($roles)}}</h3>
+                        <p>Roles</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('gestion-rolesYPermisos.index')}}" class="small-box-footer">Roles y Permisos<i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{count($permisos)}}</h3>
+                        <p>Permisos</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('gestion-rolesYPermisos.index')}}" class="small-box-footer">Roles y Permisos <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{count($usuarios)}}</h3>
+                        <p>Usuarios</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('gestion-usuarios.index')}}" class="small-box-footer">Gestión usuarios <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>{{count($pacientes)}}</h3>
+                        <p>Pacientes</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('gestion-usuarios.index')}}" class="small-box-footer">Gesitón Usuarios<i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-primary">
+                    <div class="inner">
+                        <h3>{{count($nutricionistas)}}</h3>
+                        <p>Nutricionistas</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('gestion-usuarios.index')}}" class="small-box-footer">Gestión Usuarios<i class="fas fa-arrow-circle-right"></i></a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-dark   ">
+                    <div class="inner">
+                        <h3>{{count($alimentos)}}</h3>
+                        <p>Alimentos</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-bag"></i>
+                    </div>
+                    <a href="{{route('gestion-alimentos.index')}}" class="small-box-footer">Gestión Alimentos <i class="fas fa-arrow-circle-right"></i></a>
+                </div>
             </div>
         </div>
     @endrole

@@ -26,6 +26,7 @@ use App\Http\Controllers\MenuSemanalController;
 use App\Http\Controllers\nutricionista\GestionConsultasController;
 use App\Http\Controllers\nutricionista\GestionPlieguesCutaneosController;
 use App\Http\Controllers\nutricionista\GestionTurnosController;
+use App\Http\Controllers\nutricionista\SeguimientoMisPacientesController;
 use App\Http\Controllers\paciente\DatosMedicosController;
 use App\Http\Controllers\paciente\HistoriaClinicaController;
 use App\Http\Controllers\PacienteController;
@@ -41,12 +42,16 @@ use App\Http\Controllers\TagsDiagnosticosController;
 use App\Http\Controllers\TratramientoController;
 use App\Http\Controllers\TurnoController;
 use App\Http\Controllers\UserController;
+use App\Models\Alimento;
 use App\Models\Consulta;
 use App\Models\PlanAlimentaciones;
 use App\Models\PlanesDeSeguimiento;
 use App\Models\Tratamiento;
 use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
+use App\Models\User;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -85,6 +90,31 @@ Route::middleware([
         $consultas = Consulta::all();
         $planesAlimentacionAConfirmar = PlanAlimentaciones::where('estado', 2)->get();
         $planesSeguimientoAConfirmar = PlanesDeSeguimiento::where('estado', 2)->get();
+
+        //Paciente
+        if(auth()->user()->tipo_usuario == 'Paciente'){
+            $misTurnosPendientes = Turno::where('estado', 'Pendiente')->where('paciente_id', auth()->user()->paciente->id)->get();
+            $misInasistencias = Turno::where('estado', 'Inasistencia')->where('paciente_id', auth()->user()->paciente->id)->get();
+            $misConsultas = Turno::where('estado', 'Realizado')->where('paciente_id', auth()->user()->paciente->id)->get();
+            $misTurnosCancelados = Turno::where('estado', 'Cancelado')->where('paciente_id', auth()->user()->paciente->id)->get();
+            $misPlanesAlimentacionAsociados = PlanAlimentaciones::where('paciente_id',auth()->user()->paciente->id)->get();
+            $misPlanesSeguimientoAsociados = PlanesDeSeguimiento::where('paciente_id',auth()->user()->paciente->id)->get();
+
+            return view('dashboard', compact('turnosDelDia', 'fechaActual', 'inasistencias', 'turnosCancelados', 'consultas',
+            'planesAlimentacionAConfirmar', 'planesSeguimientoAConfirmar', 'turnosPendientes',
+            'misTurnosPendientes', 'misInasistencias', 'misConsultas', 'misTurnosCancelados', 'misPlanesAlimentacionAsociados', 'misPlanesSeguimientoAsociados'));
+        }
+
+        if(auth()->user()->tipo_usuario == 'Administrador'){
+            $roles = Role::all();
+            $permisos = Permission::All();
+            $usuarios = User::all();
+            $pacientes = User::where('tipo_usuario', 'Paciente')->get();
+            $nutricionistas = User::where('tipo_usuario', 'Nutricionista')->get();
+            $alimentos = Alimento::all();
+
+            return view('dashboard', compact('roles', 'permisos', 'usuarios', 'pacientes', 'nutricionistas', 'alimentos'));
+        }
 
         return view('dashboard', compact('turnosDelDia', 'fechaActual', 'inasistencias', 'turnosCancelados', 'consultas',
         'planesAlimentacionAConfirmar', 'planesSeguimientoAConfirmar', 'turnosPendientes'));
@@ -212,7 +242,6 @@ Route::middleware([
     Route::post('plan-seguimiento.confirmarPlan/{planId}', [PlanDeSeguimientoController::class, 'confirmarPlan'])->name('plan-seguimiento.confirmarPlan');
     Route::get('plan-seguimiento.planesSeguimientoAConfirmar', [PlanDeSeguimientoController::class, 'planesSeguimientoAConfirmar'])->name('plan-seguimiento.planesSeguimientoAConfirmar');
     Route::get('plan-seguimiento.pdf/{planId}', [PlanDeSeguimientoController::class, 'pdf'])->name('plan-seguimiento.pdf');
-
 
     //Paciente
     Route::resource('historia-clinica', HistoriaClinicaController::class)->names('historia-clinica');
