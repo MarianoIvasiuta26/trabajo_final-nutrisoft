@@ -167,6 +167,7 @@ class RolesYPermisosController extends Controller
 
         $permiso = Permission::find($id);
 
+
         if(!$permiso){
             return redirect()->route('gestion-rolesYPermisos.index')->with('error', 'Error al actualizar el permiso.');
         }

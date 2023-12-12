@@ -196,7 +196,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-success edit-rol">Guardar</button>
+                                <button type="button" class="btn btn-success edit-rol" data-form-id="{{$rol->id}}">Guardar</button>
                             </div>
                         </div>
                     </div>
@@ -236,15 +236,15 @@
                                 <td>
                                     <div class="row g-1">
                                         <div class="col-auto">
-                                            <a class="btn btn-warning btn-sm" href="">
+                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editPermiso{{$permiso->id}}">
                                                 <i class="bi bi-pencil-square"></i>
-                                            </a>
+                                            </button>
                                         </div>
                                         <div class="col-auto">
-                                            <form action="{{ route('gestion-rolesYPermisos.destroyPermiso', $permiso->id) }}" method="POST">
+                                            <form id="form-destroyPermiso" action="{{ route('gestion-rolesYPermisos.destroyPermiso', $permiso->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                <button type="button" class="btn btn-danger btn-sm destroy-permiso">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
@@ -252,37 +252,38 @@
                                     </div>
                                 </td>
                             </tr>
-
-                             <!-- Modal editar permiso -->
-                            <div class="modal fade" id="editPermiso" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editPermisoLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editPermisoLabel">Nuevo permiso</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form action="{{route('gestion-rolesYPermisos.updatePermiso', $permiso->id)}}" method="POST" id="form-editPermiso">
-                                                @csrf
-                                                @method('PUT')
-
-                                                <div class="mb-3">
-                                                    <label for="nombre" class="form-label">Nombre</label>
-                                                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del permiso..." value="{{$permiso->name}}">
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                                            <button type="button" class="btn btn-primary add-permiso">Guardar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         @endforeach
                     </tbody>
                 </table>
             </div>
+            @foreach ($permisos as $permiso )
+                <!-- Modal editar permiso -->
+                <div class="modal fade" id="editPermiso{{$permiso->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editPermiso{{$permiso->id}}Label" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editPermiso{{$permiso->id}}Label">Editar permiso - {{$permiso->name}}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{{route('gestion-rolesYPermisos.updatePermiso', $permiso->id)}}" method="POST" id="form-editPermiso{{$permiso->id}}">
+                                    @csrf
+                                    @method('PUT')
+
+                                    <div class="mb-3">
+                                        <label for="nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre del permiso..." value="{{$permiso->name}}">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="button" class="btn btn-success edit-permiso" data-form-id="{{$permiso->id}}">Guardar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 @stop
@@ -427,49 +428,49 @@
     });
 
     //SweetAlert para editar rol
-    @foreach ($roles as $rol)
-        document.addEventListener('DOMContentLoaded', function () {
-            const editarRol = document.querySelectorAll('.edit-rol');
+    document.addEventListener('DOMContentLoaded', function () {
+        const editarRol = document.querySelectorAll('.edit-rol');
 
-            editarRol.forEach(button => {
-                button.addEventListener('click', function () {
-                    const swalWithBootstrapButtons = Swal.mixin({
-                        customClass: {
-                            confirmButton: 'btn btn-success',
-                            cancelButton: 'btn btn-danger'
-                        },
-                        buttonsStyling: true
-                        })
-
-                        swalWithBootstrapButtons.fire({
-                        title: '¿Está seguro de editar el rol y sus permisos?',
-                        text: "Al confirmar se guardará el rol y los permisos asociados.",
-                        icon: 'question',
-                        showCancelButton: true,
-                        cancelButtonText: '¡No, cancelar!',
-                        confirmButtonColor: '#198754',
-                        confirmButtonText: 'Editar rol!',
-                        cancelButtonColor: '#d33',
-                        reverseButtons: true
-                        }).then((result) => {
-                        if (result.isConfirmed) {
-                            //Envia el form
-                            const form = document.getElementById('form-editRol{{$rol->id}}');
-                            console.log(form);
-                            form.submit();
-                        } else if (
-                            /* Read more about handling dismissals below */
-                            result.dismiss === Swal.DismissReason.cancel
-                        ) {
-                            swalWithBootstrapButtons.fire(
-                            '¡No se guardó el rol con sus permisos!'
-                            )
-                        }
+        editarRol.forEach(button => {
+            button.addEventListener('click', function () {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-success',
+                        cancelButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: true
                     })
-                });
+
+                    swalWithBootstrapButtons.fire({
+                    title: '¿Está seguro de editar el rol y sus permisos?',
+                    text: "Al confirmar se guardará el rol y los permisos asociados.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    cancelButtonText: '¡No, cancelar!',
+                    confirmButtonColor: '#198754',
+                    confirmButtonText: 'Editar rol!',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Obtener el id del formulario desde el atributo de datos
+                        const formId = button.dataset.formId;
+
+                        // Enviar el formulario específico
+                        const form = document.getElementById('form-editRol' + formId);
+                        form.submit();
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel
+                    ) {
+                        swalWithBootstrapButtons.fire(
+                        '¡No se guardó el rol con sus permisos!'
+                        )
+                    }
+                })
             });
         });
-    @endforeach
+    });
 
 
     //SweetAlert para guardar nuevo permiso
@@ -507,6 +508,92 @@
                     ) {
                         swalWithBootstrapButtons.fire(
                         '¡No se guardó el permiso!'
+                        )
+                    }
+                })
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const editPermiso = document.querySelectorAll('.edit-permiso');
+
+        editPermiso.forEach(button => {
+            button.addEventListener('click', function () {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-success',
+                        cancelButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: true
+                    })
+
+                    swalWithBootstrapButtons.fire({
+                    title: '¿Está seguro de editar el permiso?',
+                    text: "Al confirmar se modificará el permiso.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    cancelButtonText: '¡No, cancelar!',
+                    confirmButtonColor: '#198754',
+                    confirmButtonText: '¡Guardar edición!',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Obtener el id del formulario desde el atributo de datos
+                        const formId = button.dataset.formId;
+
+                        // Enviar el formulario específico
+                        const form = document.getElementById('form-editPermiso' + formId);
+                        form.submit();
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel
+                    ) {
+                        swalWithBootstrapButtons.fire(
+                        '¡No se editó el permiso!'
+                        )
+                    }
+                })
+            });
+        });
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const destroyPermiso = document.querySelectorAll('.destroy-permiso');
+
+        destroyPermiso.forEach(button => {
+            button.addEventListener('click', function () {
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-success',
+                        cancelButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: true
+                    })
+
+                    swalWithBootstrapButtons.fire({
+                    title: '¿Está seguro de eliminar el permiso?',
+                    text: "Al confirmar se eliminará el permiso.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    cancelButtonText: '¡No, cancelar!',
+                    confirmButtonColor: '#198754',
+                    confirmButtonText: '¡Eliminar!',
+                    cancelButtonColor: '#d33',
+                    reverseButtons: true
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        //Envia el form
+                        const form = document.getElementById('form-destroyPermiso');
+                        form.submit();
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel
+                    ) {
+                        swalWithBootstrapButtons.fire(
+                        '¡No se eliminó el permiso!'
                         )
                     }
                 })

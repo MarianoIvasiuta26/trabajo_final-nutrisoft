@@ -246,13 +246,15 @@ class SeguimientoPacienteController extends Controller
                 $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $detalle->alimento_id)->first();
 
                 if(!$valorN){
+                    $valor= 0;
                     $kcal = 0.00;
+                }else{
+                    if($detalle->unidad_medida == 'Kcal'){
+                        $kcal = $kcal + $detalle->cantidad;
+                    }
+                    $kcal = $kcal + ($valorN->valor * ($detalle->cantidad/100));
                 }
 
-                if($detalle->unidad_medida == 'Kcal'){
-                    $kcal = $kcal + $detalle->cantidad;
-                }
-                $kcal = $kcal + ($valorN->valor * ($detalle->cantidad/100));
                 $fechaActual = now()->format('Y-m-d');
 
                 $registroExistente = RegistroAlimentosConsumidos::where('alimento_id',$detalle->alimento_id)
@@ -279,19 +281,22 @@ class SeguimientoPacienteController extends Controller
             foreach($otrosAlimentos as $key => $otroAlimento){
                 $alimento = Alimento::find($otroAlimento);
                 $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $alimento->id)->first();
+                $unidad = UnidadesMedidasPorComida::find($unidades_de_medida[$key]);
 
                 if(!$valorN){
+                    $valor = 0;
                     $kcal = 0.00;
+                }else{
+                    if($unidad->nombre_unidad_medida == 'Kcal'){
+                        $kcal = $kcal + $cantidades[$key];
+                    }
+                    $kcal = $kcal + ($valorN->valor *( $cantidades[$key] / 100));
                 }
 
-                $unidad = UnidadesMedidasPorComida::find($unidades_de_medida[$key]);
-                if($unidad->nombre_unidad_medida == 'Kcal'){
-                    $kcal = $kcal + $cantidades[$key];
-                }
-                $kcal = $kcal + ($valorN->valor *( $cantidades[$key] / 100));
+                $fechaActual = now()->format('Y-m-d');
 
                 $registroExistente = RegistroAlimentosConsumidos::where('alimento_id',$alimento->id)
-                    ->where('fecha_consumida', Carbon::now())
+                    ->where('fecha_consumida', $fechaActual)
                     ->where('plan_de_seguimiento_id', $planSeguimientoActivo->id)
                     ->first();
 

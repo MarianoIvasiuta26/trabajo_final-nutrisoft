@@ -96,7 +96,7 @@ Route::middleware([
     Route::resource('gestion-rolesYPermisos', RolesYPermisosController::class)->names('gestion-rolesYPermisos');
     Route::post('gestion-rolesYPermisos.storePermiso', [RolesYPermisosController::class, 'storePermiso'])->name('gestion-rolesYPermisos.storePermiso');
     Route::post('gestion-rolesYPermisos.destroyPermiso', [RolesYPermisosController::class, 'destroyPermiso'])->name('gestion-rolesYPermisos.destroyPermiso');
-    Route::post('gestion-rolesYPermisos.updatePermiso/{id}', [RolesYPermisosController::class, 'updatePermiso'])->name('gestion-rolesYPermisos.updatePermiso');
+    Route::any('gestion-rolesYPermisos.updatePermiso/{id}', [RolesYPermisosController::class, 'updatePermiso'])->name('gestion-rolesYPermisos.updatePermiso');
 
     Route::resource('gestion-alergias', AlergiaController::class)->names('gestion-alergias');
     Route::resource('prohibiciones-alergias', ProhibicionesAlergiaController::class)->names('prohibiciones-alergias');
