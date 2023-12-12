@@ -10,7 +10,7 @@
 
     <div class="card card-dark mt-3">
         <div class="card-header">
-            <h1 style="text-align:center;">Completar Registro</h1>
+            <h1 style="text-align:center;" id="paso1">Completar Registro</h1>
         </div>
 
         <div class="card-body">
@@ -25,7 +25,7 @@
             @endphp
 
             <!-- Barra de Progreso -->
-            <div class="progress">
+            <div class="progress" id="paso2">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
 
@@ -46,7 +46,7 @@
 
                     <button type="button" id="next-step1" class="btn btn-primary next-step">Siguiente</button>
                 @else
-                    <form class="row g-3 mt-3" action="{{route('datos-personales.store')}}" method="POST" id="form-datos-personales">
+                    <form class="row g-3 mt-3 paso3" action="{{route('datos-personales.store')}}" method="POST" id="form-datos-personales">
                         @csrf
                         <div class="row mt-3">
                             <div class="col-md-6">
@@ -104,7 +104,7 @@
 
                         <div class="col-12">
                             <div class="float-right">
-                                <button type="button" class="btn btn-success guardar-step1" id="guardar-step1">Guardar</button>
+                                <button type="button" class="btn btn-success guardar-step1 paso4" id="guardar-step1">Guardar</button>
                                 <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                             </div>
                         </div>
@@ -114,7 +114,7 @@
             </div>
 
             <!-- Step 2 -->
-            <div class="step mt-3" id="step2">
+            <div class="step mt-3" id="step2" >
 
                 <h5>Días y horarios Disponibles</h5>
                 <span class="text-muted">En este apartado puede registrar sus días y horas disponibles para posibles adelantamientos de turnos automático.</span>
@@ -128,7 +128,7 @@
                         <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                     </div>
                 @else
-                    <form id="form-dias-fijos" method="POST" action="{{route('adelantamiento-turno.store')}}">
+                    <form class="paso5" id="form-dias-fijos" method="POST" action="{{route('adelantamiento-turno.store')}}">
                         @csrf
                         <div class="alert alert-warning mt-3" role="alert">
                             <h5 class="alert-heading">¡Atención!</h5>
@@ -176,7 +176,7 @@
                 @if ($paciente->dni == NULL && $paciente->telefono == NULL && $paciente->sexo == NULL && $paciente->fecha_nacimiento == NULL)
                     <button type="button" class="btn btn-danger prev-step" id="prev-step2">Anterior</button>
                 @endif
-                <button type="button" class="btn btn-primary next-step">Siguiente</button>
+                <button type="button" class="btn btn-primary next-step paso6">Siguiente</button>
             </div>
 
             <!-- Step 3 -->
@@ -199,7 +199,7 @@
                     @endif
                     <button type="button" class="btn btn-primary next-step">Siguiente</button>
                 @else
-                <form id="form-datos-corporales" action="{{route('historia-clinica.store')}}" method="POST">
+                <form class="paso7" id="form-datos-corporales" action="{{route('historia-clinica.store')}}" method="POST">
                     @csrf
 
                     <div class="row">
@@ -303,7 +303,7 @@
                     <div class="row mt-3">
                         <div class="col-12">
                             <div class="float-right">
-                                <button id="guardar-step3" type="button" class="btn btn-success guardar-step3">Guardar</button>
+                                <button id="guardar-step3" type="button" class="btn btn-success guardar-step3 paso8">Guardar</button>
                                 <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                             </div>
                         </div>
@@ -335,10 +335,10 @@
                     </div>
 
                     <div class="mt-3 float-right">
-                        <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning completar-registro">Completar registro</a>
+                        <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning completar-registro paso11">Completar registro</a>
                     </div>
                 @else
-                <form class="mt-3" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
+                <form class="mt-3 paso9" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
                 @csrf
                 <div class="row mt-3">
                     <h5>Gustos alimenticios</h5>
@@ -454,7 +454,7 @@
                 <div class="row mt-3">
                     <div class="col-12">
                         <div class="float-right">
-                            <button id="guardar-step4" type="button" class="btn btn-success guardar-step4">Guardar</button>
+                            <button id="guardar-step4" type="button" class="btn btn-success guardar-step4 paso10">Guardar</button>
                             <!--<a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
                         </div>
                     </div>
@@ -477,6 +477,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/icheck-bootstrap@3.0.1/icheck-bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.18/dist/css/bootstrap-select.min.css" rel="stylesheet">
+
+    <link href=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css" rel="stylesheet">
+    <link href=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/themes/introjs-modern.css" rel="stylesheet">
 
     <!-- Select2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
@@ -514,8 +517,118 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js"></script>
 
     <script>
+
+        introJs().setOptions({
+            steps: [
+                {
+                    element: document.querySelector('#paso1'),
+                    intro: "En esta sección debe rellenar los formularios para completar su registro.",
+                    position: "right",
+                },
+                {
+                    element: document.querySelector('#paso2'),
+                    intro: "Podemos observar una barra de progreso según el avance completado en el formulario.",
+                },
+                {
+                    element: document.querySelector('.paso3'),
+                    intro: "Primero debemos completar los datos personales.",
+                },
+                {
+                    element: document.querySelector('.paso4'),
+                    intro: "Una vez completados los datos personales, debemos guardarlos",
+                },
+            ],
+            showProgress: true,
+            showBullets: false,
+            disableInteraction: true,
+            'nextLabel': 'Siguiente',
+            'prevLabel': 'Anterior',
+            'doneLabel': 'Hecho',
+        }).start();
+
+        let paso2Intro = introJs().setOptions({
+                steps: [
+                    {
+                        element: document.querySelector('.paso5'),
+                        intro: "Luego, opcionalmente podemos completar los días y horarios disponibles para adelantamientos automáticos de turnos.",
+                    },
+                    {
+                        element: document.querySelector('.paso6'),
+                        intro: "Pasamos al siguiente formulario",
+                    },
+                ],
+                showProgress: true,
+                showBullets: false,
+                disableInteraction: true,
+                'nextLabel': 'Siguiente',
+                'prevLabel': 'Anterior',
+                'doneLabel': 'Hecho',
+            });
+
+
+        let paso3Intro = introJs().setOptions({
+            steps: [
+                {
+                    element: document.querySelector('.paso7'),
+                    intro: "En este formulario completamos los datos corporales y estado físico.",
+                },
+                {
+                    element: document.querySelector('.paso8'),
+                    intro: "Una vez completados los datos corporales, debemos guardarlos.",
+                },
+            ],
+            showProgress: true,
+            showBullets: false,
+            disableInteraction: true,
+            'nextLabel': 'Siguiente',
+            'prevLabel': 'Anterior',
+            'doneLabel': 'Hecho',
+        });
+
+        @if($paciente->historiaClinica)
+            introJs().setOptions({
+                steps: [
+                    {
+                        element: document.querySelector('.paso9'),
+                        intro: "En este formulario completamos los datos médicos.",
+                    },
+                    {
+                        element: document.querySelector('.paso10'),
+                        intro: "Una vez completados los datos médicos, debemos guardarlos.",
+                    },
+                ],
+                showProgress: true,
+                showBullets: false,
+                disableInteraction: true,
+                'nextLabel': 'Siguiente',
+                'prevLabel': 'Anterior',
+                'doneLabel': 'Hecho',
+            });
+        @endif
+
+
+
+        @if (count($datosMedicos) > 0 && count($anamnesis) > 0 && count($cirugiasPaciente) > 0)
+            introJs().setOptions({
+                steps: [
+                    {
+                        element: document.querySelector('.paso11'),
+                        intro: "Una vez completados todos los formularios, podemos completar el registro.",
+                    },
+                ],
+                showProgress: true,
+                showBullets: false,
+                disableInteraction: true,
+                'nextLabel': 'Siguiente',
+                'prevLabel': 'Anterior',
+                'doneLabel': 'Hecho',
+            }).start();
+        @endif
+
+
 
         $(document).ready(function () {
             $('#dni').on('input', function () {
@@ -623,6 +736,8 @@
                     showStep(currentStep);
                     updateProgressBar();
                     $(".prev-step").prop('disabled', false);
+
+
                 } else {
                     // Aquí podrías realizar alguna acción especial si todos los pasos están completos
                     // Por ejemplo, mostrar un botón para completar el registro

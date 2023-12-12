@@ -31,6 +31,9 @@ class SeguimientoPacienteController extends Controller
         $obtener = $this->obtenerDatos();
         $planAlimentacionActivo = $obtener['planAlimentacionActivo'];
         $planSeguimientoActivo = $obtener['planSeguimientoActivo'];
+        if(!$planSeguimientoActivo){
+            return redirect()->back()->with('info', 'No tiene un plan de seguimiento activo. Para obtenerlo debe recibir una consulta por un profesional.');
+        }
         $planesAlimentacionPaciente = $obtener['planesAlimentacionPaciente'];
         $planesSeguimientoPaciente = $obtener['planesSeguimientoPaciente'];
         $pesoIdeal = $obtener['pesoIdeal'];
@@ -80,81 +83,103 @@ class SeguimientoPacienteController extends Controller
         $planesAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', auth()->user()->paciente->id)->get();
         $planesSeguimientoPaciente = PlanesDeSeguimiento::where('paciente_id', auth()->user()->paciente->id)->get();
 
-        $resultado = $this->calcularIMC($planSeguimientoActivo->consulta->peso_actual, $planSeguimientoActivo->consulta->altura_actual);
-        $diagnostico = $resultado['diagnosticoIMC'];
+        if($planAlimentacionActivo || $planSeguimientoActivo){
+            $resultado = $this->calcularIMC($planSeguimientoActivo->consulta->peso_actual, $planSeguimientoActivo->consulta->altura_actual);
+            $diagnostico = $resultado['diagnosticoIMC'];
 
-        $pesoIdeal = $resultado['pesoIdeal'];
-        $estadoIMC = $resultado['estadoIMC'];
+            $pesoIdeal = $resultado['pesoIdeal'];
+            $estadoIMC = $resultado['estadoIMC'];
 
-        // Inicializar arrays para almacenar las fechas y pesos para el gráfico
-        $fechas = [];
-        $pesos = [];
+            // Inicializar arrays para almacenar las fechas y pesos para el gráfico
+            $fechas = [];
+            $pesos = [];
 
-        // Recorrer los planes de seguimiento
-        foreach ($planesSeguimientoPaciente as $plan) {
-            // Obtener la consulta asociada al plan
-            $consulta = $plan->consulta;
+            // Recorrer los planes de seguimiento
+            foreach ($planesSeguimientoPaciente as $plan) {
+                // Obtener la consulta asociada al plan
+                $consulta = $plan->consulta;
 
-            // Agregar la fecha y peso a los arrays
-            $fechas[] = $consulta->created_at->toDateString(); // Cambiar si necesitas otro formato
-            $pesos[] = $consulta->peso_actual;
-        }
-
-        $fechaActual = now()->format('Y-m-d');
-
-        //Alimentos consumidos
-        $alimentosConsumidos = RegistroAlimentosConsumidos::where('plan_de_seguimiento_id', $planSeguimientoActivo->id)
-            ->where('paciente_id', auth()->user()->paciente->id)
-            ->where('fecha_consumida', $fechaActual)
-            ->get();
-
-        $kcal = 0.00;
-        $nutriente = Nutriente::where('nombre_nutriente', 'Valor energético')->first();
-        if($alimentosConsumidos){
-            foreach($alimentosConsumidos as $alimentoConsumido){
-                $alimento = Alimento::find($alimentoConsumido->alimento_id);
-                $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $alimento->id)->first();
-
-                $kcal = $kcal + ($valorN->valor * ($alimentoConsumido->cantidad / 100));
-
+                // Agregar la fecha y peso a los arrays
+                $fechas[] = $consulta->created_at->toDateString(); // Cambiar si necesitas otro formato
+                $pesos[] = $consulta->peso_actual;
             }
+
+            $fechaActual = now()->format('Y-m-d');
+
+            //Alimentos consumidos
+            $alimentosConsumidos = RegistroAlimentosConsumidos::where('plan_de_seguimiento_id', $planSeguimientoActivo->id)
+                ->where('paciente_id', auth()->user()->paciente->id)
+                ->where('fecha_consumida', $fechaActual)
+                ->get();
+
+            $kcal = 0.00;
+            $nutriente = Nutriente::where('nombre_nutriente', 'Valor energético')->first();
+            if($alimentosConsumidos){
+                foreach($alimentosConsumidos as $alimentoConsumido){
+                    $alimento = Alimento::find($alimentoConsumido->alimento_id);
+                    $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $alimento->id)->first();
+
+                    $kcal = $kcal + ($valorN->valor * ($alimentoConsumido->cantidad / 100));
+
+                }
+            }else{
+                $kcal = 0;
+            }
+
+            $alimentos = Alimento::all();
+            $unidades_de_medida = UnidadesMedidasPorComida::all();
+            $detallesPlanAlimentacionActivo = DetallePlanAlimentaciones::where('plan_alimentacion_id', $planAlimentacionActivo->id)->get();
+
+            $paciente = Paciente::find(auth()->user()->paciente->id);
+            $consulta = Consulta::find($planAlimentacionActivo->consulta_id);
+            $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+            $alturaMetro = $consulta->altura_actual / 100;
+
+            $resultadoGEB = $this->determinarGEB($paciente->edad, $paciente->sexo, $consulta->peso_Actual, $consulta->altura_actual, $alturaMetro);
+            $resultadoGET = $this->determinacionGET($resultadoGEB['geb'], $historiaClinica->estilo_vida);
+
+            $geb = $resultadoGEB['geb'];
+            $get = $resultadoGET['get'];
+
+            return [
+                'planAlimentacionActivo' => $planAlimentacionActivo,
+                'planSeguimientoActivo' => $planSeguimientoActivo,
+                'planesAlimentacionPaciente' => $planesAlimentacionPaciente,
+                'planesSeguimientoPaciente' => $planesSeguimientoPaciente,
+                'pesoIdeal' => $pesoIdeal,
+                'diagnostico' => $diagnostico,
+                'estadoIMC' => $estadoIMC,
+                'fechas' => $fechas,
+                'pesos' => $pesos,
+                'alimentosConsumidos' => $alimentosConsumidos,
+                'kcal' => $kcal,
+                'alimentos' => $alimentos,
+                'detallesPlanAlimentacionActivo' => $detallesPlanAlimentacionActivo,
+                'unidades_de_medida' => $unidades_de_medida,
+                'geb' => $geb,
+                'get' => $get,
+            ];
         }else{
-            $kcal = 0;
+            return [
+                'planAlimentacionActivo' => null,
+                'planSeguimientoActivo' => null,
+                'planesAlimentacionPaciente' => null,
+                'planesSeguimientoPaciente' => null,
+                'pesoIdeal' => null,
+                'diagnostico' => null,
+                'estadoIMC' => null,
+                'fechas' => null,
+                'pesos' => null,
+                'alimentosConsumidos' => null,
+                'kcal' => null,
+                'alimentos' => null,
+                'detallesPlanAlimentacionActivo' => null,
+                'unidades_de_medida' => null,
+                'geb' => null,
+                'get' => null,
+            ];
         }
 
-        $alimentos = Alimento::all();
-        $unidades_de_medida = UnidadesMedidasPorComida::all();
-        $detallesPlanAlimentacionActivo = DetallePlanAlimentaciones::where('plan_alimentacion_id', $planAlimentacionActivo->id)->get();
-
-        $paciente = Paciente::find(auth()->user()->paciente->id);
-        $consulta = Consulta::find($planAlimentacionActivo->consulta_id);
-        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
-        $alturaMetro = $consulta->altura_actual / 100;
-
-        $resultadoGEB = $this->determinarGEB($paciente->edad, $paciente->sexo, $consulta->peso_Actual, $consulta->altura_actual, $alturaMetro);
-        $resultadoGET = $this->determinacionGET($resultadoGEB['geb'], $historiaClinica->estilo_vida);
-
-        $geb = $resultadoGEB['geb'];
-        $get = $resultadoGET['get'];
-
-        return [
-            'planAlimentacionActivo' => $planAlimentacionActivo,
-            'planSeguimientoActivo' => $planSeguimientoActivo,
-            'planesAlimentacionPaciente' => $planesAlimentacionPaciente,
-            'planesSeguimientoPaciente' => $planesSeguimientoPaciente,
-            'pesoIdeal' => $pesoIdeal,
-            'diagnostico' => $diagnostico,
-            'estadoIMC' => $estadoIMC,
-            'fechas' => $fechas,
-            'pesos' => $pesos,
-            'alimentosConsumidos' => $alimentosConsumidos,
-            'kcal' => $kcal,
-            'alimentos' => $alimentos,
-            'detallesPlanAlimentacionActivo' => $detallesPlanAlimentacionActivo,
-            'unidades_de_medida' => $unidades_de_medida,
-            'geb' => $geb,
-            'get' => $get,
-        ];
     }
 
     public function calcularIMC($peso, $altura)
@@ -220,20 +245,33 @@ class SeguimientoPacienteController extends Controller
                 $detalle = DetallePlanAlimentaciones::find($alimentoPlan);
                 $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $detalle->alimento_id)->first();
 
+                if(!$valorN){
+                    $kcal = 0.00;
+                }
+
                 if($detalle->unidad_medida == 'Kcal'){
                     $kcal = $kcal + $detalle->cantidad;
                 }
                 $kcal = $kcal + ($valorN->valor * ($detalle->cantidad/100));
                 $fechaActual = now()->format('Y-m-d');
-                RegistroAlimentosConsumidos::create([
-                    'plan_de_seguimiento_id' => $planSeguimientoActivo->id,
-                    'paciente_id' => auth()->user()->paciente->id,
-                    'alimento_id' => $detalle->alimento_id,
-                    'cantidad' => $detalle->cantidad,
-                    'kcal' => $kcal,
-                    'fecha_consumida' => $fechaActual,
-                    'unidad_medida' => $detalle->unidad_medida,
-                ]);
+
+                $registroExistente = RegistroAlimentosConsumidos::where('alimento_id',$detalle->alimento_id)
+                    ->where('fecha_consumida', $fechaActual)
+                    ->where('plan_de_seguimiento_id', $planSeguimientoActivo->id)
+                    ->first();
+
+                if(!$registroExistente){
+                    RegistroAlimentosConsumidos::create([
+                        'plan_de_seguimiento_id' => $planSeguimientoActivo->id,
+                        'paciente_id' => auth()->user()->paciente->id,
+                        'alimento_id' => $detalle->alimento_id,
+                        'cantidad' => $detalle->cantidad,
+                        'kcal' => $kcal,
+                        'fecha_consumida' => $fechaActual,
+                        'unidad_medida' => $detalle->unidad_medida,
+                    ]);
+                }
+
             }
         }
 
@@ -241,22 +279,33 @@ class SeguimientoPacienteController extends Controller
             foreach($otrosAlimentos as $key => $otroAlimento){
                 $alimento = Alimento::find($otroAlimento);
                 $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $alimento->id)->first();
-                dd($valorN);
+
+                if(!$valorN){
+                    $kcal = 0.00;
+                }
+
                 $unidad = UnidadesMedidasPorComida::find($unidades_de_medida[$key]);
                 if($unidad->nombre_unidad_medida == 'Kcal'){
                     $kcal = $kcal + $cantidades[$key];
                 }
                 $kcal = $kcal + ($valorN->valor *( $cantidades[$key] / 100));
 
-                RegistroAlimentosConsumidos::create([
-                    'plan_de_seguimiento_id' => $planSeguimientoActivo->id,
-                    'paciente_id' => auth()->user()->paciente->id,
-                    'alimento_id' => $alimento->id,
-                    'cantidad' => $cantidades[$key],
-                    'kcal' => $kcal,
-                    'fecha_consumida' => Carbon::now(),
-                    'unidad_medida' => $unidad->nombre_unidad_medida,
-                ]);
+                $registroExistente = RegistroAlimentosConsumidos::where('alimento_id',$alimento->id)
+                    ->where('fecha_consumida', Carbon::now())
+                    ->where('plan_de_seguimiento_id', $planSeguimientoActivo->id)
+                    ->first();
+
+                if(!$registroExistente){
+                    RegistroAlimentosConsumidos::create([
+                        'plan_de_seguimiento_id' => $planSeguimientoActivo->id,
+                        'paciente_id' => auth()->user()->paciente->id,
+                        'alimento_id' => $alimento->id,
+                        'cantidad' => $cantidades[$key],
+                        'kcal' => $kcal,
+                        'fecha_consumida' => Carbon::now(),
+                        'unidad_medida' => $unidad->nombre_unidad_medida,
+                    ]);
+                }
             }
         }
 
@@ -474,6 +523,46 @@ class SeguimientoPacienteController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $alimentoConsumido = RegistroAlimentosConsumidos::find($id);
+        $alimentoConsumido->delete();
+
+        $obtener = $this->obtenerDatos();
+        $planAlimentacionActivo = $obtener['planAlimentacionActivo'];
+        $planSeguimientoActivo = $obtener['planSeguimientoActivo'];
+        $planesAlimentacionPaciente = $obtener['planesAlimentacionPaciente'];
+        $planesSeguimientoPaciente = $obtener['planesSeguimientoPaciente'];
+        $pesoIdeal = $obtener['pesoIdeal'];
+        $diagnostico = $obtener['diagnostico'];
+        $estadoIMC = $obtener['estadoIMC'];
+        $fechas = $obtener['fechas'];
+        $pesos = $obtener['pesos'];
+        $alimentosConsumidos = $obtener['alimentosConsumidos'];
+        $kcal = $obtener['kcal'];
+        $alimentos = $obtener['alimentos'];
+        $detallesPlanAlimentacionActivo = $obtener['detallesPlanAlimentacionActivo'];
+        $unidades_de_medida = $obtener['unidades_de_medida'];
+        $geb = $obtener['geb'];
+        $get = $obtener['get'];
+
+        return redirect()->route('mi-seguimiento.index', compact(
+                'planAlimentacionActivo',
+                'planSeguimientoActivo',
+                'planesAlimentacionPaciente',
+                'planesSeguimientoPaciente',
+                'pesoIdeal',
+                'diagnostico',
+                'estadoIMC',
+                'fechas',
+                'pesos',
+                'alimentosConsumidos',
+                'kcal',
+                'alimentos',
+                'detallesPlanAlimentacionActivo',
+                'unidades_de_medida',
+                'geb',
+                'get',
+            )
+        )->with('success', 'Alimento consumido eliminado correctamente');
+
     }
 }

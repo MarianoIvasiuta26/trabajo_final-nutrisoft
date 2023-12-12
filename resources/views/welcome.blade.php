@@ -8,7 +8,10 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+        <link href=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css" rel="stylesheet">
+        <link href=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/themes/introjs-modern.css" rel="stylesheet">
 
+        <script src=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js"></script>
         <!-- Styles -->
         <style>
             body {
@@ -219,5 +222,31 @@
                 </div>
             </div>-->
         </div>
+
+        <script>
+            introJs().setOptions({
+                steps: [
+                    {
+                        intro:"¡Bienvenido a NutriSoft!"
+                    },
+                    {
+                        element: document.querySelector('.button-container'), intro: "En este apartado encuentra los botones para acceder al sistema"
+                    },
+                    {
+                        element: document.querySelector('.login-button'), intro: "Botón para iniciar sesión si ya tiene una cuenta"
+                    },
+                    {
+                        element: document.querySelector('.register-button'), intro: "Botón para registrarse"
+                    },
+                ],
+                showProgress: true,
+                showBullets: false,
+                disableInteraction: true,
+                'nextLabel': 'Siguiente',
+                'prevLabel': 'Anterior',
+                'doneLabel': 'Hecho',
+            }).start();
+        </script>
+
     </body>
 </html>

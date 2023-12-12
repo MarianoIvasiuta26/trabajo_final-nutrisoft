@@ -20,25 +20,7 @@
 
                     </div>
 
-                    @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
-                        <div class="alert alert-warning" role="alert">
-                            Parece que aún no has completado tu Historia Clínica. <br>
-                            Haga click en el siguiente enlace para completar su historia clínica:
-                            <a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar mi Historia Clínica</a>
-                        </div>
-
-                    @endif
-
-                    @if(auth()->user()->tipo_usuario === 'Paciente' && app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
-                        @if (!app('App\Http\Controllers\PacienteController')->hasCompletedDatosMedicos() || !app('App\Http\Controllers\PacienteController')->hasCompletedCirugias() || !app('App\Http\Controllers\PacienteController')->hasCompletedAnamnesis())
-                            <div class="alert alert-warning" role="alert">
-                                Parece que aún no has terminado de completar tu Historia Clínica. Recuerda que es importante que lo completes para tener acceso a todas las funcionalidades del sistema.<br>
-                                Haga click en el siguiente enlace para completar su historia clínica:
-                                <a href="{{ route('historia-clinica.create') }}" class="alert-link">Continuar completando mi Historia Clínica</a>
-                            </div>
-                        @endif
-                    @endif
 
 
 
@@ -53,7 +35,28 @@
         <h5 style="text-align: center;">NutriSoft - Sistema de Gestión Nutricional</h5>
     </div>
 
-    
+    @role('Paciente')
+        @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
+
+            <div class="alert alert-warning" role="alert" id="step1">
+                Parece que aún no has completado tu Historia Clínica. <br>
+                Haga click en el siguiente enlace para completar su historia clínica:
+                <a href="{{ route('historia-clinica.create') }}" class="alert-link" id="step2">Completar mi Historia Clínica</a>
+            </div>
+
+        @endif
+
+        @if(auth()->user()->tipo_usuario === 'Paciente' && app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
+            @if (!app('App\Http\Controllers\PacienteController')->hasCompletedDatosMedicos() || !app('App\Http\Controllers\PacienteController')->hasCompletedCirugias() || !app('App\Http\Controllers\PacienteController')->hasCompletedAnamnesis())
+                <div class="alert alert-warning" role="alert">
+                    Parece que aún no has terminado de completar tu Historia Clínica. Recuerda que es importante que lo completes para tener acceso a todas las funcionalidades del sistema.<br>
+                    Haga click en el siguiente enlace para completar su historia clínica:
+                    <a href="{{ route('historia-clinica.create') }}" class="alert-link">Continuar completando mi Historia Clínica</a>
+                </div>
+            @endif
+        @endif
+    @endrole
+
     @role('Nutricionista')
         <div class="row mt-3">
             <div class="col-lg-4 col-6">
@@ -184,6 +187,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link href=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css" rel="stylesheet">
+    <link href=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/themes/introjs-modern.css" rel="stylesheet">
 
 @stop
 
@@ -196,8 +201,31 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+
+        introJs().setOptions({
+                steps: [
+                    {intro: "Esta es la vista principal."},
+                    {
+                        element: document.querySelector('#step1'),
+                        intro: "Cuando accede por primera vez al sistema, se le pedirá que complete su registro.",
+                    },
+                    {
+                        element: document.querySelector('#step2'),
+                        intro: "Debe presionar en el enlace que se le ofrece para completar el mismo.",
+                    },
+                ],
+                showProgress: true,
+                showBullets: false,
+                disableInteraction: true,
+                'nextLabel': 'Siguiente',
+                'prevLabel': 'Anterior',
+                'doneLabel': 'Hecho',
+            }).start();
+
         $(document).ready(function(){
             $('#tabla-turnos-hoy').DataTable({
                 responsive: false,
@@ -219,5 +247,15 @@
                 }
             });
         });
+
+        @if (session('info'))
+            Swal.fire({
+                icon: 'info',
+                title: '¡Atención!',
+                text: "{{session('info')}}",
+                showConfirmButton: false,
+                timer: 10000
+            })
+        @endif
     </script>
 @stop

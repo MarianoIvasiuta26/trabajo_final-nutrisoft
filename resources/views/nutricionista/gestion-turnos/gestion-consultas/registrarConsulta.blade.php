@@ -1264,6 +1264,7 @@
             // Agrega un controlador de cambio al checkbox
             generarPlanAlimentacionCheckbox.addEventListener('change', function () {
                 if (generarPlanAlimentacionCheckbox.checked) {
+
                     // Muestra un SweetAlert de confirmación solo si el checkbox se marca
                     Swal.fire({
                         title: '¿Está seguro de generar un plan de alimentación?',
@@ -1271,7 +1272,10 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, generar plan de alimentación',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: 'Cancelar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (!result.isConfirmed) {
                             // Si el usuario cancela, desmarca el checkbox
@@ -1297,7 +1301,10 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, generar plan de seguimiento',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: 'Cancelar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (!result.isConfirmed) {
                             // Si el usuario cancela, desmarca el checkbox

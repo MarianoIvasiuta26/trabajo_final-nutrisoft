@@ -206,6 +206,7 @@
                                 <tr>
                                     <th>Alimento</th>
                                     <th>Cantidad</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -217,6 +218,13 @@
 
                                         <td>
                                             {{ $alimentoConsumido->cantidad }} {{ $alimentoConsumido->unidad_medida }}
+                                        </td>
+                                        <td>
+                                            <form id="formEliminar" action="{{route('mi-seguimiento.destroy', $alimentoConsumido->id)}}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-danger btn-sm delete-button"><i class="bi bi-trash"></i></button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -438,6 +446,26 @@
             });
         });
 
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: "{{session('success')}}",
+                showConfirmButton: false,
+                timer: 10000
+            })
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: '¡Atención!',
+                text: "{{session('error')}}",
+                showConfirmButton: false,
+                timer: 10000
+            })
+        @endif
+
         //SweetAlert para guardar nuevo alimento
         document.addEventListener('DOMContentLoaded', function () {
             const guardarAlimento = document.querySelectorAll('.add-alimento');
@@ -479,6 +507,49 @@
                 });
             });
         });
+
+         //SweetAlert para guardar nuevo alimento
+         document.addEventListener('DOMContentLoaded', function () {
+            const eliminarAlimento = document.querySelectorAll('.delete-button');
+
+            eliminarAlimento.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de eliminar el alimento consumido?',
+                        text: "Al confirmar se eliminará el registro del alimento consumido.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Eliminar alimento!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('formEliminar');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se eliminó el alimento!'
+                            )
+                        }
+                    })
+                });
+            });
+        });
+
 
     /*
         // Configuración de datos del gráfico de estado actual

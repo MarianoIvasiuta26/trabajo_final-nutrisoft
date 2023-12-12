@@ -639,7 +639,7 @@
                             icon: 'question',
                             showCancelButton: true,
                             confirmButtonText: '¡Confirmar plan!',
-                            confirmButtonColor: '#3085d6',
+                            confirmButtonColor: '#198754',
                             cancelButtonText: '¡No, cancelar!',
                             cancelButtonColor: '#d33',
                             reverseButtons: true
