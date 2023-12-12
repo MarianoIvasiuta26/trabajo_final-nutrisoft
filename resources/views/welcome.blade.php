@@ -224,6 +224,7 @@
         </div>
 
         <script>
+            /*
             introJs().setOptions({
                 steps: [
                     {
@@ -246,6 +247,7 @@
                 'prevLabel': 'Anterior',
                 'doneLabel': 'Hecho',
             }).start();
+            */
         </script>
 
     </body>

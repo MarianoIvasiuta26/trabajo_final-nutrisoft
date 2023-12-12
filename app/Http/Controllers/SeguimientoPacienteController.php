@@ -48,6 +48,8 @@ class SeguimientoPacienteController extends Controller
         $unidades_de_medida = $obtener['unidades_de_medida'];
         $geb = $obtener['geb'];
         $get = $obtener['get'];
+        $deficitCalorico = $obtener['deficitCalorico'];
+        $superavitCalorico = $obtener['superavitCalorico'];
 
         return view('paciente.mi-seguimiento.index', compact(
                 'planAlimentacionActivo',
@@ -66,6 +68,8 @@ class SeguimientoPacienteController extends Controller
                 'unidades_de_medida',
                 'geb',
                 'get',
+                'deficitCalorico',
+                'superavitCalorico',
             )
         );
     }
@@ -141,6 +145,17 @@ class SeguimientoPacienteController extends Controller
             $geb = $resultadoGEB['geb'];
             $get = $resultadoGET['get'];
 
+            $deficitCalorico = 0;
+            $superavitCalorico = 0;
+            //Verificamos cual es el objetivo de salud del paciente
+            if($historiaClinica->objetivo_salud == 'Adelgazar'){
+                $deficitCalorico = $get - 500;
+            }
+
+            if ($historiaClinica->objetivo_salud == 'Ganar masa muscular'){
+                $superavitCalorico = $get + 500;
+            }
+
             return [
                 'planAlimentacionActivo' => $planAlimentacionActivo,
                 'planSeguimientoActivo' => $planSeguimientoActivo,
@@ -158,6 +173,8 @@ class SeguimientoPacienteController extends Controller
                 'unidades_de_medida' => $unidades_de_medida,
                 'geb' => $geb,
                 'get' => $get,
+                'deficitCalorico' =>$deficitCalorico,
+                'superavitCalorico' => $superavitCalorico,
             ];
         }else{
             return [
@@ -177,6 +194,8 @@ class SeguimientoPacienteController extends Controller
                 'unidades_de_medida' => null,
                 'geb' => null,
                 'get' => null,
+                'deficitCalorico' => null,
+                'supervitCalorico' => null,
             ];
         }
 
@@ -330,6 +349,8 @@ class SeguimientoPacienteController extends Controller
         $unidades_de_medida = $obtener['unidades_de_medida'];
         $geb = $obtener['geb'];
         $get = $obtener['get'];
+        $deficitCalorico = $obtener['deficitCalorico'];
+        $superavitCalorico = $obtener['superavitCalorico'];
 
         return redirect()->route('mi-seguimiento.index', compact(
                 'planAlimentacionActivo',
@@ -348,6 +369,8 @@ class SeguimientoPacienteController extends Controller
                 'unidades_de_medida',
                 'geb',
                 'get',
+                'deficitCalorico',
+                'superavitCalorico',
             )
         )->with('success', 'Alimentos consumidos registrados correctamente');
     }

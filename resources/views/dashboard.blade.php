@@ -375,6 +375,8 @@
 
     <script>
 
+        /*
+
         introJs().setOptions({
                 steps: [
                     {intro: "Esta es la vista principal."},
@@ -416,7 +418,7 @@
                 }
             });
         });
-
+        */
         @if (session('info'))
             Swal.fire({
                 icon: 'info',

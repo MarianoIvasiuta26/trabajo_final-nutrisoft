@@ -518,7 +518,7 @@ return [
                         ],
                     ],
                 ],
-                [
+               /* [
                     'text'    => 'Análisis clínico',
                     'icon'    => 'fas fa-fw fa-syringe',
                     'submenu' => [
@@ -533,7 +533,7 @@ return [
                             'url'  => '#',
                         ],
                     ],
-                ],
+                ],*/
 
             ],
 
@@ -640,13 +640,14 @@ return [
             'icon' => 'fas fa-lock',
             'can' => 'auditoria.index'
         ],
+        /*
 
         ['header' => 'account_settings'],
         [
             'text' => 'profile',
             'url'  => 'profile',
             'icon' => 'fas fa-fw fa-user',
-        ],
+        ],*/
         /*
             [
                 'text' => 'change_password',

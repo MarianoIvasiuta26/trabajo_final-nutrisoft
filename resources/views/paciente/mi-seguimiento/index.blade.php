@@ -106,7 +106,7 @@
 
     <!-- Consumo diario -->
     <div class="row mt-3">
-        <div class="col-lg-8 col-md-6">
+        <div class="col-lg-12 col-md-6">
             <div class="card card-dark mt-3">
                 <div class="card-header">
                     <h5 class="card-title">Consumo diario</h5>
@@ -235,11 +235,19 @@
             </div>
         </div>
 
+        <div class="col-lg-12 col-md-12">
+            <div class="alert alert-warning" role="alert">
+                Abajo se muestra las kilocalorías consumidas en el día. <br>
+                Puede guiarse con cualquiera de las recomendaciones, tanto con las kcal consumidas sobre el GET o sobre el  @if ($deficitCalorico != 0) Déficit calórico @endif  @if ($superavitCalorico != 0) Superávit calórico @endif.
+            </div>
+        </div>
+
+
         <!-- kcal consumida -->
-        <div class="col-lg-4 col-md-6">
+        <div class="col-lg-6 col-md-6">
             <div class="card card-dark mt-3">
                 <div class="card-header">
-                    <h5 class="card-title">Kilocalorías totales consumidas</h5>
+                    <h5 class="card-title">Kilocalorías consumidas / GET</h5>
                     <div class="card-tools">
                         <button type="button" class="btn btn-tool" data-card-widget = "collapse" title= "collapse">
                             <i class="fas fa-minus"></i>
@@ -248,18 +256,110 @@
                 </div>
 
                 <div class="card-body">
+                    <div class="row">
+                        <div class="col-auto" style="margin: auto;" >
+                            <span class="badge rounded-pill bg-primary">
+                                GET: {{$get}} kcal
+                            </span>
+                        </div>
+                        <div class="col-auto" style="margin: auto;" >
+                            <span class="badge rounded-pill bg-primary">GEB: {{$geb}} kcal</span>
+                        </div>
+
+                    </div>
                     <div class="row mt-3">
                         <div class="col-auto" style="margin: auto;" >
                             <div class="medallon medallon-amarillo">
-                                {{ $kcal }} kcal <br>
+                                {{ $kcal }} kcal de {{$get}}<br>
                             </div>
                         </div>
+                        <div class="mt-3">
+                            <h5 style="text-align: center;">Kilocalorías recomendadas</h5>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12" style="margin: auto;" >
+                            <span class="text-muted">
+                                <strong>Aclaración:</strong> El GET indica la cantidad máxima recomendada de kcal a consumir a diario para su objetivo de salud.
+                            </span><br>
+                            <span class="text-muted"><strong>GET:</strong> Gasto Energético Total</span> <br>
+                            <span class="text-muted"><strong>GEB:</strong> Gasto Energético Basal</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 col-md-6">
+            <div class="card card-dark mt-3">
+                <div class="card-header">
+                    <h5 class="card-title">
+                        Kilocalorías consumidas /   @if ($deficitCalorico != 0) Déficit calórico @endif  @if ($superavitCalorico != 0) Superávit calórico @endif
+                    </h5>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget = "collapse" title= "collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-auto" style="margin: auto;" >
+                            <span class="badge rounded-pill bg-primary">
+                                @if ($deficitCalorico != 0)
+                                    Déficit: {{$deficitCalorico}} kcal
+                                @endif
+                                @if ($superavitCalorico != 0)
+                                    Superávit: {{$superavitCalorico}} kcal
+                                @endif
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-auto" style="margin:auto">
+                            <div class="medallon medallon-amarillo">
+                                {{ $kcal }} kcal de
+                                @if ($deficitCalorico != 0)
+                                    {{$deficitCalorico}}
+                                @endif
+
+                                @if ($superavitCalorico != 0)
+                                    {{$superavitCalorico}}
+                                @endif
+                            </div>
+                        </div>
+                        @if ($deficitCalorico != 0)
+                            <div class="mt-3">
+                                <h5 style="text-align: center;">Kilocalorías con Déficit calórico</h5>
+                            </div>
+                        @endif
+                        @if ($superavitCalorico != 0)
+                            <div class="mt-3">
+                                <h5 style="text-align: center;">Kilocalorías con Superávit calórico</h5>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12" style="margin: auto;" >
+                            @if ($deficitCalorico != 0)
+                                <span class="text-muted">
+                                    <strong>Aclaración:</strong> El déficit calórico consiste en consumir menos calorías de las que el cuerpo necesita favoreciendo a la pérdida de peso en forma gradual y saludable.
+                                </span><br>
+                            @endif
+                            @if ($superavitCalorico != 0)
+                                <span class="text-muted">
+                                    <strong>Aclaración:</strong> El superávit calórico consiste en consumir más calorías de las que el cuerpo necesita favoreciendo el aumento de peso.
+                                </span><br>
+                            @endif
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 
 @stop
 
