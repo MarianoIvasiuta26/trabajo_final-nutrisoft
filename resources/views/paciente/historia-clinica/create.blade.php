@@ -35,6 +35,7 @@
                 <h5>Datos Personales</h5>
 
                 @if ($paciente->dni != NULL && $paciente->telefono != NULL && $paciente->sexo != NULL && $paciente->fecha_nacimiento != NULL)
+                    
                     <div class="row mt-3">
                         <div class="alert alert-success" role="alert">
                             <h4 class="alert-heading">¡Bien {{$paciente->user->name}}!</h4>
@@ -338,7 +339,7 @@
                     </div>
 
                     <div class="mt-3 float-right">
-                        <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning completar-registro paso11">Completar registro</a>
+                        <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning paso11">Completar registro</a>
                     </div>
                 @else
                     <form class="mt-3 paso9" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
@@ -781,7 +782,6 @@
                 $(".progress-bar").text(progress.toFixed(2) + "%");
             }
         });
-
 
 
         /*

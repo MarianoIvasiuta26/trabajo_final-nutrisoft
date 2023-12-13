@@ -591,7 +591,7 @@
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -608,7 +608,10 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, eliminar',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: 'Cancelar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

@@ -78,6 +78,7 @@ class HistoriaClinicaController extends Controller
         $profesionales = Nutricionista::all();
         //Obtener paciente autenticado
         $paciente = Paciente::where('user_id', auth()->user()->id)->first();
+
         // Verificar si el formulario se ha completado
         $formularioCompletado = false;
         if (session('dni') && session('telefono') && session('sexo') && session('fecha_nacimiento')) {
