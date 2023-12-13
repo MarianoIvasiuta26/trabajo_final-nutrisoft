@@ -30,8 +30,9 @@
 
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#datosTratamientos">Datos Tabulares</a></li>
-                            <li><a class="dropdown-item" href="#">Generar Reporte</a></li>
+                           <!-- <li><a class="dropdown-item" href="{{route('gestion-estadisticas.generar-reporte-grafico1')}}">Generar Reporte</a></li>-->
                         </ul>
+
                     </div>
 
                     <!-- Filtros -->
@@ -140,7 +141,9 @@
 
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#datosTags">Datos Tabulares</a></li>
+                            <!--
                             <li><a class="dropdown-item" href="#">Generar Reporte</a></li>
+                            -->
                         </ul>
                     </div>
 
@@ -240,7 +243,7 @@
 
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuAlimentosRecomendados">
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#datosAlimentosRecomendados">Datos Tabulares</a></li>
-                            <li><a class="dropdown-item" href="#">Generar Reporte</a></li>
+                            <!--<li><a class="dropdown-item" href="#">Generar Reporte</a></li>-->
                         </ul>
                     </div>
 
@@ -280,7 +283,26 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-
+                                    <table class="table table-striped" id="tabla-cantidad-alimentos">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Alimento</th>
+                                                <th scope="col">Cantidad Recomendado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($labels3 as $alimento)
+                                                <tr>
+                                                    <td>
+                                                        {{ $alimento }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $data3[$alimento] ?? 0 }}
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
@@ -476,6 +498,29 @@
                     "info": "",
                     "infoEmpty": "No hay etiquetas",
                     "infoFiltered": "(filtrado de _MAX_ etiquetas totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+                }
+            });
+        });
+
+        //Datatable Alimentos recomendados
+        $(document).ready(function(){
+            $('#tabla-cantidad-alimentos').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_",
+                    "zeroRecords": "No se encontró ningún alimento",
+                    "info": "",
+                    "infoEmpty": "No hay alimentos",
+                    "infoFiltered": "(filtrado de _MAX_ alimentos totales)",
                     "search": "Buscar:",
                     "paginate": {
                         "first": "Primero",

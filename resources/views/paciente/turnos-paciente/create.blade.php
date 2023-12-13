@@ -22,9 +22,9 @@
 
             @foreach ($turnos as $turno)
                 @if($turno->paciente_id == $paciente->id && $turno->estado == 'Pendiente' || $turno->estado == 'Confirmar asistencia')
-                    <div class="alert alert-warning" role="alert">
+                    <div class="alert alert-warning mt-3" role="alert">
                         <h5>Ya tienes un turno solicitado</h5>
-                        <p>Ya tienes un turno solicitado para el día {{$turno->fecha}} a las {{$turno->hora}} hs.</p>
+                        <p>Ya tienes un turno solicitado para el día {{\Carbon\Carbon::parse($turno->fecha)->format('d-m-Y')}} a las {{$turno->hora}} hs.</p>
                         <p>Si desea cancelar su turno, haga click en el siguiente botón:</p>
                         <form action="{{ route('turnos.destroy', $turno->id) }}" method="POST" style="display: inline-block;">
                             @csrf
@@ -96,7 +96,7 @@
                                 <div class="col-md-6">
                                     <label class="form-label" for="objetivo_salud">
                                         Objetivo de salud
-                                        <button type="button" style="margin-left: 5px; padding: 0;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Para seleccionar otro Objetivo de salud, debe modificar su historia clínica.">
+                                        <button type="button" style="margin-left: 5px; padding: 0;" class="btn btn-sm align-middle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-content="Para seleccionar otro Objetivo de salud, debe modificar sus datos en la sección 'Mis datos'.">
                                             <i class="bi bi-question-circle"></i>
                                         </button>
                                     </label>
@@ -152,8 +152,11 @@
                                 </div>
                             </div>
 
-                            <button class="btn btn-success mt-3 solicitar-turno-button" type="button">Solicitar turno</button>
-                            <a href="{{route('turnos.index')}}" class="btn btn-danger mt-3">Volver</a>
+                            <div class="float-right">
+                                <a href="{{route('turnos.index')}}" class="btn btn-danger mt-3">Volver</a>
+                                <button class="btn btn-success mt-3 solicitar-turno-button" type="button">Solicitar turno</button>
+                            </div>
+
                         </form>
                     </div>
                 </div>
@@ -281,7 +284,7 @@
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: '¡Si, solicitar turno!',
-                        confirmButtonColor: '#3085d6',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: '¡No, cancelar!',
                         cancelButtonColor: '#d33',
                         reverseButtons: true

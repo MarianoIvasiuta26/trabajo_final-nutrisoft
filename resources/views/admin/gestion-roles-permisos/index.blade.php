@@ -448,7 +448,7 @@
                     showCancelButton: true,
                     cancelButtonText: '¡No, cancelar!',
                     confirmButtonColor: '#198754',
-                    confirmButtonText: 'Editar rol!',
+                    confirmButtonText: '¡Editar rol!',
                     cancelButtonColor: '#d33',
                     reverseButtons: true
                     }).then((result) => {

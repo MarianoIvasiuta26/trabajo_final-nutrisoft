@@ -52,8 +52,14 @@ class ConfirmarAdelantamientoTurno extends Mailable
     }
 
     public function build(){
+        $logo = public_path('img/logo.jpeg');
         return $this->view('emails.confirmar-adelantamiento')
         ->with(['turnoTemporalId' => $this->turnoTemporalId, 'fechaAdelantado' => $this->fechaAdelantado, 'horaAdelantado' => $this->horaAdelantado])
-        ->subject('Confirmar Adelantamiento de Turno');
+        ->subject('Confirmar Adelantamiento de Turno')
+        ->attach($logo, [
+            'as' => 'logo.jpeg',
+            'mime' => 'image/jpeg',
+        ]);
+
     }
 }

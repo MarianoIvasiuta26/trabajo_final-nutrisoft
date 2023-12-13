@@ -82,17 +82,20 @@
                     <div class="row">
                         <div class="col-md-12">
                             <form action="{{ route('gestion-tratamientos.filtros') }}" method="GET">
-                                <label for="fecha_inicio">Desde:</label>
-                                <input class="" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
-
-                                <label for="fecha_fin">Hasta:</label>
-                                <input class="" type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
-
-                                <div class="justify-end" style="display: inline-block;">
-                                    <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
-                                    <a href="{{route('gestion-tratamientos.clearFilters')}}" class="btn btn-danger btn-sm">Borrar filtros</a>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="fecha_inicio">Desde:</label>
+                                        <input class="form-control" type="date" name="fecha_inicio"  value="{{ old('fecha_inicio', $fechaInicio) }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="fecha_fin">Hasta:</label>
+                                        <input class="form-control" type="date" name="fecha_fin" value="{{ old('fecha_fin', $fechaFin) }}">
+                                    </div>
+                                    <div class="justify-end float-right" style="display: inline-block;">
+                                        <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
+                                        <a href="{{route('gestion-tratamientos.clearFilters')}}" class="btn btn-danger btn-sm">Borrar filtros</a>
+                                    </div>
                                 </div>
-
                             </form>
                         </div>
                     </div>
@@ -232,7 +235,7 @@
                 confirmButton: 'btn btn-success',
                 cancelButton: 'btn btn-danger'
             },
-            buttonsStyling: false
+            buttonsStyling: true
         })
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -244,11 +247,14 @@
                     // Muestra un SweetAlert de confirmación
                     swalWithBootstrapButtons.fire({
                         title: '¿Estás seguro?',
-                        text: 'Esta acción eliminará el registro de alergia.',
+                        text: 'Esta acción eliminará el registro de tratamiento.',
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, eliminar',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: 'Cancelar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

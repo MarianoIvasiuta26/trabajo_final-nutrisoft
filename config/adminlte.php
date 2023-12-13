@@ -611,13 +611,13 @@ return [
             'text' => 'Usuarios',
             'route'  => 'gestion-usuarios.index',
             'icon' => 'fas fa-users fa-fw',
-            'can' => 'gestion-usuarios.index'
+            'can' => 'Ver usuarios - gestion-usuarios.index'
         ],
         [
             'text' => 'Nuevo usuario',
             'route'  => 'gestion-usuarios.create',
             'icon' => 'fas fa-fw fa-user-plus',
-            'can' => 'gestion-usuarios.create'
+            'can' => 'Crear usuario - gestion-usuarios.create'
         ],
 
         [

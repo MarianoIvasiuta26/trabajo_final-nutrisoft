@@ -44,7 +44,7 @@
                         </div>
                     </div>
 
-                    <button type="button" id="next-step1" class="btn btn-primary next-step">Siguiente</button>
+                    <button type="button" id="next-step1" class="btn btn-primary next-step float-right">Siguiente</button>
                 @else
                     <form class="row g-3 mt-3 paso3" action="{{route('datos-personales.store')}}" method="POST" id="form-datos-personales">
                         @csrf
@@ -162,10 +162,11 @@
                         </div>
 
                         <div class="row mt-3">
-                            <div class="col-12">
+                            <div class="col">
                                 <div class="float-right">
                                     <button id="guardar-step2" type="button" class="btn btn-success guardar-step2">Guardar</button>
                                     <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
+                                    <button type="button" class="btn btn-primary next-step paso6">Siguiente</button>
                                 </div>
                             </div>
                         </div>
@@ -176,7 +177,7 @@
                 @if ($paciente->dni == NULL && $paciente->telefono == NULL && $paciente->sexo == NULL && $paciente->fecha_nacimiento == NULL)
                     <button type="button" class="btn btn-danger prev-step" id="prev-step2">Anterior</button>
                 @endif
-                <button type="button" class="btn btn-primary next-step paso6">Siguiente</button>
+
             </div>
 
             <!-- Step 3 -->
@@ -195,9 +196,9 @@
                     </div>
                     <br>
                     @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
-                        <button type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</button>
+                        <button type="button" class="btn btn-danger prev-step float-right" id="prev-step3">Anterior</button>
                     @endif
-                    <button type="button" class="btn btn-primary next-step">Siguiente</button>
+                    <button type="button" class="btn btn-primary next-step float-right">Siguiente</button>
                 @else
                 <form class="paso7" id="form-datos-corporales" action="{{route('historia-clinica.store')}}" method="POST">
                     @csrf
@@ -303,8 +304,12 @@
                     <div class="row mt-3">
                         <div class="col-12">
                             <div class="float-right">
+                                @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
+                                    <button type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</button>
+                                @endif
                                 <button id="guardar-step3" type="button" class="btn btn-success guardar-step3 paso8">Guardar</button>
                                 <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
+
                             </div>
                         </div>
                     </div>
@@ -313,9 +318,7 @@
 
 
                 <br>
-                @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
-                    <button type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</button>
-                @endif
+
             </div>
 
             <!-- Step 4 -->
@@ -338,134 +341,135 @@
                         <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning completar-registro paso11">Completar registro</a>
                     </div>
                 @else
-                <form class="mt-3 paso9" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
-                @csrf
-                <div class="row mt-3">
-                    <h5>Gustos alimenticios</h5>
-                    <div class="col-md-6">
-                        <label for="gustos" class="form-label">Seleccione sus alimentos preferidos</label>
-                        <select name="alimentos_gustos[]" class="form-select" id="gustos" data-placeholder="Alimentos preferidos..." multiple>
-                            <option value="">Ninguna</option>
-                            @foreach ($alimentos->groupBy('grupo_alimento') as $grupo_alimento => $alimentos_del_grupo)
-                                <optgroup label="{{$grupo_alimento}}">
-                                    @foreach ($alimentos_del_grupo as $alimento)
-                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="no_gustos" class="form-label">Seleccione los alimentos que no le guste</label>
-                        <select name="alimentos_no_gustos[]" class="form-select" id="no_gustos" data-placeholder="Alimentos que no guste..." multiple>
-                            <option value="">Ninguna</option>
-                            @foreach ($alimentos->groupBy('grupo') as $grupo_alimento => $alimentos_del_grupo)
-                                <optgroup label="{{$grupo_alimento}}">
-                                    @foreach ($alimentos_del_grupo as $alimento)
-                                        <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <h5>Alergias</h5>
-                    <div class="col-md-12">
-                        <label for="alergias" class="form-label">Seleccione las alergias que posee</label>
-                        <select name="alergias[]" class="form-select" id="alergias" data-placeholder="Alergias..." multiple>
-                            <option value="">Ninguna</option>
-                            @foreach ($alergias->groupBy('grupo_alergia') as $grupo_alergia => $alergias_del_grupo)
-                                <optgroup label="{{$grupo_alergia}}">
-                                    @foreach ($alergias_del_grupo as $alergia)
-                                        <option value="{{$alergia->id}}">{{$alergia->alergia}}</option>
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row mt-3" id="cirugias-container">
-                    <h5>Cirugías</h5>
-                    <div class="cirugia-entry">
+                    <form class="mt-3 paso9" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
+                        @csrf
                         <div class="row mt-3">
+                            <h5>Gustos alimenticios</h5>
                             <div class="col-md-6">
-                                <select name="cirugias[]" class="form-select">
-                                    <option value="">Seleccione una cirugía</option>
-                                    @foreach ($cirugias->groupBy('grupo_cirugia') as $grupo_cirugia => $cirugias_del_grupo)
-                                        <optgroup label="{{$grupo_cirugia}}">
-                                            @foreach ($cirugias_del_grupo as $cirugia)
-                                                <option value="{{$cirugia->id}}">{{$cirugia->cirugia}}</option>
+                                <label for="gustos" class="form-label">Seleccione sus alimentos preferidos</label>
+                                <select name="alimentos_gustos[]" class="form-select" id="gustos" data-placeholder="Alimentos preferidos..." multiple>
+                                    <option value="">Ninguna</option>
+                                    @foreach ($alimentos->groupBy('grupo_alimento') as $grupo_alimento => $alimentos_del_grupo)
+                                        <optgroup label="{{$grupo_alimento}}">
+                                            @foreach ($alimentos_del_grupo as $alimento)
+                                                <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
                                             @endforeach
                                         </optgroup>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <div class="input-group">
-                                    <input type="number" name="tiempos[]" class="form-control tiempo-input" placeholder="Tiempo">
-                                    <select name="unidades_tiempo[]" class="form-select unidad-select">
-                                        <option value="dias">Días</option>
-                                        <option value="semanas">Semanas</option>
-                                        <option value="meses">Meses</option>
-                                        <option value="anios">Años</option>
-                                    </select>
-                                    <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
-                                    <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
+                                <label for="no_gustos" class="form-label">Seleccione los alimentos que no le guste</label>
+                                <select name="alimentos_no_gustos[]" class="form-select" id="no_gustos" data-placeholder="Alimentos que no guste..." multiple>
+                                    <option value="">Ninguna</option>
+                                    @foreach ($alimentos->groupBy('grupo') as $grupo_alimento => $alimentos_del_grupo)
+                                        <optgroup label="{{$grupo_alimento}}">
+                                            @foreach ($alimentos_del_grupo as $alimento)
+                                                <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <h5>Alergias</h5>
+                            <div class="col-md-12">
+                                <label for="alergias" class="form-label">Seleccione las alergias que posee</label>
+                                <select name="alergias[]" class="form-select" id="alergias" data-placeholder="Alergias..." multiple>
+                                    <option value="">Ninguna</option>
+                                    @foreach ($alergias->groupBy('grupo_alergia') as $grupo_alergia => $alergias_del_grupo)
+                                        <optgroup label="{{$grupo_alergia}}">
+                                            @foreach ($alergias_del_grupo as $alergia)
+                                                <option value="{{$alergia->id}}">{{$alergia->alergia}}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3" id="cirugias-container">
+                            <h5>Cirugías</h5>
+                            <div class="cirugia-entry">
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <select name="cirugias[]" class="form-select">
+                                            <option value="">Seleccione una cirugía</option>
+                                            @foreach ($cirugias->groupBy('grupo_cirugia') as $grupo_cirugia => $cirugias_del_grupo)
+                                                <optgroup label="{{$grupo_cirugia}}">
+                                                    @foreach ($cirugias_del_grupo as $cirugia)
+                                                        <option value="{{$cirugia->id}}">{{$cirugia->cirugia}}</option>
+                                                    @endforeach
+                                                </optgroup>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <input type="number" name="tiempos[]" class="form-control tiempo-input" placeholder="Tiempo">
+                                            <select name="unidades_tiempo[]" class="form-select unidad-select">
+                                                <option value="dias">Días</option>
+                                                <option value="semanas">Semanas</option>
+                                                <option value="meses">Meses</option>
+                                                <option value="anios">Años</option>
+                                            </select>
+                                            <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
+                                            <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="row mt-3">
-                    <h5>Patologías</h5>
-                    <div class="col-md-12">
-                        <label for="patologias" class="form-label">Seleccione las patologías que posee</label>
-                        <select name="patologias[]" class="form-select" id="patologias" data-placeholder="Patologías..." multiple>
-                            <option value="">Ninguna</option>
-                            @foreach ($patologias->groupBy('grupo_patologia') as $grupo_patologia => $patologias_del_grupo)
-                                <optgroup label="{{$grupo_patologia}}">
-                                    @foreach ($patologias_del_grupo as $patologia)
-                                        <option value="{{$patologia->id}}">{{$patologia->patologia}}</option>
+                        <div class="row mt-3">
+                            <h5>Patologías</h5>
+                            <div class="col-md-12">
+                                <label for="patologias" class="form-label">Seleccione las patologías que posee</label>
+                                <select name="patologias[]" class="form-select" id="patologias" data-placeholder="Patologías..." multiple>
+                                    <option value="">Ninguna</option>
+                                    @foreach ($patologias->groupBy('grupo_patologia') as $grupo_patologia => $patologias_del_grupo)
+                                        <optgroup label="{{$grupo_patologia}}">
+                                            @foreach ($patologias_del_grupo as $patologia)
+                                                <option value="{{$patologia->id}}">{{$patologia->patologia}}</option>
+                                            @endforeach
+                                        </optgroup>
                                     @endforeach
-                                </optgroup>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <h5>Intolerancias</h5>
-                    <div class="col-md-12">
-                        <label for="intolerancias" class="form-label">Seleccione las intolerancias que posee</label>
-                        <select name="intolerancias[]" class="form-select" id="intolerancias" data-placeholder="Intolerancias..." multiple>
-                            <option value="">Ninguna</option>
-                            @foreach ($intolerancias as $intolerancia)
-                                <option value="{{$intolerancia->id}}">{{$intolerancia->intolerancia}}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-
-                <div class="row mt-3">
-                    <div class="col-12">
-                        <div class="float-right">
-                            <button id="guardar-step4" type="button" class="btn btn-success guardar-step4 paso10">Guardar</button>
-                            <!--<a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                </form>
+
+                        <div class="row mt-3">
+                            <h5>Intolerancias</h5>
+                            <div class="col-md-12">
+                                <label for="intolerancias" class="form-label">Seleccione las intolerancias que posee</label>
+                                <select name="intolerancias[]" class="form-select" id="intolerancias" data-placeholder="Intolerancias..." multiple>
+                                    <option value="">Ninguna</option>
+                                    @foreach ($intolerancias as $intolerancia)
+                                        <option value="{{$intolerancia->id}}">{{$intolerancia->intolerancia}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="float-right">
+                                    @if(!$paciente->historiaClinica)
+                                        <button type="button" class="btn btn-danger prev-step" id="prev-step4">Anterior</button>
+                                    @endif
+                                    <button id="guardar-step4" type="button" class="btn btn-success guardar-step4 paso10">Guardar</button>
+                                    <!--<a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 @endif
 
                 <br>
-                @if(!$paciente->historiaClinica)
-                    <button type="button" class="btn btn-danger prev-step" id="prev-step4">Anterior</button>
-                @endif
+
             </div>
         </div>
     </div>
@@ -520,6 +524,8 @@
     <script src=" https://cdn.jsdelivr.net/npm/intro.js@7.2.0/intro.min.js"></script>
 
     <script>
+
+    /*
 
         introJs().setOptions({
             steps: [
@@ -628,7 +634,7 @@
             }).start();
         @endif
 
-
+    */
 
         $(document).ready(function () {
             $('#dni').on('input', function () {
@@ -712,9 +718,12 @@
         });
         */
 
+
         $(document).ready(function () {
             var totalSteps = $(".step").length;
             var currentStep = 1;
+
+            console.log(currentStep);
 
             // Obtén el estado de completitud desde el lado del cliente (puedes usar cookies o localStorage)
             var completedSteps = [false, false, false, false];
@@ -758,12 +767,7 @@
                 $(".step").hide();
                 $("#step" + step).show();
 
-                // Oculta los pasos completados
-                for (var i = 0; i < completedSteps.length; i++) {
-                    if (completedSteps[i]) {
-                        $("#step" + (i + 1)).hide();
-                    }
-                }
+
             }
 
             function validateStep1() {
@@ -779,6 +783,15 @@
         });
 
 
+
+        /*
+        // Oculta los pasos completados
+        for (var i = 0; i < completedSteps.length; i++) {
+            if (completedSteps[i]) {
+                $("#step" + (i + 1)).hide();
+            }
+        }
+        */
 
         /*Multi step anterior
         $(document).ready(function () {

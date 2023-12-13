@@ -157,7 +157,14 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, cancelar edición',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: 'No, volver a edición.',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true,
+                        customClass: {
+                            confirmButton: 'btn btn-success ml-2', // Añade la clase ml-2 al botón Confirmar
+                            cancelButton: 'btn btn-danger', // Clase para el botón Cancelar
+                        },
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario
@@ -184,7 +191,14 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, editar tratamiento',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: 'No, cancelar edición',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true,
+                        customClass: {
+                            confirmButton: 'btn btn-success ml-2', // Añade la clase ml-2 al botón Confirmar
+                            cancelButton: 'btn btn-danger', // Clase para el botón Cancelar
+                        },
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Si el usuario confirma, envía el formulario

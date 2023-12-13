@@ -23,7 +23,7 @@
         @foreach ($turnos as $turno)
             @if ($turno->paciente_id == $paciente->id)
                 @if ($turno->estado == 'Pendiente')
-                    <div class="alert alert-warning" role="alert">
+                    <div class="alert alert-warning mt-3" role="alert">
                         <h5>Turno pendiente</h5>
                         Usted tiene un turno pendiente para el día {{ \Carbon\Carbon::parse($turno->fecha)->format('d-m-Y') }} a las {{ $turno->hora }} hs.
                         <br>Para cancelar el turno, haga click en el siguiente botón:

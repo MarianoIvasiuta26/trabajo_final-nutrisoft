@@ -151,6 +151,40 @@ class TratramientoController extends Controller
 
     }
 
+    public function storeModal(Request $request)
+    {
+        $request->validate([
+            'tratamiento' => ['required', 'string', 'max:50'],
+            'tipo_de_dieta' => ['required', 'integer'],
+            'actividades' => ['array', 'required']
+        ]);
+
+        $tratamiento = $request->input('tratamiento');
+        $tipoDeDieta = $request->input('tipo_de_dieta');
+
+        $tiposActividades = $request->input('actividades');
+
+        $tratamientoCreado = Tratamiento::create([
+            'tratamiento' => $tratamiento,
+            'tipo_de_dieta_id'=> $tipoDeDieta
+        ]);
+
+        if($tratamientoCreado){
+            foreach($tiposActividades as $tipoActividad){
+                TiposActividadesPorTratamientos::create([
+                    'tratamiento_id' => $tratamientoCreado->id,
+                    'tipo_actividad_id' => $tipoActividad
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Tratamiento creado correctamente');
+
+        } else {
+            return redirect()->back()->with('error', 'Error al crear el tratamiento');
+        }
+
+    }
+
     /**
      * Display the specified resource.
      **/

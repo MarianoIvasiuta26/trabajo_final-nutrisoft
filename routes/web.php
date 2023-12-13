@@ -169,6 +169,7 @@ Route::middleware([
     Route::any('gestion-estadisticas.clearTratamientoFilters',[EstadisticaController::class,'clearTratamientoFilters'])->name('gestion-estadisticas.clearTratamientoFilters');
     Route::any('gestion-estadisticas.clearTagsFilters',[EstadisticaController::class,'clearTagsFilters'])->name('gestion-estadisticas.clearTagsFilters');
 
+    Route::any('gestion-estadisticas.generar-reporte-grafico1', [EstadisticaController::class, 'generarReporteGrafico1'])->name('gestion-estadisticas.generar-reporte-grafico1');
 
     //Receta
     Route::resource('gestion-recetas', RecetaController::class)->names('gestion-recetas');
@@ -218,6 +219,7 @@ Route::middleware([
     Route::resource('gestion-tratamientos', TratramientoController::class)->names('gestion-tratamientos');
     Route::get('gestion-tratamientos.filtros', [TratramientoController::class, 'filtros'])->name('gestion-tratamientos.filtros');
     Route::any('gestion-tratamientos.clearFilters', [TratramientoController::class, 'clearFilters'])->name('gestion-tratamientos.clearFilters');
+    Route::post('gestion-tratamientos.storeModal', [TratramientoController::class, 'storeModal'])->name('gestion-tratamientos.storeModal');
 
     Route::resource('gestion-pliegues-cutaneos', GestionPlieguesCutaneosController::class)->names('gestion-pliegues-cutaneos');
 

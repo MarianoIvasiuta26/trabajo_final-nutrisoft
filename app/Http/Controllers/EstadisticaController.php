@@ -16,6 +16,7 @@ use App\Models\TipoConsulta;
 use App\Models\Tratamiento;
 use App\Models\TratamientoPorPaciente;
 use App\Models\Turno;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -369,5 +370,42 @@ class EstadisticaController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function generarReporteGrafico1(Request $request){
+        $fechaInicio = null;
+        $fechaFin = null;
+
+        //---------------------1er Gráfico - Frecuencia de tratamientos---------------------//
+
+        // Obtener todas los tratamientos
+        $todosTratamientos = Tratamiento::all();
+        $tratamientosPorPaciente = TratamientoPorPaciente::all();
+
+        // Obtener la frecuencia de cada tratamiento desde la base de datos
+        $frecuenciaTratamientos = TratamientoPorPaciente::join('tratamientos', 'tratamientos.id', '=', 'tratamiento_por_pacientes.tratamiento_id')
+            ->groupBy('tratamiento_por_pacientes.tratamiento_id', 'tratamientos.tratamiento')
+            ->selectRaw('tratamientos.tratamiento, count(*) as total')
+            ->pluck('total', 'tratamiento');
+
+        // Completar la frecuencia con tratamientos que no tienen registros
+        $frecuenciaCompleta = $todosTratamientos->map(function ($tratamiento) use ($frecuenciaTratamientos) {
+            $nombreTratamiento = $tratamiento->tratamiento;
+            $frecuencia = $frecuenciaTratamientos->get($nombreTratamiento, 0);
+            return $frecuencia;
+        });
+
+        // Obtener las etiquetas y datos para el gráfico
+        $labels = $todosTratamientos->pluck('tratamiento'); // Nombres de los tratamientos
+        $data = $frecuenciaCompleta->values(); // Frecuencia de cada tratamiento
+
+        $fechaActual = now()->format('d-m-Y');
+
+        $pdf = Pdf::loadView('admin.estadisticas.reporte-grafico1', compact(
+            'labels', 'data', 'fechaInicio', 'fechaFin', 'todosTratamientos', 'tratamientosPorPaciente',
+            'fechaActual'
+        ));
+
+        return $pdf->stream();
     }
 }

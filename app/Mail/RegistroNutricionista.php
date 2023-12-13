@@ -56,8 +56,13 @@ class RegistroNutricionista extends Mailable
     }
 
     public function build(){
+        $logo = public_path('img/logo.jpeg');
         return $this->view('emails.registro-nutricionista')
         ->with(['userId' => $this->userId, 'passwordTemporal' => $this->passwordTemporal, 'email' => $this->email])
-        ->subject('Finalice con el proceso de registro');
+        ->subject('Finalice con el proceso de registro')
+        ->attach($logo, [
+            'as' => 'logo.jpeg',
+            'mime' => 'image/jpeg',
+        ]);
     }
 }

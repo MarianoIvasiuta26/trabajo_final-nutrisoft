@@ -22,6 +22,8 @@ use App\Models\PlanAlimentaciones;
 use App\Models\Tag;
 use App\Models\TagsDiagnostico;
 use App\Models\TipoConsulta;
+use App\Models\TiposDeActividades;
+use App\Models\TiposDeDieta;
 use App\Models\TiposDePliegueCutaneo;
 use App\Models\Tratamiento;
 use App\Models\TratamientoPorPaciente;
@@ -257,6 +259,9 @@ class GestionTurnosController extends Controller
         $anamnesisPaciente = AnamnesisAlimentaria::where('historia_clinica_id', $historiaClinica->id)->get();
 
         $turnoAnteriorPaciente = Turno::where('paciente_id', $paciente->id)->where('estado', 'Realizado')->orderBy('id', 'desc')->first();
+
+        $tiposDeDietas = TiposDeDieta::all();
+        $tiposActividades = TiposDeActividades::all();
         if($turnoAnteriorPaciente){
             $consultaAnteriorPaciente = Consulta::where('turno_id', $turnoAnteriorPaciente->id)->first();
             $diagnosticoAnteriorPaciente = Diagnostico::where('consulta_id', $consultaAnteriorPaciente->id)->first();
@@ -272,7 +277,7 @@ class GestionTurnosController extends Controller
             $ultimoPlanAlimentacionPaciente = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 1)->orderBy('id', 'desc')->first();
 
 
-            return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo', 'tags', 'gruposTags', 'ultimoPlanAlimentacionPaciente', 'planesAlimentacionPaciente', 'detallesPlanesPlanes', 'diagnosticos', 'tagsDiagnosticos', 'diagnosticoAnteriorPaciente', 'consultasPaciente', 'alimentos', 'anamnesisPaciente'));
+            return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'tiposDeDietas', 'tiposActividades', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente', 'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'turnoAnteriorPaciente', 'consultaAnteriorPaciente', 'medidaPliegueTricep', 'medidaPliegueBicep', 'medidaPliegueSubescapular', 'medidaPliegueSuprailiaco', 'medidaDiametroHumero', 'medidaDiametroMunieca', 'medidaDiametroFemur', 'medidaDiametroTobillo', 'tags', 'gruposTags', 'ultimoPlanAlimentacionPaciente', 'planesAlimentacionPaciente', 'detallesPlanesPlanes', 'diagnosticos', 'tagsDiagnosticos', 'diagnosticoAnteriorPaciente', 'consultasPaciente', 'alimentos', 'anamnesisPaciente'));
 
         }
 
@@ -282,7 +287,7 @@ class GestionTurnosController extends Controller
             return redirect()->back()->with('error', 'No se encontró la historia clínica');
         }
 
-        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente',   'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'tags', 'planesAlimentacionPaciente', 'detallesPlanesPlanes', 'diagnosticos', 'tagsDiagnosticos', 'consultasPaciente', 'alimentos', 'anamnesisPaciente'));
+        return view('nutricionista.gestion-turnos.gestion-consultas.registrarConsulta', compact('paciente', 'tiposDeDietas', 'tiposActividades', 'turno', 'tipoConsultas', 'historiaClinica', 'datosMedicos', 'alergias', 'intolerancias', 'patologias', 'cirugias', 'cirugiasPaciente',   'tratamientos', 'plieguesCutaneos', 'turnosPaciente', 'tratamientosPaciente', 'tags', 'planesAlimentacionPaciente', 'detallesPlanesPlanes', 'diagnosticos', 'tagsDiagnosticos', 'consultasPaciente', 'alimentos', 'anamnesisPaciente'));
     }
 
     public function confirmarInasistencia($id){

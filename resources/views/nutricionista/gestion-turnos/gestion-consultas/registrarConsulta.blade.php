@@ -59,7 +59,7 @@
                                     </select>
                                     {{--ACÁ VA EL FORM NUEVO--}}
                                     <div class="input-group-append">
-                                        <button type="button" class="btn btn-primary nuevo-tratamiento-button">
+                                        <button type="button" class="btn btn-primary nuevo-tratamiento-button" data-bs-toggle="modal" data-bs-target="#addTratamiento">
                                             Nuevo
                                         </button>
                                     </div>
@@ -1132,6 +1132,74 @@
         </div>
     @endforeach
 
+    <!-- Modal Nuevo tratamiento -->
+    <div class="modal fade" id="addTratamiento" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addTratamientoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTratamientoLabel">Nuevo tratamiento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{route('gestion-tratamientos.storeModal')}}" method="POST" id="form-addTratamiento">
+                        @csrf
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="tratamiento">Tratamiento <span class="text-muted">(*)</span></label>
+                                <input type="text" name="tratamiento" class="form-control" tabindex="1">
+
+                                @error('tratamiento')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label for="tipo_de_dieta">Tipo de dieta <span class="text-muted">(*)</span></label>
+                                <select class="form-select" name="tipo_de_dieta" id="tipo_de_dieta">
+                                    <option value="">Seleccione un tipo de dieta para el tratamiento</option>
+                                    @foreach ($tiposDeDietas as $dieta)
+                                        <option value="{{ $dieta->id }}">{{ $dieta->tipo_de_dieta }}</option>
+                                    @endforeach
+                                </select>
+
+                                @error('tipo_de_dieta')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label for="actividades">Tipo de Actividades <span class="text-muted">(*)</span></label>
+                                <select name="actividades[]" class="form-select" id="actividades" data-placeholder="Actividades..." multiple>
+                                    <option value="">Selecciona una actividad</option>
+                                    @foreach ($tiposActividades as $tipoActividad)
+                                        <option @if(in_array($tipoActividad->id, old('actividades', []))) selected @endif value="{{ $tipoActividad->id }}">{{ $tipoActividad->tipo_actividad }}</option>
+
+                                    @endforeach
+                                </select>
+
+                                @error('actividades')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <span class="text-muted">Los datos con la etiqueta (*) significa que son obligatorios</span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success add-tratamiento">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -1140,6 +1208,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
     <style>
         .seccion {
@@ -1221,8 +1291,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <!-- datetime-moment CDN -->
     <script src="https://cdn.datatables.net/datetime-moment/2.6.1/js/dataTables.dateTime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+        //Mensajes fhash
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: '{{session('success')}}',
+                showConfirmButton: false,
+                timer: 1500
+            })
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'success',
+                title: '{{session('error')}}',
+                showConfirmButton: false,
+                timer: 1500
+            })
+        @endif
+
+        //Select2
+        $( '#actividades' ).select2( {
+            theme: "bootstrap-5",
+            width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+            placeholder: $( this ).data( 'placeholder' ),
+            closeOnSelect: false,
+        } );
 
         $(document).ready(function() {
             $('[data-bs-toggle="popover"]').popover();
@@ -1389,6 +1487,49 @@
             buttonsStyling: false
         })
 
+        //SweetAlert para guardar nuevo tratamiento
+        document.addEventListener('DOMContentLoaded', function () {
+            const guardarTratamiento = document.querySelectorAll('.add-tratamiento');
+
+            guardarTratamiento.forEach(button => {
+                button.addEventListener('click', function () {
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            confirmButton: 'btn btn-success',
+                            cancelButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: true
+                        })
+
+                        swalWithBootstrapButtons.fire({
+                        title: '¿Está seguro de guardar el nuevo tratamiento?',
+                        text: "Al confirmar se guardará el tratamiento.",
+                        icon: 'question',
+                        showCancelButton: true,
+                        cancelButtonText: '¡No, cancelar!',
+                        confirmButtonColor: '#198754',
+                        confirmButtonText: '¡Guardar tratamiento!',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            //Envia el form
+                            const form = document.getElementById('form-addTratamiento');
+                            form.submit();
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                            '¡No se guardó el tratamiento!'
+                            )
+                        }
+                    })
+                });
+            });
+        });
+
+        /*
         //SweetAlert botón de agregar un nuevo registro de tratamiento
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'
@@ -1404,7 +1545,14 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonText: 'Sí, registrar un nuevo tratamiento',
+                        confirmButtonColor: '#198754',
                         cancelButtonText: 'Cancelar',
+                        cancelButtonColor: '#d33',
+                        reverseButtons: true,
+                        customClass: {
+                            confirmButton: 'btn btn-success ml-2', // Añade la clase ml-2 al botón Confirmar
+                            cancelButton: 'btn btn-danger', // Clase para el botón Cancelar
+                        },
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Redirige al usuario a la ruta deseada
@@ -1414,7 +1562,7 @@
                 });
             });
         });
-
+        */
         //SweetAlert botón de agregar un nuevo registro de pliegue
         document.addEventListener('DOMContentLoaded', function () {
             // Selecciona todos los botones de eliminar con la clase 'delete-button'

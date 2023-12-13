@@ -48,7 +48,7 @@ class TurnoController extends Controller
         $tipo_consultas = TipoConsulta::all();
         $turnos = Turno::all();
         $pacientes = Paciente::all();
-        $profesionales = Nutricionista::all();
+        $profesionales = Nutricionista::where('user_id', 2)->get();
         $historias_clinicas = HistoriaClinica::all();
         $horas = HorasAtencion::all();
         $dias = DiasAtencion::all();
