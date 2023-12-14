@@ -66,8 +66,18 @@ class HistoriaClinicaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+
+        $currentStep = $request->input('step', 1);
+        $totalSteps = 4;
+
+        if ($totalSteps > 0 && $currentStep <= $totalSteps) {
+            $progress = ($currentStep - 1) / ($totalSteps - 1) * 100;
+        } else {
+            $progress = 0;
+        }
+
         $dias = DiasAtencion::all();
         $horarios = HorariosAtencion::all();
         $patologias = Patologia::all();
@@ -93,26 +103,27 @@ class HistoriaClinicaController extends Controller
             $cirugiasPaciente = CirugiasPaciente::where('historia_clinica_id', $paciente->historiaClinica->id)->get();
             $adelantamientoTurnos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();
 
-            return view('paciente.historia-clinica.create', compact('dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos', 'profesionales', 'formularioCompletado', 'paciente', 'datosMedicos', 'anamnesis', 'cirugiasPaciente', 'adelantamientoTurnos'));
+            return view('paciente.historia-clinica.create', compact('currentStep', 'progress','dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos', 'profesionales', 'formularioCompletado', 'paciente', 'datosMedicos', 'anamnesis', 'cirugiasPaciente', 'adelantamientoTurnos'));
         }
 
 
-        return view('paciente.historia-clinica.create', compact('dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos', 'profesionales', 'formularioCompletado', 'paciente'));
+        return view('paciente.historia-clinica.create', compact('currentStep', 'progress','dias', 'horarios', 'patologias', 'alergias', 'cirugias', 'intolerancias', 'alimentos', 'profesionales', 'formularioCompletado', 'paciente'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     *
      */
+    //@return \Illuminate\Http\Response
     public function store(Request $request)
     {
 
         // Datos físicos
         $request->validate([
-            'peso' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'altura' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'peso' => ['required','numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'altura' => ['required','numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'circunferencia_munieca' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'circunferencia_cadera' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'circunferencia_cintura' => ['numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
@@ -179,7 +190,7 @@ class HistoriaClinicaController extends Controller
 
         session()->put('datos_fisicos', true);
 
-        return redirect()->route('historia-clinica.create')->with('success', 'Datos físicos registrados');
+        return redirect()->route('historia-clinica.create', ['step' => 4])->with('success', 'Datos físicos registrados');
         //return response()
         //->json(array('success' => true, 'datos_corporales' => true, 'message' => 'Datos corporales registrados'));
     }

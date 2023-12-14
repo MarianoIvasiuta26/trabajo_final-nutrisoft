@@ -118,7 +118,7 @@ class PacienteController extends Controller
             session()->put('edad', $edad);
             session()->put('datos_personales', true);
 
-            return redirect()->route('historia-clinica.create')->with('success', 'Datos personales registrados');
+            return redirect()->route('historia-clinica.create', ['step' => 2])->with('success', 'Datos personales registrados');
             //return response()
                 //->json(array('success' => true, 'datos_personales' => true, 'message' => 'Datos personales registrados'));
         }else{

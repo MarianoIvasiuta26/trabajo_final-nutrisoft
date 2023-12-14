@@ -125,7 +125,7 @@ Route::middleware([
     Route::resource('gestion-usuarios', GestionUsuariosController::class)->names('gestion-usuarios');
     Route::resource('gestion-rolesYPermisos', RolesYPermisosController::class)->names('gestion-rolesYPermisos');
     Route::post('gestion-rolesYPermisos.storePermiso', [RolesYPermisosController::class, 'storePermiso'])->name('gestion-rolesYPermisos.storePermiso');
-    Route::post('gestion-rolesYPermisos.destroyPermiso', [RolesYPermisosController::class, 'destroyPermiso'])->name('gestion-rolesYPermisos.destroyPermiso');
+    Route::delete('gestion-rolesYPermisos.destroyPermiso/{id}', [RolesYPermisosController::class, 'destroyPermiso'])->name('gestion-rolesYPermisos.destroyPermiso');
     Route::any('gestion-rolesYPermisos.updatePermiso/{id}', [RolesYPermisosController::class, 'updatePermiso'])->name('gestion-rolesYPermisos.updatePermiso');
 
     Route::resource('gestion-alergias', AlergiaController::class)->names('gestion-alergias');

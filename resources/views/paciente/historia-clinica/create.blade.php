@@ -30,448 +30,459 @@
             </div>
 
             <!-- Step 1 -->
-            <div class="step mt-3" id="step1">
+            @if($currentStep == 1)
+                <div class="step mt-3" id="step1">
 
-                <h5>Datos Personales</h5>
+                    <h5>Datos Personales</h5>
 
-                @if ($paciente->dni != NULL && $paciente->telefono != NULL && $paciente->sexo != NULL && $paciente->fecha_nacimiento != NULL)
-                    
-                    <div class="row mt-3">
+                    @if ($paciente->dni != NULL && $paciente->telefono != NULL && $paciente->sexo != NULL && $paciente->fecha_nacimiento != NULL)
+
+                        <div class="row mt-3">
+                            <div class="alert alert-success" role="alert">
+                                <h4 class="alert-heading">¡Bien {{$paciente->user->name}}!</h4>
+                                <p>Ya completaste tus datos personales, ahora puedes completar el resto de tu historia clínica.</p>
+                                <hr>
+                                <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
+                            </div>
+                        </div>
+                        <a href="{{route('historia-clinica.create', ['step' => 2])}}" type="button" id="next-step1" class="btn btn-primary next-step float-right">Siguiente</a>
+                    @else
+                        <form class="row g-3 mt-3 paso3" action="{{route('datos-personales.store')}}" method="POST" id="form-datos-personales">
+                            @csrf
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label for="dni" class="form-label">DNI(*)</label>
+                                    <input maxlength="8" type="text" class="form-control @error('dni') is-invalid @enderror" id="dni" name="dni" value="{{old('dni')}}{{ session('dni') }}">
+
+                                    @error('dni')
+                                        <div class="invalid-feedback">{{ $message}}</div>
+                                    @enderror
+                                    <span class="text-muted" id="dni-char-count">0/8</span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="telefono" class="form-label">Teléfono(*)</label>
+                                    <input maxlength="10" type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{old('telefono')}}{{ session('telefono') }}">
+
+                                    @error('telefono')
+                                        <div class="invalid-feedback">{{ $message}}</div>
+                                    @enderror
+                                    <span class="text-muted" id="telefono-char-count">0/10</span>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label for="sexo" class="form-label">Sexo biológico(*)</label>
+                                    <select id="sexo" class="form-select @error('sexo') is-invalid @enderror" name="sexo">
+                                        <option value="" disabled selected>Elija una opción...</option>
+                                        <option value="Masculino" @if (old('sexo') == 'Masculino' || session('sexo') == 'Masculino') selected @endif>
+                                            Masculino
+                                        </option>
+                                        <option value="Femenino" @if (old('sexo') == 'Femenino' || session('sexo') == 'Femenino') selected @endif>
+                                            Femenino
+                                        </option>
+                                    </select>
+
+                                    @error('sexo')
+                                        <div class="invalid-feedback">{{ $message}}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento(*)</label>
+                                    <input type="date" value="{{old('fecha_nacimiento')}}{{ session('fecha_nacimiento') }}" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento">
+
+                                    @error('fecha_nacimiento')
+                                        <div class="invalid-feedback">{{ $message}}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning mt-3" role="alert">
+                                Los campos marcados con un (*) son obligatorios.
+                            </div>
+
+                            <div class="col-12">
+                                <div class="float-right">
+                                    <button type="button" class="btn btn-success guardar-step1 next-step" id="guardar-step1">Guardar y continuar</button>
+                                    <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
+                                </div>
+                            </div>
+                        </form>
+
+                    @endif
+                </div>
+            @endif
+
+            <!-- Step 2 -->
+            @if($currentStep == 2)
+                <div class="step mt-3" id="step2" >
+
+                    <h5>Días y horarios Disponibles</h5>
+                    <span class="text-muted">En este apartado puede registrar sus días y horas disponibles para posibles adelantamientos de turnos automático.</span>
+
+                    @if (count($paciente->adelantamientoTurno) > 0)
                         <div class="alert alert-success" role="alert">
-                            <h4 class="alert-heading">¡Bien {{$paciente->user->name}}!</h4>
-                            <p>Ya completaste tus datos personales, ahora puedes completar el resto de tu historia clínica.</p>
+                            <h5 class="alert-heading">Días y horas registradas</h5>
+                            <p>Ya registraste los días y horas disponibles para adelantamientos de turno.</p>
+                            <p>Puedes registrar más días y horas en tu historia clínica una vez completado todo el formulario.</p>
                             <hr>
                             <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                         </div>
-                    </div>
-
-                    <button type="button" id="next-step1" class="btn btn-primary next-step float-right">Siguiente</button>
-                @else
-                    <form class="row g-3 mt-3 paso3" action="{{route('datos-personales.store')}}" method="POST" id="form-datos-personales">
-                        @csrf
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <label for="dni" class="form-label">DNI(*)</label>
-                                <input maxlength="8" type="text" class="form-control @error('dni') is-invalid @enderror" id="dni" name="dni" value="{{old('dni')}}{{ session('dni') }}">
-
-                                @error('dni')
-                                    <div class="invalid-feedback">{{ $message}}</div>
-                                @enderror
-                                <span class="text-muted" id="dni-char-count">0/8</span>
+                    @else
+                        <form class="paso5" id="form-dias-fijos" method="POST" action="{{route('adelantamiento-turno.store')}}">
+                            @csrf
+                            <div class="alert alert-warning mt-3" role="alert">
+                                <h5 class="alert-heading">¡Atención!</h5>
+                                <p>Este formulario no es obligatorio completarlo.</p>
+                                <hr>
+                                <p>En caso de no poseer ningún día y hora libre, puede prescindir de completar este formulario.</p>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label class="form-label " for="profesional">Seleccione el profesional del que recibe atenciones</label>
+                                    <select name="profesional" id="profesional" class="form-select">
+                                        <option value="">Seleccione un profesional</option>
+                                        @foreach($profesionales as $profesional)
+                                            <option value="{{$profesional->id}}">{{$profesional->user->name}} {{$profesional->user->apellido}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="telefono" class="form-label">Teléfono(*)</label>
-                                <input maxlength="10" type="text" class="form-control @error('telefono') is-invalid @enderror" id="telefono" name="telefono" value="{{old('telefono')}}{{ session('telefono') }}">
+                            <div class="row mt-3">
+                                <div class="col-md-12" id="dias-consultas">
 
-                                @error('telefono')
-                                    <div class="invalid-feedback">{{ $message}}</div>
-                                @enderror
-                                <span class="text-muted" id="telefono-char-count">0/10</span>
+                                </div>
+
+                                <!-- Horas -->
+                                @foreach ($dias as $dia)
+                                    <div class="col-md-12" id="horas-disponibles-{{$dia->dia}}">
+
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col">
+                                    <div class="float-right">
+                                        <button id="guardar-step2" type="button" class="btn btn-success guardar-step2 next-step">Guardar y continuar</button>
+                                        <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
+                                        <a href="{{route('historia-clinica.create', ['step' => 3])}}" class="btn btn-primary">Siguiente</a>
+                                        <!--<button type="button" class="btn btn-primary next-step paso6">Siguiente</button>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    @endif
+
+                    <br>
+                    @if ($paciente->dni == NULL && $paciente->telefono == NULL && $paciente->sexo == NULL && $paciente->fecha_nacimiento == NULL)
+                        <button type="button" class="btn btn-danger prev-step" id="prev-step2">Anterior</button>
+                    @endif
+
+                </div>
+            @endif
+
+            <!-- Step 3 -->
+            @if($currentStep == 3)
+                <div class="step mt-3" id="step3">
+                    <h5>Datos corporales</h5>
+                    <span class="text-muted">En este apartado puede registrar sus datos corporales y estado físico.</span>
+
+                    @if($paciente->historiaClinica)
+                        <div class="row mt-3">
+                            <div class="alert alert-success" role="alert">
+                                <h4 class="alert-heading">¡Bien {{$paciente->user->name}}!</h4>
+                                <p>Ya completaste tus datos físicos, peudes modificarlos una vez completada su historia clínica.</p>
+                                <hr>
+                                <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
+                            </div>
+                        </div>
+                        <br>
+                        @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
+
+                            <a href="{{route('historia-clinica.create', ['step' => 2])}}" type="button" class="btn btn-danger prev-step float-right" id="prev-step3">Anterior</a>
+                        @endif
+                        <a href="{{route('historia-clinica.create', ['step' => 4])}}" type="button" class="btn btn-primary next-step float-right">Siguiente</a>
+                    @else
+                    <form class="paso7" id="form-datos-corporales" action="{{route('historia-clinica.store')}}" method="POST">
+                        @csrf
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="peso" class="form-label">Peso <span class="text-muted">(*)</span></label>
+                                <div class="input-group">
+                                    <input value="{{old('peso')}}" class="form-control" name="peso" id="peso" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">kg</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="altura" class="form-label">Altura <span class="text-muted">(*)</span></label>
+                                <div class="input-group">
+                                    <input value="{{old('altura')}}" class="form-control" name="altura" id="altura" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <label for="circ_munieca" class="form-label">Circunferencia de Muñeca</label>
+                                <div class="input-group">
+                                    <input value="{{old('circ_munieca')}}" class="form-control" name="circ_munieca" id="circ_munieca" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="circ_cintura" class="form-label">Circunferencia de Cintura</label>
+                                <div class="input-group">
+                                    <input value="{{old('circ_cintura')}}" class="form-control" name="circ_cintura" id="circ_cintura" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="circ_cadera" class="form-label">Circunferencia de Cadera</label>
+                                <div class="input-group">
+                                    <input value="{{old('circ_cadera')}}" class="form-control" name="circ_cadera" id="circ_cadera" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="circ_pecho" class="form-label">Circunferencia de Pecho</label>
+                                <div class="input-group">
+                                    <input value="{{old('circ_pecho')}}" class="form-control" name="circ_pecho" id="circ_pecho" type="text">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">cm</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-md-6">
-                                <label for="sexo" class="form-label">Sexo biológico(*)</label>
-                                <select id="sexo" class="form-select @error('sexo') is-invalid @enderror" name="sexo">
-                                    <option value="" disabled selected>Elija una opción...</option>
-                                    <option value="Masculino" @if (old('sexo') == 'Masculino' || session('sexo') == 'Masculino') selected @endif>
-                                        Masculino
-                                    </option>
-                                    <option value="Femenino" @if (old('sexo') == 'Femenino' || session('sexo') == 'Femenino') selected @endif>
-                                        Femenino
-                                    </option>
+                                <label for="estilo_vida" class="form-label">Estilo de vida actual(*)</label>
+                                <select id="estilo_vida" class="form-select @error('estilo_vida') is-invalid @enderror" name="estilo_vida">
+                                    <option value="">Elija una opción...</option>
+                                    <option value="Sedentario" {{ old('estilo_vida') == 'Sedentario' ? 'selected' : '' }}>Sedentario</option>
+                                    <option value="Ligeramente activo" {{ old('estilo_vida') == 'Ligeramente activo' ? 'selected' : '' }}>Ligeramente activo</option>
+                                    <option value="Moderadamente activo" {{ old('estilo_vida') == 'Moderadamente activo' ? 'selected' : '' }}>Moderadamente activo</option>
+                                    <option value="Muy activo" {{ old('estilo_vida') == 'Muy activo' ? 'selected' : '' }}>Muy activo</option>
+                                    <option value="Extra activo" {{ old('estilo_vida') == 'Extra activo' ? 'selected' : '' }}>Extra activo</option>
                                 </select>
 
-                                @error('sexo')
-                                    <div class="invalid-feedback">{{ $message}}</div>
+                                @error('estilo_vida')
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento(*)</label>
-                                <input type="date" value="{{old('fecha_nacimiento')}}{{ session('fecha_nacimiento') }}" class="form-control @error('fecha_nacimiento') is-invalid @enderror" id="fecha_nacimiento" name="fecha_nacimiento">
+                                <label for="objetivo_salud" class="form-label">Objetivo de salud(*)</label>
+                                <select name="objetivo_salud" id="objetivo_salud" class="form-select @error('objetivo_salud') is-invalid @enderror">
+                                    <option value="" disabled>Elija una opción...</option>
+                                    <option value="Adelgazar" {{ old('objetivo_salud') == 'Adelgazar' ? 'selected' : '' }}>Adelgazar</option>
+                                    <option value="Ganar masa muscular" {{ old('objetivo_salud') == 'Ganar masa muscular' ? 'selected' : '' }}>Ganar masa muscular</option>
+                                    <option value="Nutrición deportiva" {{ old('objetivo_salud') == 'Nutrición deportiva' ? 'selected' : '' }}>Nutrición deportiva</option>
+                                    <option value="Nutrición por enfermedad" {{ old('objetivo_salud') == 'Nutrición por enfermedad' ? 'selected' : '' }}>Nutrición por enfermedad</option>
+                                </select>
 
-                                @error('fecha_nacimiento')
-                                    <div class="invalid-feedback">{{ $message}}</div>
+                                @error('objetivo_salud')
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
-
                         <div class="alert alert-warning mt-3" role="alert">
                             Los campos marcados con un (*) son obligatorios.
                         </div>
-
-                        <div class="col-12">
-                            <div class="float-right">
-                                <button type="button" class="btn btn-success guardar-step1 paso4" id="guardar-step1">Guardar</button>
-                                <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
-                            </div>
-                        </div>
-                    </form>
-
-                @endif
-            </div>
-
-            <!-- Step 2 -->
-            <div class="step mt-3" id="step2" >
-
-                <h5>Días y horarios Disponibles</h5>
-                <span class="text-muted">En este apartado puede registrar sus días y horas disponibles para posibles adelantamientos de turnos automático.</span>
-
-                @if (count($paciente->adelantamientoTurno) > 0)
-                    <div class="alert alert-success" role="alert">
-                        <h5 class="alert-heading">Días y horas registradas</h5>
-                        <p>Ya registraste los días y horas disponibles para adelantamientos de turno.</p>
-                        <p>Puedes registrar más días y horas en tu historia clínica una vez completado todo el formulario.</p>
-                        <hr>
-                        <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
-                    </div>
-                @else
-                    <form class="paso5" id="form-dias-fijos" method="POST" action="{{route('adelantamiento-turno.store')}}">
-                        @csrf
-                        <div class="alert alert-warning mt-3" role="alert">
-                            <h5 class="alert-heading">¡Atención!</h5>
-                            <p>Este formulario no es obligatorio completarlo.</p>
-                            <hr>
-                            <p>En caso de no poseer ningún día y hora libre, puede prescindir de completar este formulario.</p>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <label class="form-label " for="profesional">Seleccione el profesional del que recibe atenciones</label>
-                                <select name="profesional" id="profesional" class="form-select">
-                                    <option value="">Seleccione un profesional</option>
-                                    @foreach($profesionales as $profesional)
-                                        <option value="{{$profesional->id}}">{{$profesional->user->name}} {{$profesional->user->apellido}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
                         <div class="row mt-3">
-                            <div class="col-md-12" id="dias-consultas">
-
-                            </div>
-
-                            <!-- Horas -->
-                            @foreach ($dias as $dia)
-                                <div class="col-md-12" id="horas-disponibles-{{$dia->dia}}">
-
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col">
+                            <div class="col-12">
                                 <div class="float-right">
-                                    <button id="guardar-step2" type="button" class="btn btn-success guardar-step2">Guardar</button>
+                                    @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
+                                        <a href="{{route('historia-clinica.create', ['step' => 2])}}" type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</a>
+                                    @endif
+                                    <button id="guardar-step3" type="button" class="btn btn-success guardar-step3 paso8 next-step">Guardar y continuar</button>
                                     <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
-                                    <button type="button" class="btn btn-primary next-step paso6">Siguiente</button>
+
                                 </div>
                             </div>
                         </div>
                     </form>
-                @endif
-
-                <br>
-                @if ($paciente->dni == NULL && $paciente->telefono == NULL && $paciente->sexo == NULL && $paciente->fecha_nacimiento == NULL)
-                    <button type="button" class="btn btn-danger prev-step" id="prev-step2">Anterior</button>
-                @endif
-
-            </div>
-
-            <!-- Step 3 -->
-            <div class="step mt-3" id="step3">
-                <h5>Datos corporales</h5>
-                <span class="text-muted">En este apartado puede registrar sus datos corporales y estado físico.</span>
-
-                @if($paciente->historiaClinica)
-                    <div class="row mt-3">
-                        <div class="alert alert-success" role="alert">
-                            <h4 class="alert-heading">¡Bien {{$paciente->user->name}}!</h4>
-                            <p>Ya completaste tus datos físicos, peudes modificarlos una vez completada su historia clínica.</p>
-                            <hr>
-                            <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
-                        </div>
-                    </div>
-                    <br>
-                    @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
-                        <button type="button" class="btn btn-danger prev-step float-right" id="prev-step3">Anterior</button>
                     @endif
-                    <button type="button" class="btn btn-primary next-step float-right">Siguiente</button>
-                @else
-                <form class="paso7" id="form-datos-corporales" action="{{route('historia-clinica.store')}}" method="POST">
-                    @csrf
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="peso" class="form-label">Peso <span class="text-muted">(*)</span></label>
-                            <div class="input-group">
-                                <input value="{{old('peso')}}" class="form-control" name="peso" id="peso" type="text">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">kg</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="altura" class="form-label">Altura <span class="text-muted">(*)</span></label>
-                            <div class="input-group">
-                                <input value="{{old('altura')}}" class="form-control" name="altura" id="altura" type="text">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-3">
-                            <label for="circ_munieca" class="form-label">Circunferencia de Muñeca</label>
-                            <div class="input-group">
-                                <input value="{{old('circ_munieca')}}" class="form-control" name="circ_munieca" id="circ_munieca" type="text">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label for="circ_cintura" class="form-label">Circunferencia de Cintura</label>
-                            <div class="input-group">
-                                <input value="{{old('circ_cintura')}}" class="form-control" name="circ_cintura" id="circ_cintura" type="text">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label for="circ_cadera" class="form-label">Circunferencia de Cadera</label>
-                            <div class="input-group">
-                                <input value="{{old('circ_cadera')}}" class="form-control" name="circ_cadera" id="circ_cadera" type="text">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label for="circ_pecho" class="form-label">Circunferencia de Pecho</label>
-                            <div class="input-group">
-                                <input value="{{old('circ_pecho')}}" class="form-control" name="circ_pecho" id="circ_pecho" type="text">
-                                <div class="input-group-append">
-                                    <span class="input-group-text">cm</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <label for="estilo_vida" class="form-label">Estilo de vida actual(*)</label>
-                            <select id="estilo_vida" class="form-select @error('estilo_vida') is-invalid @enderror" name="estilo_vida">
-                                <option value="">Elija una opción...</option>
-                                <option value="Sedentario" {{ old('estilo_vida') == 'Sedentario' ? 'selected' : '' }}>Sedentario</option>
-                                <option value="Ligeramente activo" {{ old('estilo_vida') == 'Ligeramente activo' ? 'selected' : '' }}>Ligeramente activo</option>
-                                <option value="Moderadamente activo" {{ old('estilo_vida') == 'Moderadamente activo' ? 'selected' : '' }}>Moderadamente activo</option>
-                                <option value="Muy activo" {{ old('estilo_vida') == 'Muy activo' ? 'selected' : '' }}>Muy activo</option>
-                                <option value="Extra activo" {{ old('estilo_vida') == 'Extra activo' ? 'selected' : '' }}>Extra activo</option>
-                            </select>
-
-                            @error('estilo_vida')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="objetivo_salud" class="form-label">Objetivo de salud(*)</label>
-                            <select name="objetivo_salud" id="objetivo_salud" class="form-select @error('objetivo_salud') is-invalid @enderror">
-                                <option value="" disabled>Elija una opción...</option>
-                                <option value="Adelgazar" {{ old('objetivo_salud') == 'Adelgazar' ? 'selected' : '' }}>Adelgazar</option>
-                                <option value="Ganar masa muscular" {{ old('objetivo_salud') == 'Ganar masa muscular' ? 'selected' : '' }}>Ganar masa muscular</option>
-                                <option value="Nutrición deportiva" {{ old('objetivo_salud') == 'Nutrición deportiva' ? 'selected' : '' }}>Nutrición deportiva</option>
-                                <option value="Nutrición por enfermedad" {{ old('objetivo_salud') == 'Nutrición por enfermedad' ? 'selected' : '' }}>Nutrición por enfermedad</option>
-                            </select>
-
-                            @error('objetivo_salud')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="alert alert-warning mt-3" role="alert">
-                        Los campos marcados con un (*) son obligatorios.
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <div class="float-right">
-                                @if (count($paciente->adelantamientoTurno) <= 0 && !$paciente->historiaClinica)
-                                    <button type="button" class="btn btn-danger prev-step" id="prev-step3">Anterior</button>
-                                @endif
-                                <button id="guardar-step3" type="button" class="btn btn-success guardar-step3 paso8">Guardar</button>
-                                <!--<a href="{{ route('gestion-usuarios.index') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
-
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                @endif
 
 
-                <br>
+                    <br>
 
-            </div>
+                </div>
+            @endif
+
 
             <!-- Step 4 -->
-            <div class="step mt-3" id="step4">
-                <h5>Datos médicos</h5>
-                <span class="text-muted">En este apartado puede registrar información sobre su salud, datos importantes para la realización de consultas nutricionales.</span>
+            @if($currentStep == 4)
+                <div class="step mt-3" id="step4">
+                    <h5>Datos médicos</h5>
+                    <span class="text-muted">En este apartado puede registrar información sobre su salud, datos importantes para la realización de consultas nutricionales.</span>
 
-                @if (count($datosMedicos) > 0 && count($anamnesis) > 0 && count($cirugiasPaciente) > 0)
-                    <div class="col-md-12">
-                        <div class="alert alert-success" role="alert">
-                            <h5 class="alert-heading">Datos médicos registrados</h5>
-                            <p>Ya registraste tus datos médicos.</p>
-                            <p>Puedes modificarlos en tu historia clínica una vez completado todo el formulario.</p>
-                            <hr>
-                            <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
-                        </div>
-                    </div>
-
-                    <div class="mt-3 float-right">
-                        <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning paso11">Completar registro</a>
-                    </div>
-                @else
-                    <form class="mt-3 paso9" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
-                        @csrf
-                        <div class="row mt-3">
-                            <h5>Gustos alimenticios</h5>
-                            <div class="col-md-6">
-                                <label for="gustos" class="form-label">Seleccione sus alimentos preferidos</label>
-                                <select name="alimentos_gustos[]" class="form-select" id="gustos" data-placeholder="Alimentos preferidos..." multiple>
-                                    <option value="">Ninguna</option>
-                                    @foreach ($alimentos->groupBy('grupo_alimento') as $grupo_alimento => $alimentos_del_grupo)
-                                        <optgroup label="{{$grupo_alimento}}">
-                                            @foreach ($alimentos_del_grupo as $alimento)
-                                                <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="no_gustos" class="form-label">Seleccione los alimentos que no le guste</label>
-                                <select name="alimentos_no_gustos[]" class="form-select" id="no_gustos" data-placeholder="Alimentos que no guste..." multiple>
-                                    <option value="">Ninguna</option>
-                                    @foreach ($alimentos->groupBy('grupo') as $grupo_alimento => $alimentos_del_grupo)
-                                        <optgroup label="{{$grupo_alimento}}">
-                                            @foreach ($alimentos_del_grupo as $alimento)
-                                                <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
+                    @if (count($datosMedicos) > 0 && count($anamnesis) > 0 && count($cirugiasPaciente) > 0)
+                        <div class="col-md-12">
+                            <div class="alert alert-success" role="alert">
+                                <h5 class="alert-heading">Datos médicos registrados</h5>
+                                <p>Ya registraste tus datos médicos.</p>
+                                <p>Puedes modificarlos en tu historia clínica una vez completado todo el formulario.</p>
+                                <hr>
+                                <p class="mb-0">Recuerda que puedes completar tu historia clínica en cualquier momento, pero que será necesario que lo completes para acceder a todas las funcionalidades del sistema.</p>
                             </div>
                         </div>
 
-                        <div class="row mt-3">
-                            <h5>Alergias</h5>
-                            <div class="col-md-12">
-                                <label for="alergias" class="form-label">Seleccione las alergias que posee</label>
-                                <select name="alergias[]" class="form-select" id="alergias" data-placeholder="Alergias..." multiple>
-                                    <option value="">Ninguna</option>
-                                    @foreach ($alergias->groupBy('grupo_alergia') as $grupo_alergia => $alergias_del_grupo)
-                                        <optgroup label="{{$grupo_alergia}}">
-                                            @foreach ($alergias_del_grupo as $alergia)
-                                                <option value="{{$alergia->id}}">{{$alergia->alergia}}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div class="mt-3 float-right">
+                            <a id="completar-registro" href="{{route('historia-clinica.completar')}}" class="btn btn-warning paso11">Completar registro</a>
                         </div>
+                    @else
+                        <form class="mt-3 paso9" id="form-datos-medicos" action="{{route('datos-medicos.store')}}" method="POST">
+                            @csrf
+                            <div class="row mt-3">
+                                <h5>Gustos alimenticios</h5>
+                                <div class="col-md-6">
+                                    <label for="gustos" class="form-label">Seleccione sus alimentos preferidos</label>
+                                    <select name="alimentos_gustos[]" class="form-select" id="gustos" data-placeholder="Alimentos preferidos..." multiple>
+                                        <option value="">Ninguna</option>
+                                        @foreach ($alimentos->groupBy('grupo_alimento') as $grupo_alimento => $alimentos_del_grupo)
+                                            <optgroup label="{{$grupo_alimento}}">
+                                                @foreach ($alimentos_del_grupo as $alimento)
+                                                    <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="no_gustos" class="form-label">Seleccione los alimentos que no le guste</label>
+                                    <select name="alimentos_no_gustos[]" class="form-select" id="no_gustos" data-placeholder="Alimentos que no guste..." multiple>
+                                        <option value="">Ninguna</option>
+                                        @foreach ($alimentos->groupBy('grupo') as $grupo_alimento => $alimentos_del_grupo)
+                                            <optgroup label="{{$grupo_alimento}}">
+                                                @foreach ($alimentos_del_grupo as $alimento)
+                                                    <option value="{{$alimento->id}}">{{$alimento->alimento}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
 
-                        <div class="row mt-3" id="cirugias-container">
-                            <h5>Cirugías</h5>
-                            <div class="cirugia-entry">
-                                <div class="row mt-3">
-                                    <div class="col-md-6">
-                                        <select name="cirugias[]" class="form-select">
-                                            <option value="">Seleccione una cirugía</option>
-                                            @foreach ($cirugias->groupBy('grupo_cirugia') as $grupo_cirugia => $cirugias_del_grupo)
-                                                <optgroup label="{{$grupo_cirugia}}">
-                                                    @foreach ($cirugias_del_grupo as $cirugia)
-                                                        <option value="{{$cirugia->id}}">{{$cirugia->cirugia}}</option>
-                                                    @endforeach
-                                                </optgroup>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="input-group">
-                                            <input type="number" name="tiempos[]" class="form-control tiempo-input" placeholder="Tiempo">
-                                            <select name="unidades_tiempo[]" class="form-select unidad-select">
-                                                <option value="dias">Días</option>
-                                                <option value="semanas">Semanas</option>
-                                                <option value="meses">Meses</option>
-                                                <option value="anios">Años</option>
+                            <div class="row mt-3">
+                                <h5>Alergias</h5>
+                                <div class="col-md-12">
+                                    <label for="alergias" class="form-label">Seleccione las alergias que posee</label>
+                                    <select name="alergias[]" class="form-select" id="alergias" data-placeholder="Alergias..." multiple>
+                                        <option value="">Ninguna</option>
+                                        @foreach ($alergias->groupBy('grupo_alergia') as $grupo_alergia => $alergias_del_grupo)
+                                            <optgroup label="{{$grupo_alergia}}">
+                                                @foreach ($alergias_del_grupo as $alergia)
+                                                    <option value="{{$alergia->id}}">{{$alergia->alergia}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" id="cirugias-container">
+                                <h5>Cirugías</h5>
+                                <div class="cirugia-entry">
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <select name="cirugias[]" class="form-select">
+                                                <option value="">Seleccione una cirugía</option>
+                                                @foreach ($cirugias->groupBy('grupo_cirugia') as $grupo_cirugia => $cirugias_del_grupo)
+                                                    <optgroup label="{{$grupo_cirugia}}">
+                                                        @foreach ($cirugias_del_grupo as $cirugia)
+                                                            <option value="{{$cirugia->id}}">{{$cirugia->cirugia}}</option>
+                                                        @endforeach
+                                                    </optgroup>
+                                                @endforeach
                                             </select>
-                                            <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
-                                            <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                <input type="number" name="tiempos[]" class="form-control tiempo-input" placeholder="Tiempo">
+                                                <select name="unidades_tiempo[]" class="form-select unidad-select">
+                                                    <option value="dias">Días</option>
+                                                    <option value="semanas">Semanas</option>
+                                                    <option value="meses">Meses</option>
+                                                    <option value="anios">Años</option>
+                                                </select>
+                                                <button type="button" id="agregar-cirugia"  class="btn btn-primary btn-sm add-cirugia">+</button>
+                                                <button type="button" class="btn btn-danger btn-sm remove-cirugia">x</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="row mt-3">
-                            <h5>Patologías</h5>
-                            <div class="col-md-12">
-                                <label for="patologias" class="form-label">Seleccione las patologías que posee</label>
-                                <select name="patologias[]" class="form-select" id="patologias" data-placeholder="Patologías..." multiple>
-                                    <option value="">Ninguna</option>
-                                    @foreach ($patologias->groupBy('grupo_patologia') as $grupo_patologia => $patologias_del_grupo)
-                                        <optgroup label="{{$grupo_patologia}}">
-                                            @foreach ($patologias_del_grupo as $patologia)
-                                                <option value="{{$patologia->id}}">{{$patologia->patologia}}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row mt-3">
-                            <h5>Intolerancias</h5>
-                            <div class="col-md-12">
-                                <label for="intolerancias" class="form-label">Seleccione las intolerancias que posee</label>
-                                <select name="intolerancias[]" class="form-select" id="intolerancias" data-placeholder="Intolerancias..." multiple>
-                                    <option value="">Ninguna</option>
-                                    @foreach ($intolerancias as $intolerancia)
-                                        <option value="{{$intolerancia->id}}">{{$intolerancia->intolerancia}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="float-right">
-                                    @if(!$paciente->historiaClinica)
-                                        <button type="button" class="btn btn-danger prev-step" id="prev-step4">Anterior</button>
-                                    @endif
-                                    <button id="guardar-step4" type="button" class="btn btn-success guardar-step4 paso10">Guardar</button>
-                                    <!--<a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
+                            <div class="row mt-3">
+                                <h5>Patologías</h5>
+                                <div class="col-md-12">
+                                    <label for="patologias" class="form-label">Seleccione las patologías que posee</label>
+                                    <select name="patologias[]" class="form-select" id="patologias" data-placeholder="Patologías..." multiple>
+                                        <option value="">Ninguna</option>
+                                        @foreach ($patologias->groupBy('grupo_patologia') as $grupo_patologia => $patologias_del_grupo)
+                                            <optgroup label="{{$grupo_patologia}}">
+                                                @foreach ($patologias_del_grupo as $patologia)
+                                                    <option value="{{$patologia->id}}">{{$patologia->patologia}}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                @endif
 
-                <br>
+                            <div class="row mt-3">
+                                <h5>Intolerancias</h5>
+                                <div class="col-md-12">
+                                    <label for="intolerancias" class="form-label">Seleccione las intolerancias que posee</label>
+                                    <select name="intolerancias[]" class="form-select" id="intolerancias" data-placeholder="Intolerancias..." multiple>
+                                        <option value="">Ninguna</option>
+                                        @foreach ($intolerancias as $intolerancia)
+                                            <option value="{{$intolerancia->id}}">{{$intolerancia->intolerancia}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
 
-            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="float-right">
+                                        @if(!$paciente->historiaClinica)
+                                            <button type="button" class="btn btn-danger prev-step" id="prev-step4">Anterior</button>
+                                        @endif
+                                        <button id="guardar-step4" type="button" class="btn btn-success guardar-step4 paso10 next-step">Guardar y continuar</button>
+                                        <!--<a href="{{ route('dashboard') }}" class="btn btn-danger" tabindex="7">Cancelar</a>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    @endif
+
+                    <br>
+
+                </div>
+            @endif
+
         </div>
     </div>
 
@@ -719,69 +730,17 @@
         });
         */
 
-
+        //Barra de progreso
         $(document).ready(function () {
-            var totalSteps = $(".step").length;
-            var currentStep = 1;
-
-            console.log(currentStep);
-
-            // Obtén el estado de completitud desde el lado del cliente (puedes usar cookies o localStorage)
-            var completedSteps = [false, false, false, false];
-
-            $(".step:not(:first)").hide();
-            $(".prev-step").prop('disabled', true);
-
-            $(".next-step").click(function () {
-                if (currentStep === 1 && !validateStep1()) {
-                    return false;
-                }
-
-                // Actualiza el estado de completitud
-                completedSteps[currentStep - 1] = true;
-
-                // Redirige al siguiente paso si el formulario actual se completó correctamente
-                if (currentStep < totalSteps) {
-                    currentStep++;
-                    showStep(currentStep);
-                    updateProgressBar();
-                    $(".prev-step").prop('disabled', false);
-
-
-                } else {
-                    // Aquí podrías realizar alguna acción especial si todos los pasos están completos
-                    // Por ejemplo, mostrar un botón para completar el registro
-                    $('#completar-registro').show();
-                }
-            });
-
-            $(".prev-step").click(function () {
-                currentStep--;
-                showStep(currentStep);
-                updateProgressBar();
-                if (currentStep === 1) {
-                    $(".prev-step").prop('disabled', true);
-                }
-            });
-
-            function showStep(step) {
-                $(".step").hide();
-                $("#step" + step).show();
-
-
-            }
-
-            function validateStep1() {
-                // Lógica de validación para la primera etapa
-                return true;
-            }
-
-            function updateProgressBar() {
-                var progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
-                $(".progress-bar").css("width", progress + "%").attr("aria-valuenow", progress);
-                $(".progress-bar").text(progress.toFixed(2) + "%");
-            }
+            var progress = {{ $progress }};
+            updateProgressBar(progress);
         });
+
+        function updateProgressBar(progress) {
+            $("#paso2 .progress-bar").css("width", progress + "%").attr("aria-valuenow", progress);
+            $("#paso2 .progress-bar").text(progress.toFixed(2) + "%");
+        }
+
 
 
         /*
