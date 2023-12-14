@@ -25,7 +25,7 @@
                         <select name="alimento_id" class="form-control">
                             <option value="">Selecciona un alimento</option>
                             @foreach ($alimentos as $alimento)
-                                <option @if(old('alimento_id', null) == $alimento->id) selected @endif value="{{ $alimento->id }}">{{ $alimento->alimento }}</option>
+                                <option value="{{ $alimento->id }}" {{ old('alimento_id') == $alimento->id ? 'selected' : '' }}>{{ $alimento->alimento }}</option>
                             @endforeach
                         </select>
 
@@ -38,7 +38,7 @@
                         <select name="tipo_de_dieta_id" class="form-control">
                             <option value="" disabled selected>Selecciona un tipo de dieta</option>
                             @foreach ($tiposDietas as $tipoDieta)
-                                <option @if(old('tipo_de_dieta_id', null) == $tipoDieta->id) selected @endif value="{{ $tipoDieta->id }}">
+                                <option value="{{ $tipoDieta->id }}" {{ old('tipo_de_dieta_id') == $tipoDieta->id ? 'selected' : '' }}>
                                     {{ $tipoDieta->tipo_de_dieta }}
                                 </option>
                             @endforeach
@@ -64,7 +64,7 @@
                         <select name="unidad_medida_id" class="form-control">
                             <option value="">Selecciona una unidad de medida</option>
                             @foreach ($unidadesMedidas as $unidadMedida)
-                            <option @if(old('unidad_medida_id', null) == $unidadMedida->id) selected @endif value="{{ $unidadMedida->id }}">{{ $unidadMedida->nombre_unidad_medida }}</option>
+                                <option value="{{ $unidadMedida->id }}" {{ old('unidad_medida_id') == $unidadMedida->id ? 'selected' : '' }}>{{ $unidadMedida->nombre_unidad_medida }}</option>
                             @endforeach
                         </select>
 
@@ -77,7 +77,7 @@
                         <select name="comida_id" class="form-control">
                             <option value="">Selecciona una comida</option>
                             @foreach ($comidas as $comida)
-                                <option @if(old('comida_id', null) == $comida->id) selected @endif value="{{ $comida->id }}">{{ $comida->nombre_comida }}</option>
+                                <option value="{{ $comida->id }}" {{ old('comida_id') == $comida->id ? 'selected' : '' }}>{{ $comida->nombre_comida }}</option>
                             @endforeach
                         </select>
                         @error('comida_id')

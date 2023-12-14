@@ -10,7 +10,7 @@
 
     @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning mt-3" role="alert">
             <h5>Registro incompleto</h5>
             Parece que aún no ha completado su registro. <br>
             Para tener acceso a esta funcionalidad del sistema, necesita completar el registro. <br>
@@ -199,7 +199,7 @@
         });
 
          //SweetAlert
-
+        /*
         document.addEventListener('DOMContentLoaded', function () {
             const cancelarButtons = document.querySelectorAll('.cancelar-turno-button');
 
@@ -225,6 +225,7 @@
                 });
             });
         });
+        */
 
     </script>
 @stop

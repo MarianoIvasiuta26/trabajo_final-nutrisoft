@@ -10,7 +10,7 @@
 
         @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
-            <div class="alert alert-warning" role="alert">
+            <div class="alert alert-warning mt-3" role="alert">
                 <h5>Registro incompleto</h5>
                 Parece que aún no has completado su registro. <br>
                 Para tener acceso a esta funcionalidad del sistema, necesita completar el registro. <br>
@@ -52,7 +52,7 @@
                                     <select name="profesional" id="profesional" class="form-select">
                                         <option value="">Seleccione un profesional</option>
                                         @foreach($profesionales as $profesional)
-                                            <option value="{{$profesional->id}}">{{$profesional->user->name}} {{$profesional->user->apellido}}</option>
+                                            <option value="{{$profesional->id}}" {{ old('profesional') == $profesional->id ? 'selected' : '' }}>{{$profesional->user->name}} {{$profesional->user->apellido}}</option>
                                         @endforeach
                                     </select>
 
@@ -85,7 +85,7 @@
                                     <select class="form-select" name="tipo_consulta" id="tipo_consulta">
                                         <option value="">Seleccione un tipo de consulta</option>
                                         @foreach($tipo_consultas as $tipo_consulta)
-                                            <option value="{{$tipo_consulta->id}}">{{$tipo_consulta->tipo_consulta}}</option>
+                                            <option value="{{$tipo_consulta->id}}" {{ old('tipo_consulta') == $tipo_consulta->id ? 'selected' : '' }}>{{$tipo_consulta->tipo_consulta}}</option>
                                         @endforeach
                                     </select>
                                     @error('tipo_consulta')
@@ -105,7 +105,7 @@
                                             @foreach ($historias_clinicas as $historia_clinica)
                                                 @if ($paciente->user_id == auth()->user()->id)
                                                     @if ($historia_clinica->paciente_id == $paciente->id)
-                                                        <option value="{{$historia_clinica->objetivo_salud}}">{{$historia_clinica->objetivo_salud}}</option>
+                                                        <option value="{{$historia_clinica->objetivo_salud}}" {{ old('objetivo_salud') == $historia_clinica->objetivo_salud ? 'selected' : '' }}>{{$historia_clinica->objetivo_salud}}</option>
                                                     @endif
                                                 @endif
                                             @endforeach
@@ -123,7 +123,7 @@
                                     <label class="form-label" for="fecha">
                                         Fecha <span class="text-muted">(*)</span>
                                     </label>
-                                    <input class="form-control" type="date" name="fecha" id="fecha">
+                                    <input class="form-control" type="date" name="fecha" id="fecha" value="{{old('fecha')}}">
 
                                     @error('fecha')
                                         <small class="text-danger">{{$message}}</small>

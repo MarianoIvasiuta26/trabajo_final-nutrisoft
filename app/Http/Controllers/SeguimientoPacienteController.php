@@ -33,7 +33,7 @@ class SeguimientoPacienteController extends Controller
         $planAlimentacionActivo = $obtener['planAlimentacionActivo'];
         $planSeguimientoActivo = $obtener['planSeguimientoActivo'];
         if(!$planSeguimientoActivo){
-            return redirect()->back()->with('info', 'No tiene un plan de seguimiento activo. Para obtenerlo debe recibir una consulta por un profesional.');
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a su seguimiento si no tiene un plan de seguimiento activo. Para obtenerlo debe recibir una consulta por un profesional.');
         }
         $planesAlimentacionPaciente = $obtener['planesAlimentacionPaciente'];
         $planesSeguimientoPaciente = $obtener['planesSeguimientoPaciente'];

@@ -25,7 +25,9 @@
                         <select name="actividad_id" class="form-control">
                             <option value="">Selecciona una actividad</option>
                             @foreach ($actividades as $actividad)
-                                <option @if(old('actividad_id', null) == $actividad->id) selected @endif value="{{ $actividad->id }}">{{ $actividad->actividad }}</option>
+                                @if ($actividad->actividad != 'Sin Actividades')
+                                    <option value="{{ $actividad->id }}" {{ old('actividad_id') == $actividad->id ? 'selected' : '' }}>{{ $actividad->actividad }}</option>
+                                @endif
                             @endforeach
                         </select>
 
@@ -38,9 +40,11 @@
                         <select name="tipo_de_actividad_id" class="form-control">
                             <option value="" disabled selected>Selecciona un tipo de actividad</option>
                             @foreach ($tiposActividades as $tipoActividad)
-                                <option @if(old('tipo_de_dieta_id', null) == $tipoActividad->id) selected @endif value="{{ $tipoActividad->id }}">
-                                    {{ $tipoActividad->tipo_actividad }}
-                                </option>
+                                @if ($tipoActividad->tipo_actividad != 'Sin tipo de actividad')
+                                    <option value="{{ $tipoActividad->id }}" {{ old('tipo_de_actividad_id') == $tipoActividad->id ? 'selected' : '' }}>
+                                        {{ $tipoActividad->tipo_actividad }}
+                                    </option>
+                                @endif
                             @endforeach
                         </select>
                         @error('tipo_de_actividad_id')
@@ -64,7 +68,9 @@
                         <select name="unidad_tiempo_id" class="form-control">
                             <option value="">Selecciona una unidad de tiempo</option>
                             @foreach ($unidadesTiempo as $unidadTiempo)
-                                <option @if(old('unidad_tiempo_id', null) == $unidadTiempo->id) selected @endif value="{{ $unidadTiempo->id }}">{{ $unidadTiempo->nombre_unidad_tiempo }}</option>
+                                @if ($unidadTiempo->nombre_unidad_tiempo != 'Sin unidad de tiempo')
+                                    <option value="{{ $unidadTiempo->id }}" {{ old('unidad_tiempo_id') == $unidadTiempo->id ? 'selected' : '' }}>{{ $unidadTiempo->nombre_unidad_tiempo }}</option>
+                                @endif
                             @endforeach
                         </select>
 

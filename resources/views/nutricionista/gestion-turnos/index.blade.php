@@ -63,6 +63,7 @@
                         <th scope="col">Fecha</th>
                         <th scope="col">Hora</th>
                         <th scope="col">Paciente</th>
+                        <th scope="col">Motivo</th>
                         <th scope="col">Acciones</th>
                     </tr>
                 </thead>
@@ -88,6 +89,9 @@
                                         </td>
                                         <td>
                                             {{ $paciente->user->name }} {{ $paciente->user->apellido }}
+                                        </td>
+                                        <td>
+                                            {{ $turno->motivo_consulta }}
                                         </td>
                                         <td>
                                             <a class="btn btn-success" href="{{route('gestion-turnos-nutricionista.iniciarConsulta', $turno->id)}}">Iniciar consulta</a>
@@ -119,6 +123,7 @@
                         <th scope="col">Fecha</th>
                         <th scope="col">Hora</th>
                         <th scope="col">Paciente</th>
+                        <th scope="col">Motivo</th>
                     </tr>
                 </thead>
 
@@ -143,6 +148,9 @@
                                         </td>
                                         <td>
                                             {{ $paciente->user->name }} {{ $paciente->user->apellido }}
+                                        </td>
+                                        <td>
+                                            {{ $turno->motivo_consulta }}
                                         </td>
                                     </tr>
                                 @endif

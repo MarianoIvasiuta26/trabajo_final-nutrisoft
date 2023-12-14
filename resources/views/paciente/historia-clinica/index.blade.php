@@ -9,7 +9,7 @@
 @section('content')
     @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
-    <div class="alert alert-warning" role="alert">
+    <div class="alert alert-warning mt-3" role="alert">
         Parece que aún no has completado su registro. <br>
         Haga click en el siguiente enlace para completar su registro:
         <a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar registro</a>
@@ -17,7 +17,7 @@
     @else
         @if(auth()->user()->tipo_usuario === 'Paciente' && app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
             @if (!app('App\Http\Controllers\PacienteController')->hasCompletedDatosMedicos() || !app('App\Http\Controllers\PacienteController')->hasCompletedCirugias() || !app('App\Http\Controllers\PacienteController')->hasCompletedAnamnesis())
-                <div class="alert alert-warning" role="alert">
+                <div class="alert alert-warning mt-3" role="alert">
                     Parece que aún no has terminado de completar su registro. Recuerda que es importante que lo completes para tener acceso a todas las funcionalidades del sistema.<br>
                     Haga click en el siguiente enlace para completarlo:
                     <a href="{{ route('historia-clinica.create') }}" class="alert-link">Continuar completando registro</a>
