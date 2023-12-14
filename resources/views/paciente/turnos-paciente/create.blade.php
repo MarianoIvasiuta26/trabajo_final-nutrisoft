@@ -11,11 +11,11 @@
         @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
             <div class="alert alert-warning" role="alert">
-                <h5>Historia Clínica icompleta</h5>
-                Parece que aún no has completado tu Historia Clínica. <br>
-                Para tener acceso a esta funcionalidad del sistema, necesita completar su historia clínica. <br>
-                Haga click en el siguiente enlace para completar su historia clínica:
-                <br><a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar mi Historia Clínica</a>
+                <h5>Registro incompleto</h5>
+                Parece que aún no has completado su registro. <br>
+                Para tener acceso a esta funcionalidad del sistema, necesita completar el registro. <br>
+                Haga click en el siguiente enlace para completar:
+                <br><a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar registro</a>
             </div>
 
         @else

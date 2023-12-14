@@ -38,7 +38,7 @@ class AdelantamientoTurnoController extends Controller
         $dias = DiasAtencion::all();
         $horas = HorasAtencion::all();
         $horarios = HorariosAtencion::all();
-        $profesionales = Nutricionista::all();
+        $profesionales = Nutricionista::where('user_id', 2)->get();
         return view('paciente.historia-clinica.adelantamiento-turnos.create', compact('dias', 'horas', 'horarios', 'paciente', 'profesionales'));
     }
 

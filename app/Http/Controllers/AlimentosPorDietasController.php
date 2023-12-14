@@ -33,7 +33,7 @@ class AlimentosPorDietasController extends Controller
     {
         $tiposDietas = TiposDeDieta::all();
         $comidas = Comida::all();
-        $unidadesMedidas = UnidadesMedidasPorComida::all();
+        $unidadesMedidas = UnidadesMedidasPorComida::whereIn('nombre_unidad_medida', ['Gramos', 'Kcal'])->get();;
         $alimentos = Alimento::all();
 
         $alimentosPorDietas = AlimentoPorTipoDeDieta::all();
@@ -74,7 +74,7 @@ class AlimentosPorDietasController extends Controller
                 return redirect()->back()->with('error', 'Error al crear la asociación del alimento con la dieta. Ya existe un registro de este alimento en la dieta.');
             }
         }
-        
+
         $alimentoPorDieta = AlimentoPorTipoDeDieta::create([
             'alimento_id' => $request->input('alimento_id'),
             'tipo_de_dieta_id'=> $request->input('tipo_de_dieta_id'),

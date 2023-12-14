@@ -10,17 +10,17 @@
     @if(auth()->user()->tipo_usuario === 'Paciente' && !app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
 
     <div class="alert alert-warning" role="alert">
-        Parece que aún no has completado tu Historia Clínica. <br>
-        Haga click en el siguiente enlace para completar su historia clínica:
-        <a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar mi Historia Clínica</a>
+        Parece que aún no has completado su registro. <br>
+        Haga click en el siguiente enlace para completar su registro:
+        <a href="{{ route('historia-clinica.create') }}" class="alert-link">Completar registro</a>
     </div>
     @else
         @if(auth()->user()->tipo_usuario === 'Paciente' && app('App\Http\Controllers\PacienteController')->hasCompletedHistory())
             @if (!app('App\Http\Controllers\PacienteController')->hasCompletedDatosMedicos() || !app('App\Http\Controllers\PacienteController')->hasCompletedCirugias() || !app('App\Http\Controllers\PacienteController')->hasCompletedAnamnesis())
                 <div class="alert alert-warning" role="alert">
-                    Parece que aún no has terminado de completar tu Historia Clínica. Recuerda que es importante que lo completes para tener acceso a todas las funcionalidades del sistema.<br>
-                    Haga click en el siguiente enlace para completar su historia clínica:
-                    <a href="{{ route('historia-clinica.create') }}" class="alert-link">Continuar completando mi Historia Clínica</a>
+                    Parece que aún no has terminado de completar su registro. Recuerda que es importante que lo completes para tener acceso a todas las funcionalidades del sistema.<br>
+                    Haga click en el siguiente enlace para completarlo:
+                    <a href="{{ route('historia-clinica.create') }}" class="alert-link">Continuar completando registro</a>
                 </div>
             @else
                 @if(session('success'))
@@ -94,9 +94,11 @@
                                         <li class="nav-item">
                                             <a class="nav-link" href="#historial-turnos" id="tab-historial-turnos">Historial de turnos</a>
                                         </li>
+                                        <!--
                                         <li class="nav-item">
                                             <a class="nav-link" href="#planes" id="tab-planes">Planes</a>
                                         </li>
+                                    -->
                                     </ul>
                                 </div>
                                 <div class="card-body">
@@ -683,7 +685,7 @@
                                                             </td>
                                                             <td>{{ $turno->estado }}</td>
                                                             <td>
-                                                                <button class="btn btn-primary ver-detalles">Ver detalles</button>
+                                                                <button class="btn btn-primary ver-detalles btn-sm" data-bs-toggle="modal" data-bs-target="#detalleTurno{{$turno->id}}">Ver detalles</button>
                                                                 {{--
                                                                 @if ($turno->estado == 'Pendiente')
                                                                     <a href="{{ route('turnos.edit', $turno->id) }}" class="btn btn-warning">Editar</a>
@@ -697,8 +699,27 @@
                                                                 @endif
                                                             </td>
                                                         </tr>
-                                                        <tr class="detalles-turno" style="display: none;">
-                                                            <td colspan="5">
+
+                                                    @endif
+                                                @empty
+
+                                                @endforelse
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <!-- Detalle de turno -->
+                                        @forelse($turnos as $turno)
+                                            @if ($turno->paciente_id == $paciente->id)
+                                                <div class="modal fade" id="detalleTurno{{$turno->id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="detalleTurno{{$turno->id}}Label" aria-hidden="true">
+                                                    <div class="modal-dialog modal-xl">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="detalleTurno{{$turno->id}}Label">Detalle de turno</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
                                                                 <table class="table">
                                                                     <tbody>
 
@@ -743,18 +764,15 @@
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="5">No hay turnos registrados</td>
-                                                    </tr>
-                                                @endforelse
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @empty
 
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                        @endforelse
+
 
                                         <!-- Planes -->
                                         <div id="planes" class="tab-pane">
@@ -860,6 +878,29 @@
                     "info": "Mostrando la página _PAGE_ de _PAGES_",
                     "infoEmpty": "No hay días y horas existentes.",
                     "infoFiltered": "(filtrado de _MAX_ días y horas totales)",
+                    "search": "Buscar:",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Último",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    },
+                },
+                "order": [[ 0, "asc" ]],
+            });
+        });
+
+        $(document).ready(function(){
+            $('#tabla-mis-turnos').DataTable({
+                responsive: true,
+                autoWidth: false,
+                "lengthMenu": [[5, 10, 50, -1], [5, 10, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ turnos por página",
+                    "zeroRecords": "No se encontró ningún turno.",
+                    "info": "Mostrando la página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay turnos existentes.",
+                    "infoFiltered": "(filtrado de _MAX_ turnos totales)",
                     "search": "Buscar:",
                     "paginate": {
                         "first": "Primero",

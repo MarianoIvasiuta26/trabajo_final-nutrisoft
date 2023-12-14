@@ -75,7 +75,7 @@ class HistoriaClinicaController extends Controller
         $cirugias = Cirugia::all();
         $intolerancias = Intolerancia::all();
         $alimentos = Alimento::all();
-        $profesionales = Nutricionista::all();
+        $profesionales = Nutricionista::where('user_id', 2)->get();
         //Obtener paciente autenticado
         $paciente = Paciente::where('user_id', auth()->user()->id)->first();
 

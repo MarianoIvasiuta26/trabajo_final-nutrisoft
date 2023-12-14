@@ -17,6 +17,7 @@ use App\Models\UnidadesMedidasPorComida;
 use App\Models\ValorNutricional;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class SeguimientoPacienteController extends Controller
 {
@@ -123,15 +124,18 @@ class SeguimientoPacienteController extends Controller
                     $alimento = Alimento::find($alimentoConsumido->alimento_id);
                     $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $alimento->id)->first();
 
-                    $kcal = $kcal + ($valorN->valor * ($alimentoConsumido->cantidad / 100));
-
+                    if(!$valorN){
+                        $valor = 0;
+                    }else{
+                        $kcal = $kcal + ($valorN->valor * ($alimentoConsumido->cantidad / 100));
+                    }
                 }
             }else{
                 $kcal = 0;
             }
 
             $alimentos = Alimento::all();
-            $unidades_de_medida = UnidadesMedidasPorComida::all();
+            $unidades_de_medida = UnidadesMedidasPorComida::whereIn('nombre_unidad_medida', ['Gramos', 'Kcal'])->get();
             $detallesPlanAlimentacionActivo = DetallePlanAlimentaciones::where('plan_alimentacion_id', $planAlimentacionActivo->id)->get();
 
             $paciente = Paciente::find(auth()->user()->paciente->id);
@@ -248,6 +252,19 @@ class SeguimientoPacienteController extends Controller
 
     public function registrarConsumo(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'alimentos.*' => 'required',
+            'cantidades.*' => 'required',
+            'unidades_de_medida.*' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'No se pudo registrar el alimento consumido porque no ha ingresado ninguno.');
+        }
+
         //Registro
         $alimentosPlan = $request->input('alimentosPlan');
         $otrosAlimentos = $request->input('alimentos');
@@ -262,18 +279,6 @@ class SeguimientoPacienteController extends Controller
         if (!is_null($alimentosPlan) && count($alimentosPlan) > 0){
             foreach($alimentosPlan as $alimentoPlan){
                 $detalle = DetallePlanAlimentaciones::find($alimentoPlan);
-                $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $detalle->alimento_id)->first();
-
-                if(!$valorN){
-                    $valor= 0;
-                    $kcal = 0.00;
-                }else{
-                    if($detalle->unidad_medida == 'Kcal'){
-                        $kcal = $kcal + $detalle->cantidad;
-                    }
-                    $kcal = $kcal + ($valorN->valor * ($detalle->cantidad/100));
-                }
-
                 $fechaActual = now()->format('Y-m-d');
 
                 $registroExistente = RegistroAlimentosConsumidos::where('alimento_id',$detalle->alimento_id)
@@ -282,6 +287,18 @@ class SeguimientoPacienteController extends Controller
                     ->first();
 
                 if(!$registroExistente){
+                    $valorN = ValorNutricional::where('nutriente_id', $nutriente->id)->where('alimento_id', $detalle->alimento_id)->first();
+                    //dd($valorN);
+                    if(!$valorN){
+                        $valor= 0;
+                        $kcal = 0.00;
+                    }else{
+                        if($detalle->unidad_medida == 'Kcal'){
+                            $kcal = $kcal + $detalle->cantidad;
+                        }
+                        $kcal = $kcal + ($valorN->valor * ($detalle->cantidad/100));
+                    }
+
                     RegistroAlimentosConsumidos::create([
                         'plan_de_seguimiento_id' => $planSeguimientoActivo->id,
                         'paciente_id' => auth()->user()->paciente->id,
