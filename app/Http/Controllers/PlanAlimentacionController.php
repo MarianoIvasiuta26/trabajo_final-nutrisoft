@@ -291,7 +291,7 @@ class PlanAlimentacionController extends Controller
 
         $planGenerado = PlanAlimentaciones::where('paciente_id', $paciente->id)->where('estado', 2)->first();
         $detallesPlan = DetallePlanAlimentaciones::where('plan_alimentacion_id', $planGenerado->id)->get();
-
+        //dd($detallesPlan);
         $unidadesMedidas = UnidadesMedidasPorComida::all();
 
         $alimentos = Alimento::all();

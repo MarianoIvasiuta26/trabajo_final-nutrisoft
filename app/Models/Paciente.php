@@ -59,4 +59,19 @@ class Paciente extends Model
         return $this->hasMany('App\Models\RegistroAlimentosConsumidos');
     }
 
+    public function intoleranciasPaciente()
+    {
+        return $this->hasMany('App\Models\Paciente\IntoleranciasPaciente');
+    }
+
+    public function patologiasPaciente()
+    {
+        return $this->hasMany('App\Models\Paciente\PatologiasPaciente');
+    }
+
+    public function alergiasPaciente()
+    {
+        return $this->hasMany('App\Models\Paciente\AlergiasPaciente');
+    }
+
 }

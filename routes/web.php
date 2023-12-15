@@ -251,6 +251,8 @@ Route::middleware([
     Route::post('datos-personales/store', [PacienteController::class, 'store'])->name('datos-personales.store');
     Route::any('historia-clinica.completar', [HistoriaClinicaController::class, 'completarHistoriaClinica'])->name('historia-clinica.completar');
 
+    Route::delete('datos-medicos.destroyAlergia/{id}', [DatosMedicosController::class, 'destroyAlergias'])->name('datos-medicos.destroyAlergia');
+
     Route::get('datos-personales/edit/{id}', [PacienteController::class, 'edit'])->name('datos-personales.edit');
     Route::post('datos-personales/update/{id}', [PacienteController::class, 'update'])->name('datos-personales.update');
 

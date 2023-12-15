@@ -26,4 +26,8 @@ class Patologia extends Model
     public function actividadesProhibidasPatologias(){
         return $this->hasMany('App\Models\ActividadesProhibidasPatologia');
     }
+
+    public function patologiasPacientes(){
+        return $this->hasMany('App\Models\Paciente\PatologiasPaciente');
+    }
 }

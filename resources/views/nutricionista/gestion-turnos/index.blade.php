@@ -94,10 +94,10 @@
                                             {{ $turno->motivo_consulta }}
                                         </td>
                                         <td>
-                                            <a class="btn btn-success" href="{{route('gestion-turnos-nutricionista.iniciarConsulta', $turno->id)}}">Iniciar consulta</a>
+                                            <a class="btn btn-success btn-sm" href="{{route('gestion-turnos-nutricionista.iniciarConsulta', $turno->id)}}">Iniciar consulta</a>
                                             <form id="inasistencia-form" action="{{ route('gestion-turnos-nutricionista.confirmarInasistencia', $turno->id) }}" method="POST" style="display: inline-block;">
                                                 @csrf
-                                                <button type="button" class="btn btn-danger marcar-inasistencia">No asistió</button>
+                                                <button type="button" class="btn btn-danger marcar-inasistencia btn-sm">No asistió</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -290,7 +290,7 @@
                         "previous": "Anterior"
                     },
                 },
-                order: [[ 0, "desc" ]],
+                order: [[ 0, "desc" ], [ 1, "asc" ]],
                 columnDefs: [
                     {
                         targets: 0, // Índice de la columna de fecha
@@ -322,7 +322,7 @@
                         "previous": "Anterior"
                     },
                 },
-                order: [[ 0, "asc" ]],
+                order: [[ 0, "asc" ], [ 1, "asc" ]],
                 columnDefs: [
                     {
                         targets: 0, // Índice de la columna de fecha

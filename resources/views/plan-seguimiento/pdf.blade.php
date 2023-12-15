@@ -92,7 +92,7 @@
 
     <div class="container">
         <div class="hijo">
-            <h1>Información del Plan</h1>
+            <h1 style="text-align: center;">Información del Plan</h1>
 
             <table class="table table-striped table-hover">
                 <thead class="cabecera">
@@ -138,7 +138,7 @@
 
             <br>
 
-            <h1>Plan de Seguimiento</h1>
+            <h1 style="text-align: center;">Plan de Seguimiento</h1>
 
             <table class="table table-striped table-hover">
                 <thead class="cabecera">

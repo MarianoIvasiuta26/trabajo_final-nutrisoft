@@ -22,4 +22,8 @@ class Intolerancia extends Model
     public function alimentosProhibidosIntolerancias(){
         return $this->hasMany('App\Models\AlimentosProhibidosIntolerancia');
     }
+
+    public function intoleranciasPacientes(){
+        return $this->hasMany('App\Models\Paciente\IntoleranciasPaciente');
+    }
 }

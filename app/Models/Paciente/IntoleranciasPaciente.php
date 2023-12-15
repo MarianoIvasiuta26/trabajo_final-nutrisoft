@@ -5,21 +5,23 @@ namespace App\Models\Paciente;
 use App\Models\Paciente;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AdelantamientoTurno extends Model
+class IntoleranciasPaciente extends Model
 {
     use HasFactory;
-    //use SoftDeletes;
 
     protected $fillable = [
         'paciente_id',
-        'dias_fijos',
-        'horas_fijas',
+        'intolerancia_id',
     ];
 
     public function paciente()
     {
         return $this->belongsTo(Paciente::class);
+    }
+
+    public function intolerancia()
+    {
+        return $this->belongsTo(Intolerancia::class);
     }
 }

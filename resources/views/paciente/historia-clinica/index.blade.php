@@ -120,7 +120,7 @@
                                                 <div class="col-sm-4">
                                                     <div class="description-block">
                                                         <h5 class="description-header">Fecha de Nacimiento</h5>
-                                                        <span class="description-text">{{ $paciente->fecha_nacimiento }}</span>
+                                                        <span class="description-text">{{ \Carbon\Carbon::parse($paciente->fecha_nacimiento)->format('d-m-Y') }}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -129,7 +129,7 @@
                                                 <div class="col-sm-6 border-right">
                                                     <div class="description-block">
                                                         <h5 class="description-header">Edad</h5>
-                                                        <span class="description-text">{{ $paciente->edad }}</span>
+                                                        <span class="description-text">{{ $paciente->edad }}</span> <span>años</span>
                                                     </div>
                                                 </div>
 
@@ -219,13 +219,13 @@
                                                 <div class="col-sm-6 border-right">
                                                     <div class="description-block">
                                                         <h5 class="description-header">Peso</h5>
-                                                        <span class="description-text">{{ $historiaClinica->peso }}</span>
+                                                        <span class="description-text">{{ $historiaClinica->peso }}</span> <span>kg</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-6">
                                                     <div class="description-block">
                                                         <h5 class="description-header">Altura</h5>
-                                                        <span class="description-text">{{ $historiaClinica->altura }}</span>
+                                                        <span class="description-text">{{ $historiaClinica->altura }}</span> <span>cm</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -234,25 +234,25 @@
                                                 <div class="col-sm-3 border-right">
                                                     <div class="description-block ">
                                                         <h5 class="description-header">Cirunferencia de Muñeca</h5>
-                                                        <span class="description-text">{{ $historiaClinica->circunferencia_munieca}}</span>
+                                                        <span class="description-text">{{ $historiaClinica->circunferencia_munieca}}</span> <span>cm</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 border-right">
                                                     <div class="description-block">
                                                         <h5 class="description-header">Cirunferencia de Cintura</h5>
-                                                        <span class="description-text">{{ $historiaClinica->circunferencia_cintura}}</span>
+                                                        <span class="description-text">{{ $historiaClinica->circunferencia_cintura}}</span> <span>cm</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3 border-right">
                                                     <div class="description-block">
                                                         <h5 class="description-header">Cirunferencia de Cadera</h5>
-                                                        <span class="description-text">{{ $historiaClinica->circunferencia_cadera}}</span>
+                                                        <span class="description-text">{{ $historiaClinica->circunferencia_cadera}}</span> <span>cm</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-sm-3">
                                                     <div class="description-block">
                                                         <h5 class="description-header">Circunferencia de Pecho</h5>
-                                                        <span class="description-text">{{ $historiaClinica->circunferencia_pecho}}</span>
+                                                        <span class="description-text">{{ $historiaClinica->circunferencia_pecho}}</span> <span>cm</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -433,6 +433,7 @@
                                                                                                 <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
                                                                                             </form>
                                                                                         </div>
+                                                                                    </td>
                                                                                 </tr>
                                                                             @else
                                                                                 <tr>
@@ -488,10 +489,20 @@
                                                                                     <td>{{ $cirugiaPaciente->cirugia->cirugia }}</td>
                                                                                     <td>{{ $cirugiaPaciente->cirugia->grupo_cirugia }}</td>
                                                                                     <td>{{ $cirugiaPaciente->tiempo }}</td>
-                                                                                    <td>{{ $cirugiaPaciente->unidad_tiempo }}</td>
+                                                                                    <td>
+                                                                                        @if ($cirugiaPaciente->unidad_tiempo == 'anios')
+                                                                                            @if ($cirugiaPaciente->tiempo == 1)
+                                                                                                Año
+                                                                                            @else
+                                                                                                Años
+                                                                                            @endif
+                                                                                        @else
+                                                                                            {{ $cirugiaPaciente->unidad_tiempo }}
+                                                                                        @endif
+                                                                                    </td>
                                                                                     <td>
                                                                                         <div class="btn-group">
-                                                                                            <a class="btn btn-info" href="{{ route('datos-medicos.edit', $cirugiaPaciente->id) }}">Editar</a>
+                                                                                            <!--<a class="btn btn-info" href="{{ route('datos-medicos.edit', $cirugiaPaciente->id) }}">Editar</a>-->
                                                                                             <form action="{{ route('datos-medicos.destroy', $cirugiaPaciente->id) }}" method="POST">
                                                                                                 @csrf
                                                                                                 @method('DELETE')
@@ -559,13 +570,14 @@
                                                                                     <td>{{ $patologia->grupo_patologia}}</td>
                                                                                     <td>
                                                                                         <div class="btn-group">
-                                                                                            <a class="btn btn-info" href="{{ route('datos-medicos.edit', $patologia->id) }}">Editar</a>
+                                                                                            <!--<a class="btn btn-info" href="{{ route('datos-medicos.edit', $patologia->id) }}">Editar</a>-->
                                                                                             <form action="{{ route('datos-medicos.destroy', $patologia->id) }}" method="POST">
                                                                                                 @csrf
                                                                                                 @method('DELETE')
                                                                                                 <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
                                                                                             </form>
                                                                                         </div>
+                                                                                    </td>
                                                                                 </tr>
                                                                             @else
                                                                                 <tr>
@@ -619,13 +631,14 @@
                                                                                     <td>{{ $intolerancia->intolerancia }}</td>
                                                                                     <td>
                                                                                         <div class="btn-group">
-                                                                                            <a class="btn btn-info" href="{{ route('datos-medicos.edit', $intolerancia->id) }}">Editar</a>
+                                                                                            <!--<a class="btn btn-info" href="{{ route('datos-medicos.edit', $intolerancia->id) }}">Editar</a>-->
                                                                                             <form action="{{ route('datos-medicos.destroy', $intolerancia->id) }}" method="POST">
                                                                                                 @csrf
                                                                                                 @method('DELETE')
                                                                                                 <button class="btn btn-danger ml-2" type="submit">Eliminar</button>
                                                                                             </form>
                                                                                         </div>
+                                                                                    </td>
                                                                                 </tr>
                                                                             @else
                                                                                 <tr>

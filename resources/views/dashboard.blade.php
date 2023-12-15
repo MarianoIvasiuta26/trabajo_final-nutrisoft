@@ -251,7 +251,7 @@
                         @foreach($turnosDelDia as $turno)
                             <tr>
                                 <td>{{$turno->paciente->user->apellido}}, {{$turno->paciente->user->name}}</td>
-                                <td>{{$turno->fecha}}</td>
+                                <td>{{ \Carbon\Carbon::parse($turno->fecha)->format('d-m-Y')}}</td>
                                 <td>{{$turno->hora}}</td>
                                 <td>{{$turno->estado}}</td>
                             </tr>

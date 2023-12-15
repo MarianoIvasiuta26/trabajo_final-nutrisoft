@@ -542,7 +542,7 @@ return [
 
         [
             'text' => 'Gestión Alimentos',
-            'icon' => 'fas fa-utensils',
+            'icon' => 'fas fa-apple-alt',
             'can' => 'gestion-alimentos',
             'submenu' => [
                 [
@@ -601,7 +601,7 @@ return [
         [
             'text' => 'Gestión Recetas',
             'route' => 'gestion-recetas.index',
-            'icon' => 'fas fa-pizza-slice fa-fw',
+            'icon' => 'fas fa-utensils fa-fw',
             'can' => 'gestion-recetas.index',
         ],
 
@@ -624,21 +624,21 @@ return [
         [
             'text' => 'Roles y permisos',
             'route'  => 'gestion-rolesYPermisos.index',
-            'icon' => 'fas fa-lock',
+            'icon' => 'fas fa-crown',
             'can' => 'gestion-rolesYPermisos.index'
         ],
 
         [
             'text' => 'Estadísticas',
             'route'  => 'gestion-estadisticas.index',
-            'icon' => 'fas fa-lock',
+            'icon' => 'fas fa-chart-pie',
             'can' => 'gestion-estadisticas.index',
         ],
 
         [
             'text' => 'Auditoría',
             'route' => 'auditoria.index',
-            'icon' => 'fas fa-lock',
+            'icon' => 'fas fa-shield-alt',
             'can' => 'auditoria.index'
         ],
         /*

@@ -24,4 +24,8 @@ class Alergia extends Model
         return $this->hasMany('App\Models\AlimentosProhibidosAlergia');
     }
 
+    public function alergiasPacientes(){
+        return $this->hasMany('App\Models\Paciente\AlergiasPaciente');
+    }
+
 }
