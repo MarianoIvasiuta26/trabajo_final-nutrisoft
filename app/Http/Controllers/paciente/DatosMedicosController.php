@@ -159,7 +159,7 @@ class DatosMedicosController extends Controller
         if(!empty($alergias)){
             foreach($alergias as $alergia){
                 //Buscamos un registro existente
-                $alergiasExistente = DatosMedicos::where('alergia_id', $alergia)->first();
+                $alergiasExistente = DatosMedicos::where('alergia_id', $alergia)->where('historia_clinica_id', $historiaClinica->id)->first();
 
                 if($alergiasExistente){
                     //Si existe, actualizarlo
@@ -168,6 +168,7 @@ class DatosMedicosController extends Controller
                 }else{
                     //Si no existe, crear un nuevo registro
                     $datosMedicos->alergia_id = $alergia;
+                    $datosMedicos->save();
                 }
             }
         }
@@ -225,7 +226,7 @@ class DatosMedicosController extends Controller
             foreach ($patologias as $patologia) {
                 // Verificar si esta entrada de patología está vacía
                 if ($patologia !== '') {
-                    $patologiasExistente = DatosMedicos::where('patologia_id', $patologia)->first();
+                    $patologiasExistente = DatosMedicos::where('patologia_id', $patologia)->where('historia_clinica_id', $historiaClinica->id)->first();
 
                     if($patologiasExistente){
                         //Si existe, actualizarlo
@@ -234,6 +235,7 @@ class DatosMedicosController extends Controller
                     }else{
                         //Si no existe, crear un nuevo registro
                         $datosMedicos->patologia_id = $patologia;
+                        $datosMedicos->save();
                     }
                 }
             }
@@ -244,7 +246,7 @@ class DatosMedicosController extends Controller
             foreach ($intolerancias as $intolerancia) {
                 // Verificar si esta entrada de intolerancia está vacía
                 if ($intolerancia !== '') {
-                    $intoleranciasExistente = DatosMedicos::where('intolerancia_id', $intolerancia)->first();
+                    $intoleranciasExistente = DatosMedicos::where('intolerancia_id', $intolerancia)->where('historia_clinica_id', $historiaClinica->id)->first();
 
                     if($intoleranciasExistente){
                         //Si existe, actualizarlo
@@ -253,6 +255,8 @@ class DatosMedicosController extends Controller
                     }else{
                         //Si no existe, crear un nuevo registro
                         $datosMedicos->intolerancia_id = $intolerancia;
+                        $datosMedicos->save();
+
                     }
                 }
             }
