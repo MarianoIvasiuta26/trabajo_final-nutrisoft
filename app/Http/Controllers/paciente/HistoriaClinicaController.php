@@ -34,8 +34,13 @@ class HistoriaClinicaController extends Controller
     {
         $paciente = Paciente::where('user_id', auth()->id())->first();
         $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
         if(!$historiaClinica){
-            return view('paciente.historia-clinica.index')->with('info', 'No se ha registrado la historia clínica');
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
+
+        if($historiaClinica->completado == 0){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
         }
         $datosMedicos = DatosMedicos::where('historia_clinica_id', $historiaClinica->id)->first();
         $adelantamientos = AdelantamientoTurno::where('paciente_id', $paciente->id)->get();

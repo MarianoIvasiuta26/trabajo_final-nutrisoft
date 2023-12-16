@@ -154,10 +154,10 @@ class AlimentoController extends Controller
 
         //Validación y Creación del primer Form 'Datos de Alimento'
         $request->validate([
-            'alimento' => ['required', 'string', 'max:30'],
+            'alimento' => ['required', 'string'],
             'grupo_alimento' => ['required', 'integer'],
             'estacional' => ['required', 'boolean'],
-            'estacion' => ['required', 'string', 'max:10'],
+            'estacion' => ['required', 'string'],
         ]);
 
         if($alimento){
@@ -184,6 +184,14 @@ class AlimentoController extends Controller
                     $valor->valor = $nutrienteData['valor'];
                     $valor->save();
                 }else{
+                    if(!$nutrienteData['unidad']){
+                        $nutrienteData['unidad'] = 'Sin medida';
+                    }
+
+                    if(!$nutrienteData['valor']){
+                        $nutrienteData['valor'] = 0;
+                    }
+
                     ValorNutricional::create([
                         'alimento_id' => $alimento->id,
                         'nutriente_id' => $nutrienteId,

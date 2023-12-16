@@ -34,6 +34,16 @@ class TurnoController extends Controller
         $paciente = Paciente::where('user_id', auth()->user()->id)->first();
         $tipo_consultas = TipoConsulta::all();
 
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        if(!$historiaClinica){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
+
+        if($historiaClinica->completado == 0){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
+
         return view('paciente.turnos-paciente.index', compact('turnos', 'paciente', 'tipo_consultas'));
     }
 
@@ -54,6 +64,14 @@ class TurnoController extends Controller
         $dias = DiasAtencion::all();
         $paciente = Paciente::where('user_id', auth()->user()->id)->first();
 
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+        if(!$historiaClinica){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
+
+        if($historiaClinica->completado == 0){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
 
         return view ('paciente.turnos-paciente.create', compact('horarios', 'tipo_consultas', 'turnos', 'pacientes', 'profesionales', 'historias_clinicas', 'horas', 'dias', 'paciente'));
 

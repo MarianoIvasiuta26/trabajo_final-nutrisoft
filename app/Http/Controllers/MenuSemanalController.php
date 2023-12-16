@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ingrediente;
+use App\Models\Paciente;
+use App\Models\Paciente\HistoriaClinica;
 use App\Models\Receta;
 use App\Models\UnidadesDeTiempo;
 use App\Models\UnidadesMedidasPorComida;
@@ -22,6 +24,17 @@ class MenuSemanalController extends Controller
         $ingredientes = Ingrediente::all();
         $unidadesMedidas = UnidadesMedidasPorComida::where('nombre_unidad_medida', '!=', 'Sin unidad de medida')->get();
         $unidadesTiempo = UnidadesDeTiempo::where('nombre_unidad_tiempo', '!=', 'Sin unidad de tiempo')->get();
+
+        $paciente = Paciente::find(auth()->user()->paciente->id);
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        if(!$historiaClinica){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
+
+        if($historiaClinica->completado == 0){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
 
         return view('paciente.menu-semanal.index', compact('recetas', 'ingredientes', 'unidadesMedidas', 'unidadesTiempo'));
     }

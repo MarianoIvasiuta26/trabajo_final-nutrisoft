@@ -38,6 +38,18 @@ class PlanDeSeguimientoController extends Controller
      */
     public function index()
     {
+
+        $paciente = Paciente::find(auth()->user()->paciente->id);
+        $historiaClinica = HistoriaClinica::where('paciente_id', $paciente->id)->first();
+
+        if(!$historiaClinica){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
+
+        if($historiaClinica->completado == 0){
+            return redirect()->route('dashboard')->with('info', 'No puede acceder a este módulo hasta que complete su registro.');
+        }
+
         $planesPaciente = PlanesDeSeguimiento::where('paciente_id', auth()->user()->paciente->id)->get();
         return view('plan-seguimiento.index', compact('planesPaciente'));
     }
