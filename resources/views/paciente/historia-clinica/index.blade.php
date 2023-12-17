@@ -426,7 +426,7 @@
                                                                                     <td>{{ $alergia->grupo_alergia}}</td>
                                                                                     <td>
                                                                                         <div class="btn-group">
-                                                                                            <a class="btn btn-info" href="{{ route('datos-medicos.edit', $alergia->id) }}">Editar</a>
+                                                                                            <!--<a class="btn btn-info" href="{{ route('datos-medicos.edit', $alergia->id) }}">Editar</a>-->
                                                                                             <form action="{{ route('datos-medicos.destroy', $alergia->id) }}" method="POST">
                                                                                                 @csrf
                                                                                                 @method('DELETE')
