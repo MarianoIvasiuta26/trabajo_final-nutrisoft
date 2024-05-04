@@ -17,7 +17,8 @@ return new class extends Migration
         Schema::table('tags', function (Blueprint $table) {
             Schema::table('tags', function (Blueprint $table) {
                 $default = DB::table('grupos_tags')->where('grupo_tag','Sin grupo')->first();
-                $table->unsignedBigInteger('grupo_tag_id')->default($default->id)->after('name');
+                $defaultId = $default ? $default->id : null;
+                $table->unsignedBigInteger('grupo_tag_id')->default($defaultId)->after('name');
                 $table->foreign('grupo_tag_id')->references('id')->on('grupos_tags')->onDelete('cascade')->onUpdate('cascade');
             });
         });
